@@ -2,77 +2,64 @@
 
 namespace T4\Core;
 
-class Std implements \ArrayAccess, \Countable {
+class Std
+    extends \stdClass
+    implements \ArrayAccess, \Countable, IArrayable
+{
 
-    private $data = [];
-
-    public function __construct() {
+    public function __construct()
+    {
         set_error_handler([$this, 'errorHandler'], E_WARNING);
     }
 
-    public function isEmpty() {
-        return 0 === count($this->data);
-    }
-
-    public function errorHandler($errno, $errstr, $errfile, $errline, $errcontext) {
-        if ( 'Creating default object from empty value' == $errstr ) {
-            /*
-            if ( preg_match("/Indirect modification of overloaded property ([a-zA-Z0-9\\\\_]+)\:\:[\$]([\S]+) has no effect/i", $errcontext['php_errormsg'], $m) ) {
-                $this->{$m[2]} = new static;
-                return true;
-            }
-            */
+    public function errorHandler($errno, $errstr, $errfile, $errline, $errcontext)
+    {
+        if ('Creating default object from empty value' == $errstr && isset($errcontext['obj']) && $errcontext['obj'] instanceof static) {
             return true;
         }
         return false;
     }
 
     /**
-     * Object access implementation
-     */
-
-    public function __get($prop) {
-        return $this->data[$prop];
-    }
-
-    public function __set($prop, $value) {
-        $this->data[$prop] = $value;
-    }
-
-    public function __isset($prop) {
-        return isset($this->data[$prop]);
-    }
-
-    public function __unset($prop) {
-        unset($this->data[$prop]);
-    }
-
-    /**
      * ArrayAccess implementation
      */
 
-    public function offsetExists($offset) {
-        return isset($this->data[$offset]);
+    public function offsetExists($offset)
+    {
+        return isset($this->{$offset});
     }
 
-    public function offsetGet($offset) {
-        return $this->data[$offset];
+    public function offsetGet($offset)
+    {
+        return $this->{$offset};
     }
 
-    public function offsetSet($offset, $value) {
-        $this->data[$offset] = $value;
+    public function offsetSet($offset, $value)
+    {
+        $this->{$offset} = $value;
     }
 
-    public function offsetUnset($offset) {
-        unset($this->data[$offset]);
+    public function offsetUnset($offset)
+    {
+        unset($this->{$offset});
     }
 
     /**
      * Countable implementation
+     * @link http://php.net/manual/en/countable.count.php
+     * @return int The custom count as an integer.
+     * The return value is cast to an integer.
      */
-
-    public function count() {
-        return count($this->data);
+    public function count()
+    {
+        return count(get_object_vars($this));
     }
 
+    /**
+     * Arrayable implemetation
+     */
+    public function toArray()
+    {
+        return (array)$this;
+    }
 }
