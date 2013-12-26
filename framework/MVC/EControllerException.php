@@ -1,15 +1,11 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: Степанцев Альберт
- * Date: 26.12.13
- * Time: 14:55
- */
 
 namespace T4\MVC;
 
+use T4\Core\Exception;
+
 class EControllerException
-    extends \ErrorException
+    extends Exception
 {
 
 } 
