@@ -15,6 +15,9 @@ class Application
 
         try {
 
+            $route = Router::getInstance()->getRoute($_GET['__path']);
+            var_dump($route);
+
         } catch ( Exception $e ) {
 
         }

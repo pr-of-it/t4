@@ -1,0 +1,5 @@
+RewriteEngine on
+RewriteBase /
+
+RewriteRule ^([\/]?)$ index.php?__path=/ [QSA,L]
+RewriteRule ^(.*?)([\/]?)$ index.php?__path=$1 [QSA]
