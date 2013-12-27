@@ -5,7 +5,7 @@ namespace T4\MVC;
 use T4\Core\Std;
 
 
-class Controller
+abstract class Controller
 {
 
     /**
@@ -13,6 +13,7 @@ class Controller
      * @var \T4\Core\Std
      */
     public $data;
+
     /**
      * Ссылка на объект приложения
      * @var \T4\MVC\Application
@@ -35,13 +36,23 @@ class Controller
 
     }
 
-    final public function getActionParameters()
+    /**
+     * Возвращает список аргументов действия данного контроллера
+     * @param $name Имя действия
+     * @return array Список аргументов
+     * @throws EControllerException
+     */
+    final public function getActionParameters($name)
     {
-        $actionMethodName = 'action' . $name;
+        $actionMethodName = 'action' . ucfirst($name);
         if (method_exists($this, $actionMethodName)) {
-            $reflection = new \ReflectionFunction([$this, $actionMethodName]);
+            $reflection = new \ReflectionMethod($this, $actionMethodName);
             $params = $reflection->getParameters();
-            // TODO тут надо доделать
+            $ret = [];
+            foreach ($params as $param) {
+                $ret[] = $param->name;
+            }
+            return $ret;
         } else {
             throw new EControllerException('Action ' . $name . ' is not found in controller ' . get_class());
         }
@@ -50,11 +61,13 @@ class Controller
 
     final public function action($name, array $params = [])
     {
-        $actionMethodName = 'action' . $name;
+        $actionMethodName = 'action' . ucfirst($name);
         if (method_exists($this, $actionMethodName)) {
-            $this->beforeAction();
-            call_user_func_array([$this, $actionMethodName], $params);
-            $this->afterAction();
+            // Продолжаем выполнение действия только если из beforeAction не передано false
+            if ($this->beforeAction()) {
+                call_user_func_array([$this, $actionMethodName], $params);
+                $this->afterAction();
+            }
             return $this->data;
         } else {
             throw new EControllerException('Action ' . $name . ' is not found in controller ' . get_class());
