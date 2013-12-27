@@ -11,15 +11,14 @@ class Application
 
     protected $path = \ROOT_PATH;
 
-    public function run() {
+    public function run()
+    {
 
         try {
-
             $route = Router::getInstance()->getRoute($_GET['__path']);
-            var_dump($route);
-
-        } catch ( Exception $e ) {
-
+        } catch (Exception $e) {
+            echo $e->getMessage();
+            die;
         }
 
     }

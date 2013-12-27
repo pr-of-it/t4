@@ -60,6 +60,25 @@ class Std
      */
     public function toArray()
     {
-        return (array)$this;
+        $data = [];
+        foreach ( $this as $key => $value ) {
+            if ( $value instanceof static ) {
+                $data[$key] = $value->toArray();
+            } else {
+                $data[$key] = $value;
+            }
+        }
+        return $data;
+    }
+
+    public function fromArray(array $data) {
+        foreach ( $data as $key => $value ) {
+            if ( is_array($value) ) {
+                $this->{$key} = new static;
+                $this->{$key}->fromArray($value);
+            } else {
+                $this->{$key} = $value;
+            }
+        }
     }
 }
