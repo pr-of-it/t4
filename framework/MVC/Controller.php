@@ -28,7 +28,7 @@ abstract class Controller
 
     public function beforeAction()
     {
-
+        return true;
     }
 
     public function afterAction()
