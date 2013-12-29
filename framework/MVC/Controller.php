@@ -54,7 +54,7 @@ abstract class Controller
             }
             return $ret;
         } else {
-            throw new EControllerException('Action ' . $name . ' is not found in controller ' . get_class());
+            throw new EControllerException('Action ' . $name . ' is not found in controller ' . get_class($this));
         }
 
     }
@@ -70,7 +70,7 @@ abstract class Controller
             }
             return $this->data;
         } else {
-            throw new EControllerException('Action ' . $name . ' is not found in controller ' . get_class());
+            throw new EControllerException('Action ' . $name . ' is not found in controller ' . get_class($this));
         }
     }
 

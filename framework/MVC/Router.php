@@ -11,32 +11,55 @@ class Router
 {
     use TSingleton;
 
+    const PATH_PATTERN = '~^\/([^\/]*?)\/([^\/]*?)\/([^\/]*?)(\((.*)\))?$~';
+
+    const DEFAULT_CONTROLLER = 'Index';
+    const DEFAULT_ACTION = 'default';
+
+    /**
+     * Ссылка на объект приложения
+     * @var \T4\MVC\Application
+     */
+    protected $app;
+
+    private function __construct() {
+        $this->app = Application::getInstance();
+    }
+
     public function parseUrl($url)
     {
-        $routes = new Config(ROOT_PATH . DS . 'routes.php');
-        /*
-        foreach ($routes as $route) {
-            if (preg_match('#' . $route['path'] . '#', $url, $m)) {
-                return $route;
-            }
-        }
-        */
-        if ( isset($routes[$url]) ) {
-            // TODO: не работает регулярка!
-            if ( !preg_match('#\/([a-zA-Z0-9_-]*)\/([a-zA-Z0-9_-]+)\/([a-zA-Z0-9_-]+)#', $routes[$url]) )
-                throw new ERouterException('Invalid route \'' . $routes[$url] . '\' is not found');
+        $routes = $this->app->getRouteConfig();
+        if (isset($routes[$url])) {
+            if (!$this->checkPath($routes[$url]))
+                throw new ERouterException('Invalid route \'' . $routes[$url] . '\'');
             return $this->splitPath($routes[$url]);
         } else
             throw new ERouterException('Route to path \'' . $url . '\' is not found');
-
     }
 
-    protected function splitPath($path) {
-        $path = explode('/', $path);
+    protected function checkPath($path)
+    {
+        return preg_match(self::PATH_PATTERN, $path);
+    }
+
+    protected function splitPath($path)
+    {
+        preg_match(self::PATH_PATTERN, $path, $m);
+        $params = $m[5];
+        if ( !empty($params) ) {
+            $params = explode(',', $params);
+            $p = [];
+            foreach ($params as $pair) {
+                list($name, $value) = explode('=', $pair);
+                $p[$name] = $value;
+            }
+            $params = $p;
+        } else $params = [];
         return [
-            'module'        => $path[1],
-            'controller'    => $path[2],
-            'action'        => $path[3],
+            'module' => $m[1],
+            'controller' => $m[2] ?: self::DEFAULT_CONTROLLER,
+            'action' => $m[3] ?: self::DEFAULT_ACTION,
+            'params' => $params
         ];
     }
 
