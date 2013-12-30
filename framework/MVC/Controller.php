@@ -12,13 +12,13 @@ abstract class Controller
      * Данные, которые будут переданы фронт-контроллеру для вывода в нужном формате
      * @var \T4\Core\Std
      */
-    public $data;
+    protected $data;
 
     /**
      * Ссылка на объект приложения
      * @var \T4\MVC\Application
      */
-    protected $app;
+    public $app;
 
     final public function __construct()
     {
@@ -34,6 +34,11 @@ abstract class Controller
     public function afterAction()
     {
 
+    }
+
+    public function getData()
+    {
+        return $this->data;
     }
 
     /**

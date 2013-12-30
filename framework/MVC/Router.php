@@ -22,7 +22,8 @@ class Router
      */
     protected $app;
 
-    private function __construct() {
+    private function __construct()
+    {
         $this->app = Application::getInstance();
     }
 
@@ -30,9 +31,21 @@ class Router
     {
         $routes = $this->app->getRouteConfig();
         if (isset($routes[$url])) {
+
             if (!$this->checkPath($routes[$url]))
                 throw new ERouterException('Invalid route \'' . $routes[$url] . '\'');
-            return $this->splitPath($routes[$url]);
+
+            $route = $this->splitPath($routes[$url]);
+
+            switch (true) {
+                case false !== strpos('.html', $url):
+                default:
+                    $route['format'] = 'html';
+                    break;
+            }
+
+            return $route;
+
         } else
             throw new ERouterException('Route to path \'' . $url . '\' is not found');
     }
@@ -45,8 +58,9 @@ class Router
     protected function splitPath($path)
     {
         preg_match(self::PATH_PATTERN, $path, $m);
+
         $params = $m[5];
-        if ( !empty($params) ) {
+        if (!empty($params)) {
             $params = explode(',', $params);
             $p = [];
             foreach ($params as $pair) {
@@ -55,12 +69,14 @@ class Router
             }
             $params = $p;
         } else $params = [];
+
         return [
             'module' => $m[1],
-            'controller' => $m[2] ?: self::DEFAULT_CONTROLLER,
-            'action' => $m[3] ?: self::DEFAULT_ACTION,
+            'controller' => $m[2] ? : self::DEFAULT_CONTROLLER,
+            'action' => $m[3] ? : self::DEFAULT_ACTION,
             'params' => $params
         ];
+
     }
 
 }

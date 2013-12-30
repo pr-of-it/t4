@@ -14,11 +14,12 @@ class View
         $this->paths = (array)$paths;
         $loader = new \Twig_Loader_Filesystem($paths);
         $this->twig = new \Twig_Environment($loader);
+        $this->twig->addExtension(new TwigExtension());
     }
 
     public function render($template, $data = [])
     {
-        return $this->twig->render($template, $data->toArray());
+        return $this->twig->render($template, $data);
     }
 
 }
