@@ -16,7 +16,7 @@ class Application
     public $assets;
 
     private function __construct() {
-        $this->assets = new AssetsManager();
+        $this->assets = AssetsManager::getInstance();
     }
 
     public function run()

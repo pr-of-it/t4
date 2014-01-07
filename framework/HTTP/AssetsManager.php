@@ -3,18 +3,59 @@
 namespace T4\HTTP;
 
 
+use T4\Core\TSingleton;
+
 class AssetsManager
 {
 
-    public function __invoke($path) {
-        $dir = pathinfo(realpath(ROOT_PATH.$path), PATHINFO_DIRNAME);
-        $file = pathinfo(realpath(ROOT_PATH.$path), PATHINFO_BASENAME);
-        $hash = substr(md5($dir),0,16);
-        $symlink = ROOT_PATH.DS.'assets'.DS.$hash;
-        if ( !file_exists($symlink) ) {
-            symlink($dir, $symlink);
+    use TSingleton;
+
+    protected $assets = [];
+
+    public function __invoke($path)
+    {
+        if (!isset($this->assets[$path])) {
+            $this->assets[$path]['path'] = $this->makeRealPath($path);
+            $this->assets[$path]['url'] = $this->makeUrl($this->assets[$path]['path']);
         }
-        return $symlink.DS.$file;
+        return $this->assets[$path]['url'];
+    }
+
+    protected function makeRealPath($path)
+    {
+        return realpath(preg_replace(['/^\/\//', '/^\//'], [\T4\ROOT_PATH . DS, ROOT_PATH_PROTECTED . DS], $path));
+    }
+
+    protected function makeUrl($path)
+    {
+        $baseName = basename($path);
+        $basePath = pathinfo($path, PATHINFO_DIRNAME);
+        $basePathHash = substr(md5($basePath), 0, 12);
+        $assetPath = ROOT_PATH_PUBLIC . DS . 'assets' . DS . $basePathHash;
+        $assetUrl = '/assets/' . $basePathHash;
+        if (!$this->checkCopy($path, $assetPath . DS . $baseName)) {
+            $this->makeCopy($path, $assetPath . DS . $baseName);
+        }
+        return $assetUrl . '/' . $baseName;
+    }
+
+    protected function checkCopy($realPath, $assetPath)
+    {
+        if (!is_readable(dirname($assetPath)))
+            return false;
+        if (!is_readable($assetPath))
+            return false;
+        if (filemtime($realPath) >= filemtime($assetPath))
+            return false;
+        return true;
+    }
+
+    protected function makeCopy($realPath, $assetPath)
+    {
+        if (!is_readable(dirname($assetPath)))
+            mkdir(dirname($assetPath), 0777, true);
+        copy($realPath, $assetPath);
+        touch($assetPath);
     }
 
 }
