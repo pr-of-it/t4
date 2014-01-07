@@ -11,7 +11,7 @@ class Application
 {
     use TSingleton;
 
-    public $path = \ROOT_PATH;
+    public $path = \ROOT_PATH_PROTECTED;
 
     public $assets;
 
