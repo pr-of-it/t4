@@ -3,6 +3,7 @@
 namespace T4\HTTP;
 
 
+use T4\Core\Log;
 use T4\Core\TSingleton;
 
 class AssetsManager
@@ -41,12 +42,15 @@ class AssetsManager
 
     protected function checkCopy($realPath, $assetPath)
     {
-        if (!is_readable(dirname($assetPath)))
+        if (!is_readable(dirname($assetPath))) {
             return false;
-        if (!is_readable($assetPath))
+        }
+        if (!is_readable($assetPath)) {
             return false;
-        if (filemtime($realPath) >= filemtime($assetPath))
+        }
+        if (filemtime($realPath) >= filemtime($assetPath)) {
             return false;
+        }
         return true;
     }
 
