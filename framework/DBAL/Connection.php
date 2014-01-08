@@ -29,6 +29,10 @@ class Connection {
         }
     }
 
+    public function getDriverName() {
+        return (string) $this->config->driver;
+    }
+
     /**
      * @param $sql
      * @return \PDOStatement
