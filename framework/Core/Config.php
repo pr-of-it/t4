@@ -1,7 +1,7 @@
 <?php
 
 namespace T4\Core;
-use T4\Core\EConfigException;
+use T4\Core\Exception;
 
 
 class Config extends Std {
@@ -9,7 +9,7 @@ class Config extends Std {
     public function __construct($path=null) {
         if ( null !== $path ) {
             if ( !is_readable($path) )
-                throw new EConfigException('Config file ' . $path . ' is not found or is not readable');
+                throw new Exception('Config file ' . $path . ' is not found or is not readable');
             $this->fromArray(include($path));
         }
     }
