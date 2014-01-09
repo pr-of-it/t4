@@ -23,7 +23,7 @@ abstract class Model
      * table: table name
      * @var array
      */
-    static $schema = [];
+    static protected $schema = [];
 
     /**
      * Имя таблицы в БД, соответствующей данной модели
