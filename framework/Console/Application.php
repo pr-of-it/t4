@@ -11,12 +11,10 @@ class Application {
 
     public function run()
     {
-        global $argc, $argv;
-
         echo "Console test...\n";
-        echo "argc=" . $argc . "\n";
+        echo "argc=" . $_SERVER['argc'] . "\n";
         echo "argv=\n";
-        var_dump($argv);
+        var_dump($_SERVER['argv']);
         echo "Echo test ... ";
         $line = trim(fgets(STDIN));
         echo $line;
