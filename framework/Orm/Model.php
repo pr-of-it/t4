@@ -21,9 +21,11 @@ abstract class Model
      * Схема модели
      * db*: name of DB connection from application config
      * table: table name
+     * colums[] : colums
+     * - type
      * @var array
      */
-    static $schema = [];
+    static protected $schema = [];
 
     /**
      * Имя таблицы в БД, соответствующей данной модели
@@ -53,5 +55,8 @@ abstract class Model
         return $connection;
     }
 
+    public static function getColumns() {
+        return static::$schema['columns'];
+    }
 
 }

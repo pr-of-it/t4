@@ -53,4 +53,11 @@ class Connection {
         return $statement;
     }
 
+    /**
+     * @return string
+     */
+    public function lastInsertId() {
+        return $this->pdo->lastInsertId();
+    }
+
 }

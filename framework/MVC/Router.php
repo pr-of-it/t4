@@ -59,7 +59,7 @@ class Router
     {
         preg_match(self::PATH_PATTERN, $path, $m);
 
-        $params = $m[5];
+        $params = isset($m[5]) ? $m[5] : '';
         if (!empty($params)) {
             $params = explode(',', $params);
             $p = [];
