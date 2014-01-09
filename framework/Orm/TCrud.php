@@ -12,6 +12,7 @@ trait TCrud
     public function setNew($new)
     {
         $this->isNew = $new;
+        return $this;
     }
 
     public function isNew()
@@ -22,6 +23,7 @@ trait TCrud
     public function setDeleted($deleted)
     {
         $this->isDeleted = $deleted;
+        return $this;
     }
 
     public function isDeleted()
@@ -51,6 +53,7 @@ trait TCrud
         $driver = static::getDbDriver();
         $driver->save($this);
         $this->setNew(false);
+        return $this;
     }
 
     public function delete()

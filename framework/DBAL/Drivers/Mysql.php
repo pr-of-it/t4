@@ -10,6 +10,19 @@ class Mysql
     implements IDriver
 {
 
+    protected $types = [
+        'pk' => 'bigint(20) unsigned NOT NULL AUTO_INCREMENT',
+        'int' => 'int(11) NOT NULL',
+        'float' => 'float NOT NULL',
+        'string' => 'varchar(255) NOT NULL',
+        'text' => '',
+        'money' => '',
+    ];
+
+    public function convertAbstractType($type, $params=[]) {
+
+    }
+
     public function findAllByColumn($class, $column, $value)
     {
         $connection = $class::getDbConnection();
