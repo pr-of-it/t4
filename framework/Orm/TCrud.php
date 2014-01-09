@@ -14,9 +14,19 @@ trait TCrud
         $this->isNew = $new;
     }
 
+    public function isNew()
+    {
+        return $this->isNew;
+    }
+
     public function setDeleted($deleted)
     {
         $this->isDeleted = $deleted;
+    }
+
+    public function isDeleted()
+    {
+        return $this->isDeleted;
     }
 
     public static function findAllByColumn($column, $value)
@@ -38,12 +48,16 @@ trait TCrud
 
     public function save()
     {
-        $this->isNew = false;
+        $driver = static::getDbDriver();
+        $driver->save($this);
+        $this->setNew(false);
     }
 
     public function delete()
     {
-        $this->isDeleted = true;
+        $driver = static::getDbDriver();
+        $driver->delete($this);
+        $this->setDeleted(true);
     }
 
 }
