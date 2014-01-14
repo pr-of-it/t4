@@ -8,6 +8,18 @@ class Command {
 
     const DEFAULT_ACTION = 'default';
 
+    /**
+     * Ссылка на объект приложения
+     * @var \T4\Console\Application
+     */
+    public $app;
+
+    final public function __construct()
+    {
+        $this->app = Application::getInstance();
+    }
+
+
     public function beforeAction()
     {
         return true;

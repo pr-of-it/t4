@@ -3,8 +3,11 @@
 namespace T4\Console;
 
 
+use T4\Core\Config;
 use T4\Core\Exception;
+use T4\Core\Std;
 use T4\Core\TSingleton;
+use T4\Dbal\Connection;
 
 class Application
 {
@@ -14,6 +17,23 @@ class Application
     const CMD_PATTERN = '~^(\/?)([^\/]*?)(\/([^\/]*?))?$~';
     const OPTION_PATTERN = '~^--(.+)=(.*)$~';
     const DEFAULT_ACTION = 'default';
+
+    public $db;
+
+    private function __construct()
+    {
+        $this->config = new Config(ROOT_PATH_PROTECTED . DS . 'config.php');
+        try {
+            $this->db = new Std();
+            foreach ($this->config->db as $connection => $connectionConfig) {
+                $this->db[$connection] = new Connection($connectionConfig);
+            }
+        } catch (\T4\Dbal\Exception $e) {
+            echo $e->getMessage();
+            die;
+        }
+    }
+
 
     public function run()
     {
