@@ -22,6 +22,8 @@ class Application
 
             $route = $this->parseCmd($_SERVER['argv']);
             $commandClassName = $route['namespace'] . '\\Commands\\' . ucfirst($route['command']);
+            if (!class_exists($commandClassName))
+                throw new Exception('Command class ' . $commandClassName . ' is not found');
             $command = new $commandClassName;
             $command->action($route['action']);
 
