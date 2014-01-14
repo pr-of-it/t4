@@ -12,6 +12,7 @@ class Application
     use TSingleton;
 
     const CMD_PATTERN = '~^(\/?)([^\/]*?)(\/([^\/]*?))?$~';
+    const OPTION_PATTERN = '~^--(.+)=(.*)$~';
     const DEFAULT_ACTION = 'default';
 
     public function run()
@@ -20,20 +21,14 @@ class Application
         try {
 
             $route = $this->parseCmd($_SERVER['argv']);
-            var_dump($route);
-            die;
+            $commandClassName = $route['namespace'] . '\\Commands\\' . ucfirst($route['command']);
+            $command = new $commandClassName;
+            $command->action($route['action']);
 
         } catch (Exception $e) {
             die($e->getMessage());
         }
 
-        echo "Console test...\n";
-        echo "argc=" . $_SERVER['argc'] . "\n";
-        echo "argv=\n";
-        var_dump($_SERVER['argv']);
-        echo "Echo test ... ";
-        $line = trim(fgets(STDIN));
-        echo $line;
     }
 
     protected function parseCmd($argv)
@@ -46,11 +41,18 @@ class Application
         $actionName = isset($m[4]) ? $m[4] : self::DEFAULT_ACTION;
         $rootCommand = !empty($m[1]);
 
+        $options = [];
+        foreach ($argv as $arg) {
+            if (preg_match(self::OPTION_PATTERN, $arg, $m)) {
+                $options[$m[1]] = $m[2];
+            }
+        }
+
         return [
             'namespace' => $rootCommand ? 'T4' : 'App',
-            'command'   => $commandName,
-            'action'    => $actionName,
-            'params'    => $argv,
+            'command' => $commandName,
+            'action' => $actionName,
+            'params' => $options,
         ];
 
     }

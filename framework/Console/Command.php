@@ -18,4 +18,18 @@ class Command {
 
     }
 
+    final public function action($name, array $params = [])
+    {
+        $actionMethodName = 'action' . ucfirst($name);
+        if (method_exists($this, $actionMethodName)) {
+            // Продолжаем выполнение действия только если из beforeAction не передано false
+            if ($this->beforeAction()) {
+                call_user_func_array([$this, $actionMethodName], $params);
+                $this->afterAction();
+            }
+        } else {
+            throw new Exception('Action ' . $name . ' is not found in command ' . get_class($this));
+        }
+    }
+
 }
