@@ -5,7 +5,8 @@ namespace T4\Dbal;
 
 use T4\Core\Config;
 
-class Connection {
+class Connection
+{
 
     /**
      * Конфигурация соединения
@@ -19,25 +20,29 @@ class Connection {
      */
     protected $pdo;
 
-    public function __construct (Config $config) {
+    public function __construct(Config $config)
+    {
         $this->config = $config;
         try {
-            $dsn = $config->driver.':host='.$config->host.';dbname='.$config->dbname;
+            $dsn = $config->driver . ':host=' . $config->host . ';dbname=' . $config->dbname;
             $this->pdo = new \PDO($dsn, $config->user, $config->password);
-        } catch ( \PDOException $e) {
+            $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        } catch (\PDOException $e) {
             throw new Exception($e->getMessage());
         }
     }
 
-    public function getDriverName() {
-        return (string) $this->config->driver;
+    public function getDriverName()
+    {
+        return (string)$this->config->driver;
     }
 
     /**
      * @param $sql
      * @return \PDOStatement
      */
-    protected function prepare($sql) {
+    protected function prepare($sql)
+    {
         $statement = $this->pdo->prepare($sql);
         return $statement;
     }
@@ -47,7 +52,8 @@ class Connection {
      * @param array $params
      * @return \PDOStatement
      */
-    public function execute($sql, array $params=[]) {
+    public function execute($sql, array $params = [])
+    {
         $statement = $this->pdo->prepare($sql);
         $statement->execute($params);
         return $statement;
@@ -56,7 +62,8 @@ class Connection {
     /**
      * @return string
      */
-    public function lastInsertId() {
+    public function lastInsertId()
+    {
         return $this->pdo->lastInsertId();
     }
 

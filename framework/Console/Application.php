@@ -37,7 +37,6 @@ class Application
 
     public function run()
     {
-
         try {
 
             $route = $this->parseCmd($_SERVER['argv']);
@@ -50,7 +49,6 @@ class Application
         } catch (Exception $e) {
             die($e->getMessage());
         }
-
     }
 
     protected function parseCmd($argv)
