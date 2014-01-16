@@ -26,7 +26,7 @@ class Connection
         try {
             $dsn = $config->driver . ':host=' . $config->host . ';dbname=' . $config->dbname;
             $this->pdo = new \PDO($dsn, $config->user, $config->password);
-            $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+            $this->pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
         } catch (\PDOException $e) {
             throw new Exception($e->getMessage());
         }
