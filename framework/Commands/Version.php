@@ -10,7 +10,8 @@ class Version
     extends Command
 {
 
-    public function actionDefault() {
+    public function actionDefault()
+    {
         echo \T4\VERSION;
     }
 

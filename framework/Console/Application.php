@@ -44,7 +44,20 @@ class Application
             if (!class_exists($commandClassName))
                 throw new Exception('Command class ' . $commandClassName . ' is not found');
             $command = new $commandClassName;
-            $command->action($route['action']);
+
+            $reflection = new \ReflectionMethod($command, 'action' . ucfirst($route['action']));
+            if ($reflection->getNumberOfRequiredParameters() != count($route['params']))
+                throw new Exception('Invalid required parameters count for command');
+            $actionParams = $reflection->getParameters();
+            $params = [];
+            foreach ($actionParams as $actionParam) {
+                if (!$actionParam->isOptional() && !isset($route['params'][$actionParam->name])) {
+                    throw new Exception('Required parameter ' . $actionParam->name . ' is not set');
+                }
+                $params[$actionParam->name] = $route['params'][$actionParam->name];
+            }
+
+            $command->action($route['action'], $params);
 
         } catch (Exception $e) {
             die($e->getMessage());
