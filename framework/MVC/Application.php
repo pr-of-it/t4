@@ -49,8 +49,8 @@ class Application
             switch ($route['format']) {
                 case 'html':
                     $view = new View([
-                        $this->getPath() . DS . 'templates' . DS . $route['controller'],
-                        $this->getPath() . DS . 'layouts'
+                        $this->getPath() . DS . 'Templates' . DS . $route['controller'],
+                        $this->getPath() . DS . 'Layouts'
                     ]);
                     $stream = $view->render($route['action'] . '.' . $route['format'], ['this' => $controller] + (array)$controller->getData());
                     echo $stream;
