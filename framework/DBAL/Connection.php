@@ -55,6 +55,17 @@ class Connection
     public function execute($sql, array $params = [])
     {
         $statement = $this->pdo->prepare($sql);
+        return $statement->execute($params);
+    }
+
+    /**
+     * @param $sql
+     * @param array $params
+     * @return \PDOStatement
+     */
+    public function query($sql, array $params = [])
+    {
+        $statement = $this->pdo->prepare($sql);
         $statement->execute($params);
         return $statement;
     }

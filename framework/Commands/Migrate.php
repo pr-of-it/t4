@@ -27,7 +27,7 @@ class Migrate
 
     protected function isInstalled() {
         // TODO: заменить на вызов через драйвер
-        $st = $this->app->db->default->execute('SHOW TABLES LIKE \'' . self::TABLE_NAME . '\'');
+        $st = $this->app->db->default->query('SHOW TABLES LIKE \'' . self::TABLE_NAME . '\'');
         if ( [] == $st->fetchAll() )
             return false;
         else

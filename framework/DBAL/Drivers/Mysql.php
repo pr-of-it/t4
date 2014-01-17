@@ -32,7 +32,7 @@ class Mysql
             WHERE
                 `' . $column . '`=:value
         ';
-        $statement = $connection->execute($sql, [':value' => $value]);
+        $statement = $connection->query($sql, [':value' => $value]);
         $result = $statement->fetchAll(\PDO::FETCH_CLASS, $class);
         if (!empty($result)) {
             $ret = new Collection($result);
@@ -53,7 +53,7 @@ class Mysql
                 `' . $column . '`=:value
             LIMIT 1
         ';
-        $statement = $connection->execute($sql, [':value' => $value]);
+        $statement = $connection->query($sql, [':value' => $value]);
         $result = $statement->fetchObject($class);
         if (!empty($result))
             $result->setNew(false);
