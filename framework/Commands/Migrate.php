@@ -10,6 +10,7 @@ class Migrate
 {
 
     const TABLE_NAME = 'migrations';
+    const CLASS_NAME_PATTERN = 'm_%d_%s';
 
     public function actionDefault()
     {
@@ -28,8 +29,33 @@ class Migrate
         }
     }
 
-    public function actionCreate($name) {
-        echo $name;
+    public function actionCreate($name)
+    {
+        $className = sprintf(self::CLASS_NAME_PATTERN, time(), $name);
+        $content = <<<FILE
+<?php
+
+namespace App\Migrations;
+
+
+use T4\Orm\Migration;
+
+class {$className}
+    extends Migration
+{
+
+    public function up()
+    {
+    }
+
+    public function down()
+    {
+    }
+
+}
+FILE;
+        file_put_contents(ROOT_PATH_PROTECTED.DS.'Migrations'.DS.$className.'.php', $content);
+        echo 'Migration '.$className.' is created in '.ROOT_PATH_PROTECTED.DS.'Migrations'.DS.$className.'.php';
     }
 
     public function actionDown()
