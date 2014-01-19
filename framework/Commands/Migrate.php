@@ -54,8 +54,9 @@ class {$className}
 
 }
 FILE;
-        file_put_contents(ROOT_PATH_PROTECTED.DS.'Migrations'.DS.$className.'.php', $content);
-        echo 'Migration '.$className.' is created in '.ROOT_PATH_PROTECTED.DS.'Migrations'.DS.$className.'.php';
+        $fileName = ROOT_PATH_PROTECTED.DS.'Migrations'.DS.$className.'.php';
+        file_put_contents($fileName, $content);
+        echo 'Migration '.$className.' is created in '.dirname($fileName);
     }
 
     public function actionDown()
