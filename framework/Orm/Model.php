@@ -43,14 +43,14 @@ abstract class Model
 
     public static function getDbDriver()
     {
-        $dbConnectionName = static::$schema['db'];
+        $dbConnectionName = static::$schema['db'] ?: 'default';
         $driver = \T4\MVC\Application::getInstance()->config->db->{$dbConnectionName}->driver;
         return DriverFactory::getDriver($driver);
     }
 
     public static function getDbConnection()
     {
-        $dbConnectionName = static::$schema['db'];
+        $dbConnectionName = static::$schema['db'] ?: 'default';
         $connection = \T4\MVC\Application::getInstance()->db[$dbConnectionName];
         return $connection;
     }
