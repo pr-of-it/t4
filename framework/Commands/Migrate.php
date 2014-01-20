@@ -10,7 +10,10 @@ class Migrate
 {
 
     const TABLE_NAME = 'migrations';
+    const MIGRATIONS_NAMESPACE = 'App\\Migrations';
     const CLASS_NAME_PATTERN = 'm_%d_%s';
+    const SEARCH_FILE_NAME_PATTERN = 'm_%s_%s';
+    const NAME_PARSE_PATTERN = '~m_(\d+)~';
 
     public function actionDefault()
     {
@@ -26,16 +29,18 @@ class Migrate
         $migrations = $this->getMigrationsAfter($lastMigrationTime);
         foreach ($migrations as $migration) {
             $migration->up();
+            echo $migration->getName() . ' is up successfully'."\n";
         }
     }
 
     public function actionCreate($name)
     {
         $className = sprintf(self::CLASS_NAME_PATTERN, time(), $name);
+        $namespace = self::MIGRATIONS_NAMESPACE;
         $content = <<<FILE
 <?php
 
-namespace App\Migrations;
+namespace {$namespace};
 
 use T4\Orm\Migration;
 
@@ -53,9 +58,9 @@ class {$className}
 
 }
 FILE;
-        $fileName = ROOT_PATH_PROTECTED.DS.'Migrations'.DS.$className.'.php';
+        $fileName = $this->getMigrationsPath().DS.$className.'.php';
         file_put_contents($fileName, $content);
-        echo 'Migration '.$className.' is created in '.dirname($fileName);
+        echo 'Migration '.$className.' is created in '.$this->getMigrationsPath();
     }
 
     public function actionDown()
@@ -86,6 +91,11 @@ FILE;
         echo 'Migration table `' . self::TABLE_NAME . '` is created' . "\n";
     }
 
+    protected function getMigrationsPath()
+    {
+        return ROOT_PATH_PROTECTED.DS.'Migrations';
+    }
+
     protected function getLastTime()
     {
         $st = $this->app->db->default->query('
@@ -103,7 +113,17 @@ FILE;
 
     protected function getMigrationsAfter($time)
     {
-        return [];
+        $migrations = [];
+        foreach ( glob($this->getMigrationsPath().DS.sprintf(self::SEARCH_FILE_NAME_PATTERN, '*', '*').'.php') as $fileName ) {
+            if (preg_match(self::NAME_PARSE_PATTERN, $fileName, $m)) {
+                $migrationTime = (int)$m[1];
+                if ($migrationTime > $time) {
+                    $className = self::MIGRATIONS_NAMESPACE.'\\'.pathinfo($fileName, PATHINFO_FILENAME);
+                    $migrations[] = new $className;
+                }
+            }
+        }
+        return $migrations;
     }
 
 }

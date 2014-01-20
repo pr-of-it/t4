@@ -21,6 +21,12 @@ abstract class Migration
         $this->db = $app->db->{$db};
     }
 
+    final public function getName() {
+        $className = get_class($this);
+        preg_match('~\\\\([^\\\\]+?)$~', $className, $m);
+        return $m[1];
+    }
+
     abstract public function up();
 
     abstract public function down();
