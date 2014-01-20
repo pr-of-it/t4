@@ -5,6 +5,7 @@ namespace T4\Commands;
 
 use T4\Console\Command;
 use T4\Console\Exception;
+use T4\Orm\Model;
 
 class Migrate
     extends Command
@@ -89,7 +90,7 @@ FILE;
         // TODO: заменить на вызов через драйвер
         $this->app->db->default->execute('
             CREATE TABLE  `' . self::TABLE_NAME . '` (
-            `__id` SERIAL,
+            `' . Model::PK . '` SERIAL,
               `time` int(10) unsigned NOT NULL,
               UNIQUE KEY `time` (`time`)
             )
@@ -107,7 +108,7 @@ FILE;
         $st = $this->app->db->default->query('
             SELECT `time`
             FROM `' . self::TABLE_NAME . '`
-            ORDER BY `__id` DESC
+            ORDER BY `' . Model::PK . '` DESC
             LIMIT 1
         ');
         $row = $st->fetch(\PDO::FETCH_OBJ);
