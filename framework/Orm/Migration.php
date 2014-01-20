@@ -3,11 +3,15 @@
 namespace T4\Orm;
 
 
+use T4\Dbal\Connection;
 use T4\MVC\Application;
 
 abstract class Migration
 {
 
+    /**
+     * @var Connection
+     */
     protected $db;
 
     final public function __construct()
@@ -31,8 +35,25 @@ abstract class Migration
 
     abstract public function down();
 
-    final protected function createTable($tableName, $columns=[], $indexes=[]) {
-        echo 'Creating table `'.$tableName.'` with '.count($columns).' columns and '.count($indexes).' indexes'."\n";
+    final protected function createTable($tableName, $columns=[], $indexes=[])
+    {
+        $driver = $this->db->getDriver();
+        $driver->createTable($this->db, $tableName, $columns, $indexes);
+        echo 'Table `' . $tableName . '` is created'."\n";
     }
 
-} 
+    final protected function truncateTable($tableName)
+    {
+        $driver = $this->db->getDriver();
+        $driver->truncateTable($this->db, $tableName);
+        echo 'Table ' . $tableName . ' is truncated'."\n";
+    }
+
+    final protected function dropTable($tableName)
+    {
+        $driver = $this->db->getDriver();
+        $driver->dropTable($this->db, $tableName);
+        echo 'Table ' . $tableName . ' is dropped'."\n";
+    }
+
+}

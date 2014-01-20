@@ -4,23 +4,64 @@ namespace T4\Dbal\Drivers;
 
 
 use T4\Core\Collection;
+use T4\Dbal\Connection;
 use T4\Dbal\IDriver;
+use T4\Orm\Model;
 
 class Mysql
     implements IDriver
 {
 
-    protected $types = [
-        'pk' => 'bigint(20) unsigned NOT NULL AUTO_INCREMENT',
-        'int' => 'int(11) NOT NULL',
-        'float' => 'float NOT NULL',
-        'string' => 'varchar(255) NOT NULL',
-        'text' => '',
-        'money' => '',
-    ];
+    protected function createColumnDDL($options) {
+        switch ($options['type']) {
+            case 'pk':
+                return 'SERIAL';
+                break;
+            case 'int':
+                return 'INT(11) NOT NULL';
+                break;
+            case 'float':
+                return 'FLOAT NOT NULL';
+                break;
+            case 'text':
+                return 'TEXT';
+                break;
+            case 'string':
+            default:
+                return 'VARCHAR(' . ( isset($options['length']) ? (int)$options['length'] : 255 ) . ') NOT NULL';
+                break;
+        }
+    }
 
-    public function convertAbstractType($type, $params=[]) {
+    public function createTable(Connection $connection, $tableName, $columns=[], $indexes=[])
+    {
+        $sql = 'CREATE TABLE `'.$tableName.'`';
 
+        $columnsDDL = [];
+        $hasPK = false;
+        foreach ( $columns as $name => $options ) {
+            $columnsDDL[] = '`'.$name.'` ' . $this->createColumnDDL($options);
+            if ('pk' == $options['type']) {
+                $hasPK = true;
+            }
+        }
+        if (!$hasPK) {
+            array_unshift($columnsDDL, '`' . Model::PK . '` ' . $this->createColumnDDL(['type'=>'pk']));
+        }
+
+        $sql .= ' ( '.implode(', ', $columnsDDL).' )';
+        $connection->execute($sql);
+
+    }
+
+    public function truncateTable(Connection $connection, $tableName)
+    {
+        $connection->execute('TRUNCATE TABLE `'.$tableName.'`');
+    }
+
+    public function dropTable(Connection $connection, $tableName)
+    {
+        $connection->execute('DROP TABLE `'.$tableName.'`');
     }
 
     public function findAllByColumn($class, $column, $value)

@@ -32,9 +32,20 @@ class Connection
         }
     }
 
+    /**
+     * @return string
+     */
     public function getDriverName()
     {
         return (string)$this->config->driver;
+    }
+
+    /**
+     * @return IDriver
+     */
+    public function getDriver()
+    {
+        return DriverFactory::getDriver($this->getDriverName());
     }
 
     /**

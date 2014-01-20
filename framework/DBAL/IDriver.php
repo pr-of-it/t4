@@ -5,8 +5,11 @@ namespace T4\Dbal;
 
 interface IDriver
 {
+    public function createTable(Connection $connection, $tableName, $columns=[], $indexes=[]);
 
-    public function convertAbstractType($type, $params=[]);
+    public function truncateTable(Connection $connection, $tableName);
+
+    public function dropTable(Connection $connection, $tableName);
 
     public function findAllByColumn($class, $column, $value);
 
@@ -16,4 +19,4 @@ interface IDriver
 
     public function delete($model);
 
-} 
+}

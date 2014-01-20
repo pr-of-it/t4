@@ -60,7 +60,7 @@ class Application
             $command->action($route['action'], $params);
 
         } catch (Exception $e) {
-            die($e->getMessage());
+            die('ERROR: '. $e->getMessage());
         }
     }
 

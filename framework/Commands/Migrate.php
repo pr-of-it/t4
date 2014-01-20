@@ -4,6 +4,7 @@ namespace T4\Commands;
 
 
 use T4\Console\Command;
+use T4\Console\Exception;
 
 class Migrate
     extends Command
@@ -22,14 +23,19 @@ class Migrate
 
     public function actionUp()
     {
-        if (!$this->isInstalled()) {
-            $this->install();
-        }
-        $lastMigrationTime = $this->getLastTime();
-        $migrations = $this->getMigrationsAfter($lastMigrationTime);
-        foreach ($migrations as $migration) {
-            $migration->up();
-            echo $migration->getName() . ' is up successfully'."\n";
+        try {
+            if (!$this->isInstalled()) {
+                $this->install();
+            }
+            $lastMigrationTime = $this->getLastTime();
+            $migrations = $this->getMigrationsAfter($lastMigrationTime);
+            foreach ($migrations as $migration) {
+                echo $migration->getName() . ' up...'."\n";
+                $migration->up();
+                echo $migration->getName() . ' is up successfully'."\n";
+            }
+        } catch (\PDOException $e) {
+            throw new Exception($e->getMessage());
         }
     }
 
