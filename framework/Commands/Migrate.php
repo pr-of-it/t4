@@ -16,7 +16,6 @@ class Migrate
     const MIGRATIONS_NAMESPACE = 'App\\Migrations';
     const CLASS_NAME_PATTERN = 'm_%d_%s';
     const SEARCH_FILE_NAME_PATTERN = 'm_%s_%s';
-    const NAME_PARSE_PATTERN = '~m_(\d+)~';
 
     public function actionDefault()
     {
@@ -31,10 +30,10 @@ class Migrate
             }
             $migrations = $this->getMigrationsAfter($this->getLastTime());
             foreach ($migrations as $migration) {
-                echo $migration->getName() . ' up...'."\n";
+                echo $migration->getName() . ' up...' . "\n";
                 $migration->up();
                 $this->save($migration);
-                echo $migration->getName() . ' is up successfully'."\n";
+                echo $migration->getName() . ' is up successfully' . "\n";
             }
         } catch (\PDOException $e) {
             throw new Exception($e->getMessage());
@@ -71,9 +70,9 @@ class {$className}
 
 }
 FILE;
-        $fileName = $this->getMigrationsPath().DS.$className.'.php';
+        $fileName = $this->getMigrationsPath() . DS . $className . '.php';
         file_put_contents($fileName, $content);
-        echo 'Migration '.$className.' is created in '.$this->getMigrationsPath();
+        echo 'Migration ' . $className . ' is created in ' . $this->getMigrationsPath();
     }
 
     protected function isInstalled()
@@ -101,7 +100,7 @@ FILE;
 
     protected function getMigrationsPath()
     {
-        return ROOT_PATH_PROTECTED.DS.'Migrations';
+        return ROOT_PATH_PROTECTED . DS . 'Migrations';
     }
 
     protected function getLastTime()
@@ -122,19 +121,18 @@ FILE;
     protected function getMigrationsAfter($time)
     {
         $migrations = [];
-        foreach ( glob($this->getMigrationsPath().DS.sprintf(self::SEARCH_FILE_NAME_PATTERN, '*', '*').'.php') as $fileName ) {
-            if (preg_match(self::NAME_PARSE_PATTERN, $fileName, $m)) {
-                $migrationTime = (int)$m[1];
-                if ($migrationTime > $time) {
-                    $className = self::MIGRATIONS_NAMESPACE.'\\'.pathinfo($fileName, PATHINFO_FILENAME);
-                    $migrations[] = new $className;
-                }
+        foreach (glob($this->getMigrationsPath() . DS . sprintf(self::SEARCH_FILE_NAME_PATTERN, '*', '*') . '.php') as $fileName) {
+            $className = self::MIGRATIONS_NAMESPACE . '\\' . pathinfo($fileName, PATHINFO_FILENAME);
+            $migration = new $className;
+            if ($migration->getTimestamp() > $time) {
+                $migrations[] = $migration;
             }
         }
         return $migrations;
     }
 
-    protected function save(Migration $migration) {
+    protected function save(Migration $migration)
+    {
         $this->app->db->default->execute('
             INSERT INTO `' . self::TABLE_NAME . '`
             (`time`)

@@ -15,7 +15,10 @@ class Mysql
     protected function createColumnDDL($options) {
         switch ($options['type']) {
             case 'pk':
-                return 'SERIAL';
+                return 'BIGINT UNSIGNED NOT NULL AUTO_INCREMENT';
+                break;
+            case 'relation':
+                return 'BIGINT UNSIGNED NOT NULL DEFAULT \'0\'';
                 break;
             case 'int':
                 return 'INT(11) NOT NULL';
@@ -38,18 +41,25 @@ class Mysql
         $sql = 'CREATE TABLE `'.$tableName.'`';
 
         $columnsDDL = [];
+        $indexesDDL = [];
+
         $hasPK = false;
         foreach ( $columns as $name => $options ) {
             $columnsDDL[] = '`'.$name.'` ' . $this->createColumnDDL($options);
             if ('pk' == $options['type']) {
+                $indexesDDL[] = 'PRIMARY KEY (`' . $name . '`)';
                 $hasPK = true;
             }
         }
         if (!$hasPK) {
             array_unshift($columnsDDL, '`' . Model::PK . '` ' . $this->createColumnDDL(['type'=>'pk']));
+            $indexesDDL[] = 'PRIMARY KEY (`' . Model::PK . '`)';
         }
 
-        $sql .= ' ( '.implode(', ', $columnsDDL).' )';
+        $sql .= ' ( ' .
+            implode(', ', $columnsDDL) . ', ' .
+            implode(', ', $indexesDDL) .
+        ' )';
         $connection->execute($sql);
 
     }
