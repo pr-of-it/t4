@@ -5,6 +5,7 @@ namespace T4\Commands;
 
 use T4\Console\Command;
 use T4\Console\Exception;
+use T4\Orm\Migration;
 use T4\Orm\Model;
 
 class Migrate
@@ -28,16 +29,21 @@ class Migrate
             if (!$this->isInstalled()) {
                 $this->install();
             }
-            $lastMigrationTime = $this->getLastTime();
-            $migrations = $this->getMigrationsAfter($lastMigrationTime);
+            $migrations = $this->getMigrationsAfter($this->getLastTime());
             foreach ($migrations as $migration) {
                 echo $migration->getName() . ' up...'."\n";
                 $migration->up();
+                $this->save($migration);
                 echo $migration->getName() . ' is up successfully'."\n";
             }
         } catch (\PDOException $e) {
             throw new Exception($e->getMessage());
         }
+    }
+
+    public function actionDown()
+    {
+
     }
 
     public function actionCreate($name)
@@ -68,11 +74,6 @@ FILE;
         $fileName = $this->getMigrationsPath().DS.$className.'.php';
         file_put_contents($fileName, $content);
         echo 'Migration '.$className.' is created in '.$this->getMigrationsPath();
-    }
-
-    public function actionDown()
-    {
-
     }
 
     protected function isInstalled()
@@ -131,6 +132,14 @@ FILE;
             }
         }
         return $migrations;
+    }
+
+    protected function save(Migration $migration) {
+        $this->app->db->default->execute('
+            INSERT INTO `' . self::TABLE_NAME . '`
+            (`time`)
+            VALUES (\'' . $migration->getTimestamp() . '\')
+        ');
     }
 
 }

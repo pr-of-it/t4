@@ -31,6 +31,11 @@ abstract class Migration
         return $m[1];
     }
 
+    final public function getTimestamp() {
+        preg_match('~m_(\d+)_~', $this->getName(), $m);
+        return (int)$m[1];
+    }
+
     abstract public function up();
 
     abstract public function down();
