@@ -32,8 +32,8 @@ class AssetsManager
         $baseName = basename($path);
         $basePath = pathinfo($path, PATHINFO_DIRNAME);
         $basePathHash = substr(md5($basePath), 0, 12);
-        $assetPath = ROOT_PATH_PUBLIC . DS . 'assets' . DS . $basePathHash;
-        $assetUrl = '/assets/' . $basePathHash;
+        $assetPath = ROOT_PATH_PUBLIC . DS . 'Assets' . DS . $basePathHash;
+        $assetUrl = '/Assets/' . $basePathHash;
         if (!$this->checkCopy($path, $assetPath . DS . $baseName)) {
             $this->makeCopy($path, $assetPath . DS . $baseName);
         }
