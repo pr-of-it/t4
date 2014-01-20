@@ -128,11 +128,8 @@ FILE;
             ORDER BY `' . Model::PK . '` DESC
             LIMIT 1
         ');
-        $row = $st->fetch(\PDO::FETCH_OBJ);
-        if (!empty($row))
-            return $row->time;
-        else
-            return 0;
+        $time = $st->fetchScalar() ?: 0;
+        return $time;
     }
 
     protected function getMigrationsAfter($time)
