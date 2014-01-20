@@ -27,6 +27,7 @@ class Connection
             $dsn = $config->driver . ':host=' . $config->host . ';dbname=' . $config->dbname;
             $this->pdo = new \PDO($dsn, $config->user, $config->password);
             $this->pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
+            $this->pdo->setAttribute(\PDO::ATTR_STATEMENT_CLASS, [__NAMESPACE__.'\\Statement']);
         } catch (\PDOException $e) {
             throw new Exception($e->getMessage());
         }
@@ -50,7 +51,7 @@ class Connection
 
     /**
      * @param $sql
-     * @return \PDOStatement
+     * @return Statement
      */
     protected function prepare($sql)
     {
@@ -61,7 +62,7 @@ class Connection
     /**
      * @param $sql
      * @param array $params
-     * @return \PDOStatement
+     * @return Statement
      */
     public function execute($sql, array $params = [])
     {
@@ -72,7 +73,7 @@ class Connection
     /**
      * @param $sql
      * @param array $params
-     * @return \PDOStatement
+     * @return Statement
      */
     public function query($sql, array $params = [])
     {

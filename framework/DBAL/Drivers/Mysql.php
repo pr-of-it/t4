@@ -74,6 +74,7 @@ class Mysql
                 `' . $column . '`=:value
         ';
         $statement = $connection->query($sql, [':value' => $value]);
+        // TODO: изгнать отюда \PDO
         $result = $statement->fetchAll(\PDO::FETCH_CLASS, $class);
         if (!empty($result)) {
             $ret = new Collection($result);

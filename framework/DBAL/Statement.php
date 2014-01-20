@@ -1,9 +1,6 @@
 <?php
-/**
- * Пока не используется, потому что непонятно, как к нему привести вообще PDOStatement
- */
 
-namespace T4\DBAL;
+namespace T4\Dbal;
 
 
 class Statement
