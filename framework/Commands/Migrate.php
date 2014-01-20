@@ -17,6 +17,12 @@ class Migrate
     const CLASS_NAME_PATTERN = 'm_%d_%s';
     const SEARCH_FILE_NAME_PATTERN = 'm_%s_%s';
 
+    protected function getMigrationsPath()
+    {
+        return ROOT_PATH_PROTECTED . DS . 'Migrations';
+    }
+
+
     public function actionDefault()
     {
         $this->actionUp();
@@ -42,7 +48,23 @@ class Migrate
 
     public function actionDown()
     {
+        if (!$this->isInstalled()) {
+            throw new Exception('Migrations are not installed. Use t4 /migrate command to install ones.');
+        }
 
+        $migration = $this->getLastMigration();
+        if ( false === $migration) {
+            throw new Exception('No migrations to down');
+        }
+
+        try {
+            echo $migration->getName() . ' down...' . "\n";
+            $migration->down();
+            $this->delete($migration);
+            echo $migration->getName() . ' is down successfully' . "\n";
+        } catch (\PDOException $e) {
+            throw new Exception($e->getMessage());
+        }
     }
 
     public function actionCreate($name)
@@ -98,11 +120,6 @@ FILE;
         echo 'Migration table `' . self::TABLE_NAME . '` is created' . "\n";
     }
 
-    protected function getMigrationsPath()
-    {
-        return ROOT_PATH_PROTECTED . DS . 'Migrations';
-    }
-
     protected function getLastTime()
     {
         $st = $this->app->db->default->query('
@@ -131,12 +148,35 @@ FILE;
         return $migrations;
     }
 
+    protected function getLastMigration()
+    {
+        $lastMigrationTime = $this->getLastTime();
+        if (empty($lastMigrationTime))
+            return false;
+
+        foreach (glob($this->getMigrationsPath() . DS . sprintf(self::CLASS_NAME_PATTERN, $lastMigrationTime, '*') . '.php') as $fileName) {
+            $className = self::MIGRATIONS_NAMESPACE . '\\' . pathinfo($fileName, PATHINFO_FILENAME);
+            $migration = new $className;
+            break;
+        }
+
+        return $migration;
+    }
+
     protected function save(Migration $migration)
     {
         $this->app->db->default->execute('
             INSERT INTO `' . self::TABLE_NAME . '`
             (`time`)
             VALUES (\'' . $migration->getTimestamp() . '\')
+        ');
+    }
+
+    protected function delete(Migration $migration)
+    {
+        $this->app->db->default->execute('
+            DELETE FROM `' . self::TABLE_NAME . '`
+            WHERE `time`=\'' . $migration->getTimestamp() . '\'
         ');
     }
 
