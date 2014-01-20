@@ -37,7 +37,6 @@ class Migrate
 
 namespace App\Migrations;
 
-
 use T4\Orm\Migration;
 
 class {$className}
