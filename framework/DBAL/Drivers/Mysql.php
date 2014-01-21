@@ -36,6 +36,22 @@ class Mysql
         }
     }
 
+    protected function createIndexDDL($name, $options) {
+        if (is_numeric($name))
+            $name = implode('_', $options['columns']);
+        if ( !isset($options['type']) )
+            $options['type'] = '';
+        $ddl = '`'.$name.'` (`' . implode('`,`', $options['columns']) . '`)';
+        switch ( $options['type'] ) {
+            case 'unique':
+                return 'UNIQUE INDEX ' . $ddl;
+                break;
+            default:
+                return 'INDEX ' . $ddl;
+                break;
+        }
+    }
+
     public function createTable(Connection $connection, $tableName, $columns=[], $indexes=[])
     {
         $sql = 'CREATE TABLE `'.$tableName.'`';
@@ -54,6 +70,10 @@ class Mysql
         if (!$hasPK) {
             array_unshift($columnsDDL, '`' . Model::PK . '` ' . $this->createColumnDDL(['type'=>'pk']));
             $indexesDDL[] = 'PRIMARY KEY (`' . Model::PK . '`)';
+        }
+
+        foreach ( $indexes as $name => $options ) {
+            $indexesDDL[] = $this->createIndexDDL($name, $options);
         }
 
         $sql .= ' ( ' .

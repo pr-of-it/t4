@@ -53,7 +53,7 @@ class Migrate
         }
 
         $migration = $this->getLastMigration();
-        if ( false === $migration) {
+        if (false === $migration) {
             throw new Exception('No migrations to down');
         }
 
@@ -128,7 +128,7 @@ FILE;
             ORDER BY `' . Model::PK . '` DESC
             LIMIT 1
         ');
-        $time = $st->fetchScalar() ?: 0;
+        $time = $st->fetchScalar() ? : 0;
         return $time;
     }
 
