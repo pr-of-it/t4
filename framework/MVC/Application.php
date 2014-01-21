@@ -16,6 +16,10 @@ class Application
     public $path = \ROOT_PATH_PROTECTED;
 
     public $config;
+
+    /**
+     * @var Std
+     */
     public $db;
 
     public $assets;
@@ -27,7 +31,7 @@ class Application
         try {
             $this->db = new Std;
             foreach ($this->config->db as $connection => $connectionConfig) {
-                $this->db[$connection] = new Connection($connectionConfig);
+                $this->db->{$connection} = new Connection($connectionConfig);
             }
         } catch (\T4\Dbal\Exception $e) {
             echo $e->getMessage();

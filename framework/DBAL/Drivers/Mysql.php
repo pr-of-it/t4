@@ -104,8 +104,34 @@ class Mysql
         foreach ( $columns as $name ) {
             $columnsDDL[] = 'DROP COLUMN `'.$name.'`';
         }
-        echo $sql .= ' ' .
+        $sql .= ' ' .
             implode(', ', $columnsDDL) .
+        '';
+        $connection->execute($sql);
+    }
+
+    public function addIndex(Connection $connection, $tableName, array $indexes)
+    {
+        $sql = 'ALTER TABLE `'.$tableName.'`';
+        $indexesDDL = [];
+        foreach ( $indexes as $name => $options ) {
+            $indexesDDL[] = 'ADD ' . $this->createIndexDDL($name, $options);
+        }
+        $sql .= ' ' .
+            implode(', ', $indexesDDL) .
+        '';
+        $connection->execute($sql);
+    }
+
+    public function dropIndex(Connection $connection, $tableName, array $indexes)
+    {
+        $sql = 'ALTER TABLE `'.$tableName.'`';
+        $indexesDDL = [];
+        foreach ( $indexes as $name ) {
+            $indexesDDL[] = 'DROP INDEX `'.$name.'`';
+        }
+        $sql .= ' ' .
+            implode(', ', $indexesDDL) .
         '';
         $connection->execute($sql);
     }

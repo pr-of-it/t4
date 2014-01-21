@@ -76,4 +76,19 @@ abstract class Migration
         echo 'Table `' . $tableName . '` is altered: columns `'.implode('`,`', $columns).'` are dropped'."\n";
     }
 
+    final protected function addIndex($tableName, $indexes)
+    {
+        $driver = $this->db->getDriver();
+        $driver->addIndex($this->db, $tableName, $indexes);
+        echo 'Table `' . $tableName . '` is altered: indexes `'.implode('`,`', array_keys($indexes)).'` are added'."\n";
+    }
+
+    final protected function dropIndex($tableName, $indexes)
+    {
+        $indexes = (array)$indexes;
+        $driver = $this->db->getDriver();
+        $driver->dropIndex($this->db, $tableName, $indexes);
+        echo 'Table `' . $tableName . '` is altered: indexes `'.implode('`,`', $indexes).'` are dropped'."\n";
+    }
+
 }

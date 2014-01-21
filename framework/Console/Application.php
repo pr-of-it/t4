@@ -18,6 +18,9 @@ class Application
     const OPTION_PATTERN = '~^--(.+)=(.*)$~';
     const DEFAULT_ACTION = 'default';
 
+    /**
+     * @var \T4\Core\Std $db
+     */
     public $db;
 
     private function __construct()
@@ -26,7 +29,7 @@ class Application
         try {
             $this->db = new Std();
             foreach ($this->config->db as $connection => $connectionConfig) {
-                $this->db[$connection] = new Connection($connectionConfig);
+                $this->db->{$connection} = new Connection($connectionConfig);
             }
         } catch (\T4\Dbal\Exception $e) {
             echo $e->getMessage();

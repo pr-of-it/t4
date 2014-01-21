@@ -128,7 +128,7 @@ FILE;
             ORDER BY `' . Model::PK . '` DESC
             LIMIT 1
         ');
-        $time = $st->fetchScalar() ? : 0;
+        $time = $st->fetchScalar() ?: 0;
         return $time;
     }
 
