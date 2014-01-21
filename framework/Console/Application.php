@@ -43,12 +43,16 @@ class Application
         try {
 
             $route = $this->parseCmd($_SERVER['argv']);
+
             $commandClassName = $route['namespace'] . '\\Commands\\' . ucfirst($route['command']);
             if (!class_exists($commandClassName))
                 throw new Exception('Command class ' . $commandClassName . ' is not found');
             $command = new $commandClassName;
+            $actionMethodName = 'action' . ucfirst($route['action']);
+            if (!method_exists($command, $actionMethodName))
+                throw new Exception('Action ' . $route['action'] . ' is not found in command class ' . $commandClassName . '');
 
-            $reflection = new \ReflectionMethod($command, 'action' . ucfirst($route['action']));
+            $reflection = new \ReflectionMethod($command, $actionMethodName);
             if ($reflection->getNumberOfRequiredParameters() != count($route['params']))
                 throw new Exception('Invalid required parameters count for command');
             $actionParams = $reflection->getParameters();

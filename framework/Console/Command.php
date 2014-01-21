@@ -44,4 +44,11 @@ class Command {
         }
     }
 
+    protected function read()
+    {
+        $line = fgets(STDIN);
+        $line = str_replace(["\n", "\r"], '', $line);
+        return $line;
+    }
+
 }
