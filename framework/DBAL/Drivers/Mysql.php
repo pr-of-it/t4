@@ -84,6 +84,32 @@ class Mysql
 
     }
 
+    public function addColumn(Connection $connection, $tableName, array $columns)
+    {
+        $sql = 'ALTER TABLE `'.$tableName.'`';
+        $columnsDDL = [];
+        foreach ( $columns as $name => $options ) {
+            $columnsDDL[] = 'ADD COLUMN `'.$name.'` ' . $this->createColumnDDL($options);
+        }
+        $sql .= ' ' .
+            implode(', ', $columnsDDL) .
+        '';
+        $connection->execute($sql);
+    }
+
+    public function dropColumn(Connection $connection, $tableName, array $columns)
+    {
+        $sql = 'ALTER TABLE `'.$tableName.'`';
+        $columnsDDL = [];
+        foreach ( $columns as $name ) {
+            $columnsDDL[] = 'DROP COLUMN `'.$name.'`';
+        }
+        echo $sql .= ' ' .
+            implode(', ', $columnsDDL) .
+        '';
+        $connection->execute($sql);
+    }
+
     public function truncateTable(Connection $connection, $tableName)
     {
         $connection->execute('TRUNCATE TABLE `'.$tableName.'`');

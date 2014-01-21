@@ -61,4 +61,19 @@ abstract class Migration
         echo 'Table ' . $tableName . ' is dropped'."\n";
     }
 
+    final protected function addColumn($tableName, $columns)
+    {
+        $driver = $this->db->getDriver();
+        $driver->addColumn($this->db, $tableName, $columns);
+        echo 'Table `' . $tableName . '` is altered: columns `'.implode('`,`', array_keys($columns)).'` are added'."\n";
+    }
+
+    final protected function dropColumn($tableName, $columns)
+    {
+        $columns = (array)$columns;
+        $driver = $this->db->getDriver();
+        $driver->dropColumn($this->db, $tableName, $columns);
+        echo 'Table `' . $tableName . '` is altered: columns `'.implode('`,`', array_keys($columns)).'` are dropped'."\n";
+    }
+
 }
