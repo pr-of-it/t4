@@ -25,6 +25,10 @@ class Application
 
     private function __construct()
     {
+        if ( !is_readable(ROOT_PATH_PROTECTED . DS . 'config.php') ) {
+            echo 'Application is not installed. Install it using "t4 /app/create" command'."\n";
+            return;
+        }
         $this->config = new Config(ROOT_PATH_PROTECTED . DS . 'config.php');
         try {
             $this->db = new Std();
