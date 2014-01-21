@@ -73,7 +73,7 @@ abstract class Migration
         $columns = (array)$columns;
         $driver = $this->db->getDriver();
         $driver->dropColumn($this->db, $tableName, $columns);
-        echo 'Table `' . $tableName . '` is altered: columns `'.implode('`,`', array_keys($columns)).'` are dropped'."\n";
+        echo 'Table `' . $tableName . '` is altered: columns `'.implode('`,`', $columns).'` are dropped'."\n";
     }
 
 }
