@@ -44,15 +44,23 @@ class Command {
         }
     }
 
-    protected function read($message, $default='')
+    protected function read($message, $default='', $echo=true)
     {
         echo $message . ( !empty($default) ? ' ['.$default.']' : '' ) . ': ';
         $line = fgets(STDIN);
         $line = str_replace(["\n", "\r"], '', $line);
+
         if (empty($line))
-            return $default;
+            $val = $default;
         else
-            return $line;
+            $val = $line;
+
+        if ($echo) {
+            echo '---> '.$val."\n";
+        }
+
+        return $val;
+
     }
 
 }

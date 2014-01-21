@@ -48,6 +48,12 @@ class Helpers
 
     }
 
+    /**
+     * Копирует рекурсивно содержимое папки-источника в заданную
+     * @param $src Папка-источник
+     * @param $dst Папка-приемник
+     * @throws \T4\Core\Exception
+     */
     public static function copyDir($src, $dst)
     {
         $src = realpath($src);
