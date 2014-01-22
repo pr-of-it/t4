@@ -22,6 +22,8 @@ class Router
      */
     protected $app;
 
+    protected $extensions = ['.html', '.json'];
+
     private function __construct()
     {
         $this->app = Application::getInstance();
@@ -29,25 +31,28 @@ class Router
 
     public function parseUrl($url)
     {
-        $routes = $this->app->getRouteConfig();
-        if (isset($routes[$url])) {
 
-            if (!$this->checkPath($routes[$url]))
-                throw new ERouterException('Invalid route \'' . $routes[$url] . '\'');
-
-            $route = $this->splitPath($routes[$url]);
-
-            switch (true) {
-                case false !== strpos('.html', $url):
-                default:
-                    $route['format'] = 'html';
-                    break;
+        $baseUrl = str_replace($this->extensions, '', $url) ?: '/';
+        $urlExtension = '';
+        foreach ($this->extensions as $ext) {
+            if (false !== strpos($url, $ext)) {
+                $urlExtension = $ext;
+                break;
             }
+        }
 
+        $routes = $this->app->getRouteConfig();
+        if (isset($routes[$baseUrl])) {
+            if (!$this->checkPath($routes[$baseUrl])) {
+                throw new ERouterException('Invalid route \'' . $routes[$baseUrl] . '\'');
+            }
+            $route = $this->splitPath($routes[$baseUrl]);
+            $route['format'] = $urlExtension ? substr($urlExtension, 1): 'html';
             return $route;
+        } else {
+            throw new ERouterException('Route to path \'' . $baseUrl . '\' is not found');
+        }
 
-        } else
-            throw new ERouterException('Route to path \'' . $url . '\' is not found');
     }
 
     protected function checkPath($path)

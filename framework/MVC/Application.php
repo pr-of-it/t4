@@ -45,7 +45,6 @@ class Application
         try {
 
             $route = Router::getInstance()->parseUrl($_GET['__path']);
-
             $controllerClass = '\\App\\Controllers\\' . $route['controller'];
             $controller = new $controllerClass;
             $controller->action($route['action']);
@@ -56,8 +55,17 @@ class Application
                         $this->getPath() . DS . 'Templates' . DS . $route['controller'],
                         $this->getPath() . DS . 'Layouts'
                     ]);
-                    $stream = $view->render($route['action'] . '.' . $route['format'], ['this' => $controller] + (array)$controller->getData());
-                    echo $stream;
+                    $view->display($route['action'] . '.' . $route['format'], ['this' => $controller] + (array)$controller->getData());
+                    break;
+                case 'json':
+                    header('Content-Type: application/json');
+                    echo json_encode($controller->getData());
+                    die;
+                default:
+                    $view = new View([
+                        $this->getPath() . DS . 'Templates' . DS . $route['controller'],
+                    ]);
+                    $view->display($route['action'] . '.' . $route['format'], ['this' => $controller] + (array)$controller->getData());
                     break;
             }
 

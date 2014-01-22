@@ -22,4 +22,9 @@ class View
         return $this->twig->render($template, $data);
     }
 
+    public function display($template, $data = [])
+    {
+        $this->twig->display($template, $data);
+    }
+
 }
