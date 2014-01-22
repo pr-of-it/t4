@@ -24,7 +24,7 @@ class View
 
     public function display($template, $data = [])
     {
-        $this->twig->display($template, $data);
+        $this->twig->display($template, (array)$data);
     }
 
 }

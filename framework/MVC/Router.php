@@ -2,10 +2,8 @@
 
 namespace T4\MVC;
 
+use T4\Core\Std;
 use T4\Core\TSingleton;
-use T4\Core\Config;
-
-use T4\MVC\ERouterException;
 
 class Router
 {
@@ -29,10 +27,17 @@ class Router
         $this->app = Application::getInstance();
     }
 
+    /**
+     * Разбирает URL, поступивший из браузера,
+     * используя метод разбора внутреннего пути.
+     * Возвращает объект роутинга
+     * @param string $url
+     * @return \T4\Core\Std
+     * @throws \T4\MVC\ERouterException
+     */
     public function parseUrl($url)
     {
 
-        $baseUrl = str_replace($this->extensions, '', $url) ?: '/';
         $urlExtension = '';
         foreach ($this->extensions as $ext) {
             if (false !== strpos($url, $ext)) {
@@ -40,21 +45,28 @@ class Router
                 break;
             }
         }
+        $baseUrl = str_replace($urlExtension, '', $url) ? : '/';
 
         $routes = $this->app->getRouteConfig();
         if (isset($routes[$baseUrl])) {
             $route = $this->splitInternalPath($routes[$baseUrl]);
-            $route['format'] = $urlExtension ? substr($urlExtension, 1): 'html';
+            $route->format = $urlExtension ? substr($urlExtension, 1) : 'html';
             return $route;
-        } else {
-            throw new ERouterException('Route to path \'' . $baseUrl . '\' is not found');
         }
+        throw new ERouterException('Route to path \'' . $baseUrl . '\' is not found');
 
     }
 
+    /**
+     * Разбирает внутренний путь /модуль/контроллер/действие(параметры)
+     * Возвращает объект роутинга
+     * @param string $path
+     * @return \T4\Core\Std
+     * @throws \T4\MVC\ERouterException
+     */
     public function splitInternalPath($path)
     {
-        if ( !preg_match(self::INTERNAL_PATH_PATTERN, $path, $m) ) {
+        if (!preg_match(self::INTERNAL_PATH_PATTERN, $path, $m)) {
             throw new ERouterException('Invalid route \'' . $routes[$baseUrl] . '\'');
         };
 
@@ -69,12 +81,12 @@ class Router
             $params = $p;
         } else $params = [];
 
-        return [
+        return new Std([
             'module' => $m[1],
             'controller' => $m[2] ? : self::DEFAULT_CONTROLLER,
             'action' => $m[3] ? : self::DEFAULT_ACTION,
             'params' => $params
-        ];
+        ]);
 
     }
 

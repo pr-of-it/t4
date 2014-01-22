@@ -7,9 +7,12 @@ class Std
     implements \ArrayAccess, \Countable, IArrayable
 {
 
-    public function __construct()
+    public function __construct(array $data=[])
     {
         set_error_handler([$this, 'errorHandler'], E_WARNING);
+        if (!empty($data)) {
+            $this->fromArray($data);
+        }
     }
 
     public function errorHandler($errno, $errstr, $errfile, $errline, $errcontext)

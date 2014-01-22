@@ -2,10 +2,10 @@
 
 namespace T4\MVC;
 
-use T4\Core\Std;
-use T4\Core\TSingleton;
 use T4\Core\Config;
 use T4\Core\Exception;
+use T4\Core\Std;
+use T4\Core\TSingleton;
 use T4\Dbal\Connection;
 use T4\HTTP\AssetsManager;
 
@@ -52,13 +52,8 @@ class Application
 
             $route = Router::getInstance()->parseUrl($_GET['__path']);
             $controller = $this->call($route);
-            /*
-            $controllerClass = '\\App\\Controllers\\' . $route['controller'];
-            $controller = new $controllerClass;
-            $controller->action($route['action']);
-            */
 
-            switch ($route['format']) {
+            switch ($route->format) {
                 case 'json':
                     header('Content-Type: application/json');
                     echo json_encode($controller->getData());
@@ -66,11 +61,11 @@ class Application
                 default:
                 case 'html':
                     $view = new View([
-                        $this->getPath() . DS . 'Templates' . DS . $route['controller'],
+                        $this->getPath() . DS . 'Templates' . DS . $route->controller,
                         $this->getPath() . DS . 'Layouts'
                     ]);
                     header('Content-Type: text/html; charset=utf-8');
-                    $view->display($route['action'] . '.' . $route['format'], ['this' => $controller] + (array)$controller->getData());
+                    $view->display($route->action.'.'.$route->format, $controller->getData());
                     break;
             }
 
@@ -99,7 +94,7 @@ class Application
      * Внутренний запрос к controller-action-params по внутреннему пути
      * Возвращает данные от контроллера
      * @param string $internalPath
-     * @return Std
+     * @return \T4\Core\Std
      */
     public function request($internalPath)
     {
@@ -111,13 +106,14 @@ class Application
     /**
      * Вызывает controller-action-params в соответствии с переданным массивом роутинга
      * Возвращает весь объект контроллера
-     * @param array $route
+     * @param \T4\Core\Std $route
      * @return \T4\MVC\Controller
      */
-    protected function call(array $route) {
-        $controllerClass = '\\App\\Controllers\\' . $route['controller'];
+    protected function call(Std $route)
+    {
+        $controllerClass = '\\App\\Controllers\\' . $route->controller;
         $controller = new $controllerClass;
-        $controller->action($route['action']);
+        $controller->action($route->action);
         return $controller;
     }
 
