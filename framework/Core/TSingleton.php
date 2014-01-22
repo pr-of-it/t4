@@ -6,12 +6,12 @@ namespace T4\Core;
 trait TSingleton
 {
 
-    private function __construct()
+    protected function __construct()
     {
 
     }
 
-    private function __clone()
+    protected function __clone()
     {
 
     }

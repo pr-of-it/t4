@@ -56,6 +56,7 @@ class AssetsManager
 
     protected function makeCopy($realPath, $assetPath)
     {
+        // TODO: переписать через FS\Helpers
         if (!is_readable(dirname($assetPath)))
             mkdir(dirname($assetPath), 0777, true);
         copy($realPath, $assetPath);
