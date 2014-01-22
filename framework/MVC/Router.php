@@ -11,7 +11,7 @@ class Router
 {
     use TSingleton;
 
-    const PATH_PATTERN = '~^\/([^\/]*?)\/([^\/]*?)\/([^\/]*?)(\((.*)\))?$~';
+    const INTERNAL_PATH_PATTERN = '~^\/([^\/]*?)\/([^\/]*?)\/([^\/]*?)(\((.*)\))?$~';
 
     const DEFAULT_CONTROLLER = 'Index';
     const DEFAULT_ACTION = 'default';
@@ -43,10 +43,7 @@ class Router
 
         $routes = $this->app->getRouteConfig();
         if (isset($routes[$baseUrl])) {
-            if (!$this->checkPath($routes[$baseUrl])) {
-                throw new ERouterException('Invalid route \'' . $routes[$baseUrl] . '\'');
-            }
-            $route = $this->splitPath($routes[$baseUrl]);
+            $route = $this->splitInternalPath($routes[$baseUrl]);
             $route['format'] = $urlExtension ? substr($urlExtension, 1): 'html';
             return $route;
         } else {
@@ -55,14 +52,11 @@ class Router
 
     }
 
-    protected function checkPath($path)
+    public function splitInternalPath($path)
     {
-        return preg_match(self::PATH_PATTERN, $path);
-    }
-
-    protected function splitPath($path)
-    {
-        preg_match(self::PATH_PATTERN, $path, $m);
+        if ( !preg_match(self::INTERNAL_PATH_PATTERN, $path, $m) ) {
+            throw new ERouterException('Invalid route \'' . $routes[$baseUrl] . '\'');
+        };
 
         $params = isset($m[5]) ? $m[5] : '';
         if (!empty($params)) {

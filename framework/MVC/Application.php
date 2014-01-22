@@ -51,9 +51,12 @@ class Application
         try {
 
             $route = Router::getInstance()->parseUrl($_GET['__path']);
+            $controller = $this->call($route);
+            /*
             $controllerClass = '\\App\\Controllers\\' . $route['controller'];
             $controller = new $controllerClass;
             $controller->action($route['action']);
+            */
 
             switch ($route['format']) {
                 case 'json':
@@ -90,6 +93,32 @@ class Application
     public function getRouteConfig()
     {
         return new Config($this->getPath() . DS . 'routes.php');
+    }
+
+    /**
+     * Внутренний запрос к controller-action-params по внутреннему пути
+     * Возвращает данные от контроллера
+     * @param string $internalPath
+     * @return Std
+     */
+    public function request($internalPath)
+    {
+        $route = Router::getInstance()->splitInternalPath($internalPath);
+        $controller = $this->call($route);
+        return $controller->getData();
+    }
+
+    /**
+     * Вызывает controller-action-params в соответствии с переданным массивом роутинга
+     * Возвращает весь объект контроллера
+     * @param array $route
+     * @return \T4\MVC\Controller
+     */
+    protected function call(array $route) {
+        $controllerClass = '\\App\\Controllers\\' . $route['controller'];
+        $controller = new $controllerClass;
+        $controller->action($route['action']);
+        return $controller;
     }
 
 }
