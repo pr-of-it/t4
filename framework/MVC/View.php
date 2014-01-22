@@ -2,6 +2,7 @@
 
 namespace T4\MVC;
 
+use T4\Core\Std;
 
 class View
 {
@@ -22,7 +23,7 @@ class View
         return $this->twig->render($template, $data);
     }
 
-    public function display($template, $data = [])
+    public function display($template, Std $data)
     {
         $this->twig->display($template, (array)$data);
     }

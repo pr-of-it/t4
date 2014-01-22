@@ -51,12 +51,12 @@ class Application
         try {
 
             $route = Router::getInstance()->parseUrl($_GET['__path']);
-            $controller = $this->call($route);
+            $data = $this->call($route)->getData();
 
             switch ($route->format) {
                 case 'json':
                     header('Content-Type: application/json');
-                    echo json_encode($controller->getData());
+                    echo json_encode($data);
                     die;
                 default:
                 case 'html':
@@ -65,7 +65,7 @@ class Application
                         $this->getPath() . DS . 'Layouts'
                     ]);
                     header('Content-Type: text/html; charset=utf-8');
-                    $view->display($route->action.'.'.$route->format, $controller->getData());
+                    $view->display($route->action.'.'.$route->format, $data);
                     break;
             }
 
