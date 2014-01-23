@@ -51,7 +51,7 @@ class Application
         try {
 
             $route = Router::getInstance()->parseUrl($_GET['__path']);
-            $controller = $this->getController($route->controller);
+            $controller = $this->createController($route->controller);
             $controller->action($route->action, $route->params);
 
             switch ($route->format) {
@@ -96,7 +96,7 @@ class Application
      * @param string $controller
      * @return \T4\MVC\Controller
      */
-    protected function getController($controller)
+    protected function createController($controller)
     {
         $controllerClass = '\\App\\Controllers\\' . $controller;
         $controller = new $controllerClass;
