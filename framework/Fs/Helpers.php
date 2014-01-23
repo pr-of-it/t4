@@ -3,27 +3,26 @@
 
 namespace T4\Fs;
 
-
-use T4\Core\Exception;
-
 class Helpers
 {
 
 
     /**
      * Копирует файл в заданный файл или папку
-     * @param $src Путь к файлу-источнику
-     * @param $dst Путь к файлу или папке назначения
+     * @param string $src Путь к файлу-источнику
+     * @param string $dst Путь к файлу или папке назначения
      * @param int $mode Права доступа, которые будут установлены после копирования
      * @return int Длина файла
-     * @throws Exception
+     * @throws \T4\Fs\Exception
      */
     public static function copyFile($src, $dst, $mode = 0644)
     {
+        if ($src == $dst) {
+            throw new Exception('Source and destination are the same file');
+        }
         if (!is_readable($src)) {
             throw new Exception('File ' . $src . ' is not readable');
         }
-
         if (is_dir($dst)) {
             if (!is_readable($dst)) {
                 throw new Exception('Dir ' . $dst . ' is not readable');
@@ -52,7 +51,7 @@ class Helpers
      * Копирует рекурсивно содержимое папки-источника в заданную
      * @param $src Папка-источник
      * @param $dst Папка-приемник
-     * @throws \T4\Core\Exception
+     * @throws \T4\Fs\Exception
      */
     public static function copyDir($src, $dst)
     {
