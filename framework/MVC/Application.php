@@ -7,7 +7,7 @@ use T4\Core\Exception;
 use T4\Core\Std;
 use T4\Core\TSingleton;
 use T4\Dbal\Connection;
-use T4\HTTP\AssetsManager;
+use T4\Http\AssetsManager;
 
 class Application
 {
@@ -26,7 +26,7 @@ class Application
     public $db;
 
     /**
-     * @var \T4\HTTP\AssetsManager
+     * @var \T4\Http\AssetsManager
      */
     public $assets;
 
