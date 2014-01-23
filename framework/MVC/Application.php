@@ -51,12 +51,13 @@ class Application
         try {
 
             $route = Router::getInstance()->parseUrl($_GET['__path']);
-            $data = $this->call($route)->getData();
+            $controller = $this->getController($route->controller);
+            $controller->action($route->action, $route->params);
 
             switch ($route->format) {
                 case 'json':
                     header('Content-Type: application/json');
-                    echo json_encode($data);
+                    echo json_encode($controller->getData());
                     die;
                 default:
                 case 'html':
@@ -65,7 +66,7 @@ class Application
                         $this->getPath() . DS . 'Layouts'
                     ]);
                     header('Content-Type: text/html; charset=utf-8');
-                    $view->display($route->action.'.'.$route->format, $data);
+                    $view->display($route->action . '.' . $route->format, $controller->getData());
                     break;
             }
 
@@ -91,29 +92,14 @@ class Application
     }
 
     /**
-     * Внутренний запрос к controller-action-params по внутреннему пути
-     * Возвращает данные от контроллера
-     * @param string $internalPath
-     * @return \T4\Core\Std
-     */
-    public function request($internalPath)
-    {
-        $route = Router::getInstance()->splitInternalPath($internalPath);
-        $controller = $this->call($route);
-        return $controller->getData();
-    }
-
-    /**
-     * Вызывает controller-action-params в соответствии с переданным массивом роутинга
-     * Возвращает весь объект контроллера
-     * @param \T4\Core\Std $route
+     * Возвращает экземпляр контроллера согласно объекту роутинга
+     * @param string $controller
      * @return \T4\MVC\Controller
      */
-    protected function call(Std $route)
+    protected function getController($controller)
     {
-        $controllerClass = '\\App\\Controllers\\' . $route->controller;
+        $controllerClass = '\\App\\Controllers\\' . $controller;
         $controller = new $controllerClass;
-        $controller->action($route->action);
         return $controller;
     }
 

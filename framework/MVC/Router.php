@@ -2,7 +2,6 @@
 
 namespace T4\MVC;
 
-use T4\Core\Std;
 use T4\Core\TSingleton;
 
 class Router
@@ -22,7 +21,7 @@ class Router
 
     protected $extensions = ['.html', '.json'];
 
-    private function __construct()
+    protected  function __construct()
     {
         $this->app = Application::getInstance();
     }
@@ -32,7 +31,7 @@ class Router
      * используя метод разбора внутреннего пути.
      * Возвращает объект роутинга
      * @param string $url
-     * @return \T4\Core\Std
+     * @return \T4\MVC\Route
      * @throws \T4\MVC\ERouterException
      */
     public function parseUrl($url)
@@ -61,10 +60,10 @@ class Router
      * Разбирает внутренний путь /модуль/контроллер/действие(параметры)
      * Возвращает объект роутинга
      * @param string $path
-     * @return \T4\Core\Std
+     * @return \T4\MVC\Route
      * @throws \T4\MVC\ERouterException
      */
-    public function splitInternalPath($path)
+    protected function splitInternalPath($path)
     {
         if (!preg_match(self::INTERNAL_PATH_PATTERN, $path, $m)) {
             throw new ERouterException('Invalid route \'' . $routes[$baseUrl] . '\'');
@@ -81,7 +80,7 @@ class Router
             $params = $p;
         } else $params = [];
 
-        return new Std([
+        return new Route([
             'module' => $m[1],
             'controller' => $m[2] ? : self::DEFAULT_CONTROLLER,
             'action' => $m[3] ? : self::DEFAULT_ACTION,
