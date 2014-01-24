@@ -64,13 +64,13 @@ abstract class Controller
 
     }
 
-    final public function action($name, array $params = [])
+    final public function action($name, $params = [])
     {
         $actionMethodName = 'action' . ucfirst($name);
         if (method_exists($this, $actionMethodName)) {
             // Продолжаем выполнение действия только если из beforeAction не передано false
             if ($this->beforeAction()) {
-                call_user_func_array([$this, $actionMethodName], $params);
+                call_user_func_array([$this, $actionMethodName], (array)$params);
                 $this->afterAction();
             }
             return $this->data;
