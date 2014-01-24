@@ -1,6 +1,6 @@
 <?php
 
-require realpath(__DIR__ . '/../../framework/autoload.php');
+require_once realpath(__DIR__ . '/../../framework/boot.php');
 
 class StdTest extends PHPUnit_Framework_TestCase {
 
