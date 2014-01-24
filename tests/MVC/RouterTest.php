@@ -8,7 +8,6 @@ class RouterTest extends PHPUnit_Framework_TestCase
 
     public function testSplitInternalPath()
     {
-
         $router = \T4\MVC\Router::getInstance();
         $reflector = new ReflectionMethod($router, 'splitInternalPath');
         $reflector->setAccessible(true);
@@ -79,6 +78,50 @@ class RouterTest extends PHPUnit_Framework_TestCase
             new \T4\MVC\Route(['module' => '', 'controller' => 'Index', 'action' => 'default', 'params' => ['a' => 1, 'b' => 2]]),
             $reflector->invoke($router, $url)
         );
+    }
+
+    public function testScanExternalPath() {
+        $router = \T4\MVC\Router::getInstance();
+        $reflector = new ReflectionMethod($router, 'scanExternalPath');
+        $reflector->setAccessible(true);
+
+        $url = '/';
+        $template = '/';
+        $this->assertEquals(
+            '/',
+            $reflector->invoke($router, $url, $template)
+        );
+        $url = '/.html';
+        $template = '/';
+        $this->assertEquals(
+            '/',
+            $reflector->invoke($router, $url, $template)
+        );
+        $url = '/.json';
+        $template = '/';
+        $this->assertEquals(
+            '/',
+            $reflector->invoke($router, $url, $template)
+        );
+        $url = 'index';
+        $template = 'index';
+        $this->assertEquals(
+            'index',
+            $reflector->invoke($router, $url, $template)
+        );
+        $url = 'index.html';
+        $template = 'index';
+        $this->assertEquals(
+            'index',
+            $reflector->invoke($router, $url, $template)
+        );
+        $url = 'index.json';
+        $template = 'index';
+        $this->assertEquals(
+            'index',
+            $reflector->invoke($router, $url, $template)
+        );
+
     }
 
 }

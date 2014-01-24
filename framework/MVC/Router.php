@@ -56,6 +56,18 @@ class Router
 
     }
 
+    protected function scanExternalPath($url, $template) {
+        $urlExtension = '';
+        foreach ($this->extensions as $ext) {
+            if (false !== strpos($url, $ext)) {
+                $urlExtension = $ext;
+                break;
+            }
+        }
+        $baseUrl = str_replace($urlExtension, '', $url) ? : '/';
+        return $baseUrl;
+    }
+
     /**
      * Разбирает внутренний путь /модуль/контроллер/действие(параметры)
      * Возвращает объект роутинга
