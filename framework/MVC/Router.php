@@ -19,16 +19,16 @@ class Router
      */
     protected $app;
 
-    protected $extensions = ['.html', '.json'];
+    protected $extensions = ['html', 'json'];
 
-    protected  function __construct()
+    protected function __construct()
     {
         $this->app = Application::getInstance();
     }
 
     /**
      * Разбирает URL, поступивший из браузера,
-     * используя метод разбора внутреннего пути.
+     * используя методы разбора URL и внутреннего пути.
      * Возвращает объект роутинга
      * @param string $url
      * @return \T4\MVC\Route
@@ -37,35 +37,81 @@ class Router
     public function parseUrl($url)
     {
 
-        $urlExtension = '';
-        foreach ($this->extensions as $ext) {
-            if (false !== strpos($url, $ext)) {
-                $urlExtension = $ext;
-                break;
+        $url = $this->splitExternalPath($url);
+        $routes = $this->getRoutes();
+
+        foreach ($routes as $urlTemplate => $internalPath) {
+            if ( false !== $params = $this->matchUrlTemplate($urlTemplate, $url->base) )
+            {
+                $internalPath = preg_replace_callback(
+                    '~\<(\d+)\>~',
+                    function ($m) use ($params) {
+                        return $params[$m[1]];
+                    },
+                    $internalPath
+                );
+                $route = $this->splitInternalPath($internalPath);
+                $route->format = $url->extension ? : 'html';
+                return $route;
             }
         }
-        $baseUrl = str_replace($urlExtension, '', $url) ? : '/';
 
-        $routes = $this->app->getRouteConfig();
-        if (isset($routes[$baseUrl])) {
-            $route = $this->splitInternalPath($routes[$baseUrl]);
-            $route->format = $urlExtension ? substr($urlExtension, 1) : 'html';
-            return $route;
-        }
-        throw new ERouterException('Route to path \'' . $baseUrl . '\' is not found');
+        throw new ERouterException('Route to path \'' . $url->base . '\' is not found');
 
     }
 
-    protected function scanExternalPath($url, $template) {
+    /**
+     * Конфиг с правилами роутинга
+     * @return \T4\Core\Config
+     */
+    protected function getRoutes()
+    {
+        return $this->app->getRouteConfig();
+    }
+
+    /**
+     * Разбирает URL, выделяя basePath и расширение
+     * @param string $url
+     * @return \T4\MVC\Route
+     */
+    protected function splitExternalPath($url)
+    {
         $urlExtension = '';
         foreach ($this->extensions as $ext) {
-            if (false !== strpos($url, $ext)) {
+            if (false !== strpos($url, '.' . $ext)) {
                 $urlExtension = $ext;
                 break;
             }
         }
-        $baseUrl = str_replace($urlExtension, '', $url) ? : '/';
-        return $baseUrl;
+        $baseUrl = str_replace('.' . $urlExtension, '', $url) ? : '/';
+        return new Route([
+            'base' => $baseUrl,
+            'extension' => $urlExtension,
+        ]);
+    }
+
+    /**
+     * Проверка соответствия URL (базового) его шаблону из правил роутинга
+     * Возвращает false в случае несоответствия
+     * или массив параметров (возможно - пустой) в случае совпадения URL с шаблоном
+     * @param string $template
+     * @param string $url
+     * @return array|bool
+     */
+    protected function matchUrlTemplate($template, $url)
+    {
+        $template = '~^'.preg_replace('~\<(\d+)\>~', '(?<p_$1>.+?)', $template).'$~';
+        if (!preg_match($template, $url, $m)) {
+            return false;
+        } else {
+            $matches = [];
+            foreach ( $m as $key => $value ) {
+                if (substr($key, 0, 2)=='p_') {
+                    $matches[substr($key, 2)] = $value;
+                }
+            }
+            return $matches;
+        };
     }
 
     /**

@@ -2,9 +2,110 @@
 
 require_once realpath(__DIR__ . '/../../framework/boot.php');
 
+class MyRouter extends \T4\MVC\Router {
+    protected function getRoutes() {
+        return new \T4\MVC\Route([
+            '/'=>'///',
+            'index'=>'///',
+            'goods'=>'/Shop/Goods/default',
+            'goods/<1>'=>'/Shop/Goods/view(id=<1>)',
+            'shop/<2>/<1>'=>'/Shop/Goods/view(id=<1>,vendor=<2>)',
+        ]);
+    }
+}
 
 class RouterTest extends PHPUnit_Framework_TestCase
 {
+
+    public function testSplitExternalPath()
+    {
+
+        $router = \T4\MVC\Router::getInstance();
+        $reflector = new ReflectionMethod($router, 'splitExternalPath');
+        $reflector->setAccessible(true);
+
+        $url = '/';
+        $this->assertEquals(
+            new \T4\MVC\Route(['base' => '/', 'extension' => '']),
+            $reflector->invoke($router, $url)
+        );
+        $url = '/.html';
+        $this->assertEquals(
+            new \T4\MVC\Route(['base' => '/', 'extension' => 'html']),
+            $reflector->invoke($router, $url)
+        );
+        $url = '/.json';
+        $this->assertEquals(
+            new \T4\MVC\Route(['base' => '/', 'extension' => 'json']),
+            $reflector->invoke($router, $url)
+        );
+        $url = 'index';
+        $this->assertEquals(
+            new \T4\MVC\Route(['base' => 'index', 'extension' => '']),
+            $reflector->invoke($router, $url)
+        );
+        $url = 'index.html';
+        $this->assertEquals(
+            new \T4\MVC\Route(['base' => 'index', 'extension' => 'html']),
+            $reflector->invoke($router, $url)
+        );
+        $url = 'index.json';
+        $this->assertEquals(
+            new \T4\MVC\Route(['base' => 'index', 'extension' => 'json']),
+            $reflector->invoke($router, $url)
+        );
+
+        $url = 'shop/goods.html';
+        $this->assertEquals(
+            new \T4\MVC\Route(['base' => 'shop/goods', 'extension' => 'html']),
+            $reflector->invoke($router, $url)
+        );
+
+    }
+
+    public function testMatchUrlTemplate()
+    {
+
+        $router = \T4\MVC\Router::getInstance();
+        $reflector = new ReflectionMethod($router, 'matchUrlTemplate');
+        $reflector->setAccessible(true);
+
+        $template = '/';
+        $url = '/';
+        $this->assertEquals(
+            [],
+            $reflector->invoke($router, $template, $url)
+        );
+
+        $template = 'goods';
+        $url = '/';
+        $this->assertEquals(
+            false,
+            $reflector->invoke($router, $template, $url)
+        );
+
+        $template = 'goods';
+        $url = 'index';
+        $this->assertEquals(
+            false,
+            $reflector->invoke($router, $template, $url)
+        );
+
+        $template = 'goods/<1>';
+        $url = 'goods/13';
+        $this->assertEquals(
+            [1=>13],
+            $reflector->invoke($router, $template, $url)
+        );
+
+        $template = 'goods/<2>/<1>';
+        $url = 'goods/cars/volvo';
+        $this->assertEquals(
+            [1=>'volvo', 2=>'cars'],
+            $reflector->invoke($router, $template, $url)
+        );
+
+    }
 
     public function testSplitInternalPath()
     {
@@ -80,46 +181,29 @@ class RouterTest extends PHPUnit_Framework_TestCase
         );
     }
 
-    public function testScanExternalPath() {
-        $router = \T4\MVC\Router::getInstance();
-        $reflector = new ReflectionMethod($router, 'scanExternalPath');
-        $reflector->setAccessible(true);
+    public function testParseUrl()
+    {
 
-        $url = '/';
-        $template = '/';
+        $router = MyRouter::getInstance();
+
         $this->assertEquals(
-            '/',
-            $reflector->invoke($router, $url, $template)
+            new \T4\MVC\Route(['module'=>'', 'controller'=>'Index', 'action'=>'default', 'params'=>[], 'format'=>'html']),
+            $router->parseUrl('')
         );
-        $url = '/.html';
-        $template = '/';
+
         $this->assertEquals(
-            '/',
-            $reflector->invoke($router, $url, $template)
+            new \T4\MVC\Route(['module'=>'Shop', 'controller'=>'Goods', 'action'=>'default', 'params'=>[], 'format'=>'html']),
+            $router->parseUrl('goods')
         );
-        $url = '/.json';
-        $template = '/';
+
         $this->assertEquals(
-            '/',
-            $reflector->invoke($router, $url, $template)
+            new \T4\MVC\Route(['module'=>'Shop', 'controller'=>'Goods', 'action'=>'view', 'params'=>['id'=>13], 'format'=>'html']),
+            $router->parseUrl('goods/13.html')
         );
-        $url = 'index';
-        $template = 'index';
+
         $this->assertEquals(
-            'index',
-            $reflector->invoke($router, $url, $template)
-        );
-        $url = 'index.html';
-        $template = 'index';
-        $this->assertEquals(
-            'index',
-            $reflector->invoke($router, $url, $template)
-        );
-        $url = 'index.json';
-        $template = 'index';
-        $this->assertEquals(
-            'index',
-            $reflector->invoke($router, $url, $template)
+            new \T4\MVC\Route(['module'=>'Shop', 'controller'=>'Goods', 'action'=>'view', 'params'=>['vendor'=>'volvo', 'id'=>42], 'format'=>'html']),
+            $router->parseUrl('shop/volvo/42.html')
         );
 
     }
