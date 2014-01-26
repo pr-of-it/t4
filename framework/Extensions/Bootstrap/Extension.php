@@ -8,6 +8,7 @@ class Extension
 
     public function init()
     {
+        var_dump($this->path);
     }
 
 }

@@ -14,6 +14,11 @@ abstract class Extension
     protected $options;
 
     /**
+     * @var string Путь к папке расширения
+     */
+    protected $path;
+
+    /**
      * Ссылка на объект приложения
      * @var \T4\Mvc\Application
      */
@@ -23,6 +28,8 @@ abstract class Extension
     {
         $this->options = $options;
         $this->app = Application::getInstance();
+        $reflect = new \ReflectionClass($this);
+        $this->path = dirname($reflect->getFileName());
     }
 
     abstract public function init();

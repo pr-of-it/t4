@@ -22,7 +22,7 @@ class Application
      */
     public $db;
 
-    private function __construct()
+    protected function __construct()
     {
         if ( !is_readable(ROOT_PATH_PROTECTED . DS . 'config.php') ) {
             echo 'Application is not installed. Install it using "t4 /create/app" command'."\n";
