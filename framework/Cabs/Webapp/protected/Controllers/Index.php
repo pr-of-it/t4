@@ -3,7 +3,7 @@
 
 namespace App\Controllers;
 
-use T4\MVC\Controller;
+use T4\Mvc\Controller;
 
 class Index
     extends Controller

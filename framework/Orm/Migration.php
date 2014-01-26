@@ -4,7 +4,7 @@ namespace T4\Orm;
 
 
 use T4\Dbal\Connection;
-use T4\MVC\Application;
+use T4\Mvc\Application;
 
 abstract class Migration
 {
