@@ -1,18 +1,15 @@
 <?php
 
-
 namespace T4\Commands;
-
 
 use T4\Console\Command;
 use T4\Core\Std;
-use T4\Fs\Helpers;
 
-class App
+class Create
     extends Command
 {
 
-    public function actionCreate()
+    public function actionApp()
     {
         $src = \T4\ROOT_PATH.DS.'Cabs'.DS.'Webapp';
         $dst = ROOT_PATH;
@@ -39,7 +36,7 @@ class App
 
         $settings->db->default->password = $this->read('Default DB password', '', false);
 
-        Helpers::copyDir($src, $dst);
+        \T4\Fs\Helpers::copyDir($src, $dst);
         echo 'Application files are copied'."\n";
 
         $configFileName = $dst.DS.'protected'.DS.'config.php';
@@ -50,6 +47,33 @@ class App
 
         rename($dst.DS.'www', $dst.DS.$publicDirName);
         echo 'Application is installed!'."\n";
+
+    }
+
+    public function actionExtension($name) {
+        $name = ucfirst($name);
+        $dirname = ROOT_PATH_PROTECTED.DS.'Extensions'.DS.$name;
+        $nameSpace = 'APP\\Extensions\\'.$name;
+
+        \T4\Fs\Helpers::mkDir($dirname);
+        $fileName = $dirname.DS.'Extension.php';
+        $content = <<<FILE
+<?php
+
+namespace {$nameSpace};
+
+class Extension
+    extends \T4\Core\Extension
+{
+
+    public function init()
+    {
+    }
+
+}
+FILE;
+        file_put_contents($fileName, $content);
+        echo 'Extension ' . $name . ' is created in ' . $dirname;
 
     }
 

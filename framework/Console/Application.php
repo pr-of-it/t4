@@ -2,7 +2,6 @@
 
 namespace T4\Console;
 
-
 use T4\Core\Config;
 use T4\Core\Exception;
 use T4\Core\Std;
@@ -26,7 +25,7 @@ class Application
     private function __construct()
     {
         if ( !is_readable(ROOT_PATH_PROTECTED . DS . 'config.php') ) {
-            echo 'Application is not installed. Install it using "t4 /app/create" command'."\n";
+            echo 'Application is not installed. Install it using "t4 /create/app" command'."\n";
             return;
         }
         $this->config = new Config(ROOT_PATH_PROTECTED . DS . 'config.php');

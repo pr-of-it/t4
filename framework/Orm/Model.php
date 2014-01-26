@@ -2,7 +2,6 @@
 
 namespace T4\Orm;
 
-
 use T4\Core\Std;
 use T4\Dbal\DriverFactory;
 
@@ -19,10 +18,11 @@ abstract class Model
 
     /**
      * Схема модели
-     * db*: name of DB connection from application config
+     * db: name of DB connection from application config
      * table: table name
      * colums[] : colums
-     * - type
+     * - type*
+     * - length
      * @var array
      */
     static protected $schema = [];

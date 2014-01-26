@@ -6,6 +6,16 @@ namespace T4\Fs;
 class Helpers
 {
 
+    /**
+     * Создает папку по указанному пути
+     * @param $dirName Имя папки
+     * @param int $mode Права доступа к создаваемой папке
+     */
+    public static function mkDir($dirName, $mode = 0777)
+    {
+        mkdir($dirName, $mode, true);
+    }
+
 
     /**
      * Копирует файл в заданный файл или папку
@@ -64,7 +74,7 @@ class Helpers
         }
 
         if (!file_exists($dst)) {
-            mkdir($dst, 0777, true);
+            self::mkDir($dst);
         }
         $dst = realpath($dst);
         if (!is_readable($dst)) {

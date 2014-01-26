@@ -30,15 +30,29 @@ class Application
      */
     public $assets;
 
+    /**
+     * @var \T4\Core\Std
+     */
+    public $extensions;
+
     protected function __construct()
     {
         $this->assets = AssetsManager::getInstance();
         $this->config = new Config($this->getPath() . DS . 'config.php');
         try {
+
             $this->db = new Std;
             foreach ($this->config->db as $connection => $connectionConfig) {
                 $this->db->{$connection} = new Connection($connectionConfig);
             }
+
+            $this->extensions = new Std;
+            foreach ($this->config->extensions as $extension => $options) {
+                $extensionClassName = '\\T4\\Extensions\\'.$options->className;
+                $this->extensions->{$extension} = new $extensionClassName($options);
+                $this->extensions->{$extension}->init();
+            }
+
         } catch (\T4\Dbal\Exception $e) {
             echo $e->getMessage();
             die;
