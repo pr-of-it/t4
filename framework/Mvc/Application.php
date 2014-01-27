@@ -51,6 +51,7 @@ class Application
                 foreach ($this->config->extensions as $extension => $options) {
                     $extensionClassName = '\\T4\\Extensions\\'.$options->className;
                     $this->extensions->{$extension} = new $extensionClassName($options);
+                    $this->extensions->{$extension}->setApp($this);
                     $this->extensions->{$extension}->init();
                 }
             }

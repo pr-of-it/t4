@@ -27,9 +27,13 @@ abstract class Extension
     public function __construct($options)
     {
         $this->options = $options;
-        $this->app = Application::getInstance();
         $reflect = new \ReflectionClass($this);
         $this->path = dirname($reflect->getFileName());
+    }
+
+    public function setApp(Application $app)
+    {
+        $this->app = $app;
     }
 
     abstract public function init();
