@@ -47,10 +47,12 @@ class Application
             }
 
             $this->extensions = new Std;
-            foreach ($this->config->extensions as $extension => $options) {
-                $extensionClassName = '\\T4\\Extensions\\'.$options->className;
-                $this->extensions->{$extension} = new $extensionClassName($options);
-                $this->extensions->{$extension}->init();
+            if (isset($this->config->extensions)) {
+                foreach ($this->config->extensions as $extension => $options) {
+                    $extensionClassName = '\\T4\\Extensions\\'.$options->className;
+                    $this->extensions->{$extension} = new $extensionClassName($options);
+                    $this->extensions->{$extension}->init();
+                }
             }
 
         } catch (\T4\Dbal\Exception $e) {
