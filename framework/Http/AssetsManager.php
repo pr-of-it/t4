@@ -23,9 +23,16 @@ class AssetsManager
         return $this->assets[$path]['url'];
     }
 
+    public function registerCss($url)
+    {
+        $this->publishCss[] = $url;
+    }
+
     public function publishCss($path)
     {
-        return $this->publishCss[] = $this($path);
+        $url = $this($path);
+        $this->registerCss($url);
+        return $url;
     }
 
     public function getPublishedCss()
@@ -36,17 +43,24 @@ class AssetsManager
         return implode("\n", $links)."\n";
     }
 
+    public function registerJs($url)
+    {
+        $this->publishCss[] = $url;
+    }
+
+    public function publishJs($path)
+    {
+        $url = $this($path);
+        $this->registerJs($url);
+        return $url;
+    }
+
     public function getPublishedJs()
     {
         $links = [];
         foreach ($this->publishJs as $js)
             $links[] = '<script type="text/javascript" src="' . $js . '"></script>';
         return implode("\n", $links)."\n";
-    }
-
-    public function publishJs($path)
-    {
-        return $this->publishJs[] = $this($path);
     }
 
     protected function makeRealPath($path)

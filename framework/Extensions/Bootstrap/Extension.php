@@ -9,9 +9,15 @@ class Extension
     public function init()
     {
         $assets = $this->app->assets;
-        $assets->publishCss($this->path.DS.'lib'.DS.'css'.DS.'bootstrap.min.css');
-        $assets->publishCss($this->path.DS.'lib'.DS.'css'.DS.'bootstrap-theme.min.css');
-        $assets->publishJs($this->path.DS.'lib'.DS.'js'.DS.'bootstrap.min.js');
+        if ( isset($this->options->location) && 'local'==$this->options->location ) {
+            $assets->publishCss($this->path.DS.'lib'.DS.'css'.DS.'bootstrap.min.css');
+            $assets->publishCss($this->path.DS.'lib'.DS.'css'.DS.'bootstrap-theme.min.css');
+            $assets->publishJs($this->path.DS.'lib'.DS.'js'.DS.'bootstrap.min.js');
+        } else {
+            $assets->registerCss('//netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap.min.css');
+            $assets->registerCss('//netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap-theme.min.css');
+            $assets->registerJs('//netdna.bootstrapcdn.com/bootstrap/3.0.3/js/bootstrap.min.js');
+        }
     }
 
 }
