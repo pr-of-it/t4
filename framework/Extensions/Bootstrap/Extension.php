@@ -8,7 +8,10 @@ class Extension
 
     public function init()
     {
-        var_dump($this->path);
+        $assets = $this->app->assets;
+        $assets->publishCss($this->path.DS.'lib'.DS.'css'.DS.'bootstrap.min.css');
+        $assets->publishCss($this->path.DS.'lib'.DS.'css'.DS.'bootstrap-theme.min.css');
+        $assets->publishJs($this->path.DS.'lib'.DS.'js'.DS.'bootstrap.min.js');
     }
 
 }

@@ -11,6 +11,9 @@ class AssetsManager
 
     protected $assets = [];
 
+    protected $publishCss = [];
+    protected $publishJs = [];
+
     public function __invoke($path)
     {
         if (!isset($this->assets[$path])) {
@@ -18,6 +21,32 @@ class AssetsManager
             $this->assets[$path]['url'] = $this->makeUrl($this->assets[$path]['path']);
         }
         return $this->assets[$path]['url'];
+    }
+
+    public function publishCss($path)
+    {
+        return $this->publishCss[] = $this($path);
+    }
+
+    public function getPublishedCss()
+    {
+        $links = [];
+        foreach ($this->publishCss as $css)
+            $links[] = '<link rel="stylesheet" href="' . $css . '">';
+        return implode("\n", $links)."\n";
+    }
+
+    public function getPublishedJs()
+    {
+        $links = [];
+        foreach ($this->publishJs as $js)
+            $links[] = '<script type="text/javascript" src="' . $js . '"></script>';
+        return implode("\n", $links)."\n";
+    }
+
+    public function publishJs($path)
+    {
+        return $this->publishJs[] = $this($path);
     }
 
     protected function makeRealPath($path)
