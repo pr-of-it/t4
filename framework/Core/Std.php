@@ -74,7 +74,7 @@ class Std
         return $data;
     }
 
-    public function fromArray(array $data) {
+    public function fromArray($data) {
         foreach ( $data as $key => $value ) {
             if ( is_array($value) ) {
                 $this->{$key} = new static;

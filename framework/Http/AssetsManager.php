@@ -14,15 +14,6 @@ class AssetsManager
     protected $publishCss = [];
     protected $publishJs = [];
 
-    public function __invoke($path)
-    {
-        if (!isset($this->assets[$path])) {
-            $this->assets[$path]['path'] = $this->makeRealPath($path);
-            $this->assets[$path]['url'] = $this->makeUrl($this->assets[$path]['path']);
-        }
-        return $this->assets[$path]['url'];
-    }
-
     public function registerCss($url)
     {
         $this->publishCss[] = $url;
@@ -63,9 +54,25 @@ class AssetsManager
         return implode("\n", $links)."\n";
     }
 
+    public function __invoke($path)
+    {
+        if (!isset($this->assets[$path])) {
+            $this->assets[$path]['path'] = $this->makeRealPath($path);
+            $this->assets[$path]['url'] = $this->makeUrl($this->assets[$path]['path']);
+        }
+        return $this->assets[$path]['url'];
+    }
+
     protected function makeRealPath($path)
     {
-        return realpath(preg_replace(['/^\/\//', '/^\//'], [\T4\ROOT_PATH . DS, ROOT_PATH_PROTECTED . DS], $path));
+        if ( preg_match('~^\/\/~', $path) )
+            $realPath = preg_replace('~^\/\/~', \T4\ROOT_PATH.DS, $path);
+        elseif (  preg_match('~^\/~', $path)  )
+            $realPath = preg_replace('~^\/~', ROOT_PATH_PROTECTED.DS, $path);
+        else {
+            $realPath = $path;
+        }
+        return realpath($realPath);
     }
 
     protected function makeUrl($path)
