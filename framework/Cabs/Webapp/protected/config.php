@@ -12,10 +12,8 @@ return [
     ],
     'extensions' => [
         'jquery' => [
-            'className' => 'Jquery\\Extension'
         ],
         'bootstrap' => [
-            'className' => 'Bootstrap\\Extension'
         ],
     ],
 ];

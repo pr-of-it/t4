@@ -49,7 +49,12 @@ class Application
             $this->extensions = new Std;
             if (isset($this->config->extensions)) {
                 foreach ($this->config->extensions as $extension => $options) {
-                    $extensionClassName = '\\T4\\Extensions\\'.$options->className;
+                    $extensionClassName = 'Extensions\\'.ucfirst($extension).'\\Extension';
+                    if ( class_exists('\\App\\'.$extensionClassName) ) {
+                        $extensionClassName = '\\App\\'.$extensionClassName;
+                    } else {
+                        $extensionClassName = '\\T4\\'.$extensionClassName;
+                    }
                     $this->extensions->{$extension} = new $extensionClassName($options);
                     $this->extensions->{$extension}->setApp($this);
                     $this->extensions->{$extension}->init();
