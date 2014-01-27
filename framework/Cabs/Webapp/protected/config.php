@@ -9,5 +9,13 @@ return [
             'user' => '{{user}}',
             'password' => '{{password}}',
         ]
-    ]
+    ],
+    'extensions' => [
+        'jquery' => [
+            'className' => 'Jquery\\Extension'
+        ],
+        'bootstrap' => [
+            'className' => 'Bootstrap\\Extension'
+        ],
+    ],
 ];
