@@ -10,10 +10,13 @@ class Helpers
      * Создает папку по указанному пути
      * @param $dirName Имя папки
      * @param int $mode Права доступа к создаваемой папке
+     * @throws \T4\Fs\Exception
      */
     public static function mkDir($dirName, $mode = 0777)
     {
-        mkdir($dirName, $mode, true);
+        $result = mkdir($dirName, $mode, true);
+        if (!$result)
+            throw new Exception('Can not create dir '.$dirName);
     }
 
 
