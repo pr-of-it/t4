@@ -4,5 +4,5 @@ namespace T4\Core;
 
 interface IArrayable {
     public function toArray();
-    public function fromArray(array $data);
+    public function fromArray($data);
 }

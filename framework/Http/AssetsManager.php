@@ -14,18 +14,16 @@ class AssetsManager
     protected $publishCss = [];
     protected $publishJs = [];
 
-    public function __invoke($path)
+    public function registerCss($url)
     {
-        if (!isset($this->assets[$path])) {
-            $this->assets[$path]['path'] = $this->makeRealPath($path);
-            $this->assets[$path]['url'] = $this->makeUrl($this->assets[$path]['path']);
-        }
-        return $this->assets[$path]['url'];
+        $this->publishCss[] = $url;
     }
 
     public function publishCss($path)
     {
-        return $this->publishCss[] = $this($path);
+        $url = $this($path);
+        $this->registerCss($url);
+        return $url;
     }
 
     public function getPublishedCss()
@@ -36,6 +34,18 @@ class AssetsManager
         return implode("\n", $links)."\n";
     }
 
+    public function registerJs($url)
+    {
+        $this->publishCss[] = $url;
+    }
+
+    public function publishJs($path)
+    {
+        $url = $this($path);
+        $this->registerJs($url);
+        return $url;
+    }
+
     public function getPublishedJs()
     {
         $links = [];
@@ -44,14 +54,25 @@ class AssetsManager
         return implode("\n", $links)."\n";
     }
 
-    public function publishJs($path)
+    public function __invoke($path)
     {
-        return $this->publishJs[] = $this($path);
+        if (!isset($this->assets[$path])) {
+            $this->assets[$path]['path'] = $this->makeRealPath($path);
+            $this->assets[$path]['url'] = $this->makeUrl($this->assets[$path]['path']);
+        }
+        return $this->assets[$path]['url'];
     }
 
     protected function makeRealPath($path)
     {
-        return realpath(preg_replace(['/^\/\//', '/^\//'], [\T4\ROOT_PATH . DS, ROOT_PATH_PROTECTED . DS], $path));
+        if ( preg_match('~^\/\/~', $path) )
+            $realPath = preg_replace('~^\/\/~', \T4\ROOT_PATH.DS, $path);
+        elseif (  preg_match('~^\/~', $path)  )
+            $realPath = preg_replace('~^\/~', ROOT_PATH_PROTECTED.DS, $path);
+        else {
+            $realPath = $path;
+        }
+        return realpath($realPath);
     }
 
     protected function makeUrl($path)

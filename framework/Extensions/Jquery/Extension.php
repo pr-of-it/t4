@@ -9,7 +9,11 @@ class Extension
     public function init()
     {
         $assets = $this->app->assets;
-        $assets->publishJs($this->path.DS.'lib'.DS.'js'.DS.'jquery-2.1.0.min.js');
+        if ( isset($this->options->location) && 'local'==$this->options->location ) {
+            $assets->publishJs($this->path.DS.'lib'.DS.'js'.DS.'jquery-2.1.0.min.js');
+        } else {
+            $assets->registerJs('http://code.jquery.com/jquery-2.1.0.min.js');
+        }
     }
 
 }
