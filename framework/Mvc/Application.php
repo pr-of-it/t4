@@ -83,13 +83,8 @@ class Application
                     die;
                 default:
                 case 'html':
-                    $view = new View([
-                        $this->getPath() . DS . 'Templates' . DS . $route->controller,
-                        $this->getPath() . DS . 'Layouts'
-                    ]);
-                    $view->setController($controller);
                     header('Content-Type: text/html; charset=utf-8');
-                    $view->display($route->action . '.' . $route->format, $controller->getData());
+                    $controller->view->display($route->action . '.' . $route->format, $controller->getData());
                     break;
             }
 

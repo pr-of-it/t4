@@ -20,10 +20,27 @@ abstract class Controller
      */
     public $app;
 
+    /**
+     * Ссылка на настроенный на данный контроллер объект View
+     * @var \T4\Mvc\View
+     */
+    public $view;
+
     final public function __construct()
     {
         $this->data = new Std();
         $this->app = Application::getInstance();
+        $this->view = new View([
+            $this->app->getPath() . DS . 'Templates' . DS . $this->getShortName(),
+            $this->app->getPath() . DS . 'Layouts'
+        ]);
+        $this->view->setController($this);
+    }
+
+    public function getShortName()
+    {
+        $classNameParts = explode('\\', get_class($this));
+        return array_pop($classNameParts);
     }
 
     public function beforeAction()
