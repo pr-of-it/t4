@@ -40,6 +40,9 @@ class Router
         $url = $this->splitExternalPath($url);
         $routes = $this->getRoutes();
 
+        /**
+         * Попытка найти роут в файле конфигурации роутинга
+         */
         foreach ($routes as $urlTemplate => $internalPath) {
             if ( false !== $params = $this->matchUrlTemplate($urlTemplate, $url->base) )
             {
@@ -54,6 +57,20 @@ class Router
                 $route->format = $url->extension ? : 'html';
                 return $route;
             }
+        }
+
+        /**
+         * Попытка разобрать URL самостоятельно
+         */
+        $urlParts = preg_split('~/~', $url->base, -1, PREG_SPLIT_NO_EMPTY);
+        if ( 0<count($urlParts) && count($urlParts)<4 ) {
+            $urlParts = array_pad($urlParts, 3, '');
+            return new Route([
+                'module' => ucfirst($urlParts[0]),
+                'controller' => $urlParts[1] ? ucfirst($urlParts[1]) : self::DEFAULT_CONTROLLER,
+                'action' => $urlParts[2] ? ucfirst($urlParts[2]) : self::DEFAULT_ACTION,
+                'params' => []
+            ]);
         }
 
         throw new ERouterException('Route to path \'' . $url->base . '\' is not found');
