@@ -123,7 +123,13 @@ class Application
 
     public function getBlock($path)
     {
-        $route = Router::getInstance()->splitInternalPath($path);
+        $router = Router::getInstance();
+        $route = $router->splitInternalPath($path);
+
+        $canonicalPath = $router->mergeInternalPath($route);
+        if ( !isset($this->config->blocks) || !isset($this->config->blocks[$canonicalPath]))
+            throw new Exception('No config for block '.$canonicalPath);
+
         $controller = $this->createController($route->controller);
         $controller->action($route->action, $route->params);
         return $controller->view->render($route->action . '.block.html', $controller->getData());

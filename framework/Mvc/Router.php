@@ -147,4 +147,17 @@ class Router
 
     }
 
+    /**
+     * Возвращает канонический внутренний путь, построенный из объекта роутинга
+     * Не учитывает параметры
+     * @param Route $route
+     * @return string
+     */
+    public function mergeInternalPath(Route $route)
+    {
+        return '/'.$route->module.'/'.
+            ($route->controller == self::DEFAULT_CONTROLLER ? '' : $route->controller). '/'.
+            ($route->action == self::DEFAULT_ACTION ? '' : $route->action);
+    }
+
 }

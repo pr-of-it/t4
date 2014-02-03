@@ -8,7 +8,7 @@ use T4\Core\Std;
 class View
 {
 
-    const BLOCK_TAG_PATTERN = '~\<t4:block[\s]+path=\"(.*)\"\>~i';
+    const BLOCK_TAG_PATTERN = '~\<t4:block[\s]+path=\"(.*)\"([\s]+\/)?\>~i';
 
     protected $paths = [];
     protected $twig;
@@ -64,7 +64,7 @@ class View
                 $block = $app->getBlock($blockPath);
                 $content = str_replace($tag, $block, $content);
             } catch (Exception $e) {
-                echo $e->getMessage();die;
+                echo $e->getMessage();
                 $content = str_replace($tag, '', $content);
             }
         }
