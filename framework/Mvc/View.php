@@ -28,21 +28,16 @@ class View
     public function setController(Controller $controller)
     {
         $this->links->controller = $controller;
+        $this->twig->addGlobal('controller', $this->links->controller);
     }
 
     public function render($template, $data = [])
     {
-        if ( !($data instanceof Std) )
-            $data = new Std($data);
-        $data->this = $this->links;
         return $this->twig->render($template, $data->toArray());
     }
 
     public function display($template, $data)
     {
-        if ( !($data instanceof Std) )
-            $data = new Std($data);
-        $data->this = $this->links;
         $this->twig->display($template, $data->toArray());
     }
 
