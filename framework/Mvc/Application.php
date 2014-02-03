@@ -67,6 +67,32 @@ class Application
         }
     }
 
+    public function getPath()
+    {
+        return $this->path;
+    }
+
+    /**
+     * Возвращает конфиг роутинга приложения
+     * @return \T4\Core\Config Объект конфига роутинга
+     */
+    public function getRouteConfig()
+    {
+        return new Config($this->getPath() . DS . 'routes.php');
+    }
+
+    /**
+     * Возвращает экземпляр контроллера согласно объекту роутинга
+     * @param string $controller
+     * @return \T4\Mvc\Controller
+     */
+    protected function createController($controller)
+    {
+        $controllerClass = '\\App\\Controllers\\' . $controller;
+        $controller = new $controllerClass;
+        return $controller;
+    }
+
     public function run()
     {
 
@@ -95,30 +121,12 @@ class Application
 
     }
 
-    public function getPath()
+    public function getBlock($path)
     {
-        return $this->path;
-    }
-
-    /**
-     * Возвращает конфиг роутинга приложения
-     * @return \T4\Core\Config Объект конфига роутинга
-     */
-    public function getRouteConfig()
-    {
-        return new Config($this->getPath() . DS . 'routes.php');
-    }
-
-    /**
-     * Возвращает экземпляр контроллера согласно объекту роутинга
-     * @param string $controller
-     * @return \T4\Mvc\Controller
-     */
-    protected function createController($controller)
-    {
-        $controllerClass = '\\App\\Controllers\\' . $controller;
-        $controller = new $controllerClass;
-        return $controller;
+        $route = Router::getInstance()->splitInternalPath($path);
+        $controller = $this->createController($route->controller);
+        $controller->action($route->action, $route->params);
+        return $controller->view->render($route->action . '.block.html', $controller->getData());
     }
 
 }

@@ -121,10 +121,10 @@ class Router
      * @return \T4\Mvc\Route
      * @throws \T4\Mvc\ERouterException
      */
-    protected function splitInternalPath($path)
+    public function splitInternalPath($path)
     {
         if (!preg_match(self::INTERNAL_PATH_PATTERN, $path, $m)) {
-            throw new ERouterException('Invalid route \'' . $routes[$baseUrl] . '\'');
+            throw new ERouterException('Invalid route \'' . $path . '\'');
         };
 
         $params = isset($m[5]) ? $m[5] : '';

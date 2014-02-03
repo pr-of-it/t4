@@ -2,10 +2,13 @@
 
 namespace T4\Mvc;
 
+use T4\Core\Exception;
 use T4\Core\Std;
 
 class View
 {
+
+    const BLOCK_TAG_PATTERN = '~\<t4:block[\s]+path=\"(.*)\"\>~i';
 
     protected $paths = [];
     protected $twig;
@@ -33,12 +36,39 @@ class View
 
     public function render($template, $data = [])
     {
-        return $this->twig->render($template, $data->toArray());
+        return $this->postProcess(
+            $this->twig->render($template, $data->toArray())
+        );
     }
 
-    public function display($template, $data)
+    public function display($template, $data = [])
     {
-        $this->twig->display($template, $data->toArray());
+        print $this->postProcess(
+            $this->twig->render($template, $data->toArray())
+        );
+    }
+
+    protected function postProcess($content)
+    {
+        $content = $this->parseBlocks($content);
+        return $content;
+    }
+
+    protected function parseBlocks($content)
+    {
+        $app = Application::getInstance();
+        preg_match_all(self::BLOCK_TAG_PATTERN, $content, $m);
+        foreach ($m[0] as $n => $tag) {
+            $blockPath = $m[1][$n];
+            try {
+                $block = $app->getBlock($blockPath);
+                $content = str_replace($tag, $block, $content);
+            } catch (Exception $e) {
+                echo $e->getMessage();die;
+                $content = str_replace($tag, '', $content);
+            }
+        }
+        return $content;
     }
 
 }
