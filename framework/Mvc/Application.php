@@ -86,13 +86,18 @@ class Application
     }
 
     /**
-     * Возвращает экземпляр контроллера согласно объекту роутинга
+     * Возвращает экземпляр контроллера
+     * @param string $module
      * @param string $controller
      * @return \T4\Mvc\Controller
      */
-    protected function createController($controller)
+    protected function createController($module, $controller)
     {
-        $controllerClass = '\\App\\Controllers\\' . $controller;
+        if (empty($module))
+            $controllerClass = '\\App\\Controllers\\' . $controller;
+        else
+            $controllerClass = '\\App\\Modules\\' . $module . '\\Controllers\\' . $controller;
+
         $controller = new $controllerClass;
         return $controller;
     }
@@ -103,7 +108,7 @@ class Application
         try {
 
             $route = Router::getInstance()->parseUrl($_GET['__path']);
-            $controller = $this->createController($route->controller);
+            $controller = $this->createController($route->module, $route->controller);
             $controller->action($route->action, $route->params);
 
             switch ($route->format) {
@@ -134,7 +139,7 @@ class Application
         if ( !isset($this->config->blocks) || !isset($this->config->blocks[$canonicalPath]))
             throw new Exception('No config for block '.$canonicalPath);
 
-        $controller = $this->createController($route->controller);
+        $controller = $this->createController($route->module, $route->controller);
         $controller->action($route->action, $route->params);
         return $controller->view->render($route->action . '.block.html', $controller->getData());
     }
