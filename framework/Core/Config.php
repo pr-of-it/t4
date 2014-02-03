@@ -14,4 +14,4 @@ class Config extends Std {
         }
     }
 
-} 
+}

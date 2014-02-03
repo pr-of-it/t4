@@ -38,7 +38,11 @@ class Application
     protected function __construct()
     {
         $this->assets = AssetsManager::getInstance();
+
         $this->config = new Config($this->getPath() . DS . 'config.php');
+        $this->config->sections = new Config($this->getPath() . DS . 'sections.php');
+        $this->config->blocks   = new Config($this->getPath() . DS . 'blocks.php');
+
         try {
 
             $this->db = new Std;
@@ -121,7 +125,7 @@ class Application
 
     }
 
-    public function getBlock($path)
+    public function callBlock($path)
     {
         $router = Router::getInstance();
         $route = $router->splitInternalPath($path);

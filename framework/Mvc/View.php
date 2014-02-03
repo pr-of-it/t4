@@ -61,7 +61,7 @@ class View
         foreach ($m[0] as $n => $tag) {
             $blockPath = $m[1][$n];
             try {
-                $block = $app->getBlock($blockPath);
+                $block = $app->callBlock($blockPath);
                 $content = str_replace($tag, $block, $content);
             } catch (Exception $e) {
                 echo $e->getMessage();
