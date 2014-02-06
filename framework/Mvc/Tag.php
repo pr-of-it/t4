@@ -21,17 +21,21 @@ abstract class Tag {
 
     final protected function parseParams($str)
     {
+        $ret = new Std();
+
         $paramPairs = preg_split('~[\s]+~', $str, -1, PREG_SPLIT_NO_EMPTY);
         if ( empty($paramPairs) )
-            return [];
-        $ret = new Std();
+            return $ret;
+
         foreach ($paramPairs as $pair) {
             if (!preg_match(self::PARAM_PAIR_STR_TEMPLATE, $pair, $m)) {
                 throw new Exception('Invalid tag params format: `' . $pair . '`');
             }
             $ret->{$m[1]} = $m[2];
         }
+
         return $ret;
+
     }
 
     final public function __toString()
