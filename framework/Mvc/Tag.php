@@ -15,7 +15,7 @@ abstract class Tag {
     final public function __construct($params='')
     {
         $classNameParts = explode('\\', get_class($this));
-        $this->name = strtolower(str_replace('Tag', '', array_pop($classNameParts)));
+        $this->name = strtolower(array_pop($classNameParts));
         $this->params = $this->parseParams($params);
     }
 
