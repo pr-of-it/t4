@@ -58,7 +58,7 @@ class View
     {
         preg_match_all(self::TAG_PATTERN, $content, $m);
         foreach ($m[1] as $n => $tag) {
-            $tagClassName = '\\T4\\Mvc\\Tags\\'.ucfirst($tag);
+            $tagClassName = '\\' . __NAMESPACE__ . '\\Tags\\'.ucfirst($tag);
             $tag = new $tagClassName($m[2][$n]);
             try {
                 $content = str_replace($m[0][$n], $tag, $content);

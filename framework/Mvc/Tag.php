@@ -41,5 +41,4 @@ abstract class Tag {
 
     abstract protected function render();
 
-
 }
