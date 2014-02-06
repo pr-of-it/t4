@@ -8,7 +8,7 @@ use T4\Core\Std;
 class View
 {
 
-    const BLOCK_TAG_PATTERN = '~\<t4:block[\s]+path=\"(.*)\"([\s]+\/)?\>~i';
+    const TAG_PATTERN = '~\<t4:(\S+)[\s]*([\s\S]*?)\/?\>~i';
 
     protected $paths = [];
     protected $twig;
@@ -50,19 +50,18 @@ class View
 
     protected function postProcess($content)
     {
-        $content = $this->parseBlocks($content);
+        $content = $this->parseTags($content);
         return $content;
     }
 
-    protected function parseBlocks($content)
+    protected function parseTags($content)
     {
-        $app = Application::getInstance();
-        preg_match_all(self::BLOCK_TAG_PATTERN, $content, $m);
-        foreach ($m[0] as $n => $tag) {
-            $blockPath = $m[1][$n];
+        preg_match_all(self::TAG_PATTERN, $content, $m);
+        foreach ($m[1] as $n => $tag) {
+            $tagClassName = '\\T4\\Mvc\\Tags\\'.ucfirst($tag);
+            $tag = new $tagClassName($m[2][$n]);
             try {
-                $block = $app->callBlock($blockPath);
-                $content = str_replace($tag, $block, $content);
+                $content = str_replace($m[0][$n], $tag, $content);
             } catch (Exception $e) {
                 echo $e->getMessage();
                 $content = str_replace($tag, '', $content);
