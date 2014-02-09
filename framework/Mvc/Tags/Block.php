@@ -12,7 +12,9 @@ class Block
     protected function render()
     {
         $app = Application::getInstance();
-        $block = $app->callBlock($this->params->path, $this->params);
+        $path = $this->params->path;
+        unset($this->params->path);
+        $block = $app->callBlock($path, $this->params);
         return $block;
     }
 

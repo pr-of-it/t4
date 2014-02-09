@@ -134,7 +134,7 @@ class Application
     {
         $router = Router::getInstance();
         $route = $router->splitInternalPath($path);
-        $route->params = array_merge($route->params, $params);
+        $route->params->merge($params);
 
         $canonicalPath = $router->mergeInternalPath($route);
         if ( !isset($this->config->blocks) || !isset($this->config->blocks[$canonicalPath]))

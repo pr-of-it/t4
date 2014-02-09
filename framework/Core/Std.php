@@ -84,4 +84,9 @@ class Std
             }
         }
     }
+
+    public function merge($obj)
+    {
+        $this->fromArray($obj->toArray());
+    }
 }
