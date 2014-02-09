@@ -11,6 +11,7 @@ class Tree
             '__lft' => ['type' => 'int'],
             '__rgt' => ['type' => 'int'],
             '__lvl' => ['type' => 'int'],
+            '__prt' => ['type' => 'link'],
         ];
     }
 
@@ -20,6 +21,7 @@ class Tree
             '__lft' => ['columns' => ['__lft']],
             '__rgt' => ['columns' => ['__rgt']],
             '__lvl' => ['columns' => ['__lvl']],
+            '__prt' => ['columns' => ['__prt']],
         ];
     }
 
