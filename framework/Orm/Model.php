@@ -27,6 +27,11 @@ abstract class Model
      */
     static protected $schema = [];
 
+    /**
+     * Схема модели
+     * с учетом изменений, внесенных расширениями
+     * @return array
+     */
     public static function getSchema()
     {
         $schema = static::$schema;
@@ -37,6 +42,7 @@ abstract class Model
                 $schema['columns'] = $extension->prepareColumns($schema['columns']);
             }
         }
+        return $schema;
     }
 
     /**
