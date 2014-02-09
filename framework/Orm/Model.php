@@ -27,14 +27,27 @@ abstract class Model
      */
     static protected $schema = [];
 
+    public static function getSchema()
+    {
+        $schema = static::$schema;
+        if (isset($schema['extensions']) && !empty($schema['extensions'])) {
+            foreach ( $schema['extensions'] as $extension ) {
+                $extensionClassName = '\\T4\\Orm\\Extensions\\'.ucfirst($extension);
+                $extension = new $extensionClassName;
+                $schema['columns'] = $extension->prepareColumns($schema['columns']);
+            }
+        }
+    }
+
     /**
      * Имя таблицы в БД, соответствующей данной модели
      * @return string Имя таблицы в БД
      */
     public static function getTableName()
     {
-        if (isset(static::$schema['table']))
-            return static::$schema['table'];
+        $schema = static::getSchema();
+        if (isset($schema['table']))
+            return $schema['table'];
         else {
             $className = explode('\\', get_called_class());
             return strtolower(array_pop($className)) . 's';
@@ -43,20 +56,23 @@ abstract class Model
 
     public static function getDbDriver()
     {
-        $dbConnectionName = static::$schema['db'] ?: 'default';
+        $schema = static::getSchema();
+        $dbConnectionName = $schema['db'] ?: 'default';
         $driver = \T4\Mvc\Application::getInstance()->config->db->{$dbConnectionName}->driver;
         return DriverFactory::getDriver($driver);
     }
 
     public static function getDbConnection()
     {
-        $dbConnectionName = static::$schema['db'] ?: 'default';
+        $schema = static::getSchema();
+        $dbConnectionName = $schema['db'] ?: 'default';
         $connection = \T4\Mvc\Application::getInstance()->db[$dbConnectionName];
         return $connection;
     }
 
     public static function getColumns() {
-        return static::$schema['columns'];
+        $schema = static::getSchema();
+        return $schema['columns'];
     }
 
 }
