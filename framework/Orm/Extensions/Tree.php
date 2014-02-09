@@ -17,10 +17,10 @@ class Tree
     public function prepareIndexes($indexes)
     {
         return $indexes + [
-            ['columns' => '__lft'],
-            ['columns' => '__rgt'],
-            ['columns' => '__lvl'],
+            '__lft' => ['columns' => ['__lft']],
+            '__rgt' => ['columns' => ['__rgt']],
+            '__lvl' => ['columns' => ['__lvl']],
         ];
     }
 
-} 
+}
