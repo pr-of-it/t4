@@ -19,6 +19,7 @@ class Mysql
                 return 'BIGINT UNSIGNED NOT NULL AUTO_INCREMENT';
                 break;
             case 'relation':
+            case 'link':
                 return 'BIGINT UNSIGNED NOT NULL DEFAULT \'0\'';
                 break;
             case 'int':
