@@ -12,7 +12,8 @@ class Mysql
     implements IDriver
 {
 
-    protected function createColumnDDL($options) {
+    protected function createColumnDDL($options)
+    {
         switch ($options['type']) {
             case 'pk':
                 return 'BIGINT UNSIGNED NOT NULL AUTO_INCREMENT';
@@ -46,18 +47,19 @@ class Mysql
                 break;
             case 'string':
             default:
-                return 'VARCHAR(' . ( isset($options['length']) ? (int)$options['length'] : 255 ) . ') NOT NULL';
+                return 'VARCHAR(' . (isset($options['length']) ? (int)$options['length'] : 255) . ') NOT NULL';
                 break;
         }
     }
 
-    protected function createIndexDDL($name, $options) {
+    protected function createIndexDDL($name, $options)
+    {
         if (is_numeric($name))
             $name = implode('_', $options['columns']);
-        if ( !isset($options['type']) )
+        if (!isset($options['type']))
             $options['type'] = '';
-        $ddl = '`'.$name.'` (`' . implode('`,`', $options['columns']) . '`)';
-        switch ( $options['type'] ) {
+        $ddl = '`' . $name . '` (`' . implode('`,`', $options['columns']) . '`)';
+        switch ($options['type']) {
             case 'unique':
                 return 'UNIQUE INDEX ' . $ddl;
                 break;
@@ -67,98 +69,106 @@ class Mysql
         }
     }
 
-    public function createTable(Connection $connection, $tableName, $columns=[], $indexes=[])
+    public function createTable(Connection $connection, $tableName, $columns = [], $indexes = [], $extensions = [])
     {
-        $sql = 'CREATE TABLE `'.$tableName.'`';
+
+        foreach ( $extensions as $extension ) {
+            $extensionClassName = '\\T4\\Orm\\Extensions\\'.ucfirst($extension);
+            $extension = new $extensionClassName;
+            $columns = $extension->prepareColumns($columns);
+            $indexes = $extension->prepareIndexes($indexes);
+        }
+
+        $sql = 'CREATE TABLE `' . $tableName . '`';
 
         $columnsDDL = [];
         $indexesDDL = [];
 
         $hasPK = false;
-        foreach ( $columns as $name => $options ) {
-            $columnsDDL[] = '`'.$name.'` ' . $this->createColumnDDL($options);
+        foreach ($columns as $name => $options) {
+            $columnsDDL[] = '`' . $name . '` ' . $this->createColumnDDL($options);
             if ('pk' == $options['type']) {
                 $indexesDDL[] = 'PRIMARY KEY (`' . $name . '`)';
                 $hasPK = true;
             }
         }
         if (!$hasPK) {
-            array_unshift($columnsDDL, '`' . Model::PK . '` ' . $this->createColumnDDL(['type'=>'pk']));
+            array_unshift($columnsDDL, '`' . Model::PK . '` ' . $this->createColumnDDL(['type' => 'pk']));
             $indexesDDL[] = 'PRIMARY KEY (`' . Model::PK . '`)';
         }
 
-        foreach ( $indexes as $name => $options ) {
+        foreach ($indexes as $name => $options) {
             $indexesDDL[] = $this->createIndexDDL($name, $options);
         }
 
         $sql .= ' ( ' .
             implode(', ', $columnsDDL) . ', ' .
             implode(', ', $indexesDDL) .
-        ' )';
+            ' )';
         $connection->execute($sql);
 
     }
 
     public function addColumn(Connection $connection, $tableName, array $columns)
     {
-        $sql = 'ALTER TABLE `'.$tableName.'`';
+        $sql = 'ALTER TABLE `' . $tableName . '`';
         $columnsDDL = [];
-        foreach ( $columns as $name => $options ) {
-            $columnsDDL[] = 'ADD COLUMN `'.$name.'` ' . $this->createColumnDDL($options);
+        foreach ($columns as $name => $options) {
+            $columnsDDL[] = 'ADD COLUMN `' . $name . '` ' . $this->createColumnDDL($options);
         }
         $sql .= ' ' .
             implode(', ', $columnsDDL) .
-        '';
+            '';
         $connection->execute($sql);
     }
 
     public function dropColumn(Connection $connection, $tableName, array $columns)
     {
-        $sql = 'ALTER TABLE `'.$tableName.'`';
+        $sql = 'ALTER TABLE `' . $tableName . '`';
         $columnsDDL = [];
-        foreach ( $columns as $name ) {
-            $columnsDDL[] = 'DROP COLUMN `'.$name.'`';
+        foreach ($columns as $name) {
+            $columnsDDL[] = 'DROP COLUMN `' . $name . '`';
         }
         $sql .= ' ' .
             implode(', ', $columnsDDL) .
-        '';
+            '';
         $connection->execute($sql);
     }
 
     public function addIndex(Connection $connection, $tableName, array $indexes)
     {
-        $sql = 'ALTER TABLE `'.$tableName.'`';
+        $sql = 'ALTER TABLE `' . $tableName . '`';
         $indexesDDL = [];
-        foreach ( $indexes as $name => $options ) {
+        foreach ($indexes as $name => $options) {
             $indexesDDL[] = 'ADD ' . $this->createIndexDDL($name, $options);
         }
         $sql .= ' ' .
             implode(', ', $indexesDDL) .
-        '';
+            '';
         $connection->execute($sql);
     }
 
     public function dropIndex(Connection $connection, $tableName, array $indexes)
     {
-        $sql = 'ALTER TABLE `'.$tableName.'`';
+        $sql = 'ALTER TABLE `' . $tableName . '`';
         $indexesDDL = [];
-        foreach ( $indexes as $name ) {
-            $indexesDDL[] = 'DROP INDEX `'.$name.'`';
+        foreach ($indexes as $name) {
+            $indexesDDL[] = 'DROP INDEX `' . $name . '`';
         }
         $sql .= ' ' .
             implode(', ', $indexesDDL) .
-        '';
+            '';
         $connection->execute($sql);
     }
 
     public function truncateTable(Connection $connection, $tableName)
     {
-        $connection->execute('TRUNCATE TABLE `'.$tableName.'`');
+        $connection->execute('TRUNCATE TABLE `' . $tableName . '`');
     }
 
     public function dropTable(Connection $connection, $tableName)
     {
-        $connection->execute('DROP TABLE `'.$tableName.'`');
+        $connection->execute('DROP TABLE `' . $tableName . '`');
     }
 
     public function findAllByColumn($class, $column, $value)

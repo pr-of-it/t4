@@ -40,10 +40,10 @@ abstract class Migration
 
     abstract public function down();
 
-    final protected function createTable($tableName, $columns=[], $indexes=[])
+    final protected function createTable($tableName, $columns=[], $indexes=[], $extensions=[])
     {
         $driver = $this->db->getDriver();
-        $driver->createTable($this->db, $tableName, $columns, $indexes);
+        $driver->createTable($this->db, $tableName, $columns, $indexes, $extensions);
         echo 'Table `' . $tableName . '` is created'."\n";
     }
 

@@ -5,7 +5,7 @@ namespace T4\Dbal;
 
 interface IDriver
 {
-    public function createTable(Connection $connection, $tableName, $columns=[], $indexes=[]);
+    public function createTable(Connection $connection, $tableName, $columns = [], $indexes = [], $extensions = []);
 
     public function addColumn(Connection $connection, $tableName, array $columns);
 
