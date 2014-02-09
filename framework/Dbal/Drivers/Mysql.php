@@ -27,7 +27,22 @@ class Mysql
                 return 'FLOAT NOT NULL';
                 break;
             case 'text':
-                return 'TEXT';
+                switch (strtolower($options['length'])) {
+                    case 'tiny':
+                    case 'small':
+                        return 'TINYTEXT';
+                        break;
+                    case 'medium':
+                        return 'MEDIUMTEXT';
+                        break;
+                    case 'long':
+                    case 'big':
+                        return 'LONGTEXT';
+                        break;
+                    default:
+                        return 'TEXT';
+                        break;
+                };
                 break;
             case 'string':
             default:
