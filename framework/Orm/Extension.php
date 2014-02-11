@@ -2,11 +2,28 @@
 
 namespace T4\Orm;
 
-interface Extension
+abstract class Extension
 {
 
-    public function prepareColumns($columns);
+    public function prepareColumns($columns)
+    {
+        return $columns;
+    }
 
-    public function prepareIndexes($indexes);
+    public function prepareIndexes($indexes)
+    {
+        return $indexes;
+    }
+
+    public function callStatic($class, $method, $argv)
+    {
+        throw new Exception('Method ' . $method . ' is not found in extension ' . get_called_class());
+    }
+
+    public function call($model, $method, $argv)
+    {
+        throw new Exception('Method ' . $method . ' is not found in extension ' . get_called_class());
+    }
+
 
 } 

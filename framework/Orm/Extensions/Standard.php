@@ -6,7 +6,7 @@ use T4\Orm\Exception;
 use T4\Orm\Extension;
 
 class Standard
-    implements Extension
+    extends Extension
 {
 
     public function prepareColumns($columns)
