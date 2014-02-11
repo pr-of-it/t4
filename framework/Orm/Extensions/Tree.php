@@ -2,7 +2,10 @@
 
 namespace T4\Orm\Extensions;
 
+use T4\Orm\Extension;
+
 class Tree
+    implements Extension
 {
 
     public function prepareColumns($columns)
