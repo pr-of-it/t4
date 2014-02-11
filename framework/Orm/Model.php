@@ -28,21 +28,40 @@ abstract class Model
     static protected $schema = [];
 
     /**
+     * Расширения, подключаемые к модели
+     * @var array
+     */
+    static protected $extensions = [];
+
+    /**
      * Схема модели
      * с учетом изменений, внесенных расширениями
      * @return array
      */
     public static function getSchema()
     {
-        $schema = static::$schema;
-        if (isset($schema['extensions']) && !empty($schema['extensions'])) {
-            foreach ( $schema['extensions'] as $extension ) {
-                $extensionClassName = '\\T4\\Orm\\Extensions\\'.ucfirst($extension);
-                $extension = new $extensionClassName;
-                $schema['columns'] = $extension->prepareColumns($schema['columns']);
+        static $schema = null;
+        if (null === $schema) {
+            $schema = static::$schema;
+            $extensions = static::getExtensions();
+            if (!empty($extensions)) {
+                foreach ( $extensions as $extension ) {
+                    $extensionClassName = '\\T4\\Orm\\Extensions\\'.ucfirst($extension);
+                    $extension = new $extensionClassName;
+                    $schema['columns'] = $extension->prepareColumns($schema['columns']);
+                }
             }
         }
         return $schema;
+    }
+
+    /**
+     * Список расширений, подключаемых к модели
+     * @return array
+     */
+    public static function getExtensions()
+    {
+        return static::$extensions ?: [];
     }
 
     /**
