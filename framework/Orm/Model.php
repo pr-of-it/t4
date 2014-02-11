@@ -122,4 +122,22 @@ abstract class Model
         }
     }
 
+    public function __call($method, $argv)
+    {
+        $class = get_class($this);
+        $extensions = $class::getExtensions();
+        foreach ( $extensions as $extension ) {
+            $extensionClassName = '\\T4\\Orm\\Extensions\\'.ucfirst($extension);
+            $extension = new $extensionClassName;
+            try {
+                if (method_exists($extension, 'call')) {
+                    $result = $extension->call($this, $method, $argv);
+                    return $result;
+                }
+            } catch (Exception $e) {
+                continue;
+            }
+        }
+    }
+
 }

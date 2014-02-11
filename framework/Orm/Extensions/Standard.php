@@ -32,4 +32,16 @@ class Standard
         throw new Exception('Method ' . $method . ' is not found in extension ' . __CLASS__);
     }
 
+    public function call($model, $method, $argv)
+    {
+        switch (true) {
+            case preg_match('~^set(.+)$~', $method, $m):
+                $column = lcfirst($m[1]);
+                $model->{$column} = $argv[0];
+                return $model;
+                break;
+        }
+        throw new Exception('Method ' . $method . ' is not found in extension ' . __CLASS__);
+    }
+
 }
