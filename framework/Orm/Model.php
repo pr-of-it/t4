@@ -44,12 +44,10 @@ abstract class Model
         if (null === $schema) {
             $schema = static::$schema;
             $extensions = static::getExtensions();
-            if (!empty($extensions)) {
-                foreach ( $extensions as $extension ) {
-                    $extensionClassName = '\\T4\\Orm\\Extensions\\'.ucfirst($extension);
-                    $extension = new $extensionClassName;
-                    $schema['columns'] = $extension->prepareColumns($schema['columns']);
-                }
+            foreach ( $extensions as $extension ) {
+                $extensionClassName = '\\T4\\Orm\\Extensions\\'.ucfirst($extension);
+                $extension = new $extensionClassName;
+                $schema['columns'] = $extension->prepareColumns($schema['columns']);
             }
         }
         return $schema;
@@ -61,7 +59,14 @@ abstract class Model
      */
     public static function getExtensions()
     {
-        return static::$extensions ?: [];
+        return static::$extensions ?
+            ['standard'] + static::$extensions :
+            ['standard'];
+    }
+
+    public static function getColumns() {
+        $schema = static::getSchema();
+        return $schema['columns'];
     }
 
     /**
@@ -95,9 +100,26 @@ abstract class Model
         return $connection;
     }
 
-    public static function getColumns() {
-        $schema = static::getSchema();
-        return $schema['columns'];
+
+    /**
+     * Раздел "магии"
+     */
+
+    public static function __callStatic($method, $argv)
+    {
+        $extensions = static::getExtensions();
+        foreach ( $extensions as $extension ) {
+            $extensionClassName = '\\T4\\Orm\\Extensions\\'.ucfirst($extension);
+            $extension = new $extensionClassName;
+            try {
+                if (method_exists($extension, 'callStatic')) {
+                    $result = $extension->callStatic(get_called_class(), $method, $argv);
+                    return $result;
+                }
+            } catch (Exception $e) {
+                continue;
+            }
+        }
     }
 
 }
