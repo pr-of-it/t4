@@ -73,8 +73,8 @@ class Mysql
     public function createTable(Connection $connection, $tableName, $columns = [], $indexes = [], $extensions = [])
     {
 
-        foreach ( $extensions as $extension ) {
-            $extensionClassName = '\\T4\\Orm\\Extensions\\'.ucfirst($extension);
+        foreach ($extensions as $extension) {
+            $extensionClassName = '\\T4\\Orm\\Extensions\\' . ucfirst($extension);
             $extension = new $extensionClassName;
             $columns = $extension->prepareColumns($columns);
             $indexes = $extension->prepareIndexes($indexes);
@@ -170,6 +170,26 @@ class Mysql
     public function dropTable(Connection $connection, $tableName)
     {
         $connection->execute('DROP TABLE `' . $tableName . '`');
+    }
+
+    public function findAll($class, $options = [])
+    {
+        $connection = $class::getDbConnection();
+        $sql = '
+            SELECT *
+            FROM `' . $class::getTableName() . '`
+            ' . ( !empty($options['where']) ? 'WHERE '.$options['where'] : '' ) . '
+            ' . ( !empty($options['order']) ? 'ORDER BY '.$options['order'] : '' ) . '
+        ';
+        $statement = $connection->query($sql);
+        $result = $statement->fetchAll(\PDO::FETCH_CLASS, $class);
+        if (!empty($result)) {
+            $ret = new Collection($result);
+            $ret->setNew(false);
+        } else {
+            $ret = new Collection();
+        }
+        return $ret;
     }
 
     public function findAllByColumn($class, $column, $value)

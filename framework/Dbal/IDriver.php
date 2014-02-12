@@ -19,6 +19,8 @@ interface IDriver
 
     public function dropTable(Connection $connection, $tableName);
 
+    public function findAll($class, $options = []);
+
     public function findAllByColumn($class, $column, $value);
 
     public function findByColumn($class, $column, $value);

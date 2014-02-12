@@ -31,6 +31,12 @@ trait TCrud
         return $this->isDeleted;
     }
 
+    public static function findAll($options=[])
+    {
+        $driver = static::getDbDriver();
+        return $driver->findAll(get_called_class(), $options);
+    }
+
     public static function findAllByColumn($column, $value)
     {
         $driver = static::getDbDriver();
