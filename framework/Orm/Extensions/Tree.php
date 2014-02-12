@@ -5,6 +5,7 @@ namespace T4\Orm\Extensions;
 use T4\Dbal\QueryBuilder;
 use T4\Orm\Exception;
 use T4\Orm\Extension;
+use T4\Orm\Model;
 
 class Tree
     extends Extension
@@ -39,9 +40,11 @@ class Tree
         /** @var $connection \T4\Dbal\Connection */
         $connection = $class::getDbConnection();
 
-        $model->__prt = (int)$model->__prt;
-        if (0 != $model->__prt) {
-            $parent = $class::findByPk($model->__prt);
+        /**
+         * Был вызван метод setParent(array|Model $parent)
+         */
+        if ( !empty($model->__parent) ) {
+            $parent = $class::findByPk($model->__parent);
             if (empty($parent))
                 return false;
         }
@@ -80,6 +83,8 @@ class Tree
                 $model->__lft = $rgt;
                 $model->__rgt = $rgt + 1;
                 $model->__lvl = $lvl + 1;
+                $model->__prt = $model->__parent;
+                $model->__parent = null;
                 return true;
             }
 
@@ -87,6 +92,15 @@ class Tree
              * Перенос в дереве уже существующей записи
              */
         } else {
+
+            $lft = $model->__lft;
+            $rgt = $model->__rgt;
+            $lvl = $model->__lvl;
+            if (isset($parent)) {
+                $lvlUp = $parent->__lvl;
+            } else {
+                $lvlUp = 0;
+            }
             die('ERROR!');
         }
 
@@ -102,10 +116,17 @@ class Tree
         throw new Exception('Method ' . $method . ' is not found in extension ' . __CLASS__);
     }
 
-    public function call($model, $method, $argv)
+    public function call(&$model, $method, $argv)
     {
         $class = get_class($model);
         switch (true) {
+            case 'setParent':
+                if ( is_numeric($argv[0]) ) {
+                    $model->__parent = (int)$argv[0];
+                } elseif ( $argv[0] instanceof Model) {
+                    $model->__parent = $argv[0]->__prt;
+                }
+                return $model;
             case 'findAllChildren':
                 return $class::findAll([
                     'where'=>'__lft>'.$model->__lft.' AND __rgt<='.$model->__rgt,
