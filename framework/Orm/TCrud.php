@@ -2,7 +2,6 @@
 
 namespace T4\Orm;
 
-
 trait TCrud
 {
 
@@ -31,6 +30,16 @@ trait TCrud
         return $this->isDeleted;
     }
 
+    /*
+     * Find methods
+     */
+
+    public static function findAll($options = [])
+    {
+        $driver = static::getDbDriver();
+        return $driver->findAll(get_called_class(), $options);
+    }
+
     public static function findAllByColumn($column, $value)
     {
         $driver = static::getDbDriver();
@@ -48,17 +57,58 @@ trait TCrud
         return static::findByColumn(static::PK, $value);
     }
 
+    /*
+     * Save model methods
+     */
+
+    public function beforeSave()
+    {
+        $class = get_class($this);
+        $extensions = $class::getExtensions();
+        foreach ($extensions as $extension) {
+            $extensionClassName = '\\T4\\Orm\\Extensions\\' . ucfirst($extension);
+            $extension = new $extensionClassName;
+            if (!$extension->beforeSave($this))
+                return false;
+        }
+        return true;
+    }
+
     public function save()
     {
-        $driver = static::getDbDriver();
-        $driver->save($this);
-        $this->setNew(false);
+        if ($this->beforeSave()) {
+            $class = get_class($this);
+            $driver = $class::getDbDriver();
+            $driver->save($this);
+            $this->setNew(false);
+        } else {
+            return false;
+        }
+        $this->afterSave();
         return $this;
     }
 
+    public function afterSave()
+    {
+        $class = get_class($this);
+        $extensions = $class::getExtensions();
+        foreach ($extensions as $extension) {
+            $extensionClassName = '\\T4\\Orm\\Extensions\\' . ucfirst($extension);
+            $extension = new $extensionClassName;
+            if (!$extension->afterSave($this))
+                return false;
+        }
+        return true;
+    }
+
+    /*
+     * Delete model methods
+     */
+
     public function delete()
     {
-        $driver = static::getDbDriver();
+        $class = get_class($this);
+        $driver = $class::getDbDriver();
         $driver->delete($this);
         $this->setDeleted(true);
     }
