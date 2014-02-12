@@ -85,7 +85,9 @@ class QueryBuilder
                 if (!is_array($this->select)) {
                     $this->select = preg_split('~\,[\s]*~', $this->select, -1, \PREG_SPLIT_NO_EMPTY);
                 }
+                // TODO: грамотное экранирование имен полей
                 $sql = "SELECT `" . implode('`, `', $this->select). "`\n";
+                $sql = "SELECT " . implode(', ', $this->select). "\n";
             }
 
             /*
@@ -94,7 +96,9 @@ class QueryBuilder
             if (!is_array($this->from)) {
                 $this->from = preg_split('~\,[\s]*~', $this->from, -1, \PREG_SPLIT_NO_EMPTY);
             }
+            // TODO: грамотное экранирование имен таблиц
             $sql .= "FROM `" . implode('`, `', $this->from). "`\n";
+            $sql .= "FROM " . implode(', ', $this->from). "\n";
 
             /*
              * WHERE part
