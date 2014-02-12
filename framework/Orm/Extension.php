@@ -72,7 +72,7 @@ abstract class Extension
      * @param $argv array
      * @throws \T4\Orm\Exception
      */
-    public function call($model, $method, $argv)
+    public function call(&$model, $method, $argv)
     {
         throw new Exception('Method ' . $method . ' is not found in extension ' . get_called_class());
     }
