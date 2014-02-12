@@ -22,7 +22,7 @@ class Standard
         throw new Exception('Method ' . $method . ' is not found in extension ' . __CLASS__);
     }
 
-    public function call($model, $method, $argv)
+    public function call(&$model, $method, $argv)
     {
         switch (true) {
             case preg_match('~^set(.+)$~', $method, $m):
