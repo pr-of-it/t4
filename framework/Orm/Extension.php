@@ -15,6 +15,16 @@ abstract class Extension
         return $indexes;
     }
 
+    public function beforeSave($model)
+    {
+        return true;
+    }
+
+    public function afterSave($model)
+    {
+        return true;
+    }
+
     public function callStatic($class, $method, $argv)
     {
         throw new Exception('Method ' . $method . ' is not found in extension ' . get_called_class());
@@ -25,5 +35,4 @@ abstract class Extension
         throw new Exception('Method ' . $method . ' is not found in extension ' . get_called_class());
     }
 
-
-} 
+}

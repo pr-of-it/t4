@@ -9,16 +9,6 @@ class Standard
     extends Extension
 {
 
-    public function prepareColumns($columns)
-    {
-        return $columns;
-    }
-
-    public function prepareIndexes($indexes)
-    {
-        return $indexes;
-    }
-
     public function callStatic($class, $method, $argv)
     {
         switch (true) {
