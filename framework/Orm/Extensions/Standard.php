@@ -27,6 +27,9 @@ class Standard
         switch (true) {
             case preg_match('~^set(.+)$~', $method, $m):
                 $column = lcfirst($m[1]);
+                $columns = $model->getColumns();
+                if (!isset($columns[$column]))
+                    throw new Exception('Column `'.$column.'` is not defined in model '.get_class($model));
                 $model->{$column} = $argv[0];
                 return $model;
                 break;
