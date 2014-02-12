@@ -39,38 +39,55 @@ class Tree
         /** @var $connection \T4\Dbal\Connection */
         $connection = $class::getDbConnection();
 
+        $model->__prt = (int)$model->__prt;
+        if (0 != $model->__prt) {
+            $parent = $class::findByPk($model->__prt);
+            if (empty($parent))
+                return false;
+        }
+
         /**
          * Вставка новой записи в таблицу
-         * родительскую запись определяем по полю __prt
+         * ID родительской записи определяем по полю __prt
          */
         if ($model->isNew()) {
-            if (empty($model->__prt)) {
-                $model->__prt = 0;
+
+            /*
+             * Запись вставляется, как новый корень дерева
+             */
+            if ( !isset($parent) ) {
                 $query = new QueryBuilder();
                 $query->select('MAX(__rgt)')->from($tableName);
-                $right = $connection->query($query->getQuery())->fetchScalar() + 1;
-                $level = 0;
+                $rgt = (int)$connection->query($query->getQuery())->fetchScalar() + 1;
+                $lvl = 0;
+                /*
+                 * У записи будет существующий родитель
+                 */
             } else {
-                $parent = $class::findByPk($model->__prt);
-                if (empty($parent))
-                    return false;
-                $right = $parent->__rgt;
-                $level = $parent->__lvl;
+                $rgt = $parent->__rgt;
+                $lvl = $parent->__lvl;
             }
+
             $result = $connection->execute("
                 UPDATE `" . $tableName . "`
                 SET
-                    `__rgt`=:right+2,
-                    `__lft`=IF(`__lft`>:right, `__lft` + 2, `__lft`) WHERE `__rgt`>=:right
-                ", [':right' => $right]);
+                    `__rgt`=__rgt+2,
+                    `__lft`=IF(`__lft`>:rgt, `__lft` + 2, `__lft`) WHERE `__rgt`>=:rgt
+                ", [':rgt' => $rgt]);
             if (!$result) {
                 return false;
             } else {
-                $model->__lft = $right;
-                $model->__rgt = $right + 1;
-                $model->__lvl = $level + 1;
+                $model->__lft = $rgt;
+                $model->__rgt = $rgt + 1;
+                $model->__lvl = $lvl + 1;
                 return true;
             }
+
+            /**
+             * Перенос в дереве уже существующей записи
+             */
+        } else {
+            die('ERROR!');
         }
 
     }

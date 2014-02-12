@@ -90,4 +90,11 @@ class Connection
         return $this->pdo->lastInsertId();
     }
 
+    /**
+     * @return array
+     */
+    public function getErrorInfo() {
+        return $this->pdo->errorInfo();
+    }
+
 }
