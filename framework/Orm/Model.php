@@ -60,7 +60,7 @@ abstract class Model
     public static function getExtensions()
     {
         return !empty(static::$extensions) ?
-            ['standard'] + static::$extensions :
+            array_merge(['standard'], static::$extensions) :
             ['standard'];
     }
 
