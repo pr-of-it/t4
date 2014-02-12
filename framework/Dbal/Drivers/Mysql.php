@@ -6,6 +6,7 @@ namespace T4\Dbal\Drivers;
 use T4\Core\Collection;
 use T4\Dbal\Connection;
 use T4\Dbal\IDriver;
+use T4\Dbal\QueryBuilder;
 use T4\Orm\Model;
 
 class Mysql
@@ -174,15 +175,15 @@ class Mysql
 
     public function findAll($class, $options = [])
     {
-        $connection = $class::getDbConnection();
-        $sql = '
-            SELECT *
-            FROM `' . $class::getTableName() . '`
-            ' . ( !empty($options['where']) ? 'WHERE '.$options['where'] : '' ) . '
-            ' . ( !empty($options['order']) ? 'ORDER BY '.$options['order'] : '' ) . '
-        ';
-        $statement = $connection->query($sql);
-        $result = $statement->fetchAll(\PDO::FETCH_CLASS, $class);
+        $query = new QueryBuilder();
+        $query
+            ->select('*')
+            ->from($class::getTableName())
+            ->where($options['where'] ?: '')
+            ->order($options['where'] ?: '')
+            ->params($options['params'] ?: []);
+
+        $result = $class::getDbConnection()->query($query->getQuery(), $query->getParams())->fetchAll(\PDO::FETCH_CLASS, $class);
         if (!empty($result)) {
             $ret = new Collection($result);
             $ret->setNew(false);
@@ -194,16 +195,14 @@ class Mysql
 
     public function findAllByColumn($class, $column, $value)
     {
-        $connection = $class::getDbConnection();
-        $sql = '
-            SELECT *
-            FROM `' . $class::getTableName() . '`
-            WHERE
-                `' . $column . '`=:value
-        ';
-        $statement = $connection->query($sql, [':value' => $value]);
-        // TODO: изгнать отюда \PDO
-        $result = $statement->fetchAll(\PDO::FETCH_CLASS, $class);
+        $query = new QueryBuilder();
+        $query
+            ->select('*')
+            ->from($class::getTableName())
+            ->where('`' . $column . '`=:value')
+            ->params([':value' => $value]);
+
+        $result = $class::getDbConnection()->query($query->getQuery(), $query->getParams())->fetchAll(\PDO::FETCH_CLASS, $class);
         if (!empty($result)) {
             $ret = new Collection($result);
             $ret->setNew(false);
@@ -215,16 +214,15 @@ class Mysql
 
     public function findByColumn($class, $column, $value)
     {
-        $connection = $class::getDbConnection();
-        $sql = '
-            SELECT *
-            FROM `' . $class::getTableName() . '`
-            WHERE
-                `' . $column . '`=:value
-            LIMIT 1
-        ';
-        $statement = $connection->query($sql, [':value' => $value]);
-        $result = $statement->fetchObject($class);
+        $query = new QueryBuilder();
+        $query
+            ->select('*')
+            ->from($class::getTableName())
+            ->where('`' . $column . '`=:value')
+            ->limit(1)
+            ->params([':value' => $value]);
+
+        $result = $class::getDbConnection()->query($query->getQuery(), $query->getParams())->fetchObject($class);;
         if (!empty($result))
             $result->setNew(false);
         return $result;
