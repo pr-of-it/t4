@@ -59,7 +59,7 @@ abstract class Model
      */
     public static function getExtensions()
     {
-        return static::$extensions ?
+        return !empty(static::$extensions) ?
             ['standard'] + static::$extensions :
             ['standard'];
     }
