@@ -180,7 +180,7 @@ class Mysql
             ->select('*')
             ->from($class::getTableName())
             ->where($options['where'] ?: '')
-            ->order($options['where'] ?: '')
+            ->order($options['order'] ?: '')
             ->params($options['params'] ?: []);
 
         $result = $class::getDbConnection()->query($query->getQuery(), $query->getParams())->fetchAll(\PDO::FETCH_CLASS, $class);
