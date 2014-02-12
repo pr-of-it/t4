@@ -42,10 +42,15 @@ class Tree
 
         /**
          * Был вызван метод setParent(array|Model $parent)
+         * Находим родительский узел в БД
+         * Проверяем его существование
+         * и то, не равен ли он данному (замыкание на себя)
          */
         if ( !empty($model->__parent) ) {
             $parent = $class::findByPk($model->__parent);
             if (empty($parent))
+                return false;
+            if ($parent->{$class::PK} == $model->{$class::PK})
                 return false;
         }
 
@@ -93,6 +98,17 @@ class Tree
              */
         } else {
 
+            /**
+             * Метод setParent не вызывался
+             * либо родительский узел не найден в БД
+             * либо родитель не изменился
+             * - перемещение не требуется
+             */
+            // TODO: не рассмотрен случай изменения порядка без смены родительского узла
+            if ( !isset($model->__parent) || !isset($parent) || $parent->{$class::PK}==$model->__prt ) {
+                return true;
+            }
+
             $lft = $model->__lft;
             $rgt = $model->__rgt;
             $lvl = $model->__lvl;
@@ -101,7 +117,100 @@ class Tree
             } else {
                 $lvlUp = 0;
             }
-            die('ERROR!');
+
+            /*
+             * Перенос узла в корень дерева
+             */
+            if (0 == $model->__parent) {
+                $query = new QueryBuilder();
+                $query->select('MAX(__rgt)')->from($tableName);
+                $rgtKeyNear = (int)$connection->query($query->getQuery())->fetchScalar();
+
+            } else {
+                /*
+                 * Простое перемещение в другой узел
+                 */
+                if ( true ) {
+                    $rgtKeyNear = $parent->__rgt - 1;
+                    /*
+                     * Поднятие узла в той же ветке на уровень выше
+                     */
+                } else {
+                    //Правый ключ старого родительского узла??
+                    //$rgtKeyNear =
+                }
+            }
+
+            $skewLvl = $lvlUp - $lvl + 1;
+            $skewTree = $rgt - $lft + 1;
+
+            /*
+             * PK узлов перемещаемой ветки
+             */
+            $ids = $connection->query("
+                    SELECT `" . $class::PK . "`
+                    FROM `" . $tableName . "` AS t WHERE t.__lft >= :lft AND t.__rgt <= :rgt
+                ", [':lft'=>$lft, ':rgt'=>$rgt])->fetchAll(\PDO::FETCH_COLUMN);
+
+            /*
+             * Перемещение в область вышестоящих узлов
+             */
+            if ($rgtKeyNear > $rgt) {
+
+                $skewEdit = $rgtKeyNear - $lft;
+                /*
+                $sql = "
+                UPDATE `" . $tableName . "`
+                SET
+                  __rgt = IF(__lft >= :lft, __rgt + :skewEdit, IF(__rgt < :lft, __rgt + :skewTree, __rgt)),
+                  __lvl = IF(__lft >= :lft, __lvl + :skewLvl, __lvl),
+                  __lft = IF(__lft >= :lft, __lft + :skewEdit, IF(__lft > :rgtKeyNear, __lft + :skewTree, __lft))
+                WHERE __rgt > :rgtKeyNear AND __lft < :rgt
+                ";
+                */
+                $sql = "UPDATE `" . $tableName . "`
+                        SET __rgt = :rgt + :skewTree
+                        WHERE __rgt < :lft AND __rgt > :rgtKeyNear";
+                $result = $connection->execute($sql, [
+                    ':lft'=>$lft, ':rgt'=>$rgt,
+                    ':rgtKeyNear'=>$rgtKeyNear,
+                    ':skewTree'=>$skewTree,
+                ]);
+
+                $sql = "UPDATE `" . $tableName . "`
+                        SET __lft = __lft + :skewTree
+                        WHERE __lft < :lft AND __lft > :rgtKeyNear";
+                $result = $result && $connection->execute($sql, [
+                        ':lft'=>$lft,
+                        ':rgtKeyNear'=>$rgtKeyNear,
+                        ':skewTree'=>$skewTree,
+                    ]);
+
+                $sql = "UPDATE `" . $tableName . "`
+                        SET __lft = __lft + :skewEdit, __rgt = __rgt + :skewEdit, __lvl = __lvl + :skewLvl
+                        WHERE `" . $class::PK . "` IN (" . implode(',', array_unique($ids)) . ")";
+                $result = $result && $connection->execute($sql, [
+                        ':skewEdit'=>$skewEdit, ':skewLvl'=>$skewLvl,
+                    ]);
+
+                if ($result) {
+                    $model->__lft = $model->__lft + $skewEdit;
+                    $model->__rgt = $model->__rgt + $skewEdit;
+                    $model->__lvl = $model->__lvl + $skewLvl;
+                    $model->__prt = $model->__parent;
+                }
+
+                /*
+                 * Перемещение в область нижестоящих узлов
+                 */
+            } else {
+
+                $skewEdit = $rgtKeyNear - $lft + 1 - $skewTree;
+
+            }
+
+            return $result;
+
         }
 
     }
@@ -120,6 +229,7 @@ class Tree
     {
         $class = get_class($model);
         switch (true) {
+            // TODO: убрать отсюда с появлением relations
             case 'setParent':
                 if ( is_numeric($argv[0]) ) {
                     $model->__parent = (int)$argv[0];
