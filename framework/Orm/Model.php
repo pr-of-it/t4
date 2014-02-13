@@ -87,7 +87,7 @@ abstract class Model
     public static function getDbDriver()
     {
         $schema = static::getSchema();
-        $dbConnectionName = $schema['db'] ?: 'default';
+        $dbConnectionName = !empty($schema['db']) ? $schema['db'] : 'default';
         $driver = \T4\Mvc\Application::getInstance()->config->db->{$dbConnectionName}->driver;
         return DriverFactory::getDriver($driver);
     }
@@ -95,7 +95,7 @@ abstract class Model
     public static function getDbConnection()
     {
         $schema = static::getSchema();
-        $dbConnectionName = $schema['db'] ?: 'default';
+        $dbConnectionName = !empty($schema['db']) ? $schema['db'] : 'default';
         $connection = \T4\Mvc\Application::getInstance()->db[$dbConnectionName];
         return $connection;
     }
