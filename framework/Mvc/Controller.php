@@ -49,7 +49,7 @@ abstract class Controller
     {
         static $moduleName = null;
         if (is_null($moduleName)) {
-            if (preg_match('~App\\\\Modules\\\\(.*)\\\\~', get_class($this), $m)) {
+            if (preg_match('~App\\\\Modules\\\\(.*?)\\\\~', get_class($this), $m)) {
                 $moduleName = $m[1];
             } else
                 $moduleName = '';
