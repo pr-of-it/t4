@@ -60,7 +60,6 @@ class Tree
 
         /**
          * Вставка новой записи в таблицу
-         * ID родительской записи определяем по полю __prt
          */
         if ($model->isNew()) {
 
@@ -100,7 +99,107 @@ class Tree
          */
         } else {
 
-            die('ERROR!');
+            $skewTree = $model->__rgt - $model->__lft + 1;
+
+            if (isset($parent)) {
+                $lft = $parent->__rgt;
+                $lvl = $parent->__lvl + 1;
+            } else {
+                $query = new QueryBuilder();
+                $query->select('MAX(__rgt)')->from($tableName);
+                $lft = (int)$connection->query($query->getQuery())->fetchScalar() + 1;
+                $lvl = 0;
+            }
+
+            // Перемещение в диапазон перемещаемого узла запрещено!
+            if ( $lft>0 && $lft>$model->__lft && $lft<=$model->__rgt) {
+                return false;
+            }
+
+            $skewLvl = $lvl - $model->__lvl;
+
+            if ($lft > $model->__lft) {
+                /*
+                 * Перемещение вверх по дереву
+                 */
+                $skewEdit = $lft - $model->__lft - $skewTree;
+
+                $sql = "
+                UPDATE `" . $tableName . "`
+                SET __lft = CASE WHEN __rgt <= " . $model->__rgt . "
+                                     THEN __lft + :skewEdit
+                                     ELSE CASE WHEN __lft > " . $model->__rgt . "
+                                               THEN __lft - :skewTree
+                                               ELSE __lft
+                                          END
+                               END,
+                    __lvl =  CASE WHEN __rgt <= " . $model->__rgt . "
+                                    THEN __lvl + :skewLvl
+                                    ELSE __lvl
+                               END,
+                    __rgt = CASE WHEN __rgt <= " . $model->__rgt . "
+                                     THEN __rgt + :skewEdit
+                                     ELSE CASE WHEN __rgt < :lft
+                                               THEN __rgt - :skewTree
+                                               ELSE __rgt
+                                          END
+                                END
+                WHERE __rgt > " . $model->__lft . " AND
+                      __lft < :lft
+                ";
+                $result = $connection->query($sql, [
+                    ':skewTree'=>$skewTree, ':skewLvl'=>$skewLvl, ':skewEdit'=>$skewEdit,
+                    ':lft' => $lft,
+                ]);
+                if (!$result)
+                    return false;
+                $lft = $lft - $skewTree;
+
+            } else {
+                /*
+                 * Перемещение вниз по дереву
+                 */
+                $skewEdit = $lft - $model->__lft;
+
+                $sql = "
+                UPDATE `" . $tableName . "`
+                    SET
+                        __rgt = CASE WHEN __lft >= " . $model->__lft . "
+                                         THEN __rgt + :skewEdit
+                                         ELSE CASE WHEN __rgt < " . $model->__lft . "
+                                                   THEN __rgt + :skewTree
+                                                   ELSE __rgt
+                                              END
+                                    END,
+                        __lvl = CASE WHEN __lft >= " . $model->__lft . "
+                                         THEN __lvl + :skewLvl
+                                         ELSE __lvl
+                                    END,
+                        __lft =  CASE WHEN __lft >= " . $model->__lft . "
+                                         THEN __lft + :skewEdit
+                                         ELSE CASE WHEN __lft >= :lft
+                                                   THEN __lft + :skewTree
+                                                   ELSE __lft
+                                              END
+                                    END
+                    WHERE __rgt >= :lft AND
+                          __lft < " . $model->__rgt . "
+                ";
+                $result = $connection->query($sql, [
+                    ':skewTree'=>$skewTree, ':skewLvl'=>$skewLvl, ':skewEdit'=>$skewEdit,
+                    ':lft' => $lft,
+                ]);
+                if (!$result)
+                    return false;
+
+            }
+
+            $model->__lft = $lft;
+            $model->__lvl = $lvl;
+            $model->__rgt = $lft + $skewTree - 1;
+            $model->__prt = $parentId;
+
+            return true;
 
         }
 
