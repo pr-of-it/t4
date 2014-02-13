@@ -106,6 +106,36 @@ class Tree
 
     }
 
+    /**
+     * Удаление узла дерева
+     * В данном методе удаляются все оставшиеся подузлы
+     * @param \T4\Orm\Model $model
+     * @return bool
+     */
+    public function afterDelete(&$model)
+    {
+        $class = get_class($model);
+        $tableName = $class::getTableName();
+        /** @var $connection \T4\Dbal\Connection */
+        $connection = $class::getDbConnection();
+
+        $sql = "
+            DELETE FROM `" . $tableName . "`
+            WHERE __lft >= :lft AND __rgt <= :rgt
+            ";
+        $result = $connection->execute($sql, [':lft' => $model->__lft, ':rgt' => $model->__rgt]);
+
+        $sql = "
+            UPDATE `" . $tableName . "`
+                SET __lft = IF(__lft > :lft, __lft - (:rgt - :lft + 1), __lft),
+                __rgt = __rgt - (:rgt - :lft + 1)
+            WHERE __rgt > :rgt
+            ";
+        $result = $result && $connection->execute($sql, [':lft' => $model->__lft, ':rgt' => $model->__rgt]);
+
+        return $result;
+    }
+
     public function callStatic($class, $method, $argv)
     {
         switch (true) {
@@ -125,7 +155,8 @@ class Tree
                 if ( is_numeric($argv[0]) ) {
                     $model->__parent = (int)$argv[0];
                 } elseif ( $argv[0] instanceof Model) {
-                    $model->__parent = $argv[0]->__prt;
+                    $class = get_class($model);
+                    $model->__parent = $argv[0]->{$class::PK};
                 }
                 return $model;
             case 'findAllChildren':

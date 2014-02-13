@@ -52,6 +52,27 @@ abstract class Extension
     }
 
     /**
+     * Метод, срабатывающий перед удалением модели из БД
+     * Возврат false предотвращает удаление
+     * @param $model \T4\Orm\Model
+     * @return bool
+     */
+    public function beforeDelete(&$model)
+    {
+        return true;
+    }
+
+    /**
+     * Метод, срабатывающий после удаления модели в БД
+     * @param $model \T4\Orm\Model
+     * @return bool
+     */
+    public function afterDelete(&$model)
+    {
+        return true;
+    }
+
+    /**
      * Метод-коллекция статических методов, добавляемых к модели
      * Должен выбрасывать исключение, если в данном расширении указанный метод не найден
      * @param $class string

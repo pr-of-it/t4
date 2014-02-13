@@ -53,7 +53,7 @@ class Connection
      * @param $sql
      * @return Statement
      */
-    protected function prepare($sql)
+    public function prepare($sql)
     {
         $statement = $this->pdo->prepare($sql);
         return $statement;
