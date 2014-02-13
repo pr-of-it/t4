@@ -105,12 +105,46 @@ trait TCrud
      * Delete model methods
      */
 
-    public function delete()
+    public function beforeDelete()
     {
         $class = get_class($this);
-        $driver = $class::getDbDriver();
-        $driver->delete($this);
-        $this->setDeleted(true);
+        $extensions = $class::getExtensions();
+        foreach ($extensions as $extension) {
+            $extensionClassName = '\\T4\\Orm\\Extensions\\' . ucfirst($extension);
+            $extension = new $extensionClassName;
+            if (!$extension->beforeDelete($this))
+                return false;
+        }
+        return true;
+    }
+
+    public function delete()
+    {
+        if ($this->isNew())
+            return false;
+        if ($this->beforeDelete()) {
+            $class = get_class($this);
+            $driver = $class::getDbDriver();
+            $driver->delete($this);
+            $this->setDeleted(true);
+        } else {
+            return false;
+        }
+        $this->afterDelete();
+        return $this;
+    }
+
+    public function afterDelete()
+    {
+        $class = get_class($this);
+        $extensions = $class::getExtensions();
+        foreach ($extensions as $extension) {
+            $extensionClassName = '\\T4\\Orm\\Extensions\\' . ucfirst($extension);
+            $extension = new $extensionClassName;
+            if (!$extension->afterDelete($this))
+                return false;
+        }
+        return true;
     }
 
 }
