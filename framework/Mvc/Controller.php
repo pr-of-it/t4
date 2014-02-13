@@ -4,7 +4,6 @@ namespace T4\Mvc;
 
 use T4\Core\Std;
 
-
 abstract class Controller
 {
 
@@ -30,11 +29,32 @@ abstract class Controller
     {
         $this->data = new Std();
         $this->app = Application::getInstance();
-        $this->view = new View([
-            $this->app->getPath() . DS . 'Templates' . DS . $this->getShortName(),
-            $this->app->getPath() . DS . 'Layouts'
-        ]);
+
+        $templatesPaths = [];
+        if ('' == $this->getModuleName()) {
+            $templatesPaths[] = $this->app->getPath() . DS . 'Templates' . DS . $this->getShortName();
+        } else {
+            $templatesPaths[] = $this->app->getPath() . DS . 'Modules' . DS . $this->getModuleName() . DS . 'Templates' . DS . $this->getShortName();
+        }
+        if ('' != $this->getModuleName() && is_readable($moduleLayoutPath = $this->app->getPath() . DS . 'Layouts' . DS . $this->getModuleName())) {
+            $templatesPaths[] = $moduleLayoutPath;
+        }
+        $templatesPaths[] = $this->app->getPath() . DS . 'Layouts';
+
+        $this->view = new View($templatesPaths);
         $this->view->setController($this);
+    }
+
+    public function getModuleName()
+    {
+        static $moduleName = null;
+        if (is_null($moduleName)) {
+            if (preg_match('~App\\\\Modules\\\\(.*)\\\\~', get_class($this), $m)) {
+                $moduleName = $m[1];
+            } else
+                $moduleName = '';
+        }
+        return $moduleName;
     }
 
     public function getShortName()
