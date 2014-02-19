@@ -1,6 +1,5 @@
 <?php
 
-
 namespace T4\Fs;
 
 class Helpers
