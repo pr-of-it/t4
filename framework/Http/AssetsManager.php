@@ -49,18 +49,14 @@ class AssetsManager
             Helpers::mkDir($assetBasePath);
             if ('dir' == $type) {
                 Helpers::copyDir($realPath, $assetBasePath);
-                echo 'Copy!!!';
             } else {
                 Helpers::copyFile($realPath, $assetBasePath);
-                echo 'Copy!!!';
             }
         } else {
             if ('dir' == $type && filemtime($realPath.DS.'.') > filemtime($assetBasePath.DS.'.')) {
                 Helpers::copyDir($realPath, $assetBasePath);
-                echo 'Copy!!!';
             } elseif (filemtime($realPath) > filemtime($assetBasePath)) {
                 Helpers::copyFile($realPath, $assetBasePath);
-                echo 'Copy!!!';
             }
         }
 
