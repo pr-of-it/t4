@@ -35,10 +35,12 @@ class Helpers
         if (!is_readable($src)) {
             throw new Exception('File ' . $src . ' is not readable');
         }
+
+        $dstPath = pathinfo($dst, PATHINFO_DIRNAME);
+        if (!is_readable($dstPath))
+            self::mkDir($dstPath);
+
         if (is_dir($dst)) {
-            if (!is_readable($dst)) {
-                throw new Exception('Dir ' . $dst . ' is not readable');
-            }
             $dst = $dst . DS . basename($src);
         }
 

@@ -2,7 +2,9 @@
 
 namespace T4\Http;
 
+use T4\Core\Exception;
 use T4\Core\TSingleton;
+use T4\Fs\Helpers;
 
 class AssetsManager
 {
@@ -14,6 +16,66 @@ class AssetsManager
     protected $publishCss = [];
     protected $publishJs = [];
 
+    /**
+     * Публикует ресурс (файл или директорию)
+     * Возвращает публичный URL ресурса
+     * @param string $path
+     * @return string
+     */
+    public function publish($path)
+    {
+        // Получаем абсолютный путь в ФС до ресурса и узнаем тип ресурса
+        $realPath = $this->getRealPath($path);
+        $type = is_dir($realPath) ? 'dir' : 'file';
+
+        // Ищем такой путь среди уже опубликованных при этом запуске приложения
+        foreach ($this->assets as $asset) {
+            if ( $asset['path'] == $realPath || false !== strpos($realPath, $asset['path']) ) {
+                return str_replace(DS, '/', str_replace($asset['path'], $asset['url'], $realPath));
+            }
+        }
+
+        // Не нашли, нужно публиковать ресурс
+        if ($type == 'dir') {
+            $baseRealPath = $realPath;
+        } else {
+            $baseRealPath = pathinfo($realPath, PATHINFO_DIRNAME);
+        }
+        $pathHash = substr(md5($baseRealPath), 0, 12);
+        $assetBasePath = ROOT_PATH_PUBLIC . DS . 'Assets' . DS . $pathHash;
+        $assetBaseUrl = '/Assets/' . $pathHash;
+
+        if ( !is_readable($assetBasePath) ) {
+            Helpers::mkDir($assetBasePath);
+            if ('dir' == $type) {
+                Helpers::copyDir($realPath, $assetBasePath);
+                echo 'Copy!!!';
+            } else {
+                Helpers::copyFile($realPath, $assetBasePath);
+                echo 'Copy!!!';
+            }
+        } else {
+            if ('dir' == $type && filemtime($realPath.DS.'.') > filemtime($assetBasePath.DS.'.')) {
+                Helpers::copyDir($realPath, $assetBasePath);
+                echo 'Copy!!!';
+            } elseif (filemtime($realPath) > filemtime($assetBasePath)) {
+                Helpers::copyFile($realPath, $assetBasePath);
+                echo 'Copy!!!';
+            }
+        }
+
+        $asset = &$this->assets[];
+        $asset['path'] = $realPath;
+        $asset['url'] = str_replace(DS, '/', str_replace($baseRealPath, $assetBaseUrl, $realPath));
+
+        return $asset['url'];
+
+    }
+
+    /*
+     * CSS
+     */
+
     public function registerCss($url)
     {
         $this->publishCss[] = $url;
@@ -21,7 +83,7 @@ class AssetsManager
 
     public function publishCss($path)
     {
-        $url = $this($path);
+        $url = $this->publish($path);
         $this->registerCss($url);
         return $url;
     }
@@ -34,6 +96,10 @@ class AssetsManager
         return implode("\n", $links)."\n";
     }
 
+    /*
+     * JS
+     */
+
     public function registerJs($url)
     {
         $this->publishCss[] = $url;
@@ -41,7 +107,7 @@ class AssetsManager
 
     public function publishJs($path)
     {
-        $url = $this($path);
+        $url = $this->publish($path);
         $this->registerJs($url);
         return $url;
     }
@@ -54,61 +120,39 @@ class AssetsManager
         return implode("\n", $links)."\n";
     }
 
+    /*
+     * Магия
+     */
+
     public function __invoke($path)
     {
-        if (!isset($this->assets[$path])) {
-            $this->assets[$path]['path'] = $this->makeRealPath($path);
-            $this->assets[$path]['url'] = $this->makeUrl($this->assets[$path]['path']);
-        }
-        return $this->assets[$path]['url'];
+        return $this->publish($path);
     }
 
-    protected function makeRealPath($path)
+    /**
+     * Получает абсолютный путь из условной записи пути до ресурса
+     * Обрабатывает две возможности:
+     * 1. Путь к ресурсу начинается с // - путь указан относительно корня фреймворка
+     * 2. Путь к ресурсу начинается с / - путь указан относительно корня protected
+     * Любой другой путь не будет изменен
+     * @param $path
+     * @return string
+     * @throws \T4\Core\Exception
+     */
+    protected function getRealPath($path)
     {
         if ( preg_match('~^\/\/~', $path) )
             $realPath = preg_replace('~^\/\/~', \T4\ROOT_PATH.DS, $path);
-        elseif (  preg_match('~^\/~', $path)  )
+        elseif (  preg_match('~^\/~', $path)  ) {
             $realPath = preg_replace('~^\/~', ROOT_PATH_PROTECTED.DS, $path);
-        else {
+        } else {
             $realPath = $path;
         }
-        return realpath($realPath);
-    }
+        $realPath = realpath($realPath);
+        if (false === $realPath)
+            throw new Exception('Path \'' . $path . '\' for asset is not found');
 
-    protected function makeUrl($path)
-    {
-        $baseName = basename($path);
-        $basePath = pathinfo($path, PATHINFO_DIRNAME);
-        $basePathHash = substr(md5($basePath), 0, 12);
-        $assetPath = ROOT_PATH_PUBLIC . DS . 'Assets' . DS . $basePathHash;
-        $assetUrl = '/Assets/' . $basePathHash;
-        if (!$this->checkCopy($path, $assetPath . DS . $baseName)) {
-            $this->makeCopy($path, $assetPath . DS . $baseName);
-        }
-        return $assetUrl . '/' . $baseName;
-    }
-
-    protected function checkCopy($realPath, $assetPath)
-    {
-        if (!is_readable(dirname($assetPath))) {
-            return false;
-        }
-        if (!is_readable($assetPath)) {
-            return false;
-        }
-        if (filemtime($realPath) >= filemtime($assetPath)) {
-            return false;
-        }
-        return true;
-    }
-
-    protected function makeCopy($realPath, $assetPath)
-    {
-        // TODO: переписать через FS\Helpers
-        if (!is_readable(dirname($assetPath)))
-            mkdir(dirname($assetPath), 0777, true);
-        copy($realPath, $assetPath);
-        touch($assetPath);
+        return $realPath;
     }
 
 }
