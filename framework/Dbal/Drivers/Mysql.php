@@ -30,6 +30,7 @@ class Mysql
                 return 'FLOAT NOT NULL';
                 break;
             case 'text':
+                $options['length'] = $options['length'] ?: '';
                 switch (strtolower($options['length'])) {
                     case 'tiny':
                     case 'small':
@@ -179,9 +180,9 @@ class Mysql
         $query
             ->select('*')
             ->from($class::getTableName())
-            ->where($options['where'] ?: '')
-            ->order($options['order'] ?: '')
-            ->params($options['params'] ?: []);
+            ->where(!empty($options['where']) ? $options['where'] : '')
+            ->order(!empty($options['order']) ? $options['order'] : '')
+            ->params(!empty($options['params']) ? $options['params'] : []);
 
         $result = $class::getDbConnection()->query($query->getQuery(), $query->getParams())->fetchAll(\PDO::FETCH_CLASS, $class);
         if (!empty($result)) {
