@@ -2,6 +2,7 @@
 
 namespace T4\Mvc;
 
+use T4\Core\Exception;
 use T4\Core\TSingleton;
 
 class Router
@@ -44,8 +45,7 @@ class Router
          * Попытка найти роут в файле конфигурации роутинга
          */
         foreach ($routes as $urlTemplate => $internalPath) {
-            if ( false !== $params = $this->matchUrlTemplate($urlTemplate, $url->base) )
-            {
+            if (false !== $params = $this->matchUrlTemplate($urlTemplate, $url->base)) {
                 $internalPath = preg_replace_callback(
                     '~\<(\d+)\>~',
                     function ($m) use ($params) {
@@ -62,19 +62,11 @@ class Router
         /**
          * Попытка разобрать URL самостоятельно
          */
-        $urlParts = preg_split('~/~', $url->base, -1, PREG_SPLIT_NO_EMPTY);;
-        if ( 0<=count($urlParts) && count($urlParts)<4 ) {
-            $urlParts = array_pad($urlParts, 3, '');
-            return new Route([
-                'module' => ucfirst($urlParts[0]),
-                'controller' => $urlParts[1] ? ucfirst($urlParts[1]) : self::DEFAULT_CONTROLLER,
-                'action' => $urlParts[2] ? ucfirst($urlParts[2]) : self::DEFAULT_ACTION,
-                'params' => [],
-                'format' => $url->extension ? : 'html'
-            ]);
+        try {
+            return $this->guessInternalPath($url);
+        } catch (ERouterException $e) {
+            throw new ERouterException('Route to path \'' . $url->base . '\' is not found');
         }
-
-        throw new ERouterException('Route to path \'' . $url->base . '\' is not found');
 
     }
 
@@ -118,18 +110,18 @@ class Router
      */
     protected function matchUrlTemplate($template, $url)
     {
-        $template = '~^'.preg_replace('~\<(\d+)\>~', '(?<p_$1>.+?)', $template).'$~';
+        $template = '~^' . preg_replace('~\<(\d+)\>~', '(?<p_$1>.+?)', $template) . '$~';
         if (!preg_match($template, $url, $m)) {
             return false;
         } else {
             $matches = [];
-            foreach ( $m as $key => $value ) {
-                if (substr($key, 0, 2)=='p_') {
+            foreach ($m as $key => $value) {
+                if (substr($key, 0, 2) == 'p_') {
                     $matches[substr($key, 2)] = $value;
                 }
             }
             return $matches;
-        };
+        }
     }
 
     /**
@@ -173,9 +165,102 @@ class Router
      */
     public function mergeInternalPath(Route $route)
     {
-        return '/'.$route->module.'/'.
-            ($route->controller == self::DEFAULT_CONTROLLER ? '' : $route->controller). '/'.
-            ($route->action == self::DEFAULT_ACTION ? '' : $route->action);
+        return '/' . $route->module . '/' .
+        ($route->controller == self::DEFAULT_CONTROLLER ? '' : $route->controller) . '/' .
+        ($route->action == self::DEFAULT_ACTION ? '' : $route->action);
+    }
+
+    /**
+     * Пытается подобрать соответствующий роутинг для URL, отсутствующего в конфиге роутинга
+     * @param \T4\Mvc\Route $url
+     * @return Route
+     * @throws ERouterException
+     */
+    protected function guessInternalPath($url)
+    {
+        $urlParts = preg_split('~/~', $url->base, -1, PREG_SPLIT_NO_EMPTY);
+
+        if (0 == count($urlParts)) {
+            return new Route([
+                'module' => '',
+                'controller' => self::DEFAULT_CONTROLLER,
+                'action' => self::DEFAULT_ACTION,
+                'params' => [],
+                'format' => $url->extension ? : 'html',
+            ]);
+        }
+
+        if (1 == count($urlParts)) {
+            if ($this->app->existsModule($urlParts[0]))
+                return new Route([
+                    'module' => ucfirst($urlParts[0]),
+                    'controller' => self::DEFAULT_CONTROLLER,
+                    'action' => self::DEFAULT_ACTION,
+                    'params' => [],
+                    'format' => $url->extension ? : 'html',
+                ]);
+            elseif ($this->app->existsController('', $urlParts[0]))
+                return new Route([
+                    'module' => '',
+                    'controller' => ucfirst($urlParts[0]),
+                    'action' => self::DEFAULT_ACTION,
+                    'params' => [],
+                    'format' => $url->extension ? : 'html',
+                ]);
+            else
+                return new Route([
+                    'module' => '',
+                    'controller' => self::DEFAULT_CONTROLLER,
+                    'action' => ucfirst($urlParts[0]),
+                    'params' => [],
+                    'format' => $url->extension ? : 'html',
+                ]);
+        }
+
+        if (2 == count($urlParts)) {
+            if ($this->app->existsModule($urlParts[0])) {
+                if ($this->app->existsController($urlParts[0], $urlParts[1])) {
+                    return new Route([
+                        'module' => ucfirst($urlParts[0]),
+                        'controller' => ucfirst($urlParts[1]),
+                        'action' => self::DEFAULT_ACTION,
+                        'params' => [],
+                        'format' => $url->extension ? : 'html',
+                    ]);
+                } else {
+                    return new Route([
+                        'module' => ucfirst($urlParts[0]),
+                        'controller' => self::DEFAULT_CONTROLLER,
+                        'action' => ucfirst($urlParts[1]),
+                        'params' => [],
+                        'format' => $url->extension ? : 'html',
+                    ]);
+                }
+            } elseif ($this->app->existsController($urlParts[0])) {
+                return new Route([
+                    'module' => '',
+                    'controller' => ucfirst($urlParts[0]),
+                    'action' => ucfirst($urlParts[1]),
+                    'params' => [],
+                    'format' => $url->extension ? : 'html',
+                ]);
+            }
+        }
+
+        if (3 == count($urlParts)) {
+            if ($this->app->existsModule($urlParts[0]) && $this->app->existsController($urlParts[0], $urlParts[1])) {
+                return new Route([
+                    'module' => ucfirst($urlParts[0]),
+                    'controller' => ucfirst($urlParts[1]),
+                    'action' => ucfirst($urlParts[2]),
+                    'params' => [],
+                    'format' => $url->extension ? : 'html',
+                ]);
+            }
+        }
+
+        throw new ERouterException('Route to path \'' . $url->base . '\' is not found');
+
     }
 
 }
