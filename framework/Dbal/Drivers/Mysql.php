@@ -30,7 +30,7 @@ class Mysql
                 return 'FLOAT NOT NULL';
                 break;
             case 'text':
-                $options['length'] = $options['length'] ?: '';
+                $options['length'] = isset($options['length']) ? $options['length'] : '';
                 switch (strtolower($options['length'])) {
                     case 'tiny':
                     case 'small':
@@ -46,7 +46,7 @@ class Mysql
                     default:
                         return 'TEXT';
                         break;
-                };
+                }
                 break;
             case 'string':
             default:
