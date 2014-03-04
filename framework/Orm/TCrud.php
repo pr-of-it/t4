@@ -8,6 +8,11 @@ trait TCrud
     protected $isNew = true;
     protected $isDeleted = false;
 
+    public function getPk()
+    {
+        return $this->{static::PK};
+    }
+
     public function setNew($new)
     {
         $this->isNew = $new;
