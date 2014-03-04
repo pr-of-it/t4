@@ -107,7 +107,21 @@ abstract class Controller
         if (method_exists($this, $actionMethodName)) {
             // Продолжаем выполнение действия только если из beforeAction не передано false
             if ($this->beforeAction()) {
-                call_user_func_array([$this, $actionMethodName], (array)$params);
+
+                $p = [];
+                foreach ($this->getActionParameters($name) as $argn) {
+                    if (!empty($_GET[$argn]))
+                        $p[$argn] = $_GET[$argn];
+                    if (!empty($_POST[$argn]))
+                        $p[$argn] = $_POST[$argn];
+                    if (!empty($params[$argn])) {
+                        $p[$argn] = $params[$argn];
+                        unset($params[$argn]);
+                    }
+                }
+                $p = array_merge($p, (array)$params);
+
+                call_user_func_array([$this, $actionMethodName], $p);
                 $this->afterAction();
             }
             return $this->data;
