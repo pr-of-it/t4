@@ -13,7 +13,7 @@ class Section
     {
         $id = $this->params->id;
         $app = Application::getInstance();
-        $blocks = App\Models\Block::findAllBySection($id);
+        $blocks = \App\Models\Block::findAllBySection($id);
 
         $ret = '<section role="section" data-section-id="' . $id . '">';
         foreach ($blocks as $block) {
