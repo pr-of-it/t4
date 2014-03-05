@@ -20,9 +20,9 @@ class Section
         foreach ($blocks as $block) {
             $ret .= '<article role="block" data-block-id="' . $block->getPk() . '">' .
                 $app->callBlock($block->path, new Std(json_decode($block->options, true))) .
-                '</article>';
+                '</article>' . "\n";
         }
-        return $ret . '</section>';
+        return $ret . '</section>' . "\n";
     }
 
 }
