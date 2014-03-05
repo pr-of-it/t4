@@ -2,6 +2,7 @@
 
 namespace T4\Mvc\Tags;
 
+use T4\Core\Std;
 use T4\Mvc\Application;
 use T4\Mvc\Tag;
 
@@ -18,7 +19,7 @@ class Section
         $ret = '<section role="section" data-section-id="' . $id . '">';
         foreach ($blocks as $block) {
             $ret .= '<article role="block" data-block-id="' . $block->getPk() . '">' .
-                $app->callBlock($block->path, json_decode($block->options, true)) .
+                $app->callBlock($block->path, new Std(json_decode($block->options, true))) .
                 '</article>';
         }
         return $ret . '</section>';
