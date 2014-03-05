@@ -95,7 +95,7 @@ class app_create_migration extends Migration {
         $this->createTable('blocks', [
             'section'   => ['type'=>'int'],
             'path'      => ['type'=>'string'],
-            'params'    => ['type'=>'text'],
+            'options'    => ['type'=>'text'],
             'order'     => ['type'=>'int'],
         ], [
             ['columns'=>['section']],
