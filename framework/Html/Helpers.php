@@ -14,7 +14,7 @@ class Helpers
         switch ($options['type']) {
             case 'select:tree':
                 $htmlOptions['name'] = $name;
-                $options['model'] = '\\App\\Models\\' . $options['model'];
+                //$options['model'] = '\\App\\Models\\' . $options['model'];
                 return self::selectTreeByModel($options['model'], is_null($value) ? $options['default'] : $value, $htmlOptions);
         }
     }
