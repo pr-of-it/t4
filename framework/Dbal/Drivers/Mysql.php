@@ -236,7 +236,12 @@ class Mysql
         $columns = $class::getColumns();
         $sets = [];
         foreach ($columns as $column => $def) {
-            $sets[] = '`' . $column . '`=\'' . $model->{$column} . '\'';
+            if (isset($model->{$column})) {
+                $value =  $model->{$column};
+            } elseif (isset($def['default'])) {
+                $value = $def['default'];
+            }
+            $sets[] = '`' . $column . '`=\'' . $value . '\'';
         }
 
         $connection = $class::getDbConnection();
