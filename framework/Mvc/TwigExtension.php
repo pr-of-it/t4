@@ -22,6 +22,12 @@ class TwigExtension extends \Twig_Extension
             'publishCss' => new \Twig_Function_Function(function () use ($app) { return $app->assets->getPublishedCss();},  ['is_safe' => ['html']]),
             'publishJs' => new \Twig_Function_Function(function () use ($app) { return $app->assets->getPublishedJs();},  ['is_safe' => ['html']]),
 
+            'selectTreeByModel' => new \Twig_Function_Function(
+                    function ($model, $selected = 0, $htmlOptions = [], $options = []) {
+                        return Helpers::selectTreeByModel($model, $selected, $htmlOptions, $options);
+                    },  ['is_safe' => ['html']]
+                ),
+
             'blockOptionInput' => new \Twig_Function_Function(
                     function ($name, $settings, $value=null, $htmlOptions=[]) use ($app) {
                         return Helpers::blockOptionInput($name, $settings, $value, $htmlOptions);
