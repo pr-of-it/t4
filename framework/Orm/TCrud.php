@@ -36,6 +36,19 @@ trait TCrud
     }
 
     /*
+     * Fill model by data from array
+     */
+
+    public function fill($data)
+    {
+        foreach (array_keys($this->getColumns()) as $column) {
+            if (!empty($data[$column]))
+                $this->{$column} = $data[$column];
+        }
+        return $this;
+    }
+
+    /*
      * Find methods
      */
 
