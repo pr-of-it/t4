@@ -26,8 +26,15 @@ class TwigExtension extends \Twig_Extension
                     function ($name, $settings, $value=null, $htmlOptions=[]) use ($app) {
                         return Helpers::blockOptionInput($name, $settings, $value, $htmlOptions);
                     },  ['is_safe' => ['html']]
-            ),
+                ),
 
+        ];
+    }
+
+    public function getFilters()
+    {
+        return [
+            new \Twig_SimpleFilter('repeat', 'str_repeat'),
         ];
     }
 
