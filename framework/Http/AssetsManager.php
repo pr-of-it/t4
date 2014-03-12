@@ -98,7 +98,7 @@ class AssetsManager
 
     public function registerJs($url)
     {
-        $this->publishCss[] = $url;
+        $this->publishJs[] = $url;
     }
 
     public function publishJs($path)

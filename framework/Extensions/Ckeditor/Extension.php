@@ -12,6 +12,9 @@ class Extension
     {
         $assets = $this->app->assets;
         $assets->publish($this->path.DS.'lib');
+        $assets->publishJs($this->path.DS.'lib'.DS.'ckeditor.js');
+        $assets->publishJs($this->path.DS.'lib'.DS.'adapters'.DS.'jquery.js');
+        $assets->publishJs($this->path.DS.'lib'.DS.'t4.js');
     }
 
 }
