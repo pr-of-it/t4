@@ -8,7 +8,7 @@ use T4\Core\Std;
 class View
 {
 
-    const TAG_PATTERN = '~\<t4:(\S+)[\s]*([\s\S]*?)\/?\>~i';
+    const TAG_PATTERN = '~\<t4:(\S+)[\s]*([\s\S]*?)\/\>~i';
 
     protected $paths = [];
     protected $twig;
