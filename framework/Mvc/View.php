@@ -26,6 +26,8 @@ class View
         $this->twig = new \Twig_Environment($loader);
         $this->twig->addExtension(new TwigExtension());
 
+        $this->twig->addGlobal('app', $this->links->app);
+
     }
 
     public function setController(Controller $controller)

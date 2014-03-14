@@ -26,4 +26,9 @@ class Session
         return $_SESSION[self::SESSION_KEY]->{$key};
     }
 
+    public static function clear($key)
+    {
+        unset($_SESSION[self::SESSION_KEY]->{$key});
+    }
+
 }
