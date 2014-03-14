@@ -4,6 +4,7 @@ namespace T4\Mvc;
 
 use T4\Core\Config;
 use T4\Core\Exception;
+use T4\Core\Session;
 use T4\Core\Std;
 use T4\Core\TSingleton;
 use T4\Dbal\Connection;
@@ -82,6 +83,7 @@ class Application
     /**
      * Конструктор
      * Инициализация:
+     * - сессий
      * - менеджера ресурсов
      * - конфигурации приложения
      * - создание подключений к БД
@@ -89,6 +91,8 @@ class Application
      */
     protected function __construct()
     {
+        Session::init();
+
         $this->config = new Config($this->getPath() . DS . 'config.php');
         $this->config->sections = new Config($this->getPath() . DS . 'sections.php');
         $this->config->blocks = new Config($this->getPath() . DS . 'blocks.php');
