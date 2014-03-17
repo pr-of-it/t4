@@ -96,10 +96,10 @@ class app_create_migration extends Migration {
             'section'   => ['type'=>'int'],
             'path'      => ['type'=>'string'],
             'options'    => ['type'=>'text'],
-            'order'     => ['type'=>'int'],
         ], [
             ['columns'=>['section']],
-            ['columns'=>['order']],
+        ], [
+            'tree'
         ]);
     }
     public function down()
