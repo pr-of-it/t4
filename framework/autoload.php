@@ -8,7 +8,7 @@ spl_autoload_register(function ($className) {
         $className = str_replace('T4', '', $className);
         $fileName = T4\ROOT_PATH . str_replace('\\', DS, $className) . '.php';
     } elseif ( 'App' == substr($className,0,3) ) {
-        $className = str_replace('App', '', $className);
+        $className = preg_replace('~^App~', '', $className);
         $fileName = ROOT_PATH_PROTECTED . str_replace('\\', DS, $className) . '.php';
     } else {
         return false;
