@@ -4,6 +4,8 @@ namespace T4\Mvc;
 
 use T4\Core\Config;
 use T4\Core\Exception;
+use T4\Core\Flash;
+use T4\Core\Session;
 use T4\Core\Std;
 use T4\Core\TSingleton;
 use T4\Dbal\Connection;
@@ -24,6 +26,11 @@ class Application
      * @var \T4\Core\Std
      */
     public $db;
+
+    /**
+     * @var \T4\Core\Flash
+     */
+    public $flash;
 
     /**
      * @var \T4\Http\AssetsManager
@@ -82,6 +89,7 @@ class Application
     /**
      * Конструктор
      * Инициализация:
+     * - сессий
      * - менеджера ресурсов
      * - конфигурации приложения
      * - создание подключений к БД
@@ -89,6 +97,9 @@ class Application
      */
     protected function __construct()
     {
+        Session::init();
+        $this->flash = new Flash();
+
         $this->config = new Config($this->getPath() . DS . 'config.php');
         $this->config->sections = new Config($this->getPath() . DS . 'sections.php');
         $this->config->blocks = new Config($this->getPath() . DS . 'blocks.php');
