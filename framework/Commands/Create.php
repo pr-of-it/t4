@@ -95,12 +95,13 @@ class app_create_migration extends Migration {
         $this->createTable('blocks', [
             'section'   => ['type'=>'int'],
             'path'      => ['type'=>'string'],
-            'options'    => ['type'=>'text'],
+            'options'   => ['type'=>'text'],
+            'order'     => ['type'=>'int'],
         ], [
             ['columns'=>['section']],
-        ], [
-            'tree'
-        ]);
+            ['columns'=>['order']],
+        ]
+        );
     }
     public function down()
     {
