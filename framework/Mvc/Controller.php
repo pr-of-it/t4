@@ -3,6 +3,7 @@
 namespace T4\Mvc;
 
 use T4\Core\Std;
+use T4\Http\Helpers;
 
 abstract class Controller
 {
@@ -133,6 +134,16 @@ abstract class Controller
     final public function __toString()
     {
         return get_class($this);
+    }
+
+
+    /**
+     * Helpers
+     */
+
+    public function redirect($url)
+    {
+        Helpers::redirect($url);
     }
 
 }
