@@ -12,7 +12,7 @@ class Migrate
     extends Command
 {
 
-    const TABLE_NAME = 'migrations';
+    const TABLE_NAME = '__migrations';
     const MIGRATIONS_NAMESPACE = 'App\\Migrations';
     const CLASS_NAME_PATTERN = 'm_%d_%s';
     const SEARCH_FILE_NAME_PATTERN = 'm_%s_%s';

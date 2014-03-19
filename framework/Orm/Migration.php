@@ -2,7 +2,6 @@
 
 namespace T4\Orm;
 
-
 use T4\Dbal\Connection;
 use T4\Mvc\Application;
 
