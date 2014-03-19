@@ -237,11 +237,10 @@ class Mysql
         $sets = [];
         foreach ($columns as $column => $def) {
             if (isset($model->{$column})) {
-                $value =  $model->{$column};
+                $sets[] = '`' . $column . '`=\'' . $model->{$column} . '\'';
             } elseif (isset($def['default'])) {
-                $value = $def['default'];
+                $sets[] = '`' . $column . '`=\'' . $def['default'] . '\'';
             }
-            $sets[] = '`' . $column . '`=\'' . $value . '\'';
         }
 
         $connection = $class::getDbConnection();
