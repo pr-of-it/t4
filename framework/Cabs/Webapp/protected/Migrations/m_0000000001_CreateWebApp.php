@@ -4,7 +4,7 @@ namespace App\Migrations;
 
 use T4\Orm\Migration;
 
-class m_0000000000_CreateWebApp
+class m_0000000001_CreateWebApp
     extends Migration
 {
 
