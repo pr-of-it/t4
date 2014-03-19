@@ -14,7 +14,7 @@ class Migrate
 
     const TABLE_NAME = '__migrations';
     const MIGRATIONS_NAMESPACE = 'App\\Migrations';
-    const CLASS_NAME_PATTERN = 'm_%d_%s';
+    const CLASS_NAME_PATTERN = 'm_%010d_%s';
     const SEARCH_FILE_NAME_PATTERN = 'm_%s_%s';
 
     protected function getMigrationsPath()
@@ -145,6 +145,10 @@ FILE;
         return $migrations;
     }
 
+    /**
+     * Возвращает последнюю примененную миграцию
+     * @return bool
+     */
     protected function getLastMigration()
     {
         $lastMigrationTime = $this->getLastTime();

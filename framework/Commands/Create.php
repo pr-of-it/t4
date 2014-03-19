@@ -47,8 +47,8 @@ class Create
 
         rename($dst.DS.'www', $dst.DS.$publicDirName);
 
-        $migration = new \App\Migrations\m_0000000001_CreateWebApp();
-        $migration->up();
+        $command = new Migrate();
+        $command->action('up');
 
         echo 'Application is installed!'."\n";
 
