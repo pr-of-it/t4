@@ -196,7 +196,7 @@ class Application
     protected function createController($module, $controller)
     {
         if (!$this->existsController($module, $controller))
-            throw new Exception('Controller ' . $controller . 'does not exist');
+            throw new Exception('Controller ' . $controller . ' does not exist');
 
         if (empty($module))
             $controllerClass = '\\App\\Controllers\\' . $controller;
