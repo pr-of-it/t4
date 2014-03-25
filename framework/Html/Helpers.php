@@ -15,7 +15,7 @@ class Helpers
             case 'select:tree':
                 $htmlOptions['name'] = $name;
                 //$options['model'] = '\\App\\Models\\' . $options['model'];
-                return self::selectTreeByModel($options['model'], is_null($value) ? $options['default'] : $value, [], $htmlOptions);
+                return self::selectTreeByModel($options['model'], is_null($value) ? $options['default'] : $value, $options, $htmlOptions);
         }
     }
 
@@ -44,6 +44,9 @@ class Helpers
             (isset($htmlOptions['id']) ? ' id="' . $htmlOptions['id'] . '"' : '') .
             (in_array('disabled', $htmlOptions) ? ' disabled="disabled"' : '') .
             '>' . "\n";
+        if (isset($options['null']) && $options['null']) {
+            array_unshift($data, [$options['valueColumn']=>0, $options['titleColumn']=>'---']);
+        }
         foreach ($data as $item) {
             $html .=
                 '<option
