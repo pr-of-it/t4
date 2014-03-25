@@ -15,7 +15,7 @@ class Helpers
             case 'select:tree':
                 $htmlOptions['name'] = $name;
                 //$options['model'] = '\\App\\Models\\' . $options['model'];
-                return self::selectTreeByModel($options['model'], is_null($value) ? $options['default'] : $value, $htmlOptions);
+                return self::selectTreeByModel($options['model'], is_null($value) ? $options['default'] : $value, [], $htmlOptions);
         }
     }
 
@@ -27,7 +27,7 @@ class Helpers
      * @param array $options
      * @return string
      */
-    static public function select($data, $selected = 0, $htmlOptions = [], $options = [])
+    static public function select($data, $selected = 0, $options = [], $htmlOptions = [])
     {
         if (empty($options['valueColumn']))
             $options['valueColumn'] = Model::PK;
@@ -36,8 +36,7 @@ class Helpers
         if (is_array($selected))
             $selected = $selected[$options['valueColumn']];
         if ($selected instanceof Model) {
-            $class = get_class($selected);
-            $selected = $selected->{$class::PK};
+            $selected = $selected->{$options['valueColumn']};
         }
 
         $html = '<select' .
@@ -51,7 +50,8 @@ class Helpers
                     value="' . $item[$options['valueColumn']] . '"' .
                 ($item[$options['valueColumn']] == $selected ? ' selected="selected"' : '') .
                 '>' .
-                (in_array('tree', $options) ? str_repeat(self::TREE_LEVEL_SYMBOL, (int)$item[$options['treeLevelColumn']]) : '') . ' ' . $item[$options['titleColumn']] .
+                (in_array('tree', $options) ? str_repeat(self::TREE_LEVEL_SYMBOL, (int)$item[$options['treeLevelColumn']]) : '') . ' ' .
+                $item[$options['titleColumn']] .
                 '</option>' . "\n";
         }
         $html .= '</select>';
@@ -66,18 +66,18 @@ class Helpers
      * @param array $options
      * @return string
      */
-    static public function selectTree($data, $selected = 0, $htmlOptions = [], $options = [])
+    static public function selectTree($data, $selected = 0, $options = [], $htmlOptions = [])
     {
         $options = array_merge($options, ['tree']);
         if (empty($options['treeLevelColumn']))
             $options['treeLevelColumn'] = '__lvl';
-        return self::select($data, $selected, $htmlOptions, $options);
+        return self::select($data, $selected, $options, $htmlOptions);
     }
 
-    static public function selectTreeByModel($model, $selected = 0, $htmlOptions = [], $options = [])
+    static public function selectTreeByModel($model, $selected = 0, $options = [], $htmlOptions = [])
     {
         $data = $model::findAllTree();
-        return self::selectTree($data, $selected, $htmlOptions, $options);
+        return self::selectTree($data, $selected, $options, $htmlOptions);
     }
 
 }
