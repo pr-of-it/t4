@@ -2,6 +2,7 @@
 
 namespace T4\Html;
 
+use T4\Core\Collection;
 use T4\Orm\Model;
 
 class Helpers
@@ -14,7 +15,6 @@ class Helpers
         switch ($options['type']) {
             case 'select:tree':
                 $htmlOptions['name'] = $name;
-                //$options['model'] = '\\App\\Models\\' . $options['model'];
                 return self::selectTreeByModel($options['model'], is_null($value) ? $options['default'] : $value, $options, $htmlOptions);
         }
     }
@@ -27,7 +27,7 @@ class Helpers
      * @param array $options
      * @return string
      */
-    static public function select($data, $selected = 0, $options = [], $htmlOptions = [])
+    static public function select(Collection $data, $selected = 0, $options = [], $htmlOptions = [])
     {
         if (empty($options['valueColumn']))
             $options['valueColumn'] = Model::PK;
@@ -45,7 +45,7 @@ class Helpers
             (in_array('disabled', $htmlOptions) ? ' disabled="disabled"' : '') .
             '>' . "\n";
         if (isset($options['null']) && $options['null']) {
-            array_unshift($data, [$options['valueColumn']=>0, $options['titleColumn']=>'---']);
+            $data->prepend([$options['valueColumn']=>0, $options['titleColumn']=>'---']);
         }
         foreach ($data as $item) {
             $html .=
@@ -53,7 +53,7 @@ class Helpers
                     value="' . $item[$options['valueColumn']] . '"' .
                 ($item[$options['valueColumn']] == $selected ? ' selected="selected"' : '') .
                 '>' .
-                (in_array('tree', $options) ? str_repeat(self::TREE_LEVEL_SYMBOL, (int)$item[$options['treeLevelColumn']]) : '') . ' ' .
+                (in_array('tree', $options) && isset($item[$options['treeLevelColumn']]) ? str_repeat(self::TREE_LEVEL_SYMBOL, (int)$item[$options['treeLevelColumn']]) : '') . ' ' .
                 $item[$options['titleColumn']] .
                 '</option>' . "\n";
         }
@@ -69,7 +69,7 @@ class Helpers
      * @param array $options
      * @return string
      */
-    static public function selectTree($data, $selected = 0, $options = [], $htmlOptions = [])
+    static public function selectTree(Collection $data, $selected = 0, $options = [], $htmlOptions = [])
     {
         $options = array_merge($options, ['tree']);
         if (empty($options['treeLevelColumn']))
@@ -77,7 +77,7 @@ class Helpers
         return self::select($data, $selected, $options, $htmlOptions);
     }
 
-    static public function selectTreeByModel($model, $selected = 0, $options = [], $htmlOptions = [])
+    static public function selectTreeByModel(Collection $model, $selected = 0, $options = [], $htmlOptions = [])
     {
         $data = $model::findAllTree();
         return self::selectTree($data, $selected, $options, $htmlOptions);
