@@ -77,7 +77,7 @@ class Helpers
         return self::select($data, $selected, $options, $htmlOptions);
     }
 
-    static public function selectTreeByModel(Model $model, $selected = 0, $options = [], $htmlOptions = [])
+    static public function selectTreeByModel($model, $selected = 0, $options = [], $htmlOptions = [])
     {
         $data = $model::findAllTree();
         return self::selectTree($data, $selected, $options, $htmlOptions);
