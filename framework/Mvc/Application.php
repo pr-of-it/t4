@@ -2,6 +2,7 @@
 
 namespace T4\Mvc;
 
+use T4\Auth\Identity;
 use T4\Core\Config;
 use T4\Core\Exception;
 use T4\Core\Flash;
@@ -41,6 +42,12 @@ class Application
      * @var \T4\Core\Std
      */
     public $extensions;
+
+    /**
+     * Модель текущего пользователя
+     * @var \App\Models\User
+     */
+    public $user;
 
     /**
      * Возвращает абсолютный путь до папки приложения
@@ -92,27 +99,39 @@ class Application
      * - сессий
      * - менеджера ресурсов
      * - конфигурации приложения
+     * - секций и блоков
      * - создание подключений к БД
      * - расширений
+     * - текущего пользователя
      */
     protected function __construct()
     {
         Session::init();
         $this->flash = new Flash();
 
-        $this->config = new Config($this->getPath() . DS . 'config.php');
-        $this->config->sections = new Config($this->getPath() . DS . 'sections.php');
-        $this->config->blocks = new Config($this->getPath() . DS . 'blocks.php');
-
         $this->assets = AssetsManager::getInstance();
 
         try {
 
+            /*
+             * Application config setup
+             * Setup sections and blocks
+             */
+            $this->config = new Config($this->getPath() . DS . 'config.php');
+            $this->config->sections = new Config($this->getPath() . DS . 'sections.php');
+            $this->config->blocks = new Config($this->getPath() . DS . 'blocks.php');
+
+            /*
+             * DB connections setup
+             */
             $this->db = new Std;
             foreach ($this->config->db as $connection => $connectionConfig) {
                 $this->db->{$connection} = new Connection($connectionConfig);
             }
 
+            /*
+             * Extensions setup and initialize
+             */
             $this->extensions = new Std;
             if (isset($this->config->extensions)) {
                 foreach ($this->config->extensions as $extension => $options) {
@@ -128,7 +147,12 @@ class Application
                 }
             }
 
-        } catch (\T4\Dbal\Exception $e) {
+            /*
+             * Current user
+             */
+            $this->user = Identity::getUser();
+
+        } catch (Exception $e) {
             echo $e->getMessage();
             die;
         }
