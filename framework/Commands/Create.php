@@ -2,6 +2,7 @@
 
 namespace T4\Commands;
 
+use App\Models\User;
 use T4\Console\Command;
 use T4\Core\Std;
 
@@ -49,6 +50,14 @@ class Create
 
         $command = new Migrate();
         $command->action('up');
+        echo 'Systems tables are created'."\n";
+
+        $user = new User();
+        $user->email = $this->read('Super user email');
+        $user->password = $this->read('Super user password', '', false);
+        $user->password = \T4\Crypt\Helpers::hashPassword($user->password);
+        $user->save();
+        echo 'Super user is created'."\n";
 
         echo 'Application is installed!'."\n";
 

@@ -2,7 +2,6 @@
 
 namespace T4\Commands;
 
-
 use T4\Console\Command;
 use T4\Console\Exception;
 use T4\Orm\Migration;

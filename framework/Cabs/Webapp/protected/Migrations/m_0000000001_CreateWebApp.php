@@ -20,10 +20,19 @@ class m_0000000001_CreateWebApp
                 ['columns'=>['order']],
             ]
         );
+
+        $this->createTable('__users', [
+            'email'     => ['type'=>'string'],
+            'password'  => ['type'=>'string'],
+        ], [
+            ['columns' => ['email']],
+        ]);
+
     }
 
     public function down()
     {
+        $this->dropTable('__users');
         $this->dropTable('__blocks');
     }
 
