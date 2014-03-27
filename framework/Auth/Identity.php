@@ -6,7 +6,6 @@ use App\Models\User;
 use T4\Mvc\Application;
 use T4\Core\Session;
 use T4\Crypt\Helpers;
-use T4\Auth\Exception;
 
 class Identity {
 

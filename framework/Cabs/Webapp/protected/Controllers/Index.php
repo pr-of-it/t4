@@ -3,7 +3,7 @@
 
 namespace App\Controllers;
 
-use T4\Auth\Identity;
+use App\Components\Identity;
 use T4\Core\Exception;
 use T4\Mvc\Controller;
 
@@ -12,7 +12,7 @@ class Index
 {
 
     public function actionDefault() {
-        $this->data->content = 'Hello, world!';
+        $this->data->content = 'Hello, T4!';
     }
 
     public function actionLogin($email=null, $password=null)
