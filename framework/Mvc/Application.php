@@ -2,7 +2,6 @@
 
 namespace T4\Mvc;
 
-use T4\Auth\Identity;
 use T4\Core\Config;
 use T4\Core\Exception;
 use T4\Core\Flash;
@@ -150,7 +149,10 @@ class Application
             /*
              * Current user
              */
-            $this->user = Identity::getUser();
+            if (class_exists('\\App\Components\Identity')) {
+                $identity = new \App\Components\Identity();
+                $this->user = $identity->getUser();
+            }
 
         } catch (Exception $e) {
             echo $e->getMessage();
