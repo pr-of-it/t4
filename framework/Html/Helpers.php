@@ -23,8 +23,8 @@ class Helpers
      * Формирует <select> из заданных данных
      * @param $data Массив данных
      * @param int $selected
-     * @param array $htmlOptions
      * @param array $options
+     * @param array $htmlOptions
      * @return string
      */
     static public function select(Collection $data, $selected = 0, $options = [], $htmlOptions = [])
@@ -38,6 +38,8 @@ class Helpers
         if ($selected instanceof Model) {
             $selected = $selected->{$options['valueColumn']};
         }
+        if (empty($options['disabled']))
+            $options['disabled'] = [];
 
         $html = '<select' .
             (isset($htmlOptions['name']) ? ' name="' . $htmlOptions['name'] . '"' : '') .
@@ -52,6 +54,7 @@ class Helpers
                 '<option
                     value="' . $item[$options['valueColumn']] . '"' .
                 ($item[$options['valueColumn']] == $selected ? ' selected="selected"' : '') .
+                (in_array($item[$options['valueColumn']], $options['disabled']) ? ' disabled="disabled"' : '') .
                 '>' .
                 (in_array('tree', $options) && isset($item[$options['treeLevelColumn']]) ? str_repeat(self::TREE_LEVEL_SYMBOL, (int)$item[$options['treeLevelColumn']]) : '') . ' ' .
                 $item[$options['titleColumn']] .
