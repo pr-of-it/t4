@@ -2,7 +2,6 @@
 
 namespace T4\Dbal\Drivers;
 
-
 use T4\Core\Collection;
 use T4\Dbal\Connection;
 use T4\Dbal\IDriver;
