@@ -3,6 +3,7 @@
 namespace T4\Mvc;
 
 use T4\Html\Helpers;
+use T4\Widgets\Factory as WidgetsFactory;
 
 class TwigExtension extends \Twig_Extension
 {
@@ -21,6 +22,13 @@ class TwigExtension extends \Twig_Extension
             'publish' => new \Twig_Function_Function(function ($path) use ($app) {$app->assets->publish($path);return '';}),
             'publishCss' => new \Twig_Function_Function(function () use ($app) { return $app->assets->getPublishedCss();},  ['is_safe' => ['html']]),
             'publishJs' => new \Twig_Function_Function(function () use ($app) { return $app->assets->getPublishedJs();},  ['is_safe' => ['html']]),
+
+            'widget' =>  new \Twig_Function_Function(
+                    function ($name, $options=[]) {
+                        $widget = WidgetsFactory::getInstance($name, $options);
+                        return $widget->render();
+                    },  ['is_safe' => ['html']]
+                ),
 
             'selectTreeByModel' => new \Twig_Function_Function(
                     function ($model, $selected = 0, $htmlOptions = [], $options = []) {
