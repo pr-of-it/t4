@@ -100,10 +100,7 @@ class Std
      */
     public function fill($data)
     {
-        foreach ($this as $column) {
-            if (isset($data[$column]))
-                $this->{$column} = $data[$column];
-        }
+        $this->fromArray($data);
         return $this;
     }
 
