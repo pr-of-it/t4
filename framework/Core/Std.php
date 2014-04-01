@@ -83,10 +83,28 @@ class Std
                 $this->{$key} = $value;
             }
         }
+        return $this;
     }
 
     public function merge($obj)
     {
         $this->fromArray($obj->toArray());
+        return $this;
     }
+
+    /**
+     * Применяется в моделях
+     * Заполняет модель внешними данными
+     * @param $data
+     * @return $this
+     */
+    public function fill($data)
+    {
+        foreach ($this as $column) {
+            if (isset($data[$column]))
+                $this->{$column} = $data[$column];
+        }
+        return $this;
+    }
+
 }
