@@ -31,21 +31,18 @@ class Pager
     {
         $pagesCount = ceil($this->options->total / $this->options->size);
 
-        if ($pagesCount > self::HEAD_MAX_ITEMS+1+3+1+self::TAIL_MAX_ITEMS) {
-            $displayed = [1, 2, 3, $this->options->active-1, $this->options->active, $this->options->active+1, $pagesCount-2, $pagesCount-1, $pagesCount];
-            $delimiters = [];
-        }
-
+        $displayed = array_unique([1,2,3,$this->options->active-1,$this->options->active,$this->options->active+1,$pagesCount-2,$pagesCount-1,$pagesCount]);
+        $delimiters = [];
 
         ?>
         <ul class="pagination">
             <li<?php echo ($this->options->active==1 ? ' class="disabled"' : ''); ?>><a href="#">&laquo;</a></li>
         <?php
         for ($i = 1; $i<=$pagesCount; $i++) {
-            if (!isset($displayed) || in_array($i, $displayed)) {
+            if (in_array($i, $displayed)) {
                 ?><li<?php echo ($this->options->active==$i ? ' class="active"' : ''); ?>><a href="#"><?php echo $i; ?></a></li><?php
             }
-            if (isset($displayed) && in_array($i, $delimiters)) {
+            if (in_array($i, $delimiters)) {
                 ?><li class="disabled"><a href="#">...</a></li><?php
             }
         }
@@ -56,3 +53,28 @@ class Pager
     }
 
 }
+
+/*
+
+Первые три показывать:
+- всегда
+
+Текущий -2 показывать:
+- если он стоит на позиции 4
+- иначе если он стоит на позиции >4 показать вместо него разделитель
+
+Текущий -1 показывать:
+- всегда
+Текущий 0 показывать:
+- всегда
+Текущий +1 показывать:
+- всегда
+
+Текущий +2 показывать:
+- если он на позиции последний -3
+- иначе показать если он на позиции <-3 вместо него разделитель
+
+Последние три показывать:
+- всегда
+
+ */
