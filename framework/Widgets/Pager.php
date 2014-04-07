@@ -25,6 +25,11 @@ class Pager
         if (!isset($this->options->active) || empty($this->options->active))
             $this->options->active = 1;
 
+        if (!isset($this->options->url) || empty($this->options->url)) {
+            $uri = preg_replace('~(\?)?page=\d~', '', $_SERVER['REQUEST_URI']);
+            $this->options->url = $uri . (false === strpos($uri, '?') ? '?page=%d' : '&page=%d');
+        }
+
     }
 
     public function render()
@@ -40,10 +45,9 @@ class Pager
             $displayed[] = $pagesCount - 3;
         }
         sort($displayed);
-
         ?>
         <ul class="pagination">
-            <li<?php echo($this->options->active == 1 ? ' class="disabled"' : ''); ?>><a href="#">&laquo;</a></li>
+            <li<?php echo($this->options->active == 1 ? ' class="disabled"' : ''); ?>><a href="<?php printf($this->options->url, 1); ?>">&laquo;</a></li>
             <?php
             $prev = 1;
             foreach ($displayed as $page) {
@@ -52,12 +56,14 @@ class Pager
                     <li class="disabled"><a href="#">...</a></li><?php
                 }
                 ?>
-                <li<?php echo($this->options->active == $page ? ' class="active"' : ''); ?>><a
-                    href="#"><?php echo $page; ?></a></li><?php
+                <li<?php echo($this->options->active == $page ? ' class="active"' : ''); ?>>
+                    <a href="<?php printf($this->options->url, $page); ?>"><?php echo $page; ?></a>
+                </li>
+                <?php
                 $prev = $page;
             }
             ?>
-            <li<?php echo($this->options->active == $pagesCount ? ' class="disabled"' : ''); ?>><a href="#">&raquo;</a>
+            <li<?php echo($this->options->active == $pagesCount ? ' class="disabled"' : ''); ?>><a href="<?php printf($this->options->url, $page); ?>">&raquo;</a>
             </li>
         </ul>
     <?php
