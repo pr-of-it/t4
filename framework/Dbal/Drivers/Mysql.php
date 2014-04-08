@@ -193,13 +193,15 @@ class Mysql
         return $ret;
     }
 
-    public function findAllByColumn($class, $column, $value)
+    // TODO: полноценная реализация options, сейчас фактически только order
+    public function findAllByColumn($class, $column, $value, $options=[])
     {
         $query = new QueryBuilder();
         $query
             ->select('*')
             ->from($class::getTableName())
             ->where('`' . $column . '`=:value')
+            ->order(!empty($options['order']) ? $options['order'] : '')
             ->params([':value' => $value]);
 
         $result = $class::getDbConnection()->query($query->getQuery(), $query->getParams())->fetchAll(\PDO::FETCH_CLASS, $class);
@@ -212,13 +214,15 @@ class Mysql
         return $ret;
     }
 
-    public function findByColumn($class, $column, $value)
+    // TODO: полноценная реализация options, сейчас фактически только order
+    public function findByColumn($class, $column, $value, $options=[])
     {
         $query = new QueryBuilder();
         $query
             ->select('*')
             ->from($class::getTableName())
             ->where('`' . $column . '`=:value')
+            ->order(!empty($options['order']) ? $options['order'] : '')
             ->limit(1)
             ->params([':value' => $value]);
 
