@@ -2,6 +2,7 @@
 
 namespace T4\Html;
 
+use T4\Core\Collection;
 use T4\Orm\Model;
 
 class Helpers
@@ -14,8 +15,7 @@ class Helpers
         switch ($options['type']) {
             case 'select:tree':
                 $htmlOptions['name'] = $name;
-                //$options['model'] = '\\App\\Models\\' . $options['model'];
-                return self::selectTreeByModel($options['model'], is_null($value) ? $options['default'] : $value, $htmlOptions);
+                return self::selectTreeByModel($options['model'], is_null($value) ? $options['default'] : $value, $options, $htmlOptions);
         }
     }
 
@@ -23,11 +23,11 @@ class Helpers
      * Формирует <select> из заданных данных
      * @param $data Массив данных
      * @param int $selected
-     * @param array $htmlOptions
      * @param array $options
+     * @param array $htmlOptions
      * @return string
      */
-    static public function select($data, $selected = 0, $htmlOptions = [], $options = [])
+    static public function select(Collection $data, $selected = 0, $options = [], $htmlOptions = [])
     {
         if (empty($options['valueColumn']))
             $options['valueColumn'] = Model::PK;
@@ -36,22 +36,28 @@ class Helpers
         if (is_array($selected))
             $selected = $selected[$options['valueColumn']];
         if ($selected instanceof Model) {
-            $class = get_class($selected);
-            $selected = $selected->{$class::PK};
+            $selected = $selected->{$options['valueColumn']};
         }
+        if (empty($options['disabled']))
+            $options['disabled'] = [];
 
         $html = '<select' .
             (isset($htmlOptions['name']) ? ' name="' . $htmlOptions['name'] . '"' : '') .
             (isset($htmlOptions['id']) ? ' id="' . $htmlOptions['id'] . '"' : '') .
             (in_array('disabled', $htmlOptions) ? ' disabled="disabled"' : '') .
             '>' . "\n";
+        if (isset($options['null']) && $options['null']) {
+            $data->prepend([$options['valueColumn']=>0, $options['titleColumn']=>'---']);
+        }
         foreach ($data as $item) {
             $html .=
                 '<option
                     value="' . $item[$options['valueColumn']] . '"' .
                 ($item[$options['valueColumn']] == $selected ? ' selected="selected"' : '') .
+                (in_array($item[$options['valueColumn']], $options['disabled']) ? ' disabled="disabled"' : '') .
                 '>' .
-                (in_array('tree', $options) ? str_repeat(self::TREE_LEVEL_SYMBOL, (int)$item[$options['treeLevelColumn']]) : '') . ' ' . $item[$options['titleColumn']] .
+                (in_array('tree', $options) && isset($item[$options['treeLevelColumn']]) ? str_repeat(self::TREE_LEVEL_SYMBOL, (int)$item[$options['treeLevelColumn']]) : '') . ' ' .
+                $item[$options['titleColumn']] .
                 '</option>' . "\n";
         }
         $html .= '</select>';
@@ -66,18 +72,18 @@ class Helpers
      * @param array $options
      * @return string
      */
-    static public function selectTree($data, $selected = 0, $htmlOptions = [], $options = [])
+    static public function selectTree(Collection $data, $selected = 0, $options = [], $htmlOptions = [])
     {
         $options = array_merge($options, ['tree']);
         if (empty($options['treeLevelColumn']))
             $options['treeLevelColumn'] = '__lvl';
-        return self::select($data, $selected, $htmlOptions, $options);
+        return self::select($data, $selected, $options, $htmlOptions);
     }
 
-    static public function selectTreeByModel($model, $selected = 0, $htmlOptions = [], $options = [])
+    static public function selectTreeByModel($model, $selected = 0, $options = [], $htmlOptions = [])
     {
         $data = $model::findAllTree();
-        return self::selectTree($data, $selected, $htmlOptions, $options);
+        return self::selectTree($data, $selected, $options, $htmlOptions);
     }
 
 }

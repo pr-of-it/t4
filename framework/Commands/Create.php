@@ -2,9 +2,9 @@
 
 namespace T4\Commands;
 
+use App\Models\User;
 use T4\Console\Command;
 use T4\Core\Std;
-use T4\Orm\Migration;
 
 class Create
     extends Command
@@ -48,8 +48,16 @@ class Create
 
         rename($dst.DS.'www', $dst.DS.$publicDirName);
 
-        $migration = new app_create_migration();
-        $migration->up();
+        $command = new Migrate();
+        $command->action('up');
+        echo 'Systems tables are created'."\n";
+
+        $user = new User();
+        $user->email = $this->read('Super user email');
+        $user->password = $this->read('Super user password', '', false);
+        $user->password = \T4\Crypt\Helpers::hashPassword($user->password);
+        $user->save();
+        echo 'Super user is created'."\n";
 
         echo 'Application is installed!'."\n";
 
@@ -82,28 +90,4 @@ FILE;
 
     }
 
-}
-
-/**
- * Создание необходимых для работы веб-приложения таблиц в базе данных
- * Class app_create_migration
- * @package T4\Commands
- */
-class app_create_migration extends Migration {
-    public function up()
-    {
-        $this->createTable('blocks', [
-            'section'   => ['type'=>'int'],
-            'path'      => ['type'=>'string'],
-            'options'    => ['type'=>'text'],
-            'order'     => ['type'=>'int'],
-        ], [
-            ['columns'=>['section']],
-            ['columns'=>['order']],
-        ]);
-    }
-    public function down()
-    {
-        $this->dropTable('blocks');
-    }
 }

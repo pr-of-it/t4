@@ -24,8 +24,8 @@ class Application
 
     protected function __construct()
     {
-        if ( !is_readable(ROOT_PATH_PROTECTED . DS . 'config.php') ) {
-            echo 'Application is not installed. Install it using "t4 /create/app" command'."\n";
+        if (!is_readable(ROOT_PATH_PROTECTED . DS . 'config.php')) {
+            echo 'Application is not installed. Install it using "t4 /create/app" command' . "\n";
             return;
         }
         $this->config = new Config(ROOT_PATH_PROTECTED . DS . 'config.php');
@@ -39,7 +39,6 @@ class Application
             die;
         }
     }
-
 
     public function run()
     {
@@ -70,7 +69,7 @@ class Application
             $command->action($route['action'], $params);
 
         } catch (Exception $e) {
-            die('ERROR: '. $e->getMessage());
+            die('ERROR: ' . $e->getMessage());
         }
     }
 

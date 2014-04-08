@@ -2,7 +2,6 @@
 
 namespace T4\Dbal\Drivers;
 
-
 use T4\Core\Collection;
 use T4\Dbal\Connection;
 use T4\Dbal\IDriver;
@@ -200,13 +199,15 @@ class Mysql
         return $ret;
     }
 
-    public function findAllByColumn($class, $column, $value)
+    // TODO: полноценная реализация options, сейчас фактически только order
+    public function findAllByColumn($class, $column, $value, $options=[])
     {
         $query = new QueryBuilder();
         $query
             ->select('*')
             ->from($class::getTableName())
             ->where('`' . $column . '`=:value')
+            ->order(!empty($options['order']) ? $options['order'] : '')
             ->params([':value' => $value]);
 
         $result = $class::getDbConnection()->query($query->getQuery(), $query->getParams())->fetchAll(\PDO::FETCH_CLASS, $class);
@@ -219,13 +220,15 @@ class Mysql
         return $ret;
     }
 
-    public function findByColumn($class, $column, $value)
+    // TODO: полноценная реализация options, сейчас фактически только order
+    public function findByColumn($class, $column, $value, $options=[])
     {
         $query = new QueryBuilder();
         $query
             ->select('*')
             ->from($class::getTableName())
             ->where('`' . $column . '`=:value')
+            ->order(!empty($options['order']) ? $options['order'] : '')
             ->limit(1)
             ->params([':value' => $value]);
 
@@ -243,11 +246,10 @@ class Mysql
         $sets = [];
         foreach ($columns as $column => $def) {
             if (isset($model->{$column})) {
-                $value =  $model->{$column};
+                $sets[] = '`' . $column . '`=\'' . $model->{$column} . '\'';
             } elseif (isset($def['default'])) {
-                $value = $def['default'];
+                $sets[] = '`' . $column . '`=\'' . $def['default'] . '\'';
             }
-            $sets[] = '`' . $column . '`=\'' . $value . '\'';
         }
 
         $connection = $class::getDbConnection();

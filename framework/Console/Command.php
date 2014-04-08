@@ -1,8 +1,6 @@
 <?php
 
-
 namespace T4\Console;
-
 
 class Command {
 
@@ -16,7 +14,7 @@ class Command {
 
     final public function __construct()
     {
-        $this->app = Application::getInstance();
+        $this->app = \T4\Console\Application::getInstance();
     }
 
 

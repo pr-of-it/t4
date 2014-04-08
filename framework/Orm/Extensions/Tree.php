@@ -71,9 +71,9 @@ class Tree
                 $query->select('MAX(__rgt)')->from($tableName);
                 $rgt = (int)$connection->query($query->getQuery())->fetchScalar() + 1;
                 $lvl = 0;
-            /*
-             * У записи будет существующий родитель
-             */
+                /*
+                 * У записи будет существующий родитель
+                 */
             } else {
                 $rgt = $parent->__rgt;
                 $lvl = $parent->__lvl;
@@ -94,9 +94,9 @@ class Tree
             $result = $connection->execute($sql, [':rgt' => $rgt]);
             return $result;
 
-        /**
-         * Перенос в дереве уже существующей записи
-         */
+            /**
+             * Перенос в дереве уже существующей записи
+             */
         } else {
 
             $skewTree = $model->__rgt - $model->__lft + 1;
@@ -248,7 +248,7 @@ class Tree
     public function call(&$model, $method, $argv)
     {
         $class = get_class($model);
-        switch (true) {
+        switch ($method) {
             // TODO: убрать отсюда с появлением relations
             case 'setParent':
                 if ( is_numeric($argv[0]) ) {
