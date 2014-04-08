@@ -149,8 +149,8 @@ class Application
             /*
              * Current user
              */
-            if (class_exists('\\App\Components\Identity')) {
-                $identity = new \App\Components\Identity();
+            if (class_exists('\\App\Components\Auth\Identity')) {
+                $identity = new \App\Components\Auth\Identity();
                 $this->user = $identity->getUser();
             }
 

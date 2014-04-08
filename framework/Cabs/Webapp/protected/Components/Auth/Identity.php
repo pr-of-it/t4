@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Components;
+namespace App\Components\Auth;
 
 use App\Models\User;
 use T4\Mvc\Application;
