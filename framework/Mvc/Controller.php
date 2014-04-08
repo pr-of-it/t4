@@ -8,6 +8,14 @@ use T4\Http\Helpers;
 abstract class Controller
 {
 
+    const ERROR_NO_ACCESS = 1;
+
+    /**
+     * Правила контроля доступа
+     * @var array
+     */
+    protected $access = [];
+
     /**
      * Данные, которые будут переданы фронт-контроллеру для вывода в нужном формате
      * @var \T4\Core\Std
@@ -83,7 +91,7 @@ abstract class Controller
      * Возвращает список аргументов действия данного контроллера
      * @param $name Имя действия
      * @return array Список аргументов
-     * @throws EControllerException
+     * @throws ControllerException
      */
     final public function getActionParameters($name)
     {
@@ -97,7 +105,7 @@ abstract class Controller
             }
             return $ret;
         } else {
-            throw new EControllerException('Action ' . $name . ' is not found in controller ' . get_class($this));
+            throw new ControllerException('Action ' . $name . ' is not found in controller ' . get_class($this));
         }
 
     }
@@ -105,30 +113,51 @@ abstract class Controller
     final public function action($name, $params = [])
     {
         $actionMethodName = 'action' . ucfirst($name);
-        if (method_exists($this, $actionMethodName)) {
-            // Продолжаем выполнение действия только если из beforeAction не передано false
-            if ($this->beforeAction()) {
+        if (!method_exists($this, $actionMethodName)) {
+            throw new ControllerException('Action ' . $name . ' is not found in controller ' . get_class($this));
+        }
 
-                $p = [];
-                foreach ($this->getActionParameters($name) as $argn) {
-                    if (!empty($_GET[$argn]))
-                        $p[$argn] = $_GET[$argn];
-                    if (!empty($_POST[$argn]))
-                        $p[$argn] = $_POST[$argn];
-                    if (!empty($params[$argn])) {
-                        $p[$argn] = $params[$argn];
-                        unset($params[$argn]);
+        // Проверяем правила контроля доступа к заданному action
+        if (!empty($this->access) && isset($this->access[$name])) {
+            // @ - доступ только зарегистрированным пользователям
+            if ('@'==$this->access[$name] && empty($this->app->user)) {
+                throw new ControllerException('User is not logged in. Access denied.', self::ERROR_NO_ACCESS);
+            }
+            // массив - описывает подробные правила доступа для зарегистрированных пользователей
+            if (is_array($this->access[$name])) {
+                if (empty($this->app->user)) {
+                    throw new ControllerException('User is not logged in. Access denied.', self::ERROR_NO_ACCESS);
+                }
+                foreach ($this->access[$name] as $col=>$val ) {
+                    if ($this->app->user->{$col} != $val) {
+                        throw new ControllerException('User ' . $col . ' is invalid. Access denied.', self::ERROR_NO_ACCESS);
                     }
                 }
-                $p = array_merge($p, (array)$params);
-
-                call_user_func_array([$this, $actionMethodName], $p);
-                $this->afterAction();
             }
-            return $this->data;
-        } else {
-            throw new EControllerException('Action ' . $name . ' is not found in controller ' . get_class($this));
         }
+
+        // Продолжаем выполнение действия только если из beforeAction не передано false
+        if ($this->beforeAction()) {
+
+            $p = [];
+            foreach ($this->getActionParameters($name) as $argn) {
+                if (!empty($_GET[$argn]))
+                    $p[$argn] = $_GET[$argn];
+                if (!empty($_POST[$argn]))
+                    $p[$argn] = $_POST[$argn];
+                if (!empty($params[$argn])) {
+                    $p[$argn] = $params[$argn];
+                    unset($params[$argn]);
+                }
+            }
+            $p = array_merge($p, (array)$params);
+
+            call_user_func_array([$this, $actionMethodName], $p);
+            $this->afterAction();
+        }
+
+        return $this->data;
+
     }
 
     final public function __toString()
