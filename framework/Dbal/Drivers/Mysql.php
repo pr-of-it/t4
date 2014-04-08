@@ -112,6 +112,12 @@ class Mysql
 
     }
 
+    public function renameTable(Connection $connection, $tableName, $tableNewName)
+    {
+        $sql = 'RENAME TABLE `' . $tableName . '` TO `' . $tableNewName . '`';
+        $connection->execute($sql);
+    }
+
     public function addColumn(Connection $connection, $tableName, array $columns)
     {
         $sql = 'ALTER TABLE `' . $tableName . '`';
