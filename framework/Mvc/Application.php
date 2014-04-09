@@ -258,4 +258,14 @@ class Application
         }
     }
 
+    public function __isset($key)
+    {
+        switch ($key) {
+            // current user
+            case 'user':
+                return null !== $this->user;
+                break;
+        }
+    }
+
 }
