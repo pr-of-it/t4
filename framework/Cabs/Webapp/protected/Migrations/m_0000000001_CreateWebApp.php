@@ -10,30 +10,33 @@ class m_0000000001_CreateWebApp
 
     public function up()
     {
-        $this->createTable('__blocks', [
-                'section'   => ['type'=>'int'],
-                'path'      => ['type'=>'string'],
-                'options'   => ['type'=>'text'],
-                'order'     => ['type'=>'int'],
-            ], [
-                ['columns'=>['section']],
-                ['columns'=>['order']],
-            ]
-        );
+        if (!$this->existsTable('__blocks')) {
+            $this->createTable('__blocks', [
+                    'section'   => ['type'=>'int'],
+                    'path'      => ['type'=>'string'],
+                    'options'   => ['type'=>'text'],
+                    'order'     => ['type'=>'int'],
+                ], [
+                    ['columns'=>['section']],
+                    ['columns'=>['order']],
+                ]
+            );
+        };
 
-        $this->createTable('__users', [
-            'email'     => ['type'=>'string'],
-            'password'  => ['type'=>'string'],
-        ], [
-            ['columns' => ['email']],
-        ]);
+        if (!$this->existsTable('__users')) {
+            $this->createTable('__users', [
+                'email'     => ['type'=>'string'],
+                'password'  => ['type'=>'string'],
+            ], [
+                ['columns' => ['email']],
+            ]);
+        }
 
     }
 
     public function down()
     {
-        $this->dropTable('__users');
-        $this->dropTable('__blocks');
+        echo 'CreateWebApp migration is not down-able!';
     }
 
 }

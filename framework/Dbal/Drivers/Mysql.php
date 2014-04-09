@@ -111,6 +111,29 @@ class Mysql
 
     }
 
+    public function existsTable(Connection $connection, $tableName)
+    {
+        $sql = 'SHOW TABLES LIKE \'' . $tableName . '\'';
+        $result = $connection->query($sql);
+        return 0 != count($result->fetchAll());
+    }
+
+    public function renameTable(Connection $connection, $tableName, $tableNewName)
+    {
+        $sql = 'RENAME TABLE `' . $tableName . '` TO `' . $tableNewName . '`';
+        $connection->execute($sql);
+    }
+
+    public function truncateTable(Connection $connection, $tableName)
+    {
+        $connection->execute('TRUNCATE TABLE `' . $tableName . '`');
+    }
+
+    public function dropTable(Connection $connection, $tableName)
+    {
+        $connection->execute('DROP TABLE `' . $tableName . '`');
+    }
+
     public function addColumn(Connection $connection, $tableName, array $columns)
     {
         $sql = 'ALTER TABLE `' . $tableName . '`';
@@ -161,16 +184,6 @@ class Mysql
             implode(', ', $indexesDDL) .
             '';
         $connection->execute($sql);
-    }
-
-    public function truncateTable(Connection $connection, $tableName)
-    {
-        $connection->execute('TRUNCATE TABLE `' . $tableName . '`');
-    }
-
-    public function dropTable(Connection $connection, $tableName)
-    {
-        $connection->execute('DROP TABLE `' . $tableName . '`');
     }
 
     public function findAll($class, $options = [])
@@ -232,7 +245,7 @@ class Mysql
         return $result;
     }
 
-    public function save($model)
+    public function save(Model $model)
     {
 
         $class = get_class($model);
@@ -265,7 +278,7 @@ class Mysql
 
     }
 
-    public function delete($model)
+    public function delete(Model $model)
     {
 
         $class = get_class($model);

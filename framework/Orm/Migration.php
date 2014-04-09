@@ -46,6 +46,19 @@ abstract class Migration
         echo 'Table `' . $tableName . '` is created'."\n";
     }
 
+    final protected function existsTable($tableName)
+    {
+        $driver = $this->db->getDriver();
+        return $driver->existsTable($this->db, $tableName);
+    }
+
+    final protected function renameTable($tableName, $tableNewName)
+    {
+        $driver = $this->db->getDriver();
+        $driver->renameTable($this->db, $tableName, $tableNewName);
+        echo 'Table `' . $tableName . '` is renamed into `' . $tableNewName . '`'."\n";
+    }
+
     final protected function truncateTable($tableName)
     {
         $driver = $this->db->getDriver();
