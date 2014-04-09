@@ -11,9 +11,23 @@ use T4\Core\TSingleton;
 use T4\Dbal\Connection;
 use T4\Http\AssetsManager;
 
+/**
+ * Class Application
+ * @package T4\Mvc
+ * @property \App\Models\User $user
+ */
 class Application
 {
     use TSingleton;
+
+    /*
+     * Protected properties for getters and setters
+     */
+    protected $__user;
+
+    /*
+     * Public properties
+     */
 
     public $path = \ROOT_PATH_PROTECTED;
 
@@ -41,12 +55,6 @@ class Application
      * @var \T4\Core\Std
      */
     public $extensions;
-
-    /**
-     * Модель текущего пользователя
-     * @var \App\Models\User
-     */
-    public $user;
 
     /**
      * Возвращает абсолютный путь до папки приложения
@@ -146,14 +154,6 @@ class Application
                 }
             }
 
-            /*
-             * Current user
-             */
-            if (class_exists('\\App\Components\Auth\Identity')) {
-                $identity = new \App\Components\Auth\Identity();
-                $this->user = $identity->getUser();
-            }
-
         } catch (Exception $e) {
             echo $e->getMessage();
             die;
@@ -231,6 +231,31 @@ class Application
 
         $controller = new $controllerClass;
         return $controller;
+    }
+
+    /**
+     * Получение некоторых свойств через магию
+     * чтобы развязать узел с бесконечным вызовом конструктора
+     * @param $key
+     * @return mixed
+     */
+    public function __get($key)
+    {
+        switch ($key) {
+            // current user
+            // TODO: если пользователь не залогинен, так и будет бесконечно его запрашивать из базы! (возможно...)
+            case 'user':
+                if (null === $this->__user) {
+                    if (class_exists('\\App\Components\Auth\Identity')) {
+                        $identity = new \App\Components\Auth\Identity();
+                        $this->__user = $identity->getUser();
+                    } else {
+                        return null;
+                    }
+                }
+                return $this->__user;
+                break;
+        }
     }
 
 }

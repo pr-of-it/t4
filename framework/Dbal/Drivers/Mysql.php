@@ -248,14 +248,22 @@ class Mysql
     public function save(Model $model)
     {
 
-        $class = get_class($model);
-        $columns = $class::getColumns();
+        $class      = get_class($model);
+        $columns    = $class::getColumns();
+        $relations  = $class::getRelations();
         $sets = [];
         foreach ($columns as $column => $def) {
             if (isset($model->{$column})) {
                 $sets[] = '`' . $column . '`=\'' . $model->{$column} . '\'';
             } elseif (isset($def['default'])) {
                 $sets[] = '`' . $column . '`=\'' . $def['default'] . '\'';
+            }
+        }
+        // TODO: тут очень много работы, пока сделано только прямое присваивание значения полю связи
+        foreach ($relations as $def) {
+            $column = $class::getRelationLinkColumn($def);
+            if (isset($model->{$column})) {
+                $sets[] = '`' . $column . '`=\'' . $model->{$column} . '\'';
             }
         }
 

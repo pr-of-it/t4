@@ -10,6 +10,9 @@ return [
             'password' => '{{password}}',
         ]
     ],
+    'auth' => [
+        'expire' => 31536000 // 1 year
+    ],
     'extensions' => [
         'jquery' => [
         ],

@@ -30,6 +30,15 @@ class m_0000000001_CreateWebApp
             ], [
                 ['columns' => ['email']],
             ]);
+            $this->createTable('__user_sessions', [
+                'hash'          => ['type'=>'string'],
+                '__user_id'     => ['type'=>'link'],
+                'userAgentHash' => ['type'=>'string'],
+            ], [
+                'hash'  => ['columns'=>['hash']],
+                'user'  => ['columns'=>['__user_id']],
+                'ua'    => ['columns'=>['userAgentHash']],
+            ]);
         }
 
     }

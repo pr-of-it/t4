@@ -10,17 +10,17 @@ trait TRelations {
      */
     public static function getRelations() {
         $schema = static::getSchema();
-        return $schema['relations'];
+        return !empty($schema['relations']) ? $schema['relations'] : [];
     }
 
     /**
      * Возвращает имя поля связи
-     * @param string $class
      * @param array $relation
      * @return string
      */
-    protected static function getRelationLinkColumn($class, $relation)
+    public static function getRelationLinkColumn($relation)
     {
+        $class = get_called_class();
         switch ($relation['type']) {
             case $class::HAS_ONE:
             case $class::BELONGS_TO:
@@ -52,7 +52,7 @@ trait TRelations {
             case $class::HAS_ONE:
             case $class::BELONGS_TO:
                 $relationClass = '\\App\\Models\\' . $relation['model'];
-                $link = $this->getRelationLinkColumn($class, $relation);
+                $link = $this->getRelationLinkColumn($relation);
                 $subModel = $relationClass::findByPK($this->{$link});
                 if (empty($subModel))
                     return null;
@@ -62,7 +62,7 @@ trait TRelations {
 
             case $class::HAS_MANY:
                 $relationClass = '\\App\\Models\\' . $relation['model'];
-                $link = $this->getRelationLinkColumn($class, $relation);
+                $link = $this->getRelationLinkColumn($relation);
                 return $relationClass::findAllByColumn($link, $this->getPk());
                 break;
 
