@@ -2,6 +2,8 @@
 
 namespace T4\Orm;
 
+use T4\Core\Std;
+
 trait TMagic {
 
     public function __get($key)
@@ -27,7 +29,10 @@ trait TMagic {
             if (empty($keys)) {
                 return $this->{$key};
             } else {
-                return $this->{$key}->{implode('.', $keys)};
+                if ( $this->{$key} instanceof Std)
+                    return $this->{$key}->{implode('.', $keys)};
+                else
+                    return null;
             }
         }
 

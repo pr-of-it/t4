@@ -48,17 +48,24 @@ trait TRelations {
 
         $relation = $relations[$key];
         switch ($relation['type']) {
+
             case $class::HAS_ONE:
             case $class::BELONGS_TO:
                 $relationClass = '\\App\\Models\\' . $relation['model'];
                 $link = $this->getRelationLinkColumn($class, $relation);
-                return $relationClass::findByPK($this->{$link});
+                $subModel = $relationClass::findByPK($this->{$link});
+                if (empty($subModel))
+                    return null;
+                else
+                    return $relationClass::findByPK($this->{$link});
                 break;
+
             case $class::HAS_MANY:
                 $relationClass = '\\App\\Models\\' . $relation['model'];
                 $link = $this->getRelationLinkColumn($class, $relation);
                 return $relationClass::findAllByColumn($link, $this->getPk());
                 break;
+
         }
     }
 
