@@ -9,12 +9,20 @@ abstract class Model
     extends Std
 {
 
-    use TCrud;
+    use TMagic, TCrud, TRelations;
 
     /**
      * Имя поля первичного ключа
      */
     const PK = '__id';
+
+    /**
+     * Типы связей
+     */
+    const HAS_ONE = 'hasOne';
+    const BELONGS_TO = 'belongsTo';
+    const HAS_MANY = 'hasMany';
+    const MANY_TO_MANY = 'manyToMany';
 
     /**
      * Схема модели
@@ -51,7 +59,7 @@ abstract class Model
                 $extensionClassName = '\\T4\\Orm\\Extensions\\'.ucfirst($extension);
                 $extension = new $extensionClassName;
                 $schema['columns'] = $extension->prepareColumns($schema['columns']);
-                $schema['relations'] = $extension->prepareRelations($schema['columns']);
+                $schema['relations'] = $extension->prepareRelations(isset($schema['relations']) ? $schema['relations'] : []);
             }
         }
         return $schema;
@@ -64,15 +72,6 @@ abstract class Model
     public static function getColumns() {
         $schema = static::getSchema();
         return $schema['columns'];
-    }
-
-    /**
-     * Список связей модели
-     * @return array
-     */
-    public static function getRelations() {
-        $schema = static::getSchema();
-        return $schema['relations'];
     }
 
     /**
