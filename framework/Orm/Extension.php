@@ -31,6 +31,16 @@ abstract class Extension
     }
 
     /**
+     * Функция изменения состава связей модели
+     * @param $relations array
+     * @return array
+     */
+    public function prepareRelations($relations)
+    {
+        return $relations;
+    }
+
+    /**
      * Метод, срабатывающий перед сохранением модели в БД
      * Возврат false предотвращает сохранение
      * @param $model \T4\Orm\Model

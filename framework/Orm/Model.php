@@ -20,9 +20,12 @@ abstract class Model
      * Схема модели
      * db: name of DB connection from application config
      * table: table name
-     * colums[] : colums
+     * columns[] : columns
      * - type*
      * - length
+     * relations[] : relations
+     * - type*
+     * - model*
      * @var array
      */
     static protected $schema = [];
@@ -48,9 +51,28 @@ abstract class Model
                 $extensionClassName = '\\T4\\Orm\\Extensions\\'.ucfirst($extension);
                 $extension = new $extensionClassName;
                 $schema['columns'] = $extension->prepareColumns($schema['columns']);
+                $schema['relations'] = $extension->prepareRelations($schema['columns']);
             }
         }
         return $schema;
+    }
+
+    /**
+     * Список полей модели
+     * @return array
+     */
+    public static function getColumns() {
+        $schema = static::getSchema();
+        return $schema['columns'];
+    }
+
+    /**
+     * Список связей модели
+     * @return array
+     */
+    public static function getRelations() {
+        $schema = static::getSchema();
+        return $schema['relations'];
     }
 
     /**
@@ -62,11 +84,6 @@ abstract class Model
         return !empty(static::$extensions) ?
             array_merge(['standard'], static::$extensions) :
             ['standard'];
-    }
-
-    public static function getColumns() {
-        $schema = static::getSchema();
-        return $schema['columns'];
     }
 
     /**
