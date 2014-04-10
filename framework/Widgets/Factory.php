@@ -16,4 +16,4 @@ class Factory {
         return new $className($options);
     }
 
-} 
+}

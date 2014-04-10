@@ -98,12 +98,7 @@ abstract class Controller
         $actionMethodName = 'action' . ucfirst($name);
         if (method_exists($this, $actionMethodName)) {
             $reflection = new \ReflectionMethod($this, $actionMethodName);
-            $params = $reflection->getParameters();
-            $ret = [];
-            foreach ($params as $param) {
-                $ret[] = $param->name;
-            }
-            return $ret;
+            return $params = $reflection->getParameters();
         } else {
             throw new ControllerException('Action ' . $name . ' is not found in controller ' . get_class($this));
         }
@@ -140,15 +135,21 @@ abstract class Controller
         if ($this->beforeAction()) {
 
             $p = [];
-            foreach ($this->getActionParameters($name) as $argn) {
-                if (!empty($_GET[$argn]))
-                    $p[$argn] = $_GET[$argn];
-                if (!empty($_POST[$argn]))
-                    $p[$argn] = $_POST[$argn];
-                if (!empty($params[$argn])) {
-                    $p[$argn] = $params[$argn];
-                    unset($params[$argn]);
+            foreach ($this->getActionParameters($name) as $param) {
+
+                if (!empty($params[$param->name])) {
+                    $p[$param->name] = $params[$param->name];
+                    unset($params[$param->name]);
+                } elseif (!empty($_POST[$param->name])) {
+                    $p[$param->name] = $_POST[$param->name];
+                } elseif (!empty($_GET[$param->name])) {
+                    $p[$param->name] = $_GET[$param->name];
+                } elseif ( $param->isDefaultValueAvailable() ) {
+                    $p[$param->name] = $param->getDefaultValue();
+                } else {
+                    throw new ControllerException('Missing argument ' . $param->name . ' for action ' . $actionMethodName);
                 }
+
             }
             $p = array_merge($p, (array)$params);
 

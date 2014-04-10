@@ -10,7 +10,7 @@ class Section
     extends Tag
 {
 
-    protected function render()
+    public function render()
     {
         $id = $this->params->id;
         $app = Application::getInstance();

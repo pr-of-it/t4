@@ -43,6 +43,6 @@ abstract class Tag {
         return $this->render();
     }
 
-    abstract protected function render();
+    abstract public function render();
 
 }

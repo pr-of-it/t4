@@ -8,7 +8,7 @@ class Editor
     extends Tag
 {
 
-    protected function render()
+    public function render()
     {
         $value = isset($this->params->value) ? $this->params->value : '';
         $class = isset($this->params->class) ? $this->params->class : '';

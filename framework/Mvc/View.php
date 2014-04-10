@@ -63,10 +63,10 @@ class View
             $tagClassName = '\\' . __NAMESPACE__ . '\\Tags\\'.ucfirst($tag);
             $tag = new $tagClassName($m[2][$n]);
             try {
-                $content = str_replace($m[0][$n], $tag, $content);
+                $content = str_replace($m[0][$n], $tag->render(), $content);
             } catch (Exception $e) {
                 echo $e->getMessage();
-                $content = str_replace($tag, '', $content);
+                $content = str_replace($m[0][$n], '', $content);
             }
         }
         return $content;

@@ -9,7 +9,7 @@ class Block
     extends Tag
 {
 
-    protected function render()
+    public function render()
     {
         $app = Application::getInstance();
         $path = $this->params->path;
