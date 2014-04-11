@@ -4,7 +4,7 @@ namespace T4\Mvc;
 
 use T4\Core\Exception;
 
-class ERouterException
+class RouterException
     extends Exception
 {
 

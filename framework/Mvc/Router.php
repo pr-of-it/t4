@@ -2,17 +2,16 @@
 
 namespace T4\Mvc;
 
-use T4\Core\Exception;
 use T4\Core\TSingleton;
 
 class Router
 {
     use TSingleton;
 
-    const INTERNAL_PATH_PATTERN = '~^\/([^\/]*?)\/([^\/]*?)\/([^\/]*?)(\((.*)\))?$~';
+    const INTERNAL_PATH_PATTERN = '~^\/([^\/]*?)\/([^\/]*?)\/([^\/]*?)(\((.*)\))?$~i';
 
     const DEFAULT_CONTROLLER = 'Index';
-    const DEFAULT_ACTION = 'default';
+    const DEFAULT_ACTION = 'Default';
 
     /**
      * Ссылка на объект приложения
@@ -20,6 +19,10 @@ class Router
      */
     protected $app;
 
+    /**
+     * Распознаваемые расширения в URL
+     * @var array
+     */
     protected $extensions = ['html', 'json'];
 
     protected function __construct()
@@ -33,7 +36,7 @@ class Router
      * Возвращает объект роутинга
      * @param string $url
      * @return \T4\Mvc\Route
-     * @throws \T4\Mvc\ERouterException
+     * @throws \T4\Mvc\RouterException
      */
     public function parseUrl($url)
     {
@@ -64,8 +67,8 @@ class Router
          */
         try {
             return $this->guessInternalPath($url);
-        } catch (ERouterException $e) {
-            throw new ERouterException('Route to path \'' . $url->base . '\' is not found');
+        } catch (RouterException $e) {
+            throw new RouterException('Route to path \'' . $url->base . '\' is not found');
         }
 
     }
@@ -110,7 +113,7 @@ class Router
      */
     protected function matchUrlTemplate($template, $url)
     {
-        $template = '~^' . preg_replace('~\<(\d+)\>~', '(?<p_$1>.+?)', $template) . '$~';
+        $template = '~^' . preg_replace('~\<(\d+)\>~', '(?<p_$1>.+?)', $template) . '$~i';
         if (!preg_match($template, $url, $m)) {
             return false;
         } else {
@@ -129,12 +132,12 @@ class Router
      * Возвращает объект роутинга
      * @param string $path
      * @return \T4\Mvc\Route
-     * @throws \T4\Mvc\ERouterException
+     * @throws \T4\Mvc\RouterException
      */
     public function splitInternalPath($path)
     {
         if (!preg_match(self::INTERNAL_PATH_PATTERN, $path, $m)) {
-            throw new ERouterException('Invalid route \'' . $path . '\'');
+            throw new RouterException('Invalid route \'' . $path . '\'');
         };
 
         $params = isset($m[5]) ? $m[5] : '';
@@ -149,9 +152,9 @@ class Router
         } else $params = [];
 
         return new Route([
-            'module' => $m[1],
-            'controller' => $m[2] ? : self::DEFAULT_CONTROLLER,
-            'action' => $m[3] ? : self::DEFAULT_ACTION,
+            'module' => ucfirst($m[1]),
+            'controller' => ucfirst($m[2]) ? : self::DEFAULT_CONTROLLER,
+            'action' => ucfirst($m[3]) ? : self::DEFAULT_ACTION,
             'params' => $params
         ]);
 
@@ -174,7 +177,7 @@ class Router
      * Пытается подобрать соответствующий роутинг для URL, отсутствующего в конфиге роутинга
      * @param \T4\Mvc\Route $url
      * @return Route
-     * @throws ERouterException
+     * @throws RouterException
      */
     protected function guessInternalPath($url)
     {
@@ -259,7 +262,7 @@ class Router
             }
         }
 
-        throw new ERouterException('Route to path \'' . $url->base . '\' is not found');
+        throw new RouterException('Route to path \'' . $url->base . '\' is not found');
 
     }
 
