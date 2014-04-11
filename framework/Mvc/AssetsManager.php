@@ -63,6 +63,7 @@ class AssetsManager
         $assetBasePath = ROOT_PATH_PUBLIC . DS . 'Assets' . DS . $pathHash;
         $assetBaseUrl = '/Assets/' . $pathHash;
 
+        // Вообще нет такого пути в папке Assets
         if ( !is_readable($assetBasePath) ) {
             Helpers::mkDir($assetBasePath);
             if ('dir' == $type) {
@@ -71,9 +72,15 @@ class AssetsManager
                 Helpers::copyFile($realPath, $assetBasePath);
             }
         } else {
+
+            // Путь есть, но нет нашего файла или папки в нём
+            if (true)
+
+            // Есть и путь, и наш файл/папка, но они устарели
             if ('dir' == $type && filemtime($realPath.DS.'.') > filemtime($assetBasePath.DS.'.')) {
                 Helpers::copyDir($realPath, $assetBasePath);
-            } elseif (filemtime($realPath) > filemtime($assetBasePath)) {
+            //} elseif (filemtime($realPath) > filemtime($assetBasePath.DS.'.')) {
+            } elseif (true) {
                 Helpers::copyFile($realPath, $assetBasePath);
             }
         }
