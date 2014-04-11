@@ -9,12 +9,12 @@ use T4\Core\Session;
 use T4\Core\Std;
 use T4\Core\TSingleton;
 use T4\Dbal\Connection;
-use T4\Http\AssetsManager;
 
 /**
  * Class Application
  * @package T4\Mvc
  * @property \App\Models\User $user
+ * @property \T4\Mvc\AssetsManager $assets
  */
 class Application
 {
@@ -45,11 +45,6 @@ class Application
      * @var \T4\Core\Flash
      */
     public $flash;
-
-    /**
-     * @var \T4\Http\AssetsManager
-     */
-    public $assets;
 
     /**
      * @var \T4\Core\Std
@@ -115,8 +110,6 @@ class Application
     {
         Session::init();
         $this->flash = new Flash();
-
-        $this->assets = AssetsManager::getInstance();
 
         try {
 
@@ -236,6 +229,7 @@ class Application
     /**
      * Получение некоторых свойств через магию
      * чтобы развязать узел с бесконечным вызовом конструктора
+     * и сделать их инициализацию ленивой
      * @param $key
      * @return mixed
      */
@@ -255,6 +249,10 @@ class Application
                 }
                 return $this->__user;
                 break;
+            case 'assets':
+                return AssetsManager::getInstance();
+                break;
+
         }
     }
 
@@ -264,6 +262,9 @@ class Application
             // current user
             case 'user':
                 return null !== $this->user;
+                break;
+            case 'assets':
+                return true;
                 break;
         }
     }

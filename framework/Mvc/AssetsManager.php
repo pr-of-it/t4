@@ -1,20 +1,38 @@
 <?php
 
-namespace T4\Http;
+namespace T4\Mvc;
 
 use T4\Core\Exception;
 use T4\Core\TSingleton;
 use T4\Fs\Helpers;
 
+/**
+ * Менеджер публикации ресурсов
+ *
+ * Class AssetsManager
+ * @package T4\Http
+ */
 class AssetsManager
 {
 
     use TSingleton;
 
+    /**
+     * Список ресурсов, опубликованных при текущем запуске приложения
+     * @var array
+     */
     protected $assets = [];
 
-    protected $publishCss = [];
-    protected $publishJs = [];
+    /**
+     * URLs опубликованных файлов стилей
+     * @var array
+     */
+    protected $publishedCss = [];
+    /**
+     * URLs опубликованных файлов JS
+     * @var array
+     */
+    protected $publishedJs = [];
 
     /**
      * Публикует ресурс (файл или директорию)
@@ -74,7 +92,7 @@ class AssetsManager
 
     public function registerCss($url)
     {
-        $this->publishCss[] = $url;
+        $this->publishedCss[] = $url;
     }
 
     public function publishCss($path)
@@ -87,7 +105,7 @@ class AssetsManager
     public function getPublishedCss()
     {
         $links = [];
-        foreach ($this->publishCss as $css)
+        foreach ($this->publishedCss as $css)
             $links[] = '<link rel="stylesheet" href="' . $css . '">';
         return implode("\n", $links)."\n";
     }
@@ -98,7 +116,7 @@ class AssetsManager
 
     public function registerJs($url)
     {
-        $this->publishJs[] = $url;
+        $this->publishedJs[] = $url;
     }
 
     public function publishJs($path)
@@ -111,7 +129,7 @@ class AssetsManager
     public function getPublishedJs()
     {
         $links = [];
-        foreach ($this->publishJs as $js)
+        foreach ($this->publishedJs as $js)
             $links[] = '<script type="text/javascript" src="' . $js . '"></script>';
         return implode("\n", $links)."\n";
     }
