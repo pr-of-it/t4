@@ -10,7 +10,7 @@ use T4\Fs\Helpers;
  * Менеджер публикации ресурсов
  *
  * Class AssetsManager
- * @package T4\Http
+ * @package T4\Mvc
  */
 class AssetsManager
 {
@@ -64,6 +64,7 @@ class AssetsManager
 
         // Вариант 1 - такого пути в папке Assets нет
         if (!is_readable($assetBasePath)) {
+            Helpers::mkDir($assetBasePath);
             if ('dir' == $type) {
                 Helpers::copyDir($realPath, $assetBasePath);
             } else {
@@ -75,7 +76,7 @@ class AssetsManager
 
         // Вариант 2 - нужный путь уже есть, нужно проверить наличие там нашего файла
         clearstatcache();
-        if ('file' == 'type') {
+        if ('file' == $type) {
             // Файл не найден, копируем его
             // Файл найден, но протух - перезаписываем
             if (
