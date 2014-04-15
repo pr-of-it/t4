@@ -19,7 +19,7 @@ class Section
         $ret = '<section role="section" data-section-id="' . $id . '">' . "\n";
         foreach ($blocks as $block) {
             $ret .= '<article role="block" data-block-id="' . $block->getPk() . '">' .
-                $app->callBlock($block->path, new Std(json_decode($block->options, true))) .
+                $app->callBlock($block->path, '', new Std(json_decode($block->options, true))) .
                 '</article>' . "\n";
         }
         return $ret . '</section>' . "\n";

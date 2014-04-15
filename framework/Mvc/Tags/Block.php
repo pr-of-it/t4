@@ -14,7 +14,9 @@ class Block
         $app = Application::getInstance();
         $path = $this->params->path;
         unset($this->params->path);
-        $block = $app->callBlock($path, $this->params);
+        $template = isset($this->params->template) ? $this->params->template : '';
+        unset($this->params->template);
+        $block = $app->callBlock($path, $template, $this->params);
         return $block;
     }
 
