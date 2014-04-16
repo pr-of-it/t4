@@ -123,13 +123,14 @@ abstract class Model
 
     public static function __callStatic($method, $argv)
     {
-        $extensions = static::getExtensions();
+        $class = get_called_class();
+        $extensions = $class::getExtensions();
         foreach ( $extensions as $extension ) {
             $extensionClassName = '\\T4\\Orm\\Extensions\\'.ucfirst($extension);
             $extension = new $extensionClassName;
             try {
                 if (method_exists($extension, 'callStatic')) {
-                    $result = $extension->callStatic(get_called_class(), $method, $argv);
+                    $result = $extension->callStatic($class, $method, $argv);
                     return $result;
                 }
             } catch (Exception $e) {
