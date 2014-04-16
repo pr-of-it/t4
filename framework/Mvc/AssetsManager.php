@@ -44,6 +44,14 @@ class AssetsManager
     {
         // Получаем абсолютный путь в ФС до ресурса и узнаем тип ресурса
         $realPath = $this->getRealPath($path);
+
+        // TODO: смущает меня этот кусок, если честно. Надо внимательно его перепроверить.
+        foreach ($this->assets as $asset) {
+            if (false !== strpos($realPath, $asset['path'])) {
+                return str_replace(DS, '/', str_replace($asset['path'], $asset['url'], $realPath));
+            }
+        }
+
         $type = is_dir($realPath) ? 'dir' : 'file';
 
         // Получаем время последней модификации ресурса
@@ -64,44 +72,42 @@ class AssetsManager
 
         // Вариант 1 - такого пути в папке Assets нет
         if (!is_readable($assetBasePath)) {
+
             Helpers::mkDir($assetBasePath);
             if ('dir' == $type) {
                 Helpers::copyDir($realPath, $assetBasePath);
             } else {
                 Helpers::copyFile($realPath, $assetBasePath);
             }
-            $url = str_replace(DS, '/', str_replace($baseRealPath, $assetBaseUrl, $realPath));
-            return $url;
-        }
 
-        // Вариант 2 - нужный путь уже есть, нужно проверить наличие там нашего файла
-        clearstatcache();
-        if ('file' == $type) {
-            // Файл не найден, копируем его
-            // Файл найден, но протух - перезаписываем
-            if (
-                !is_readable($assetBasePath . DS. $baseRealName)
-                || $lastModifiedTime >= filemtime($assetBasePath . DS. $baseRealName)
-            ) {
-                Helpers::copyFile($realPath, $assetBasePath);
-            }
         } else {
-            // Это папка. Она уже скопирована. Но протухла
-            if ($lastModifiedTime >= filemtime($assetBasePath . DS. '.')) {
-                Helpers::copyDir($realPath, $assetBasePath);
+
+            // Вариант 2 - нужный путь уже есть, нужно проверить наличие там нашего файла
+            clearstatcache();
+            if ('file' == $type) {
+                // Файл не найден, копируем его
+                // Файл найден, но протух - перезаписываем
+                if (
+                    !is_readable($assetBasePath . DS. $baseRealName)
+                    || $lastModifiedTime >= filemtime($assetBasePath . DS. $baseRealName)
+                ) {
+                    Helpers::copyFile($realPath, $assetBasePath);
+                }
+            } else {
+                // Это папка. Она уже скопирована. Но протухла
+                if ($lastModifiedTime >= filemtime($assetBasePath . DS. '.')) {
+                    Helpers::copyDir($realPath, $assetBasePath);
+                }
             }
+
         }
 
-        $url = str_replace(DS, '/', str_replace($baseRealPath, $assetBaseUrl, $realPath));
-        return $url;
+        $asset = & $this->assets[];
+        $asset['path'] = $realPath;
+        $asset['url'] = str_replace(DS, '/', str_replace($baseRealPath, $assetBaseUrl, $realPath));
 
-        /*
-                $asset = & $this->assets[];
-                $asset['path'] = $realPath;
-                $asset['url'] = str_replace(DS, '/', str_replace($baseRealPath, $assetBaseUrl, $realPath));
+        return $asset['url'];
 
-                return $asset['url'];
-        */
     }
 
     /*
