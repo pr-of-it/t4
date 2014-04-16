@@ -8,10 +8,6 @@ trait TMagic {
 
     public function __get($key)
     {
-        // Такое свойство установлено в объекте, неважно каким путем, например как Std
-        if (isset($this->{$key}))
-            return $this->{$key};
-
         $class = get_class($this);
 
         // Такое свойство есть в перечне полей модели, но установлено не было
@@ -40,5 +36,25 @@ trait TMagic {
         throw new Exception('No such column or relation: ' . $key . ' in model of ' . $class . ' class');
 
     }
+
+    public function __isset($key)
+    {
+        $class = get_class($this);
+
+        // Такое свойство есть в перечне полей модели, но установлено не было
+        $columns = $class::getColumns();
+        if (isset($columns[$key]))
+            return true;
+
+        // Такое свойство есть в перечне связей, но установлено не было
+        $relations = $class::getRelations();
+        $keys = explode('.', $key);
+        $key = array_shift($keys);
+        if (isset($relations[$key]))
+            return true;
+
+        return false;
+    }
+
 
 }
