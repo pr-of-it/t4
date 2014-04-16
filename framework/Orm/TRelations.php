@@ -24,7 +24,9 @@ trait TRelations {
         switch ($relation['type']) {
             case $class::HAS_ONE:
             case $class::BELONGS_TO:
-                return '__' . strtolower($relation['model']) . '_id';
+                $class = explode('\\', $relation['model']);
+                $class = array_pop($class);
+                return '__' . strtolower($class) . '_id';
             case $class::HAS_MANY:
                 $class = explode('\\', $class);
                 $class = array_pop($class);
