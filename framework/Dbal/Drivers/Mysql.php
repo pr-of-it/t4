@@ -47,6 +47,15 @@ class Mysql
                         break;
                 }
                 break;
+            case 'datetime':
+                return 'DATETIME';
+                break;
+            case 'date':
+                return 'DATE';
+                break;
+            case 'time':
+                return 'TIME';
+                break;
             case 'string':
             default:
                 return 'VARCHAR(' . (isset($options['length']) ? (int)$options['length'] : 255) . ') NOT NULL';
@@ -207,7 +216,7 @@ class Mysql
     }
 
     // TODO: полноценная реализация options, сейчас фактически только order
-    public function findAllByColumn($class, $column, $value, $options=[])
+    public function findAllByColumn($class, $column, $value, $options = [])
     {
         $query = new QueryBuilder();
         $query
@@ -228,7 +237,7 @@ class Mysql
     }
 
     // TODO: полноценная реализация options, сейчас фактически только order
-    public function findByColumn($class, $column, $value, $options=[])
+    public function findByColumn($class, $column, $value, $options = [])
     {
         $query = new QueryBuilder();
         $query
@@ -248,9 +257,9 @@ class Mysql
     public function save(Model $model)
     {
 
-        $class      = get_class($model);
-        $columns    = $class::getColumns();
-        $relations  = $class::getRelations();
+        $class = get_class($model);
+        $columns = $class::getColumns();
+        $relations = $class::getRelations();
         $sets = [];
         foreach ($columns as $column => $def) {
             if (isset($model->{$column})) {
