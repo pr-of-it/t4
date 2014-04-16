@@ -24,7 +24,9 @@ trait TRelations {
         switch ($relation['type']) {
             case $class::HAS_ONE:
             case $class::BELONGS_TO:
-                return '__' . strtolower($relation['model']) . '_id';
+                $class = explode('\\', $relation['model']);
+                $class = array_pop($class);
+                return '__' . strtolower($class) . '_id';
             case $class::HAS_MANY:
                 $class = explode('\\', $class);
                 $class = array_pop($class);
@@ -51,7 +53,7 @@ trait TRelations {
 
             case $class::HAS_ONE:
             case $class::BELONGS_TO:
-                $relationClass = '\\App\\Models\\' . $relation['model'];
+                $relationClass = (false !== strpos($relation['model'], 'App\\')) ? $relation['model'] : '\\App\\Models\\' . $relation['model'];
                 $link = $this->getRelationLinkColumn($relation);
                 $subModel = $relationClass::findByPK($this->{$link});
                 if (empty($subModel))

@@ -51,6 +51,9 @@ class QueryBuilder
 
     public function limit($limit)
     {
+        if (empty($limit))
+            return $this;
+
         if (!is_array($limit)) {
             $limit = preg_split('~\,[\s]*~', $limit, -1, \PREG_SPLIT_NO_EMPTY);
         }

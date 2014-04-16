@@ -47,6 +47,15 @@ class Mysql
                         break;
                 }
                 break;
+            case 'datetime':
+                return 'DATETIME';
+                break;
+            case 'date':
+                return 'DATE';
+                break;
+            case 'time':
+                return 'TIME';
+                break;
             case 'string':
             default:
                 return 'VARCHAR(' . (isset($options['length']) ? (int)$options['length'] : 255) . ') NOT NULL';
@@ -207,7 +216,7 @@ class Mysql
     }
 
     // TODO: полноценная реализация options, сейчас фактически только order
-    public function findAllByColumn($class, $column, $value, $options=[])
+    public function findAllByColumn($class, $column, $value, $options = [])
     {
         $query = new QueryBuilder();
         $query
@@ -215,6 +224,7 @@ class Mysql
             ->from($class::getTableName())
             ->where('`' . $column . '`=:value')
             ->order(!empty($options['order']) ? $options['order'] : '')
+            ->limit(!empty($options['limit']) ? $options['limit'] : '')
             ->params([':value' => $value]);
 
         $result = $class::getDbConnection()->query($query->getQuery(), $query->getParams())->fetchAll(\PDO::FETCH_CLASS, $class);
@@ -228,7 +238,7 @@ class Mysql
     }
 
     // TODO: полноценная реализация options, сейчас фактически только order
-    public function findByColumn($class, $column, $value, $options=[])
+    public function findByColumn($class, $column, $value, $options = [])
     {
         $query = new QueryBuilder();
         $query
@@ -248,22 +258,26 @@ class Mysql
     public function save(Model $model)
     {
 
-        $class      = get_class($model);
-        $columns    = $class::getColumns();
-        $relations  = $class::getRelations();
+        $class = get_class($model);
+        $columns = $class::getColumns();
+        $relations = $class::getRelations();
         $sets = [];
+        $data = [];
         foreach ($columns as $column => $def) {
             if (isset($model->{$column})) {
-                $sets[] = '`' . $column . '`=\'' . $model->{$column} . '\'';
+                $sets[] = '`' . $column . '`=:' . $column;
+                $data[':'.$column] = $model->{$column};
             } elseif (isset($def['default'])) {
-                $sets[] = '`' . $column . '`=\'' . $def['default'] . '\'';
+                $sets[] = '`' . $column . '`=:' . $column;
+                $data[':'.$column] = $def['default'];
             }
         }
         // TODO: тут очень много работы, пока сделано только прямое присваивание значения полю связи
         foreach ($relations as $def) {
             $column = $class::getRelationLinkColumn($def);
             if (isset($model->{$column})) {
-                $sets[] = '`' . $column . '`=\'' . $model->{$column} . '\'';
+                $sets[] = '`' . $column . '`=:' . $column;
+                $data[':'.$column] = $model->{$column};
             }
         }
 
@@ -273,7 +287,7 @@ class Mysql
                 INSERT INTO `' . $class::getTableName() . '`
                 SET ' . implode(', ', $sets) . '
             ';
-            $connection->execute($sql);
+            $connection->execute($sql, $data);
             $model->{$class::PK} = $connection->lastInsertId();
         } else {
             $sql = '
@@ -281,7 +295,7 @@ class Mysql
                 SET ' . implode(', ', $sets) . '
                 WHERE `' . $class::PK . '`=\'' . $model->{$class::PK} . '\'
             ';
-            $connection->execute($sql);
+            $connection->execute($sql, $data);
         }
 
     }
