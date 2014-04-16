@@ -184,11 +184,12 @@ class Application
     /**
      * Вызов блока
      * @param string $path Внутренний путь до блока
+     * @param string $template Шаблон блока
      * @param array $params Параметры, передаваемые блоку
-     * @return mixed Результат рендера блока
      * @throws \T4\Core\Exception
+     * @return mixed Результат рендера блока
      */
-    public function callBlock($path, $params = [])
+    public function callBlock($path, $template = '', $params = [])
     {
         $router = Router::getInstance();
         $route = $router->splitInternalPath($path);
@@ -200,7 +201,10 @@ class Application
 
         $controller = $this->createController($route->module, $route->controller);
         $controller->action($route->action, $route->params);
-        return $controller->view->render($route->action . '.block.html', $controller->getData());
+        return $controller->view->render(
+            $route->action . (!empty($template) ? '.' . $template : '') . '.block.html',
+            $controller->getData()
+        );
     }
 
     /**
