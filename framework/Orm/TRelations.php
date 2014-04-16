@@ -51,7 +51,7 @@ trait TRelations {
 
             case $class::HAS_ONE:
             case $class::BELONGS_TO:
-                $relationClass = '\\App\\Models\\' . $relation['model'];
+                $relationClass = (false !== strpos($relation['model'], 'App\\')) ? $relation['model'] : '\\App\\Models\\' . $relation['model'];
                 $link = $this->getRelationLinkColumn($relation);
                 $subModel = $relationClass::findByPK($this->{$link});
                 if (empty($subModel))
