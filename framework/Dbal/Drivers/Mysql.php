@@ -224,6 +224,7 @@ class Mysql
             ->from($class::getTableName())
             ->where('`' . $column . '`=:value')
             ->order(!empty($options['order']) ? $options['order'] : '')
+            ->limit(!empty($options['limit']) ? $options['limit'] : '')
             ->params([':value' => $value]);
 
         $result = $class::getDbConnection()->query($query->getQuery(), $query->getParams())->fetchAll(\PDO::FETCH_CLASS, $class);
