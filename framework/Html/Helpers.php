@@ -3,6 +3,7 @@
 namespace T4\Html;
 
 use T4\Core\Collection;
+use T4\Core\Std;
 use T4\Orm\Model;
 
 class Helpers
@@ -12,16 +13,35 @@ class Helpers
 
     static public function blockOptionInput($name, $options, $value = null, $htmlOptions = [])
     {
+        $htmlOptions['name'] = $name;
         switch ($options['type']) {
+            case 'int':
+                return self::inputInt(is_null($value) ? $options['default'] : $value, $options, $htmlOptions);
             case 'select:tree':
-                $htmlOptions['name'] = $name;
                 return self::selectTreeByModel($options['model'], is_null($value) ? $options['default'] : $value, $options, $htmlOptions);
         }
     }
 
     /**
+     * Формирует <input type="int"> с заданным значением
+     * @param int $value
+     * @param array $options
+     * @param array $htmlOptions
+     * @return string
+     */
+    static public function inputInt($value = 0, $options = [], $htmlOptions = [])
+    {
+        $html = '<input type="number"' .
+            (isset($htmlOptions['name']) ? ' name="' . $htmlOptions['name'] . '"' : '') .
+            (isset($htmlOptions['id']) ? ' id="' . $htmlOptions['id'] . '"' : '') .
+            (in_array('disabled', $htmlOptions) ? ' disabled="disabled"' : '') .
+            ' value="' . $value . '">' . "\n";
+        return $html;
+    }
+
+    /**
      * Формирует <select> из заданных данных
-     * @param $data Массив данных
+     * @param \T4\Core\Collection $data Массив данных
      * @param int $selected
      * @param array $options
      * @param array $htmlOptions
@@ -74,7 +94,7 @@ class Helpers
      */
     static public function selectTree(Collection $data, $selected = 0, $options = [], $htmlOptions = [])
     {
-        $options = array_merge($options, ['tree']);
+        $options = array_merge($options instanceof Std ? $options->toArray() : $options, ['tree']);
         if (empty($options['treeLevelColumn']))
             $options['treeLevelColumn'] = '__lvl';
         return self::select($data, $selected, $options, $htmlOptions);

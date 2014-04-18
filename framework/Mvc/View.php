@@ -39,14 +39,14 @@ class View
     public function render($template, $data = [])
     {
         return $this->postProcess(
-            $this->twig->render($template, $data->toArray())
+            $this->twig->render($template, (array)$data)
         );
     }
 
     public function display($template, $data = [])
     {
         print $this->postProcess(
-            $this->twig->render($template, $data->toArray())
+            $this->twig->render($template, (array)$data)
         );
     }
 
