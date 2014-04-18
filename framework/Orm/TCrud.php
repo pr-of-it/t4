@@ -62,6 +62,18 @@ trait TCrud
         return static::findByColumn(static::PK, $value);
     }
 
+    public static function countAll($options = [])
+    {
+        $driver = static::getDbDriver();
+        return $driver->countAll(get_called_class(), $options);
+    }
+
+    public static function countAllByColumn($column, $value, $options = [])
+    {
+        $driver = static::getDbDriver();
+        return $driver->countAllByColumn(get_called_class(), $column, $value, $options);
+    }
+
     /*
      * Save model methods
      */

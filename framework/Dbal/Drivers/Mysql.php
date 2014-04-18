@@ -203,6 +203,7 @@ class Mysql
             ->from($class::getTableName())
             ->where(!empty($options['where']) ? $options['where'] : '')
             ->order(!empty($options['order']) ? $options['order'] : '')
+            ->limit(!empty($options['limit']) ? $options['limit'] : '')
             ->params(!empty($options['params']) ? $options['params'] : []);
 
         $result = $class::getDbConnection()->query($query->getQuery(), $query->getParams())->fetchAll(\PDO::FETCH_CLASS, $class);
@@ -253,6 +254,30 @@ class Mysql
         if (!empty($result))
             $result->setNew(false);
         return $result;
+    }
+
+    public function countAll($class, $options = [])
+    {
+        $query = new QueryBuilder();
+        $query
+            ->select('COUNT(*)')
+            ->from($class::getTableName())
+            ->where(!empty($options['where']) ? $options['where'] : '')
+            ->params(!empty($options['params']) ? $options['params'] : []);
+
+        return $class::getDbConnection()->query($query->getQuery(), $query->getParams())->fetchScalar();
+    }
+
+    public function countAllByColumn($class, $column, $value, $options = [])
+    {
+        $query = new QueryBuilder();
+        $query
+            ->select('COUNT(*)')
+            ->from($class::getTableName())
+            ->where('`' . $column . '`=:value')
+            ->params([':value' => $value]);
+
+        return $class::getDbConnection()->query($query->getQuery(), $query->getParams())->fetchScalar();
     }
 
     public function save(Model $model)
