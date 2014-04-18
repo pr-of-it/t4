@@ -8,7 +8,7 @@ class Router
 {
     use TSingleton;
 
-    const INTERNAL_PATH_PATTERN = '~^\/([^\/]*?)\/([^\/]*?)\/([^\/]*?)(\((.*)\))?$~i';
+    const INTERNAL_PATH_PATTERN = '~^\/([^\/]*?)\/([^\/]*?)\/([^\/]*?)\/?(\((.*)\))?$~i';
 
     const DEFAULT_CONTROLLER = 'Index';
     const DEFAULT_ACTION = 'Default';
