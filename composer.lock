@@ -3,8 +3,61 @@
         "This file locks the dependencies of your project to a known state",
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file"
     ],
-    "hash": "f9b9e3edfd7a7298ea953b10c5674c5d",
+    "hash": "4ced38238d962de32f8a5312abb6fc1e",
     "packages": [
+        {
+            "name": "phpmailer/phpmailer",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/PHPMailer/PHPMailer.git",
+                "reference": "69d00b89652e1856daf571c71d7d1963ac5a35c7"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/PHPMailer/PHPMailer/zipball/69d00b89652e1856daf571c71d7d1963ac5a35c7",
+                "reference": "69d00b89652e1856daf571c71d7d1963ac5a35c7",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.0.0"
+            },
+            "require-dev": {
+                "phpdocumentor/phpdocumentor": "*",
+                "phpunit/phpunit": "4.0.*"
+            },
+            "type": "library",
+            "autoload": {
+                "classmap": [
+                    "class.phpmailer.php",
+                    "class.pop3.php",
+                    "class.smtp.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "LGPL-2.1"
+            ],
+            "authors": [
+                {
+                    "name": "Jim Jagielski",
+                    "email": "jimjag@gmail.com"
+                },
+                {
+                    "name": "Marcus Bointon",
+                    "email": "phpmailer@synchromedia.co.uk"
+                },
+                {
+                    "name": "Andy Prevost",
+                    "email": "codeworxtech@users.sourceforge.net"
+                },
+                {
+                    "name": "Brent R. Matzelle"
+                }
+            ],
+            "description": "PHPMailer is a full-featured email creation and transfer class for PHP",
+            "time": "2014-04-21 20:09:49"
+        },
         {
             "name": "twig/twig",
             "version": "v1.15.1",
@@ -310,16 +363,16 @@
         },
         {
             "name": "phpunit/phpunit",
-            "version": "3.7.34",
+            "version": "3.7.35",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/phpunit.git",
-                "reference": "248d6ce95e6ca7f0e3135252c0b984bbe1f52f19"
+                "reference": "83f9537e46346f75ed6925441ac259453213c7cc"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/248d6ce95e6ca7f0e3135252c0b984bbe1f52f19",
-                "reference": "248d6ce95e6ca7f0e3135252c0b984bbe1f52f19",
+                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/83f9537e46346f75ed6925441ac259453213c7cc",
+                "reference": "83f9537e46346f75ed6925441ac259453213c7cc",
                 "shasum": ""
             },
             "require": {
@@ -380,7 +433,7 @@
                 "testing",
                 "xunit"
             ],
-            "time": "2014-03-28 11:04:36"
+            "time": "2014-04-21 06:25:54"
         },
         {
             "name": "phpunit/phpunit-mock-objects",
@@ -485,9 +538,9 @@
 
     ],
     "minimum-stability": "stable",
-    "stability-flags": [
-
-    ],
+    "stability-flags": {
+        "phpmailer/phpmailer": 20
+    },
     "platform": {
         "php": ">=5.4.0"
     },
