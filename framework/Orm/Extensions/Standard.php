@@ -13,10 +13,10 @@ class Standard
     {
         switch (true) {
             case preg_match('~^findAllBy(.+)$~', $method, $m):
-                return $class::findAllByColumn($m[1], $argv[0], isset($argv[1]) ? $argv[1] : []);
+                return $class::findAllByColumn(lcfirst($m[1]), $argv[0], isset($argv[1]) ? $argv[1] : []);
                 break;
             case preg_match('~^findBy(.+)$~', $method, $m):
-                return $class::findByColumn($m[1], $argv[0], isset($argv[1]) ? $argv[1] : []);
+                return $class::findByColumn(lcfirst($m[1]), $argv[0], isset($argv[1]) ? $argv[1] : []);
                 break;
         }
         throw new Exception('Method ' . $method . ' is not found in extension ' . __CLASS__);
