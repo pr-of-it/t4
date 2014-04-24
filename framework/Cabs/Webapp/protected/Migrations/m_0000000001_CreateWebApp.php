@@ -14,6 +14,7 @@ class m_0000000001_CreateWebApp
             $this->createTable('__blocks', [
                     'section'   => ['type'=>'int'],
                     'path'      => ['type'=>'string'],
+                    'template'  => ['type'=>'string'],
                     'options'   => ['type'=>'text'],
                     'order'     => ['type'=>'int'],
                 ], [
