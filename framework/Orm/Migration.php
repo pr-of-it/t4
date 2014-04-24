@@ -88,6 +88,13 @@ abstract class Migration
         echo 'Table `' . $tableName . '` is altered: columns `'.implode('`,`', $columns).'` are dropped'."\n";
     }
 
+    final protected function renameColumn($tableName, $oldName, $newName)
+    {
+        $driver = $this->db->getDriver();
+        $driver->renameColumn($this->db, $tableName, $oldName, $newName);
+        echo 'Table `' . $tableName . '` is altered: column `'.$oldName.'` is renamed into `'.$newName.'`'."\n";
+    }
+
     final protected function addIndex($tableName, $indexes)
     {
         $driver = $this->db->getDriver();

@@ -169,6 +169,17 @@ class Mysql
         $connection->execute($sql);
     }
 
+    public function renameColumn(Connection $connection, $tableName, $oldName, $newName)
+    {
+        $sql = 'SHOW CREATE TABLE `' . $tableName . '`';
+        $result = $connection->query($sql)->fetch()['Create Table'];
+        preg_match('~^[\s]+\`'.$oldName.'\`[\s]+(.*?)[\,]?$~m', $result, $m);
+        $sql = '
+            ALTER TABLE `' . $tableName . '`
+            CHANGE `' . $oldName . '` `' . $newName . '` ' . $m[1];
+        $connection->execute($sql);
+    }
+
     public function addIndex(Connection $connection, $tableName, array $indexes)
     {
         $sql = 'ALTER TABLE `' . $tableName . '`';
