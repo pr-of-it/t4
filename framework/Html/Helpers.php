@@ -17,6 +17,8 @@ class Helpers
         switch ($options['type']) {
             case 'int':
                 return self::inputInt(is_null($value) ? $options['default'] : $value, $options, $htmlOptions);
+            case 'text':
+                return self::inputText(is_null($value) ? $options['default'] : $value, $options, $htmlOptions);
             case 'select:tree':
                 return self::selectTreeByModel($options['model'], is_null($value) ? $options['default'] : $value, $options, $htmlOptions);
         }
@@ -36,6 +38,23 @@ class Helpers
             (isset($htmlOptions['id']) ? ' id="' . $htmlOptions['id'] . '"' : '') .
             (in_array('disabled', $htmlOptions) ? ' disabled="disabled"' : '') .
             ' value="' . $value . '">' . "\n";
+        return $html;
+    }
+
+    /**
+     * Формирует <textarea> с заданным значением
+     * @param string $value
+     * @param array $options
+     * @param array $htmlOptions
+     * @return string
+     */
+    static public function inputText($value = '', $options = [], $htmlOptions = [])
+    {
+        $html = '<textarea' .
+            (isset($htmlOptions['name']) ? ' name="' . $htmlOptions['name'] . '"' : '') .
+            (isset($htmlOptions['id']) ? ' id="' . $htmlOptions['id'] . '"' : '') .
+            (in_array('disabled', $htmlOptions) ? ' disabled="disabled"' : '') .
+            '>' . $value . '</textarea>'."\n";
         return $html;
     }
 
