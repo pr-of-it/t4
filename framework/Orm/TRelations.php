@@ -2,6 +2,9 @@
 
 namespace T4\Orm;
 
+use T4\Core\Collection;
+use T4\Dbal\QueryBuilder;
+
 trait TRelations {
 
     /**
@@ -18,7 +21,7 @@ trait TRelations {
      * @param array $relation
      * @return string
      */
-    public static function getRelationLinkColumn($relation)
+    public static function getRelationLinkName($relation)
     {
         $class = get_called_class();
         switch ($relation['type']) {
@@ -31,8 +34,28 @@ trait TRelations {
                 $class = explode('\\', $class);
                 $class = array_pop($class);
                 return '__' . strtolower($class) . '_id';
+            case $class::MANY_TO_MANY:
+                $thisTableName = $class::getTableName();
+                $relationClass = (false !== strpos($relation['model'], 'App\\')) ? $relation['model'] : '\\App\\Models\\' . $relation['model'];
+                $thatTableName = $relationClass::getTableName();
+                return $thisTableName < $thatTableName ? $thisTableName .'_to_'. $thatTableName : $thatTableName .'_to_'. $thisTableName;
         }
 
+    }
+
+    protected static function getManyToManyThisLinkColumnName()
+    {
+        $class = get_called_class();
+        $class = explode('\\', $class);
+        $class = array_pop($class);
+        return '__' . strtolower($class) . '_id';
+    }
+
+    protected static function getManyToManyThatLinkColumnName($relation)
+    {
+        $class = explode('\\', $relation['model']);
+        $class = array_pop($class);
+        return '__' . strtolower($class) . '_id';
     }
 
     /**
@@ -54,7 +77,7 @@ trait TRelations {
             case $class::HAS_ONE:
             case $class::BELONGS_TO:
                 $relationClass = (false !== strpos($relation['model'], 'App\\')) ? $relation['model'] : '\\App\\Models\\' . $relation['model'];
-                $link = $this->getRelationLinkColumn($relation);
+                $link = $this->getRelationLinkName($relation);
                 $subModel = $relationClass::findByPK($this->{$link});
                 if (empty($subModel))
                     return null;
@@ -63,10 +86,27 @@ trait TRelations {
                 break;
 
             case $class::HAS_MANY:
-                $relationClass = '\\App\\Models\\' . $relation['model'];
-                $link = $this->getRelationLinkColumn($relation);
+                $relationClass = (false !== strpos($relation['model'], 'App\\')) ? $relation['model'] : '\\App\\Models\\' . $relation['model'];
+                $link = $this->getRelationLinkName($relation);
                 return $relationClass::findAllByColumn($link, $this->getPk());
                 break;
+
+            case $class::MANY_TO_MANY:
+                $relationClass = (false !== strpos($relation['model'], 'App\\')) ? $relation['model'] : '\\App\\Models\\' . $relation['model'];
+                $linkTable = $this->getRelationLinkName($relation);
+                $query = new QueryBuilder();
+                $query
+                    ->select('t1.*')
+                    ->from($relationClass::getTableName())
+                    ->rightJoin($linkTable, 't1.' . $relationClass::PK . '=j1.' . static::getManyToManyThatLinkColumnName($relation))
+                    ->where('j1.'.static::getManyToManyThisLinkColumnName().'=:id');
+                $query->params([':id'=>$this->getPk()]);
+                $result = $relationClass::getDbConnection()->query($query->getQuery(), $query->getParams())->fetchAll(\PDO::FETCH_CLASS, $relationClass);
+                if (!empty($result)) {
+                    return new Collection($result);
+                } else {
+                    return new Collection();
+                }
 
         }
     }

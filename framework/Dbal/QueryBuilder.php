@@ -10,7 +10,8 @@ class QueryBuilder
 
     protected $select;
     protected $from;
-    protected $what;
+    protected $leftJoin = [];
+    protected $rightJoin = [];
     protected $where;
     protected $order;
     protected $limitFrom;
@@ -28,6 +29,22 @@ class QueryBuilder
     public function from($from)
     {
         $this->from = $from;
+        return $this;
+    }
+
+    public function leftJoin($table, $on)
+    {
+        $join = &$this->leftJoin[];
+        $join['table'] = $table;
+        $join['on'] = $on;
+        return $this;
+    }
+
+    public function rightJoin($table, $on)
+    {
+        $join = &$this->rightJoin[];
+        $join['table'] = $table;
+        $join['on'] = $on;
         return $this;
     }
 
@@ -99,9 +116,40 @@ class QueryBuilder
             if (!is_array($this->from)) {
                 $this->from = preg_split('~[\s]\,[\s]*~', $this->from, -1, \PREG_SPLIT_NO_EMPTY);
             }
+            $this->from = array_map(function ($x) {
+                static $i = 0;
+                $i++;
+                return $x . ' AS t' . $i;
+            }, $this->from);
             // TODO: грамотное экранирование имен таблиц
             //$sql .= "FROM `" . implode('`, `', $this->from). "`\n";
             $sql .= "FROM " . implode(', ', $this->from). "\n";
+
+            /*
+             * LEFT JOIN PART
+             */
+            $this->leftJoin = array_map(function ($x) {
+                static $i = 0;
+                $i++;
+                $x['table'] = $x['table'] . ' AS j' . $i;
+                return $x;
+            }, $this->leftJoin);
+            foreach ($this->leftJoin as $join) {
+                $sql .= "LEFT JOIN " . $join['table'] . " ON " . $join['on'] . "\n";
+            }
+
+            /*
+             * RIGHT JOIN PART
+             */
+            $this->rightJoin = array_map(function ($x) {
+                static $i = 0;
+                $i++;
+                $x['table'] = $x['table'] . ' AS j' . $i;
+                return $x;
+            }, $this->rightJoin);
+            foreach ($this->rightJoin as $join) {
+                $sql .= "RIGHT JOIN " . $join['table'] . " ON " . $join['on'] . "\n";
+            }
 
             /*
              * WHERE part

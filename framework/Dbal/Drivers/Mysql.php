@@ -310,7 +310,7 @@ class Mysql
         }
         // TODO: тут очень много работы, пока сделано только прямое присваивание значения полю связи
         foreach ($relations as $def) {
-            $column = $class::getRelationLinkColumn($def);
+            $column = $class::getRelationLinkName($def);
             if (isset($model->{$column})) {
                 $sets[] = '`' . $column . '`=:' . $column;
                 $data[':'.$column] = $model->{$column};
