@@ -400,16 +400,18 @@ class Mysql
                             }
                             $sets[] = '(' . $model->getPk() . ',' . $subModel->getPk() . ')';
                         }
+
                         $table = $class::getRelationLinkName($relation);
                         $sql = 'DELETE FROM `' . $table . '` WHERE `' . $class::getManyToManyThisLinkColumnName() . '`=:id';
                         $connection->execute($sql, [':id'=>$model->getPk()]);
-                        $sql = 'INSERT INTO `' . $table . '`
-                                (`' . $class::getManyToManyThisLinkColumnName() . '`, `' . $class::getManyToManyThatLinkColumnName($relation) . '`)
-                                VALUES
-                                ' . (implode(', ', $sets)) . '
-                                ';
-
-                        $connection->execute($sql);
+                        if (!empty($sets)) {
+                            $sql = 'INSERT INTO `' . $table . '`
+                                    (`' . $class::getManyToManyThisLinkColumnName() . '`, `' . $class::getManyToManyThatLinkColumnName($relation) . '`)
+                                    VALUES
+                                    ' . (implode(', ', $sets)) . '
+                                    ';
+                            $connection->execute($sql);
+                        }
                     }
                     break;
 
