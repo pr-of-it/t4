@@ -16,10 +16,10 @@ trait TSingleton
 
     }
 
-    public static function getInstance()
+    public static function getInstance($new = false)
     {
         static $instance = null;
-        if (null === $instance)
+        if (null === $instance || $new)
             $instance = new static;
         return $instance;
     }
