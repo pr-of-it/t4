@@ -43,7 +43,7 @@ trait TRelations {
 
     }
 
-    protected static function getManyToManyThisLinkColumnName()
+    public static function getManyToManyThisLinkColumnName()
     {
         $class = get_called_class();
         $class = explode('\\', $class);
@@ -51,7 +51,7 @@ trait TRelations {
         return '__' . strtolower($class) . '_id';
     }
 
-    protected static function getManyToManyThatLinkColumnName($relation)
+    public static function getManyToManyThatLinkColumnName($relation)
     {
         $class = explode('\\', $relation['model']);
         $class = array_pop($class);
@@ -77,7 +77,7 @@ trait TRelations {
             case $class::HAS_ONE:
             case $class::BELONGS_TO:
                 $relationClass = (false !== strpos($relation['model'], 'App\\')) ? $relation['model'] : '\\App\\Models\\' . $relation['model'];
-                $link = $this->getRelationLinkName($relation);
+                $link = $class::getRelationLinkName($relation);
                 $subModel = $relationClass::findByPK($this->{$link});
                 if (empty($subModel))
                     return null;
@@ -87,13 +87,13 @@ trait TRelations {
 
             case $class::HAS_MANY:
                 $relationClass = (false !== strpos($relation['model'], 'App\\')) ? $relation['model'] : '\\App\\Models\\' . $relation['model'];
-                $link = $this->getRelationLinkName($relation);
+                $link = $class::getRelationLinkName($relation);
                 return $relationClass::findAllByColumn($link, $this->getPk());
                 break;
 
             case $class::MANY_TO_MANY:
                 $relationClass = (false !== strpos($relation['model'], 'App\\')) ? $relation['model'] : '\\App\\Models\\' . $relation['model'];
-                $linkTable = $this->getRelationLinkName($relation);
+                $linkTable = $class::getRelationLinkName($relation);
                 $query = new QueryBuilder();
                 $query
                     ->select('t1.*')

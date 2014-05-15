@@ -291,16 +291,20 @@ class Mysql
         return $class::getDbConnection()->query($query->getQuery(), $query->getParams())->fetchScalar();
     }
 
-    public function save(Model $model)
+    /**
+     * Сохранение полей модели без учета связей, требующих ID модели
+     * @param Model $model
+     * @return Model
+     */
+    protected function saveColumns(Model $model)
     {
-
         $class = get_class($model);
         $columns = $class::getColumns();
         $relations = $class::getRelations();
         $sets = [];
         $data = [];
         foreach ($columns as $column => $def) {
-            if (isset($model->{$column})) {
+            if (isset($model->{$column}) && !is_null($model->{$column})) {
                 $sets[] = '`' . $column . '`=:' . $column;
                 $data[':'.$column] = $model->{$column};
             } elseif (isset($def['default'])) {
@@ -308,12 +312,16 @@ class Mysql
                 $data[':'.$column] = $def['default'];
             }
         }
-        // TODO: тут очень много работы, пока сделано только прямое присваивание значения полю связи
-        foreach ($relations as $def) {
-            $column = $class::getRelationLinkName($def);
-            if (isset($model->{$column})) {
-                $sets[] = '`' . $column . '`=:' . $column;
-                $data[':'.$column] = $model->{$column};
+        foreach ($relations as $relation) {
+            switch ($relation['type']) {
+                case $class::HAS_ONE:
+                case $class::BELONGS_TO:
+                    $column = $class::getRelationLinkName($relation);
+                    if (isset($model->{$column}) && !is_null($model->{$column})) {
+                        $sets[] = '`' . $column . '`=:' . $column;
+                        $data[':'.$column] = $model->{$column};
+                    }
+                    break;
             }
         }
 
@@ -332,6 +340,80 @@ class Mysql
                 WHERE `' . $class::PK . '`=\'' . $model->{$class::PK} . '\'
             ';
             $connection->execute($sql, $data);
+        }
+
+        return $model;
+
+    }
+
+    public function save(Model $model)
+    {
+        $class = get_class($model);
+        $relations = $class::getRelations();
+        $connection = $class::getDbConnection();
+
+        /*
+         * Сохраняем связанные данные, которым не требуется ID нашей записи
+         */
+        foreach ($relations as $key => $relation) {
+            switch ($relation['type']) {
+                case $class::HAS_ONE:
+                case $class::BELONGS_TO:
+                    $column = $class::getRelationLinkName($relation);
+                    if (!empty($model->{$key}) && $model->{$key} instanceof Model ) {
+                        if ( $model->{$key}->isNew() ) {
+                            $model->{$key}->save();
+                        }
+                        $model->{$column} = $model->{$key}->getPk();
+                    }
+                    break;
+            }
+        }
+
+        /*
+         * Сохраняем поля самой модели
+         */
+        $this->saveColumns($model);
+
+        /*
+        * И еще раз сохраняем связанные данные, которым требовался ID нашей записи
+        */
+        foreach ($relations as $key => $relation) {
+            switch ($relation['type']) {
+
+                case $class::HAS_MANY:
+                    if (!empty($model->{$key}) && $model->{$key} instanceof Collection ) {
+                        $column = $class::getRelationLinkName($relation);
+                        foreach ( $model->{$key} as $subModel) {
+                            $subModel->{$column} = $model->getPk();
+                            $subModel->save();
+                        }
+                    }
+                    break;
+
+                case $class::MANY_TO_MANY:
+                    if (!empty($model->{$key}) && $model->{$key} instanceof Collection ) {
+                        $sets = [];
+                        foreach ( $model->{$key} as $subModel ) {
+                            if ($subModel->isNew()) {
+                                $this->saveColumns($subModel);
+                            }
+                            $sets[] = '(' . $model->getPk() . ',' . $subModel->getPk() . ')';
+                        }
+                        $table = $class::getRelationLinkName($relation);
+                        $sql = 'DELETE FROM `' . $table . '` WHERE `' . $class::getManyToManyThisLinkColumnName() . '`=:id';
+                        $connection->execute($sql, [':id'=>$model->getPk()]);
+                        $sql = 'INSERT INTO `' . $table . '`
+                                (`' . $class::getManyToManyThisLinkColumnName() . '`, `' . $class::getManyToManyThatLinkColumnName($relation) . '`)
+                                VALUES
+                                ' . (implode(', ', $sets)) . '
+                                ';
+
+                        $connection->execute($sql);
+                    }
+                    break;
+
+            }
         }
 
     }
