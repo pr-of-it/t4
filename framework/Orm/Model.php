@@ -104,7 +104,12 @@ abstract class Model
     {
         $schema = static::getSchema();
         $dbConnectionName = !empty($schema['db']) ? $schema['db'] : 'default';
-        $driver = \T4\Mvc\Application::getInstance()->config->db->{$dbConnectionName}->driver;
+        if ('cli'==PHP_SAPI) {
+            $app = \T4\Console\Application::getInstance();
+        } else {
+            $app = \T4\Mvc\Application::getInstance();
+        }
+        $driver = $app->config->db->{$dbConnectionName}->driver;
         return DriverFactory::getDriver($driver);
     }
 
@@ -112,7 +117,12 @@ abstract class Model
     {
         $schema = static::getSchema();
         $dbConnectionName = !empty($schema['db']) ? $schema['db'] : 'default';
-        $connection = \T4\Mvc\Application::getInstance()->db[$dbConnectionName];
+        if ('cli'==PHP_SAPI) {
+            $app = \T4\Console\Application::getInstance();
+        } else {
+            $app = \T4\Mvc\Application::getInstance();
+        }
+        $connection = $app->db[$dbConnectionName];
         return $connection;
     }
 
