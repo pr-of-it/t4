@@ -2,6 +2,7 @@
 
 namespace T4\Commands;
 
+use T4\Console\Application;
 use T4\Console\Command;
 use T4\Console\Exception;
 use T4\Orm\Migration;
@@ -98,6 +99,7 @@ FILE;
 
     protected function isInstalled()
     {
+        $this->app = Application::getInstance(true);
         // TODO: заменить на вызов через драйвер
         $st = $this->app->db->default->query('SHOW TABLES LIKE \'' . self::TABLE_NAME . '\'');
         if ([] == $st->fetchAll())
