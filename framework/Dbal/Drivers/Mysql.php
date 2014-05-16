@@ -292,6 +292,7 @@ class Mysql
     }
 
     /**
+     * TODO: много лишних isset, которые всегда true по определению
      * Сохранение полей модели без учета связей, требующих ID модели
      * @param Model $model
      * @return Model
@@ -312,14 +313,17 @@ class Mysql
                 $data[':'.$column] = $def['default'];
             }
         }
-        foreach ($relations as $relation) {
-            switch ($relation['type']) {
+        foreach ($relations as $rel => $def) {
+            switch ($def['type']) {
                 case $class::HAS_ONE:
                 case $class::BELONGS_TO:
-                    $column = $class::getRelationLinkName($relation);
+                    $column = $class::getRelationLinkName($def);
                     if (isset($model->{$column}) && !is_null($model->{$column})) {
                         $sets[] = '`' . $column . '`=:' . $column;
                         $data[':'.$column] = $model->{$column};
+                    } elseif (isset($model->{$rel}) && $model->{$rel} instanceof Model) {
+                        $sets[] = '`' . $column . '`=:' . $column;
+                        $data[':'.$column] = $model->{$rel}->getPk();
                     }
                     break;
             }
@@ -353,6 +357,7 @@ class Mysql
         $connection = $class::getDbConnection();
 
         /*
+         * TODO это тут лишнее, перенести в saveColumns
          * Сохраняем связанные данные, которым не требуется ID нашей записи
          */
         foreach ($relations as $key => $relation) {

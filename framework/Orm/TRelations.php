@@ -103,7 +103,9 @@ trait TRelations {
                 $query->params([':id'=>$this->getPk()]);
                 $result = $relationClass::getDbConnection()->query($query->getQuery(), $query->getParams())->fetchAll(\PDO::FETCH_CLASS, $relationClass);
                 if (!empty($result)) {
-                    return new Collection($result);
+                    $ret = new Collection($result);
+                    $ret->setNew(false);
+                    return $ret;
                 } else {
                     return new Collection();
                 }
