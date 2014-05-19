@@ -2,8 +2,10 @@
 
 namespace T4\Mvc;
 
+use T4\Core\Collection;
 use T4\Core\Std;
 use T4\Http\Helpers;
+use T4\Orm\Model;
 
 abstract class Controller
 {
@@ -105,6 +107,72 @@ abstract class Controller
 
     }
 
+    /**
+     * Проверка прав на доступ к данному действию
+     * @param $action
+     * @return bool
+     * @throws ControllerException
+     */
+    final public function checkAccess($action)
+    {
+        // Правила контроля доступа не заданы вообще либо не заданы для данного action
+        if (empty($this->access) || empty($this->access[$action]))
+            return true;
+
+        // Задано правило "требуется авторизация"
+        if ('@'==$this->access[$action]) {
+            if (empty($this->app->user)) {
+                throw new ControllerException('User is not logged in. Access denied.', self::ERROR_NO_ACCESS);
+            } else {
+                return true;
+            }
+        }
+
+        // Задано сложное правило в виде массива. При этом автоматически требуется авторизация.
+        if (is_array($this->access[$action])) {
+            if (empty($this->app->user)) {
+                throw new ControllerException('User is not logged in. Access denied.', self::ERROR_NO_ACCESS);
+            }
+
+            $user = $this->app->user;
+            foreach ($this->access[$action] as $column => $value) {
+
+                // Каждый ключ массива - поле модели $this->app->user
+                if (!isset($user->{$column})) {
+                    throw new ControllerException('User has not property `' . $column . '`. Access denied.', self::ERROR_NO_ACCESS);
+                }
+
+                // Если это просто скалярное поле
+                if (is_scalar($user->{$column})) {
+                    if ($user->{$column} != $value) {
+                        throw new ControllerException('User ' . $column . ' is invalid. Access denied.', self::ERROR_NO_ACCESS);
+                    } else {
+                        return true;
+                    }
+                    // Если это связанная модель - ищем в ней поле name
+                } elseif ($user->{$column} instanceof Model) {
+                    if (!isset($user->{$column}->name) || $user->{$column} != $value) {
+                        throw new ControllerException('User ' . $column . ' is invalid. Access denied.', self::ERROR_NO_ACCESS);
+                    } else {
+                        return true;
+                    }
+                    // Если это коллекция моделей - ищем хотя бы одну с таким полем name
+                } elseif ( is_array($user->{$column}) || $user->{$column} instanceof Collection ) {
+                    foreach ($user->{$column} as $subModel) {
+                        if (isset($subModel->name) && $subModel->name == $value) {
+                            return true;
+                        }
+                    }
+                    throw new ControllerException('User ' . $column . ' is invalid. Access denied.', self::ERROR_NO_ACCESS);
+                }
+
+            }
+        }
+
+        return true;
+
+    }
+
     final public function action($name, $params = [])
     {
         $actionMethodName = 'action' . ucfirst($name);
@@ -113,23 +181,7 @@ abstract class Controller
         }
 
         // Проверяем правила контроля доступа к заданному action
-        if (!empty($this->access) && isset($this->access[$name])) {
-            // @ - доступ только зарегистрированным пользователям
-            if ('@'==$this->access[$name] && empty($this->app->user)) {
-                throw new ControllerException('User is not logged in. Access denied.', self::ERROR_NO_ACCESS);
-            }
-            // массив - описывает подробные правила доступа для зарегистрированных пользователей
-            if (is_array($this->access[$name])) {
-                if (empty($this->app->user)) {
-                    throw new ControllerException('User is not logged in. Access denied.', self::ERROR_NO_ACCESS);
-                }
-                foreach ($this->access[$name] as $col=>$val ) {
-                    if ($this->app->user->{$col} != $val) {
-                        throw new ControllerException('User ' . $col . ' is invalid. Access denied.', self::ERROR_NO_ACCESS);
-                    }
-                }
-            }
-        }
+        $this->checkAccess($name);
 
         // Продолжаем выполнение действия только если из beforeAction не передано false
         if ($this->beforeAction()) {
