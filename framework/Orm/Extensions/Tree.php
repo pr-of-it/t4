@@ -34,6 +34,13 @@ class Tree
 
     public function beforeSave(&$model)
     {
+        /**
+         * Модель отображает существующую запись в таблице
+         * Родитель не менялся
+         * Делать тут нечего
+         */
+        if (!$model->isNew() && empty($model->__parent))
+            return true;
 
         $class = get_class($model);
         $tableName = $class::getTableName();
