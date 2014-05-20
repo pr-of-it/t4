@@ -260,9 +260,10 @@ class Tree
             case 'setParent':
                 if ( is_numeric($argv[0]) ) {
                     $model->__parent = (int)$argv[0];
-                } elseif ( $argv[0] instanceof Model) {
-                    $class = get_class($model);
+                } elseif ( $argv[0] instanceof $class) {
                     $model->__parent = $argv[0]->{$class::PK};
+                } else {
+                    throw new Exception('Invalid parent type');
                 }
                 return $model;
             case 'findAllChildren':
