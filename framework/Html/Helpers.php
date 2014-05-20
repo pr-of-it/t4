@@ -34,8 +34,9 @@ class Helpers
     static public function inputInt($value = 0, $options = [], $htmlOptions = [])
     {
         $html = '<input type="number"' .
-            (isset($htmlOptions['name']) ? ' name="' . $htmlOptions['name'] . '"' : '') .
             (isset($htmlOptions['id']) ? ' id="' . $htmlOptions['id'] . '"' : '') .
+            (isset($htmlOptions['name']) ? ' name="' . $htmlOptions['name'] . '"' : '') .
+            (isset($htmlOptions['class']) ? ' class="' . $htmlOptions['class'] . '"' : '') .
             (in_array('disabled', $htmlOptions) ? ' disabled="disabled"' : '') .
             ' value="' . $value . '">' . "\n";
         return $html;
@@ -51,8 +52,9 @@ class Helpers
     static public function inputText($value = '', $options = [], $htmlOptions = [])
     {
         $html = '<textarea' .
-            (isset($htmlOptions['name']) ? ' name="' . $htmlOptions['name'] . '"' : '') .
             (isset($htmlOptions['id']) ? ' id="' . $htmlOptions['id'] . '"' : '') .
+            (isset($htmlOptions['name']) ? ' name="' . $htmlOptions['name'] . '"' : '') .
+            (isset($htmlOptions['class']) ? ' class="' . $htmlOptions['class'] . '"' : '') .
             (in_array('disabled', $htmlOptions) ? ' disabled="disabled"' : '') .
             '>' . $value . '</textarea>'."\n";
         return $html;
@@ -81,8 +83,9 @@ class Helpers
             $options['disabled'] = [];
 
         $html = '<select' .
-            (isset($htmlOptions['name']) ? ' name="' . $htmlOptions['name'] . '"' : '') .
             (isset($htmlOptions['id']) ? ' id="' . $htmlOptions['id'] . '"' : '') .
+            (isset($htmlOptions['name']) ? ' name="' . $htmlOptions['name'] . '"' : '') .
+            (isset($htmlOptions['class']) ? ' class="' . $htmlOptions['class'] . '"' : '') .
             (in_array('disabled', $htmlOptions) ? ' disabled="disabled"' : '') .
             '>' . "\n";
         if (isset($options['null']) && $options['null']) {
