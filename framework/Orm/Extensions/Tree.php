@@ -39,7 +39,7 @@ class Tree
          * Родитель не менялся
          * Делать тут нечего
          */
-        if (!$model->isNew() && empty($model->__parent))
+        if (!$model->isNew() && !isset($model->__parent))
             return true;
 
         $class = get_class($model);
