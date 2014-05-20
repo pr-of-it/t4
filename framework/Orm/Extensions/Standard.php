@@ -2,7 +2,6 @@
 
 namespace T4\Orm\Extensions;
 
-use T4\Orm\Exception;
 use T4\Orm\Extension;
 
 class Standard

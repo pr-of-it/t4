@@ -1,6 +1,7 @@
 <?php
 
 namespace T4\Orm;
+use T4\Orm\Extensions\Exception;
 
 /**
  * Абстрактный класс расширения модели
@@ -84,11 +85,11 @@ abstract class Extension
 
     /**
      * Метод-коллекция статических методов, добавляемых к модели
-     * Должен выбрасывать исключение, если в данном расширении указанный метод не найден
+     * Должен выбрасывать соответствующее исключение, если в данном расширении указанный метод не найден
      * @param $class string
      * @param $method string
      * @param $argv array
-     * @throws \T4\Orm\Exception
+     * @throws \T4\Orm\Extensions\Exception
      */
     public function callStatic($class, $method, $argv)
     {
@@ -97,11 +98,11 @@ abstract class Extension
 
     /**
      * Метод-коллекция динамических методов, добавляемых к модели
-     * Должен выбрасывать исключение, если в данном расширении указанный метод не найден
+     * Должен выбрасывать соответствующее исключение, если в данном расширении указанный метод не найден
      * @param $model \T4\Orm\Model
      * @param $method string
      * @param $argv array
-     * @throws \T4\Orm\Exception
+     * @throws \T4\Orm\Extensions\Exception
      */
     public function call(&$model, $method, $argv)
     {

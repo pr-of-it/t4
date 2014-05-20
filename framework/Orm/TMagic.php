@@ -56,5 +56,40 @@ trait TMagic {
         return false;
     }
 
+    public static function __callStatic($method, $argv)
+    {
+        $class = get_called_class();
+        $extensions = $class::getExtensions();
+        foreach ( $extensions as $extension ) {
+            $extensionClassName = '\\T4\\Orm\\Extensions\\'.ucfirst($extension);
+            $extension = new $extensionClassName;
+            try {
+                if (method_exists($extension, 'callStatic')) {
+                    $result = $extension->callStatic($class, $method, $argv);
+                    return $result;
+                }
+            } catch (\T4\Orm\Extensions\Exception $e) {
+                continue;
+            }
+        }
+    }
+
+    public function __call($method, $argv)
+    {
+        $class = get_class($this);
+        $extensions = $class::getExtensions();
+        foreach ( $extensions as $extension ) {
+            $extensionClassName = '\\T4\\Orm\\Extensions\\'.ucfirst($extension);
+            $extension = new $extensionClassName;
+            try {
+                if (method_exists($extension, 'call')) {
+                    $result = $extension->call($this, $method, $argv);
+                    return $result;
+                }
+            } catch (\T4\Orm\Extensions\Exception $e) {
+                continue;
+            }
+        }
+    }
 
 }

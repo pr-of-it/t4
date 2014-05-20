@@ -3,9 +3,7 @@
 namespace T4\Orm\Extensions;
 
 use T4\Dbal\QueryBuilder;
-use T4\Orm\Exception;
 use T4\Orm\Extension;
-use T4\Orm\Model;
 
 class Tree
     extends Extension
@@ -263,7 +261,7 @@ class Tree
                 } elseif ( $argv[0] instanceof $class) {
                     $model->__parent = $argv[0]->{$class::PK};
                 } else {
-                    throw new Exception('Invalid parent type');
+                    throw new \T4\Orm\Exception('Invalid parent type');
                 }
                 return $model;
             case 'findAllChildren':
