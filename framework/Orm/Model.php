@@ -34,6 +34,7 @@ abstract class Model
      * relations[] : relations
      * - type*
      * - model*
+     * - on
      * @var array
      */
     static protected $schema = [];
@@ -53,13 +54,14 @@ abstract class Model
     {
         static $schema = null;
         if (null === $schema) {
-            $schema = static::$schema;
-            $extensions = static::getExtensions();
+            $class = get_called_class();
+            $schema = $class::$schema;
+            $extensions = $class::getExtensions();
             foreach ( $extensions as $extension ) {
                 $extensionClassName = '\\T4\\Orm\\Extensions\\'.ucfirst($extension);
                 $extension = new $extensionClassName;
-                $schema['columns'] = $extension->prepareColumns($schema['columns']);
-                $schema['relations'] = $extension->prepareRelations(isset($schema['relations']) ? $schema['relations'] : []);
+                $schema['columns'] = $extension->prepareColumns($schema['columns'], $class);
+                $schema['relations'] = $extension->prepareRelations(isset($schema['relations']) ? $schema['relations'] : [], $class);
             }
         }
         return $schema;

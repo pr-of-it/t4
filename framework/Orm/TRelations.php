@@ -23,6 +23,9 @@ trait TRelations {
      */
     public static function getRelationLinkName($relation)
     {
+        if (!empty($relation['on']))
+            return $relation['on'];
+
         $class = get_called_class();
         switch ($relation['type']) {
             case $class::HAS_ONE:
@@ -111,6 +114,35 @@ trait TRelations {
                 }
 
         }
+    }
+
+    protected function setRelation($key, $value)
+    {
+        $class = get_class($this);
+        $relations = $class::getRelations();
+        if (empty($relations[$key])) {
+            throw new Exception('No such relation: ' . $key . ' in model of ' . $class . ' class');
+        }
+
+        $relation = $relations[$key];
+        switch ($relation['type']) {
+
+            case $class::HAS_ONE:
+            case $class::BELONGS_TO:
+                $relationClass = (false !== strpos($relation['model'], 'App\\')) ? $relation['model'] : '\\App\\Models\\' . $relation['model'];
+                if ($value instanceof $relationClass) {
+                    $this->$key = $value;
+                } else {
+                    $this->$key = $relationClass::findByPk($value);
+                }
+                break;
+
+            default:
+                $this->$key = $value;
+                break;
+
+        }
+
     }
 
 }

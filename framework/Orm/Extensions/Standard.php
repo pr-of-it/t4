@@ -10,6 +10,9 @@ class Standard
 
     public function callStatic($class, $method, $argv)
     {
+        /**
+         * @var \T4\Orm\Model $class
+         */
         switch (true) {
             case preg_match('~^findAllBy(.+)$~', $method, $m):
                 return $class::findAllByColumn(lcfirst($m[1]), $argv[0], isset($argv[1]) ? $argv[1] : []);
@@ -26,9 +29,6 @@ class Standard
         switch (true) {
             case preg_match('~^set(.+)$~', $method, $m):
                 $column = lcfirst($m[1]);
-                $columns = $model->getColumns();
-                if (!isset($columns[$column]))
-                    throw new Exception('Column `'.$column.'` is not defined in model '.get_class($model));
                 $model->{$column} = $argv[0];
                 return $model;
                 break;

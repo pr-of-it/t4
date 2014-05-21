@@ -13,20 +13,22 @@ abstract class Extension
 
     /**
      * Функция изменения состава полей модели
-     * @param $columns array
+     * @param array $columns
+     * @param string $class
      * @return array
      */
-    public function prepareColumns($columns)
+    public function prepareColumns($columns, $class='')
     {
         return $columns;
     }
 
     /**
      * Функция изменения состава индексов модели
-     * @param $indexes array
+     * @param array $indexes
+     * @param string $class
      * @return array
      */
-    public function prepareIndexes($indexes)
+    public function prepareIndexes($indexes, $class='')
     {
         return $indexes;
     }
@@ -34,9 +36,10 @@ abstract class Extension
     /**
      * Функция изменения состава связей модели
      * @param $relations array
+     * @param $class
      * @return array
      */
-    public function prepareRelations($relations)
+    public function prepareRelations($relations, $class='')
     {
         return $relations;
     }

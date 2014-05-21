@@ -80,10 +80,12 @@ trait TCrud
 
     public function beforeSave()
     {
+        /** @var \T4\Orm\Model $class */
         $class = get_class($this);
         $extensions = $class::getExtensions();
         foreach ($extensions as $extension) {
             $extensionClassName = '\\T4\\Orm\\Extensions\\' . ucfirst($extension);
+            /** @var \T4\Orm\Extension $extension */
             $extension = new $extensionClassName;
             if (!$extension->beforeSave($this))
                 return false;
@@ -107,10 +109,12 @@ trait TCrud
 
     public function afterSave()
     {
+        /** @var \T4\Orm\Model $class */
         $class = get_class($this);
         $extensions = $class::getExtensions();
         foreach ($extensions as $extension) {
             $extensionClassName = '\\T4\\Orm\\Extensions\\' . ucfirst($extension);
+            /** @var \T4\Orm\Extension $extension */
             $extension = new $extensionClassName;
             if (!$extension->afterSave($this))
                 return false;
@@ -124,10 +128,12 @@ trait TCrud
 
     public function beforeDelete()
     {
+        /** @var \T4\Orm\Model $class */
         $class = get_class($this);
         $extensions = $class::getExtensions();
         foreach ($extensions as $extension) {
             $extensionClassName = '\\T4\\Orm\\Extensions\\' . ucfirst($extension);
+            /** @var \T4\Orm\Extension $extension */
             $extension = new $extensionClassName;
             if (!$extension->beforeDelete($this))
                 return false;
@@ -153,10 +159,12 @@ trait TCrud
 
     public function afterDelete()
     {
+        /** @var \T4\Orm\Model $class */
         $class = get_class($this);
         $extensions = $class::getExtensions();
         foreach ($extensions as $extension) {
             $extensionClassName = '\\T4\\Orm\\Extensions\\' . ucfirst($extension);
+            /** @var \T4\Orm\Extension $extension */
             $extension = new $extensionClassName;
             if (!$extension->afterDelete($this))
                 return false;

@@ -302,10 +302,13 @@ class Mysql
         $class = get_class($model);
         $columns = $class::getColumns();
         $relations = $class::getRelations();
+        $cols = [];
         $sets = [];
         $data = [];
+
         foreach ($columns as $column => $def) {
             if (isset($model->{$column}) && !is_null($model->{$column})) {
+                $cols[] = $column;
                 $sets[] = '`' . $column . '`=:' . $column;
                 $data[':'.$column] = $model->{$column};
             } elseif (isset($def['default'])) {
@@ -313,17 +316,20 @@ class Mysql
                 $data[':'.$column] = $def['default'];
             }
         }
+
         foreach ($relations as $rel => $def) {
             switch ($def['type']) {
                 case $class::HAS_ONE:
                 case $class::BELONGS_TO:
                     $column = $class::getRelationLinkName($def);
-                    if (isset($model->{$column}) && !is_null($model->{$column})) {
-                        $sets[] = '`' . $column . '`=:' . $column;
-                        $data[':'.$column] = $model->{$column};
-                    } elseif (isset($model->{$rel}) && $model->{$rel} instanceof Model) {
-                        $sets[] = '`' . $column . '`=:' . $column;
-                        $data[':'.$column] = $model->{$rel}->getPk();
+                    if (!in_array($column, $cols)) {
+                        if (isset($model->{$column}) && !is_null($model->{$column})) {
+                            $sets[] = '`' . $column . '`=:' . $column;
+                            $data[':'.$column] = $model->{$column};
+                        } elseif (isset($model->{$rel}) && $model->{$rel} instanceof Model) {
+                            $sets[] = '`' . $column . '`=:' . $column;
+                            $data[':'.$column] = $model->{$rel}->getPk();
+                        }
                     }
                     break;
             }

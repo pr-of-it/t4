@@ -4,12 +4,13 @@ namespace T4\Orm\Extensions;
 
 use T4\Dbal\QueryBuilder;
 use T4\Orm\Extension;
+use T4\Orm\Model;
 
 class Tree
     extends Extension
 {
 
-    public function prepareColumns($columns)
+    public function prepareColumns($columns, $class='')
     {
         return $columns + [
             '__lft' => ['type' => 'int'],
@@ -19,7 +20,7 @@ class Tree
         ];
     }
 
-    public function prepareIndexes($indexes)
+    public function prepareIndexes($indexes, $class='')
     {
         return $indexes + [
             '__lft' => ['columns' => ['__lft']],
@@ -30,37 +31,39 @@ class Tree
         ];
     }
 
+    public function prepareRelations($relations, $class='')
+    {
+        return $relations + [
+            'parent' => [
+                'type' => Model::BELONGS_TO,
+                'model' => $class,
+                'on' => '__prt',
+            ],
+            /*
+            // TODO: сделать и проверить!
+            'children' => [
+                'type' => Model::HAS_MANY,
+                'model' => $class,
+                'on' => '__prt',
+            ]
+            */
+        ];
+    }
+
     public function beforeSave(&$model)
     {
-        /**
-         * Модель отображает существующую запись в таблице
-         * Родитель не менялся
-         * Делать тут нечего
-         */
-        if (!$model->isNew() && !isset($model->__parent))
-            return true;
 
+        /** @var \T4\Orm\Model $class */
         $class = get_class($model);
         $tableName = $class::getTableName();
-        /** @var $connection \T4\Dbal\Connection */
+        /** @var \T4\Dbal\Connection $connection */
         $connection = $class::getDbConnection();
 
-        /**
-         * Был вызван метод setParent(array|Model $parent)
-         * Находим родительский узел в БД
-         * Проверяем его существование
-         * и то, не равен ли он данному (замыкание на себя)
-         * На выходе имеем $parentId (возможно =0) и $parent (возможно не определено)
-         */
-        if ( !empty($model->__parent) ) {
-            $parent = $class::findByPk($model->__parent);
-            if (empty($parent))
-                return false;
-            if (!$model->isNew() && $parent->{$class::PK} == $model->{$class::PK})
-                return false;
-            $parentId = (int)$parent->{$class::PK};
-        } else {
+        if (empty($model->parent)) {
             $parentId = 0;
+        } else {
+            $parent = $model->parent;
+            $parentId = $model->parent->getPk();
         }
 
         /**
@@ -242,6 +245,9 @@ class Tree
 
     public function callStatic($class, $method, $argv)
     {
+        /**
+         * @var \T4\Orm\Model $class
+         */
         switch (true) {
             case 'findAllTree' == $method:
                 return $class::findAll(['order'=>'__lft']);
@@ -254,16 +260,6 @@ class Tree
     {
         $class = get_class($model);
         switch ($method) {
-            // TODO: убрать отсюда с появлением relations
-            case 'setParent':
-                if ( is_numeric($argv[0]) ) {
-                    $model->__parent = (int)$argv[0];
-                } elseif ( $argv[0] instanceof $class) {
-                    $model->__parent = $argv[0]->{$class::PK};
-                } else {
-                    throw new \T4\Orm\Exception('Invalid parent type');
-                }
-                return $model;
             case 'findAllChildren':
                 return $class::findAll([
                     'where'=>'__lft>'.$model->__lft.' AND __rgt<='.$model->__rgt,
