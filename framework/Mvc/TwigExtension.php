@@ -30,14 +30,21 @@ class TwigExtension extends \Twig_Extension
                     },  ['is_safe' => ['html']]
                 ),
 
+            'helper' => new \Twig_Function_Function(
+                    function ($name) {
+                        return $this->helper($name, array_slice(func_get_args(), 1));
+                    },  ['is_safe' => ['html']]),
+
+            // DEPRECATED
             'selectTreeByModel' => new \Twig_Function_Function(
                     function ($model, $selected = 0, $htmlOptions = [], $options = []) {
                         return Helpers::selectTreeByModel($model, $selected, $htmlOptions, $options);
                     },  ['is_safe' => ['html']]
                 ),
 
+            // DEPRECATED
             'blockOptionInput' => new \Twig_Function_Function(
-                    function ($name, $settings, $value=null, $htmlOptions=[]) use ($app) {
+                    function ($name, $settings, $value=null, $htmlOptions=[]) {
                         return Helpers::blockOptionInput($name, $settings, $value, $htmlOptions);
                     },  ['is_safe' => ['html']]
                 ),
@@ -50,6 +57,11 @@ class TwigExtension extends \Twig_Extension
         return [
             new \Twig_SimpleFilter('repeat', 'str_repeat'),
         ];
+    }
+
+    protected function helper($name, $args)
+    {
+        return call_user_func_array('\T4\Html\Helpers::'.$name, $args);
     }
 
 }

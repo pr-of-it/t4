@@ -128,4 +128,55 @@ class Helpers
         return self::selectTree($data, $selected, $options, $htmlOptions);
     }
 
+    static public function ulTree(Collection $tree, $options = [], $htmlOptions = [])
+    {
+        if (empty($options['titleColumn']))
+            $options['titleColumn'] = 'title';
+
+        $ret = '<ul' .
+            (isset($htmlOptions['id']) ? ' id="' . $htmlOptions['id'] . '"' : '') .
+            (isset($htmlOptions['name']) ? ' name="' . $htmlOptions['name'] . '"' : '') .
+            (isset($htmlOptions['class']) ? ' class="' . $htmlOptions['class'] . '"' : '') .
+            '>';
+        $lvl = $tree[0]->__lvl;
+        foreach ($tree as $index => $element) {
+            if ($element->__lvl > $lvl)
+                continue;
+            $ret .= '<li>' . $element->{$options['titleColumn']};
+            if (self::hasTreeElementChildren($tree, $index)) {
+                $ret .= self::ulTree(self::getAllChildrenByIndex($tree, $index), $options, $htmlOptions);
+            } else {
+                $ret .= '<ul' .
+                    (isset($htmlOptions['id']) ? ' id="' . $htmlOptions['id'] . '"' : '') .
+                    (isset($htmlOptions['name']) ? ' name="' . $htmlOptions['name'] . '"' : '') .
+                    (isset($htmlOptions['class']) ? ' class="' . $htmlOptions['class'] . '"' : '') .
+                    '></ul>';
+            }
+            $ret .= '</li>';
+        }
+        $ret .= '</ul>';
+        return $ret;
+    }
+
+    static protected function hasTreeElementChildren(Collection $tree, $index)
+    {
+        if (isset($tree[$index+1]) && $tree[$index+1]->__lvl > $tree[$index]->__lvl)
+            return true;
+        else
+            return false;
+    }
+
+    static protected function getAllChildrenByIndex(Collection $tree, $index)
+    {
+        $lvl = $tree[$index]->__lvl;
+        $tail = array_slice($tree->getArrayCopy(), $index+1);
+        $ret = [];
+        foreach ($tail as $el) {
+            if ($el->__lvl <= $lvl)
+                break;
+            $ret[] = $el;
+        }
+        return new Collection($ret);
+    }
+
 }

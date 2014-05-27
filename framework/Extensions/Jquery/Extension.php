@@ -14,6 +14,11 @@ class Extension
         } else {
             $assets->registerJs('http://code.jquery.com/jquery-2.1.0.min.js');
         }
+
+        if (!empty($this->options->ui)) {
+            $assets->registerCss('//ajax.googleapis.com/ajax/libs/jqueryui/1.10.4/themes/smoothness/jquery-ui.css');
+            $assets->registerJs('//ajax.googleapis.com/ajax/libs/jqueryui/1.10.4/jquery-ui.min.js');
+        }
     }
 
 }
