@@ -132,25 +132,24 @@ class Helpers
     {
         if (empty($options['titleColumn']))
             $options['titleColumn'] = 'title';
+        if (empty($options['parent']))
+            $options['parent'] = 0;
 
         $ret = '<ul' .
             (isset($htmlOptions['id']) ? ' id="' . $htmlOptions['id'] . '"' : '') .
-            (isset($htmlOptions['name']) ? ' name="' . $htmlOptions['name'] . '"' : '') .
             (isset($htmlOptions['class']) ? ' class="' . $htmlOptions['class'] . '"' : '') .
-            '>';
+            ' data-parent-id="' . $options['parent'] . '">';
         $lvl = $tree[0]->__lvl;
         foreach ($tree as $index => $element) {
             if ($element->__lvl > $lvl)
                 continue;
-            $ret .= '<li>' . $element->{$options['titleColumn']};
+            $ret .= '<li data-id="' . $element->getPk() . '">' . $element->{$options['titleColumn']};
             if (self::hasTreeElementChildren($tree, $index)) {
-                $ret .= self::ulTree(self::getAllChildrenByIndex($tree, $index), $options, $htmlOptions);
+                $ret .= self::ulTree(self::getAllChildrenByIndex($tree, $index), array_merge($options, ['parent'=>$element->getPk()]), $htmlOptions);
             } else {
                 $ret .= '<ul' .
-                    (isset($htmlOptions['id']) ? ' id="' . $htmlOptions['id'] . '"' : '') .
-                    (isset($htmlOptions['name']) ? ' name="' . $htmlOptions['name'] . '"' : '') .
                     (isset($htmlOptions['class']) ? ' class="' . $htmlOptions['class'] . '"' : '') .
-                    '></ul>';
+                    ' data-parent-id="' . $element->getPk() . '"></ul>';
             }
             $ret .= '</li>';
         }

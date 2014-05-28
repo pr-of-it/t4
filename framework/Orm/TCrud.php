@@ -39,24 +39,44 @@ trait TCrud
      * Find methods
      */
 
+    /**
+     * @param array $options
+     * @return \T4\Core\Collection
+     */
     public static function findAll($options = [])
     {
         $driver = static::getDbDriver();
         return $driver->findAll(get_called_class(), $options);
     }
 
+    /**
+     * @param string $column
+     * @param mixed $value
+     * @param array $options
+     * @return \T4\Core\Collection
+     */
     public static function findAllByColumn($column, $value, $options = [])
     {
         $driver = static::getDbDriver();
         return $driver->findAllByColumn(get_called_class(), $column, $value, $options);
     }
 
+    /**
+     * @param string $column
+     * @param mixed $value
+     * @param array $options
+     * @return \T4\Orm\Model
+     */
     public static function findByColumn($column, $value, $options = [])
     {
         $driver = static::getDbDriver();
         return $driver->findByColumn(get_called_class(), $column, $value, $options);
     }
 
+    /**
+     * @param mixed $value
+     * @return \T4\Orm\Model
+     */
     public static function findByPK($value)
     {
         return static::findByColumn(static::PK, $value);
