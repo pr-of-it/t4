@@ -2,6 +2,7 @@
 
 namespace T4\Orm\Extensions;
 
+use T4\Core\Collection;
 use T4\Dbal\QueryBuilder;
 use T4\Orm\Extension;
 use T4\Orm\Model;
@@ -221,26 +222,7 @@ class Tree
      */
     public function afterDelete(&$model)
     {
-        $class = get_class($model);
-        $tableName = $class::getTableName();
-        /** @var $connection \T4\Dbal\Connection */
-        $connection = $class::getDbConnection();
-
-        $sql = "
-            DELETE FROM `" . $tableName . "`
-            WHERE __lft >= :lft AND __rgt <= :rgt
-            ";
-        $result = $connection->execute($sql, [':lft' => $model->__lft, ':rgt' => $model->__rgt]);
-
-        $sql = "
-            UPDATE `" . $tableName . "`
-                SET __lft = IF(__lft > :lft, __lft - (:rgt - :lft + 1), __lft),
-                __rgt = __rgt - (:rgt - :lft + 1)
-            WHERE __rgt > :rgt
-            ";
-        $result = $result && $connection->execute($sql, [':lft' => $model->__lft, ':rgt' => $model->__rgt]);
-
-        return $result;
+        return $this->deleteSubTree(get_class($model), $model->__lft, $model->__rgt);
     }
 
     public function callStatic($class, $method, $argv)
@@ -258,20 +240,103 @@ class Tree
 
     public function call(&$model, $method, $argv)
     {
+        /* @var \T4\Orm\Model $class */
         $class = get_class($model);
         switch ($method) {
             case 'findAllChildren':
-                return $class::findAll([
-                    'where'=>'__lft>'.$model->__lft.' AND __rgt<='.$model->__rgt,
-                    'order'=>'__lft'
-                ]);
+                return $this->getSubTree($class, $model->__lft+1, $model->__rgt-1);
+                break;
             case 'findSubTree':
-                return $class::findAll([
-                    'where'=>'__lft>='.$model->__lft.' AND __rgt<='.$model->__rgt,
-                    'order'=>'__lft'
-                ]);
+                return $this->getSubTree($class, $model->__lft, $model->__rgt);
+                break;
+            case 'insertAfter':
+                if ($argv[0] instanceof Model) {
+                    $this->insertAfter(new Collection([$model]), $argv[0]);
+                } else {
+                    $this->insertAfter(new Collection([$model]), $class::findByPk($argv[0]));
+                }
+                break;
         }
         throw new Exception('Method ' . $method . ' is not found in extension ' . __CLASS__);
+    }
+
+
+    /**
+     * Служебные методы
+     */
+
+
+    /**
+     * Возвращает подмножество (поддерево в частном случае) дерева с заданным границами ключей (включительно!)
+     * @param \T4\Orm\Model $class
+     * @param int $lft
+     * @param int $rgt
+     * @return \T4\Core\Collection
+     */
+    protected function getSubTree($class, $lft, $rgt)
+    {
+        return $class::findAll([
+            'where'=>'__lft>='.$lft.' AND __rgt<='.$rgt,
+            'order'=>'__lft'
+        ]);
+    }
+
+    /**
+     * Удаляет поддерева начиная (и включая!) с данного элемента
+     * @param \T4\Orm\Model $class
+     * @param int $lft
+     * @param int $rgt
+     * @return boolean
+     */
+    protected function deleteSubTree($class, $lft, $rgt)
+    {
+        $tableName = $class::getTableName();
+        /** @var $connection \T4\Dbal\Connection */
+        $connection = $class::getDbConnection();
+        $sql = "
+            DELETE FROM `" . $tableName . "`
+            WHERE __lft >= :lft AND __rgt <= :rgt
+            ";
+        $result = $connection->execute($sql, [':lft' => $lft, ':rgt' => $rgt]);
+        $sql = "
+            UPDATE `" . $tableName . "`
+                SET __lft = IF(__lft > :lft, __lft - (:rgt - :lft + 1), __lft),
+                __rgt = __rgt - (:rgt - :lft + 1)
+            WHERE __rgt > :rgt
+            ";
+        $result = $result && $connection->execute($sql, [':lft' => $lft, ':rgt' => $rgt]);
+        return $result;
+    }
+
+    protected function insertAfter(Collection $subtree, Model $element)
+    {
+        var_dump($subtree);
+        var_dump($element);
+        echo $rgt = $element->__rgt;
+        echo ':::';
+        echo $count = count($subtree);
+        die;
+
+        /* @var \T4\Orm\Model $class */
+        $class = get_class($element);
+        $tableName = $class::getTableName();
+        /** @var $connection \T4\Dbal\Connection */
+        $connection = $class::getDbConnection();
+
+        $sql = '
+            UPDATE `' . $tableName . '`
+            SET __lft=__lft+' . ($count*2) . ', __rgt=__rgt+' . ($count*2) . '
+            WHERE __lft>:rgt
+        ';
+        $connection->execute($sql, [':rgt' => $rgt]);
+
+        $n = $subtree[0]->__lft;
+        foreach ($subtree as &$el)
+        {
+            $el->__lft = $el->__lft - $n + $rgt + 1;
+            $el->__rgt = $el->__rgt - $n + $rgt + 1;
+        }
+        $subtree->save();
     }
 
 }
