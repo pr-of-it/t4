@@ -10,7 +10,7 @@ class Extension
     {
         $assets = $this->app->assets;
         if ( isset($this->options->location) && 'local'==$this->options->location ) {
-            $assets->publishJs($this->path.DS.'lib'.DS.'js'.DS.'jquery-2.1.0.min.js');
+            $assets->publishJs($this->assetsPath.'/lib/js/jquery-2.1.0.min.js');
         } else {
             $assets->registerJs('http://code.jquery.com/jquery-2.1.0.min.js');
         }
