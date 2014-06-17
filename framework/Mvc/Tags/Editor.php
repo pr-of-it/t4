@@ -10,7 +10,7 @@ class Editor
 
     public function render()
     {
-        $value = isset($this->params->value) ? $this->params->value : '';
+        $value = $this->html;
         $class = isset($this->params->class) ? $this->params->class : '';
         unset($this->params->value);
         unset($this->params->class);

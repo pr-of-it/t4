@@ -11,12 +11,14 @@ abstract class Tag {
 
     protected $name;
     protected $params;
+    protected $html;
 
-    final public function __construct($params='')
+    final public function __construct($params='', $html='')
     {
         $classNameParts = explode('\\', get_class($this));
         $this->name = strtolower(array_pop($classNameParts));
         $this->params = $this->parseParams($params);
+        $this->html = $html;
     }
 
     final protected function parseParams($str)

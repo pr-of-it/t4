@@ -11,10 +11,16 @@ class Extension
     public function init()
     {
         $assets = $this->app->assets;
-        $assets->publish($this->path.DS.'lib');
-        $assets->publishJs($this->path.DS.'lib'.DS.'ckeditor.js');
-        $assets->publishJs($this->path.DS.'lib'.DS.'adapters'.DS.'jquery.js');
-        $assets->publishJs($this->path.DS.'lib'.DS.'t4.js');
+
+        if ( isset($this->options->location) && 'local'==$this->options->location ) {
+            $assets->publish($this->assetsPath.'/lib');
+            $assets->publishJs($this->assetsPath.'/lib/ckeditor.js');
+            $assets->publishJs($this->assetsPath.'/lib/adapters/jquery.js');
+
+        } else {
+            $assets->registerJs('//cdn.ckeditor.com/4.4.1/full/ckeditor.js');
+        }
+        $assets->publishJs($this->assetsPath.'/lib/t4.js');
     }
 
 }

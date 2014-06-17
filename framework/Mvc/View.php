@@ -8,7 +8,7 @@ use T4\Core\Std;
 class View
 {
 
-    const TAG_PATTERN = '~\<t4:(\S+)[\s]*([\s\S]*?)\/\>~i';
+    const TAG_PATTERN = '~<t4:(?P<tag>[^>\s]+)[\s]*(?P<params>[\s\S]*?)(/>|>)((?P<html>[\s\S]*?)</t4:(?P=tag)>)?~i';
 
     protected $paths = [];
     protected $twig;
@@ -59,9 +59,9 @@ class View
     protected function parseTags($content)
     {
         preg_match_all(self::TAG_PATTERN, $content, $m);
-        foreach ($m[1] as $n => $tag) {
+        foreach ($m['tag'] as $n => $tag) {
             $tagClassName = '\\' . __NAMESPACE__ . '\\Tags\\'.ucfirst($tag);
-            $tag = new $tagClassName($m[2][$n]);
+            $tag = new $tagClassName($m['params'][$n], $m['html'][$n]);
             try {
                 $content = str_replace($m[0][$n], $tag->render(), $content);
             } catch (Exception $e) {
