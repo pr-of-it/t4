@@ -22,6 +22,7 @@ class Uploader
 
     public function __invoke($name='')
     {
+        $realUploadPath = ROOT_PATH_PUBLIC . str_replace('/', DS, $this->uploadPath);
 
         if (empty($this->formFieldName) && !empty($name))
             $this->formFieldName = $name;
@@ -29,7 +30,7 @@ class Uploader
         if (empty($this->formFieldName))
             throw new Exception('Empty form field name for file upload');
 
-        if (empty($this->uploadPath) && !is_readable(ROOT_PATH_PUBLIC . DS. $this->uploadPath) && !is_dir(ROOT_PATH_PUBLIC . DS. $this->uploadPath))
+        if (empty($this->uploadPath) && !is_readable($realUploadPath) && !is_dir($realUploadPath))
             throw new Exception('Invalid upload path');
 
         if (empty($_FILES[$this->formFieldName]) || 0==$_FILES[$this->formFieldName]['size'])
@@ -38,7 +39,7 @@ class Uploader
         if (\UPLOAD_ERR_OK != $_FILES[$this->formFieldName]['error'])
             throw new Exception('Upload error while uploading file \'' . $this->formFieldName . '\': '.$_FILES[$this->formFieldName]['error']);
 
-        $file = ROOT_PATH_PUBLIC . DS. $this->uploadPath . '/' . basename($_FILES[$this->formFieldName]['name']);
+        $file = $realUploadPath . DS . basename($_FILES[$this->formFieldName]['name']);
         $ret = str_replace(DS, '/', $this->uploadPath) . '/' . basename($_FILES[$this->formFieldName]['name']);
 
         if (!move_uploaded_file($_FILES[$this->formFieldName]['tmp_name'], $file)) {
