@@ -141,7 +141,9 @@ class Application
                     }
                     $this->extensions->{$extension} = new $extensionClassName($options);
                     $this->extensions->{$extension}->setApp($this);
-                    $this->extensions->{$extension}->init();
+                    if (!isset($options->autoload) || true == $options->autoload) {
+                        $this->extensions->{$extension}->init();
+                    }
                 }
             }
 
