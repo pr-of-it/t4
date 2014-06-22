@@ -2,6 +2,8 @@
 
 namespace T4\Fs;
 
+use T4\Fs\Exception;
+
 class Helpers
 {
 
@@ -102,6 +104,24 @@ class Helpers
                 self::copyFile($fullFileName, $dst);
             }
         }
+    }
+
+    /**
+     * Удаляет файл по заданному пути
+     * @param string $file
+     * @return bool
+     * @throws \T4\Fs\Exception
+     */
+    public static function removeFile($file)
+    {
+        if (!is_readable($file) || !is_file($file)) {
+            throw new Exception('No such file: ' . $file);
+        }
+        $res = unlink($file);
+        if (false === $res) {
+            throw new Exception('File deleting failure: ' . $file);
+        }
+        return $res;
     }
 
 }
