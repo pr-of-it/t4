@@ -248,12 +248,11 @@ class Tree
             case 'findAllParents':
                 $query = new QueryBuilder;
                 $query
-                    ->select('t2.*')
+                    ->select('*')
                     ->from($class::getTableName())
-                    ->from($class::getTableName())
-                    ->where('t1.__lft > t2.__lft AND t1.__lft < t2.__rgt AND t1.__id = :id')
-                    ->order('t2.__lft')
-                    ->params([':id'=>$model->getPk()]);
+                    ->where('__lft<:lft AND __rgt>:rgt')
+                    ->order('__lft')
+                    ->params([':lft'=>$model->__lft, ':rgt'=>$model->__rgt]);
                 return $connection->query($query->getQuery(), $query->getParams())->fetchAll(\PDO::FETCH_CLASS, $class);
 
             case 'findAllChildren':
