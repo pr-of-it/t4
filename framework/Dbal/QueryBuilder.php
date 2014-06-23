@@ -9,7 +9,7 @@ class QueryBuilder
     protected $mode = 'select';
 
     protected $select;
-    protected $from;
+    protected $from = [];
     protected $leftJoin = [];
     protected $rightJoin = [];
     protected $where;
@@ -28,7 +28,7 @@ class QueryBuilder
 
     public function from($from)
     {
-        $this->from = $from;
+        $this->from[] = $from;
         return $this;
     }
 
@@ -114,7 +114,7 @@ class QueryBuilder
              * FROM part
              */
             if (!is_array($this->from)) {
-                $this->from = preg_split('~[\s]\,[\s]*~', $this->from, -1, \PREG_SPLIT_NO_EMPTY);
+                $this->from = preg_split('~[\s]*\,[\s]*~', $this->from, -1, \PREG_SPLIT_NO_EMPTY);
             }
             $this->from = array_map(function ($x) {
                 static $i = 0;

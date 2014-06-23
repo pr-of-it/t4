@@ -242,13 +242,28 @@ class Tree
     {
         /* @var \T4\Orm\Model $class */
         $class = get_class($model);
+        /* @var \T4\Dbal\Connection $connection */
+        $connection = $class::getDbConnection();
         switch ($method) {
+            case 'findAllParents':
+                $query = new QueryBuilder;
+                $query
+                    ->select('t2.*')
+                    ->from($class::getTableName())
+                    ->from($class::getTableName())
+                    ->where('t1.__lft > t2.__lft AND t1.__lft < t2.__rgt AND t1.__id = :id')
+                    ->order('t2.__lft')
+                    ->params([':id'=>$model->getPk()]);
+                return $connection->query($query->getQuery(), $query->getParams())->fetchAll(\PDO::FETCH_CLASS, $class);
+
             case 'findAllChildren':
                 return $this->getSubTree($class, $model->__lft+1, $model->__rgt-1);
                 break;
+
             case 'findSubTree':
                 return $this->getSubTree($class, $model->__lft, $model->__rgt);
                 break;
+
             case 'insertAfter':
                 if ($argv[0] instanceof Model) {
                     $this->insertAfter(new Collection([$model]), $argv[0]);
