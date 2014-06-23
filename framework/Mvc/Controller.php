@@ -40,7 +40,12 @@ abstract class Controller
     {
         $this->data = new Std();
         $this->app = Application::getInstance();
+        $this->view = new View($this->getTemplatePaths());
+        $this->view->setController($this);
+    }
 
+    public function getTemplatePaths()
+    {
         $templatesPaths = [];
         if ('' == $this->getModuleName()) {
             $templatesPaths[] = $this->app->getPath() . DS . 'Templates' . DS . $this->getShortName();
@@ -51,9 +56,7 @@ abstract class Controller
             $templatesPaths[] = $moduleLayoutPath;
         }
         $templatesPaths[] = $this->app->getPath() . DS . 'Layouts';
-
-        $this->view = new View($templatesPaths);
-        $this->view->setController($this);
+        return $templatesPaths;
     }
 
     public function getModuleName()

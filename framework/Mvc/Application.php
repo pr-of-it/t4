@@ -216,7 +216,7 @@ class Application
      * @throws \T4\Core\Exception
      * @return \T4\Mvc\Controller
      */
-    protected function createController($module, $controller)
+    public function createController($module, $controller)
     {
         if (!$this->existsController($module, $controller))
             throw new Exception('Controller ' . $controller . ' does not exist');
