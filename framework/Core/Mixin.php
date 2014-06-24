@@ -4,11 +4,11 @@ namespace T4\Core;
 
 abstract class Mixin {
 
-    protected $caller;
+    protected $_caller;
 
     final public function setCaller($caller)
     {
-        $this->$caller = $caller;
+        $this->$_caller = $caller;
     }
 
 }
