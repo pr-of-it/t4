@@ -12,7 +12,7 @@ namespace T4 {
 namespace {
     define('ROOT_PATH', realpath(__DIR__ . '/../../'));
     define('ROOT_PATH_PROTECTED', ROOT_PATH . DS . 'protected');
-    define('ROOT_PATH_PUBLIC', pathinfo(debug_backtrace()[0]['file'], PATHINFO_DIRNAME));
+    define('ROOT_PATH_PUBLIC', ROOT_PATH . DS . 'www');
 }
 
 namespace {
