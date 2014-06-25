@@ -14,13 +14,13 @@ class Extension
         $assets->publish($this->assetsPath.'/lib');
 
         if ( isset($this->options->location) && 'local'==$this->options->location ) {
-            $assets->publishJs($this->assetsPath.'/lib/ckeditor.js');
-            $assets->publishJs($this->assetsPath.'/lib/adapters/jquery.js');
+            $assets->publishJsFile($this->assetsPath.'/lib/ckeditor.js');
+            $assets->publishJsFile($this->assetsPath.'/lib/adapters/jquery.js');
         } else {
-            $assets->registerJs('//cdn.ckeditor.com/4.4.1/full/ckeditor.js');
+            $assets->registerJsUrl('//cdn.ckeditor.com/4.4.1/full/ckeditor.js');
         }
 
-        $assets->publishJs($this->assetsPath.'/lib/t4.js');
+        $assets->publishJsFile($this->assetsPath.'/lib/t4.js');
 
     }
 

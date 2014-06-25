@@ -11,17 +11,17 @@ class Extension
         $assets = $this->app->assets;
         if ( isset($this->options->location) && 'local'==$this->options->location ) {
             $assets->publish($this->assetsPath.'/lib');
-            $assets->publishCss($this->assetsPath.'/lib/css/bootstrap.min.css');
+            $assets->publishCssFile($this->assetsPath.'/lib/css/bootstrap.min.css');
             if ( !empty($this->options->theme) ) {
-                $assets->registerCss($this->options->theme->css);
+                $assets->registerCssUrl($this->options->theme->css);
             } else {
-                $assets->publishCss($this->assetsPath.'/lib/css/bootstrap-theme.min.css');
+                $assets->publishCssFile($this->assetsPath.'/lib/css/bootstrap-theme.min.css');
             }
-            $assets->publishJs($this->assetsPath.'/lib/js/bootstrap.min.js');
+            $assets->publishJsFile($this->assetsPath.'/lib/js/bootstrap.min.js');
         } else {
-            $assets->registerCss('//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css');
-            $assets->registerCss('//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap-theme.min.css');
-            $assets->registerJs('//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js');
+            $assets->registerCssUrl('//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css');
+            $assets->registerCssUrl('//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap-theme.min.css');
+            $assets->registerJsUrl('//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js');
         }
     }
 

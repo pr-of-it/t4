@@ -2,6 +2,7 @@
 
 namespace T4\Mvc;
 
+use T4\Core\Std;
 use T4\Mvc\AssetException as Exception;
 use T4\Core\TSingleton;
 use T4\Fs\Helpers;
@@ -114,23 +115,39 @@ class AssetsManager
      * CSS
      */
 
-    public function registerCss($url)
+    public function registerCssUrl($url)
     {
-        $this->publishedCss[] = $url;
+        $this->publishedCss[] = new Std([
+            'type' => 'link',
+            'url' => $url,
+        ]);
     }
 
-    public function publishCss($path)
+    public function registerCss($text)
+    {
+        $this->publishedCss[] = new Std([
+            'type' => 'text',
+            'text' => $text,
+        ]);
+    }
+
+    public function publishCssFile($path)
     {
         $url = $this->publish($path);
-        $this->registerCss($url);
+        $this->registerCssUrl($url);
         return $url;
     }
 
     public function getPublishedCss()
     {
         $links = [];
-        foreach ($this->publishedCss as $css)
-            $links[] = '<link rel="stylesheet" href="' . $css . '">';
+        foreach ($this->publishedCss as $css) {
+            if ($css->type == 'link') {
+                $links[] = '<link rel="stylesheet" href="' . $css->url . '">';
+            } elseif ($css->type == 'text') {
+                $links[] = '<style type="text/css">' . "\n" . $css->text . "\n" . '</style>';
+            }
+        }
         return implode("\n", $links) . "\n";
     }
 
@@ -138,15 +155,26 @@ class AssetsManager
      * JS
      */
 
-    public function registerJs($url)
+    public function registerJsUrl($url)
     {
-        $this->publishedJs[] = $url;
+        $this->publishedJs[] = new Std([
+            'type' => 'link',
+            'url' => $url,
+        ]);
     }
 
-    public function publishJs($path)
+    public function registerJs($text)
+    {
+        $this->publishedJs[] = new Std([
+            'type' => 'text',
+            'text' => $text,
+        ]);
+    }
+
+    public function publishJsFile($path)
     {
         $url = $this->publish($path);
-        $this->registerJs($url);
+        $this->registerJsUrl($url);
         return $url;
     }
 
@@ -154,7 +182,11 @@ class AssetsManager
     {
         $links = [];
         foreach ($this->publishedJs as $js)
-            $links[] = '<script type="text/javascript" src="' . $js . '"></script>';
+            if ($js->type == 'link') {
+                $links[] = '<script type="text/javascript" src="' . $js->url . '"></script>';
+            } elseif ($js->type == 'text') {
+                $links[] = '<script type="text/javascript">' . "\n" . $js->text . "\n" . '</script>';
+            }
         return implode("\n", $links) . "\n";
     }
 

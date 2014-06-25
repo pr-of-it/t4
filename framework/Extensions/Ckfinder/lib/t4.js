@@ -1,3 +1,0 @@
-$(function(){
-    CKFinder.setupCKEditor(null, '');
-});

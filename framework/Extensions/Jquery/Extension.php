@@ -10,14 +10,14 @@ class Extension
     {
         $assets = $this->app->assets;
         if ( isset($this->options->location) && 'local'==$this->options->location ) {
-            $assets->publishJs($this->assetsPath.'/lib/js/jquery-2.1.0.min.js');
+            $assets->publishJsFile($this->assetsPath.'/lib/js/jquery-2.1.0.min.js');
         } else {
-            $assets->registerJs('http://code.jquery.com/jquery-2.1.0.min.js');
+            $assets->registerJsUrl('http://code.jquery.com/jquery-2.1.0.min.js');
         }
 
         if (!empty($this->options->ui)) {
-            $assets->registerCss('//ajax.googleapis.com/ajax/libs/jqueryui/1.10.4/themes/smoothness/jquery-ui.css');
-            $assets->registerJs('//ajax.googleapis.com/ajax/libs/jqueryui/1.10.4/jquery-ui.min.js');
+            $assets->registerCssUrl('//ajax.googleapis.com/ajax/libs/jqueryui/1.10.4/themes/smoothness/jquery-ui.css');
+            $assets->registerJsUrl('//ajax.googleapis.com/ajax/libs/jqueryui/1.10.4/jquery-ui.min.js');
         }
     }
 

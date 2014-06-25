@@ -12,16 +12,14 @@ class Extension
         $assets = $this->app->assets;
         $assetsUrl = $assets->publish($this->assetsPath.'/lib');
 
-        // TODO: отвратительное решение!
-        $content = <<<FILE
+        $assets->publishJsFile($this->assetsPath.'/lib/ckfinder.js');
+
+        $assets->registerJs(<<<FILE
 $(function(){
     CKFinder.setupCKEditor(null, '{$assetsUrl}');
 });
-FILE;
-        file_put_contents($this->path.DS.'lib'.DS.'t4.js', $content );
-
-        $assets->publishJs($this->assetsPath.'/lib/ckfinder.js');
-        $assets->publishJs($this->assetsPath.'/lib/t4.js');
+FILE
+    );
 
     }
 

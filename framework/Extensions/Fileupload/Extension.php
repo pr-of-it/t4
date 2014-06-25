@@ -10,8 +10,8 @@ class Extension
     {
         $assets = $this->app->assets;
         $assets->publish($this->assetsPath.'/lib/js/');
-        $assets->publishJs($this->assetsPath.'/lib/js/jquery.iframe-transport.js');
-        $assets->publishJs($this->assetsPath.'/lib/js/jquery.fileupload.js');
+        $assets->publishJsFile($this->assetsPath.'/lib/js/jquery.iframe-transport.js');
+        $assets->publishJsFile($this->assetsPath.'/lib/js/jquery.fileupload.js');
     }
 
 }
