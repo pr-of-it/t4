@@ -1,6 +1,7 @@
 <?php
 
-require_once __DIR__ . '/../../../../t4/framework/boot.php';
+require_once realpath(__DIR__ . '/../../../t4/framework/boot.php');
+
 /*
  * ### CKFinder : Configuration File - Basic Instructions
  *
@@ -196,6 +197,7 @@ to upload `.swf` files only if you understand and can accept this risk.
 */
 $config['DefaultResourceTypes'] = '';
 
+/*
 $config['ResourceType'][] = Array(
 		'name' => 'Files',				// Single quotes not allowed
 		'url' => $baseUrl . 'files',
@@ -203,15 +205,17 @@ $config['ResourceType'][] = Array(
 		'maxSize' => 0,
 		'allowedExtensions' => '7z,aiff,asf,avi,bmp,csv,doc,docx,fla,flv,gif,gz,gzip,jpeg,jpg,mid,mov,mp3,mp4,mpc,mpeg,mpg,ods,odt,pdf,png,ppt,pptx,pxd,qt,ram,rar,rm,rmi,rmvb,rtf,sdc,sitd,swf,sxc,sxw,tar,tgz,tif,tiff,txt,vsd,wav,wma,wmv,xls,xlsx,zip',
 		'deniedExtensions' => '');
-
+*/
 $config['ResourceType'][] = Array(
 		'name' => 'Images',
-		'url' => $baseUrl . 'images',
-		'directory' => $baseDir . 'images',
+		//'url' => $baseUrl . 'images',
+		'url' => $baseUrl,
+		//'directory' => $baseDir . 'images',
+		'directory' => $baseDir,
 		'maxSize' => 0,
 		'allowedExtensions' => 'bmp,gif,jpeg,jpg,png',
 		'deniedExtensions' => '');
-
+/*
 $config['ResourceType'][] = Array(
 		'name' => 'Flash',
 		'url' => $baseUrl . 'flash',
@@ -219,7 +223,7 @@ $config['ResourceType'][] = Array(
 		'maxSize' => 0,
 		'allowedExtensions' => 'swf,flv',
 		'deniedExtensions' => '');
-
+*/
 /*
  Due to security issues with Apache modules, it is recommended to leave the
  following setting enabled.
