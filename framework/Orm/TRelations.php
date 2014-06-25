@@ -101,8 +101,8 @@ trait TRelations {
                 $query
                     ->select('t1.*')
                     ->from($relationClass::getTableName())
-                    ->rightJoin($linkTable, 't1.' . $relationClass::PK . '=j1.' . static::getManyToManyThatLinkColumnName($relation))
-                    ->where('j1.'.static::getManyToManyThisLinkColumnName().'=:id');
+                    ->rightJoin($linkTable, 't1.' . $relationClass::PK . '=rj1.' . static::getManyToManyThatLinkColumnName($relation))
+                    ->where('rj1.'.static::getManyToManyThisLinkColumnName().'=:id');
                 $query->params([':id'=>$this->getPk()]);
                 $result = $relationClass::getDbConnection()->query($query->getQuery(), $query->getParams())->fetchAll(\PDO::FETCH_CLASS, $relationClass);
                 if (!empty($result)) {

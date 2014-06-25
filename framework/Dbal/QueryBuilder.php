@@ -28,6 +28,11 @@ class QueryBuilder
 
     public function from($from)
     {
+        /*
+        if (!is_array($this->from)) {
+            $this->from = preg_split('~[\s]*\,[\s]*~', $this->from, -1, \PREG_SPLIT_NO_EMPTY);
+        }
+        */
         $this->from[] = $from;
         return $this;
     }
@@ -113,9 +118,6 @@ class QueryBuilder
             /*
              * FROM part
              */
-            if (!is_array($this->from)) {
-                $this->from = preg_split('~[\s]*\,[\s]*~', $this->from, -1, \PREG_SPLIT_NO_EMPTY);
-            }
             $this->from = array_map(function ($x) {
                 static $i = 0;
                 $i++;
@@ -131,7 +133,7 @@ class QueryBuilder
             $this->leftJoin = array_map(function ($x) {
                 static $i = 0;
                 $i++;
-                $x['table'] = $x['table'] . ' AS j' . $i;
+                $x['table'] = $x['table'] . ' AS lj' . $i;
                 return $x;
             }, $this->leftJoin);
             foreach ($this->leftJoin as $join) {
@@ -144,7 +146,7 @@ class QueryBuilder
             $this->rightJoin = array_map(function ($x) {
                 static $i = 0;
                 $i++;
-                $x['table'] = $x['table'] . ' AS j' . $i;
+                $x['table'] = $x['table'] . ' AS rj' . $i;
                 return $x;
             }, $this->rightJoin);
             foreach ($this->rightJoin as $join) {
