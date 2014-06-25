@@ -202,10 +202,10 @@ class AssetsManager
      */
     protected function getRealPath($path)
     {
-        if (preg_match('~^\/\/~', $path))
-            $realPath = preg_replace('~^\/\/~', \T4\ROOT_PATH . DS, $path);
-        elseif (preg_match('~^\/~', $path)) {
-            $realPath = preg_replace('~^\/~', ROOT_PATH_PROTECTED . DS, $path);
+        if (0 === strpos($path, '//')) {
+            $realPath = \T4\ROOT_PATH . DS . substr($path, 2);
+        } elseif (0 === strpos($path, '/')) {
+            $realPath = ROOT_PATH_PROTECTED . DS . substr($path, 1);
         } else {
             throw new Exception('Path \'' . $path . '\' for asset is invalid');
         }
