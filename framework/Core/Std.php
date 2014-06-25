@@ -61,7 +61,11 @@ class Std
     }
 
     /**
-     * Arrayable implemetation
+     * Arrayable implementation
+     */
+
+    /**
+     * @return array
      */
     public function toArray()
     {
@@ -76,6 +80,10 @@ class Std
         return $data;
     }
 
+    /**
+     * @param array $data
+     * @return \T4\Core\Std $this
+     */
     public function fromArray($data) {
         foreach ( $data as $key => $value ) {
             if ( is_array($value) ) {
@@ -88,9 +96,18 @@ class Std
         return $this;
     }
 
+    /**
+     * @param \T4\Core\Std | array $obj
+     * @return \T4\Core\Std $this
+     */
     public function merge($obj)
     {
-        $this->fromArray($obj->toArray());
+        if ($obj instanceof self) {
+            $obj = $obj->toArray();
+        } else {
+            $obj = (array)$obj;
+        }
+        $this->fromArray(array_merge($this->toArray(), $obj));
         return $this;
     }
 
@@ -102,8 +119,7 @@ class Std
      */
     public function fill($data)
     {
-        $this->fromArray($data);
-        return $this;
+        return $this->merge($data);
     }
 
     /**
