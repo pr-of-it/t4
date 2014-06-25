@@ -124,4 +124,21 @@ class Helpers
         return $res;
     }
 
+    /**
+     * Возвращает максимальное время модификации файлов по заданному пути
+     * @param string $path
+     * @return int
+     */
+    static public function dirMTime($path)
+    {
+        $mtime = 0;
+        $itr = new \RecursiveDirectoryIterator($path);
+        foreach ($itr as $file) {
+            $mt = $file->getMTime();
+            if ($mt > $mtime)
+                $mtime = $mt;
+        }
+        return $mtime;
+    }
+
 }

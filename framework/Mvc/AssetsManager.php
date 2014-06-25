@@ -54,18 +54,18 @@ class AssetsManager
 
         $type = is_dir($realPath) ? 'dir' : 'file';
 
+
         // Получаем время последней модификации ресурса
         // и, заодно, путь до него и до возможной публикации
         clearstatcache(true, $realPath);
         if ('dir' == $type) {
             $baseRealPath = $realPath;
-            $lastModifiedTime = filemtime($realPath . DS . '.');
+            $lastModifiedTime = Helpers::dirMTime($realPath . DS . '.');
         } else {
             $baseRealPath = pathinfo($realPath, PATHINFO_DIRNAME);
             $baseRealName = pathinfo($realPath, PATHINFO_BASENAME);
             $lastModifiedTime = filemtime($realPath);
         }
-
         $pathHash = substr(md5($baseRealPath), 0, 12);
         $assetBasePath = ROOT_PATH_PUBLIC . DS . 'Assets' . DS . $pathHash;
         $assetBaseUrl = '/Assets/' . $pathHash;
