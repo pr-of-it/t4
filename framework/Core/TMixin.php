@@ -2,16 +2,14 @@
 
 namespace T4\Core;
 
-use T4\Core\Mixin;
-
 trait TMixin
 {
 
-    static protected $mixins = [];
+    static protected $_mixins = [];
 
     public function __call($name, $argv)
     {
-        foreach (static::$mixins as $class) {
+        foreach (static::$_mixins as $class) {
 
             if (!class_exists($class))
                 throw new Exception('Class ' . $class . ' does not exist.');
@@ -34,7 +32,7 @@ trait TMixin
 
     public function __callStatic($name, $argv)
     {
-        foreach (static::$mixins as $class) {
+        foreach (static::$_mixins as $class) {
 
             if (!class_exists($class))
                 throw new Exception('Class ' . $class . ' does not exist.');
