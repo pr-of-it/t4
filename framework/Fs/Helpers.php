@@ -132,7 +132,7 @@ class Helpers
     static public function dirMTime($path)
     {
         $mtime = 0;
-        $itr = new \RecursiveDirectoryIterator($path);
+        $itr = new \RecursiveIteratorIterator( new \RecursiveDirectoryIterator($path) );
         foreach ($itr as $file) {
             $mt = $file->getMTime();
             if ($mt > $mtime)
