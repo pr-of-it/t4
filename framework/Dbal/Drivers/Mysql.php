@@ -234,11 +234,10 @@ class Mysql
         $query
             ->select('*')
             ->from($class::getTableName())
-            ->where('`' . $column . '`=:value')
+            ->where('`' . $column . '`=:value' . (!empty($options['where']) ? ' AND (' . $options['where'] . ')' : ''))
             ->order(!empty($options['order']) ? $options['order'] : '')
             ->limit(!empty($options['limit']) ? $options['limit'] : '')
             ->params([':value' => $value]);
-
         $result = $class::getDbConnection()->query($query->getQuery(), $query->getParams())->fetchAll(\PDO::FETCH_CLASS, $class);
         if (!empty($result)) {
             $ret = new Collection($result);
