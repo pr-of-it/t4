@@ -130,6 +130,9 @@ class Helpers
 
     static public function ulTree(Collection $tree, $options = [], $htmlOptions = [])
     {
+        if (0 == count($tree))
+            return '';
+
         if (empty($options['titleColumn']))
             $options['titleColumn'] = 'title';
         if (empty($options['parent']))

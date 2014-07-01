@@ -62,7 +62,7 @@ class Connection
     /**
      * @param $sql
      * @param array $params
-     * @return Statement
+     * @return bool
      */
     public function execute($sql, array $params = [])
     {

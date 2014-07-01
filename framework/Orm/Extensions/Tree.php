@@ -40,32 +40,210 @@ class Tree
                 'model' => $class,
                 'on' => '__prt',
             ],
-            /*
-            // TODO: сделать и проверить!
             'children' => [
                 'type' => Model::HAS_MANY,
                 'model' => $class,
                 'on' => '__prt',
-            ]
-            */
+            ],
         ];
     }
 
-    public function beforeSave(&$model)
-    {
+    /**
+     * Манипуляции с деревом nested sets
+     */
 
+    /**
+     * Подготовка модели к вставке в дерево перед заданным элементом, в то же поддерево, что и заданный элемент
+     * @param \T4\Orm\Model $model
+     * @param \T4\Orm\Model $element
+     * @return bool
+     */
+    public function insertModelBeforeElement(Model &$model, Model &$element)
+    {
         /** @var \T4\Orm\Model $class */
         $class = get_class($model);
         $tableName = $class::getTableName();
         /** @var \T4\Dbal\Connection $connection */
         $connection = $class::getDbConnection();
 
+        $sql = "
+            UPDATE `" . $tableName . "`
+            SET
+                `__rgt` = `__rgt` + 2,
+                `__lft` = `__lft` + 2
+            WHERE `__lft`>=:lft
+        ";
+        $connection->execute($sql, [':lft' => $element->__lft]);
+
+        $model->__lft = $element->__lft;
+        $model->__rgt = $element->__lft + 1;
+        $model->__lvl = $element->__lvl;
+        $model->__prt = $element->__prt;
+
+        $element->__lft += 2;
+        $element->__rgt += 2;
+
+    }
+
+    /**
+     * Подготовка модели к вставке в дерево сразу после заданного элемента, в то же поддерево, что и заданный элемент
+     * @param \T4\Orm\Model $model
+     * @param \T4\Orm\Model $element
+     * @return bool
+     */
+    public function insertModelAfterElement(Model &$model, Model &$element)
+    {
+        /** @var \T4\Orm\Model $class */
+        $class = get_class($model);
+        $tableName = $class::getTableName();
+        /** @var \T4\Dbal\Connection $connection */
+        $connection = $class::getDbConnection();
+
+        $sql = "
+            UPDATE `" . $tableName . "`
+            SET `__rgt` = `__rgt` + 2
+            WHERE `__rgt`>:rgt
+        ";
+        $connection->execute($sql, [':rgt' => $element->__rgt]);
+        $sql = "
+            UPDATE `" . $tableName . "`
+            SET `__lft` = `__lft` + 2
+            WHERE `__lft`>:rgt
+        ";
+        $connection->execute($sql, [':rgt' => $element->__rgt]);
+
+        $model->__lft = $element->__rgt + 1;
+        $model->__rgt = $element->__rgt + 2;
+        $model->__lvl = $element->__lvl;
+        $model->__prt = $element->__prt;
+
+    }
+
+
+    /**
+     * Подготовка модели к вставке в дерево в качестве первого потомка заданного элемента
+     * @param \T4\Orm\Model $model
+     * @param \T4\Orm\Model $parent
+     */
+    protected function insertModelAsFirstChildOf(Model &$model, Model &$parent)
+    {
+        /** @var \T4\Orm\Model $class */
+        $class = get_class($model);
+        $tableName = $class::getTableName();
+        /** @var \T4\Dbal\Connection $connection */
+        $connection = $class::getDbConnection();
+
+        $sql = "
+            UPDATE `" . $tableName . "`
+            SET `__rgt` = `__rgt` + 2
+            WHERE `__lft` >= :lft
+        ";
+        $connection->execute($sql, [':lft' => $parent->__lft]);
+        $sql = "
+            UPDATE `" . $tableName . "`
+            SET `__lft` = `__lft` + 2
+            WHERE `__lft` > :lft
+        ";
+        $connection->execute($sql, [':lft' => $parent->__lft]);
+
+        $model->__lft = $parent->__lft + 1;
+        $model->__rgt = $parent->__lft + 2;
+        $model->__lvl = $parent->__lvl + 1;
+        $model->__prt = $parent->getPk();
+
+    }
+
+    /**
+     * Подготовка модели к вставке в дерево в качестве последнего потомка заданного элемента
+     * @param \T4\Orm\Model $model
+     * @param \T4\Orm\Model $parent
+     */
+    protected function insertModelAsLastChildOf(Model &$model, Model &$parent)
+    {
+        /** @var \T4\Orm\Model $class */
+        $class = get_class($model);
+        $tableName = $class::getTableName();
+        /** @var \T4\Dbal\Connection $connection */
+        $connection = $class::getDbConnection();
+
+        $sql = "
+            UPDATE `" . $tableName . "`
+            SET `__rgt` = `__rgt` + 2
+            WHERE `__rgt` >= :rgt
+        ";
+        $connection->execute($sql, [':rgt' => $parent->__rgt]);
+        $sql = "
+            UPDATE `" . $tableName . "`
+            SET `__lft` = `__lft` + 2
+            WHERE `__lft` > :rgt
+        ";
+        $connection->execute($sql, [':rgt' => $parent->__rgt]);
+
+        $model->__lft = $parent->__rgt;
+        $model->__rgt = $parent->__rgt + 1;
+        $model->__lvl = $parent->__lvl + 1;
+        $model->__prt = $parent->getPk();
+
+        $parent->__rgt += 2;
+
+    }
+
+    /**
+     * Подготовка модели к вставке в дерево в качестве последнего корня
+     * @param \T4\Orm\Model $model
+     */
+    protected function insertModelAsLastRoot(Model &$model)
+    {
+        /** @var \T4\Orm\Model $class */
+        $class = get_class($model);
+        $tableName = $class::getTableName();
+        /** @var \T4\Dbal\Connection $connection */
+        $connection = $class::getDbConnection();
+
+        $query = new QueryBuilder();
+        $query->select('MAX(`__rgt`)')->from($tableName);
+        $maxRgt = (int)$connection->query($query->getQuery())->fetchScalar();
+
+        $model->__lft = $maxRgt + 1;
+        $model->__rgt = $maxRgt + 2;
+        $model->__lvl = 0;
+        $model->__prt = 0;
+
+    }
+
+    /*
+     * Методы модели
+     */
+
+    public function beforeSave(&$model)
+    {
+
         if (empty($model->parent)) {
+            $parent = null;
             $parentId = 0;
         } else {
             $parent = $model->parent;
             $parentId = $model->parent->getPk();
         }
+
+        if ($model->isNew()) {
+            if (null == $parent) {
+                $this->insertModelAsLastRoot($model);
+            } else {
+                $this->insertModelAsLastChildOf($model, $parent);
+            }
+            return true;
+        }
+
+        /**
+         *
+         */
+
+        /** @var \T4\Orm\Model $class */
+        $class = get_class($model);
+        $tableName = $class::getTableName();
+        /** @var \T4\Dbal\Connection $connection */
+        $connection = $class::getDbConnection();
 
         /**
          * Вставка новой записи в таблицу
@@ -320,37 +498,6 @@ class Tree
             ";
         $result = $result && $connection->execute($sql, [':lft' => $lft, ':rgt' => $rgt]);
         return $result;
-    }
-
-    protected function insertAfter(Collection $subtree, Model $element)
-    {
-        var_dump($subtree);
-        var_dump($element);
-        echo $rgt = $element->__rgt;
-        echo ':::';
-        echo $count = count($subtree);
-        die;
-
-        /* @var \T4\Orm\Model $class */
-        $class = get_class($element);
-        $tableName = $class::getTableName();
-        /** @var $connection \T4\Dbal\Connection */
-        $connection = $class::getDbConnection();
-
-        $sql = '
-            UPDATE `' . $tableName . '`
-            SET __lft=__lft+' . ($count*2) . ', __rgt=__rgt+' . ($count*2) . '
-            WHERE __lft>:rgt
-        ';
-        $connection->execute($sql, [':rgt' => $rgt]);
-
-        $n = $subtree[0]->__lft;
-        foreach ($subtree as &$el)
-        {
-            $el->__lft = $el->__lft - $n + $rgt + 1;
-            $el->__rgt = $el->__rgt - $n + $rgt + 1;
-        }
-        $subtree->save();
     }
 
 }

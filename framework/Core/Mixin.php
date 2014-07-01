@@ -8,7 +8,7 @@ abstract class Mixin {
 
     final public function setCaller($caller)
     {
-        $this->$_caller = $caller;
+        $this->_caller = $caller;
     }
 
 }
