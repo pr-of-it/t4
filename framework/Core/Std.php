@@ -2,27 +2,19 @@
 
 namespace T4\Core;
 
+use ArrayAccess;
 use Traversable;
 
 class Std
     extends \stdClass
-    implements \ArrayAccess, \Countable, \IteratorAggregate, IArrayable
+    implements ArrayAccess, \Countable, \IteratorAggregate, IArrayable
 {
 
-    public function __construct(array $data=[])
+    public function __construct($data=null)
     {
-        set_error_handler([$this, 'errorHandler'], E_WARNING);
-        if (!empty($data)) {
+        if (null !== $data) {
             $this->fromArray($data);
         }
-    }
-
-    public function errorHandler($errno, $errstr, $errfile, $errline, $errcontext)
-    {
-        if ('Creating default object from empty value' == $errstr && isset($errcontext['obj']) && $errcontext['obj'] instanceof static) {
-            return true;
-        }
-        return false;
     }
 
     /**
@@ -57,7 +49,7 @@ class Std
      */
     public function count()
     {
-        return count(get_object_vars($this));
+        return count((array)$this);
     }
 
     /**
@@ -133,4 +125,31 @@ class Std
     {
         return new \ArrayIterator($this);
     }
+
+
+    public function __isset($key)
+    {
+        $method = 'get' . ucfirst($key);
+        return
+            isset($this->{$key}) || method_exists($this, $method);
+    }
+
+    public function __get($key)
+    {
+        $method = 'get' . ucfirst($key);
+        if ( method_exists($this, $method) )
+            return $this->$method();
+        else
+            return $this->$key;
+    }
+
+    public function __set($key, $value)
+    {
+        $method = 'set' . ucfirst($key);
+        if ( method_exists($this, $method) )
+            $this->$method($value);
+        else
+            $this->$key = $value;
+    }
+
 }
