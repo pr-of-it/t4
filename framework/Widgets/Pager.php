@@ -35,6 +35,8 @@ class Pager
     public function render()
     {
         $pagesCount = ceil($this->options->total / $this->options->size);
+        if (!$pagesCount)
+            return;
 
         $displayed = array_unique([1, $pagesCount>1 ? 2 : 1, $pagesCount>2 ? 3 : 1, $this->options->active - 1 ?: 1, $this->options->active, $this->options->active + 1, $pagesCount - 2 ?: 1, $pagesCount - 1 ?: 1, $pagesCount]);
 
