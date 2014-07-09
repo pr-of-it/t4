@@ -18,6 +18,11 @@ class Std
         }
     }
 
+    public function getData()
+    {
+        return $this->__data;
+    }
+
     /**
      * ArrayAccess implementation
      */

@@ -39,7 +39,7 @@ class View
     public function render($template, $data = [])
     {
         if ($data instanceof Std)
-            $data = $data->toArray();
+            $data = $data->getData();
         else
             $data = (array)$data;
 
