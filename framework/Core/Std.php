@@ -168,7 +168,7 @@ class Std
         if ( method_exists($this, $method) )
             return $this->$method();
 
-        return $this->__data[$key];
+        return isset($this->__data[$key]) ? $this->__data[$key] : null;
     }
 
     public function __set($key, $value)
