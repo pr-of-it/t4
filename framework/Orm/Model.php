@@ -13,6 +13,11 @@ abstract class Model
 
     const PK = '__id';
 
+    public function getPk()
+    {
+        return $this->{static::PK};
+    }
+
     const HAS_ONE = 'hasOne';
     const BELONGS_TO = 'belongsTo';
     const HAS_MANY = 'hasMany';
@@ -66,16 +71,6 @@ abstract class Model
     }
 
     /**
-     * @return array
-     */
-    static public function getExtensions()
-    {
-        return !empty(static::$extensions) ?
-            array_merge(['standard'], static::$extensions) :
-            ['standard'];
-    }
-
-    /**
      * @return string
      */
     static public function getTableName()
@@ -124,6 +119,16 @@ abstract class Model
         }
         $driverName = $app->config->db->{static::getDbConnectionName()}->driver;
         return DriverFactory::getDriver($driverName);
+    }
+
+    /**
+     * @return array
+     */
+    static public function getExtensions()
+    {
+        return !empty(static::$extensions) ?
+            array_merge(['standard'], static::$extensions) :
+            ['standard'];
     }
 
 }
