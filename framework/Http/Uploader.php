@@ -79,7 +79,7 @@ class Uploader
     protected function suggestUploadedFileName($path, $name)
     {
         if (!file_exists($path.DS.$name))
-            return $name;
+            return strtolower($name);
 
         $filename = pathinfo($name, \PATHINFO_FILENAME);
         $extension = pathinfo($name, \PATHINFO_EXTENSION);
@@ -89,7 +89,7 @@ class Uploader
         while (file_exists($path.DS.($file = $m[1] . '_' . $i . '.' . $extension)))
             $i++;
 
-        return $file;
+        return strtolower($file);
 
     }
 
