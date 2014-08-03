@@ -2,10 +2,38 @@
 
 namespace T4\Fs;
 
-use T4\Fs\Exception;
-
 class Helpers
 {
+
+    public static function listDir($path)
+    {
+        if (!is_dir($path))
+            throw new Exception('No such dir: ' . $path);
+        return array_map(
+            function ($f) use ($path) {
+                return $path.DS.$f;
+            },
+            scandir($path, \SCANDIR_SORT_NONE)
+        );
+    }
+
+    public static function listDirRecursive($path)
+    {
+        $list = self::listDir($path);
+        $ret = [];
+        foreach ($list as $file) {
+            if ('.' == basename($file) || '..' == basename($file)) {
+                $ret[] = $file;
+                continue;
+            }
+            if (is_dir($file)) {
+                $ret = array_merge($ret, self::listDir($file));
+            } else {
+                $ret[] = $file;
+            }
+        }
+        return $ret;
+    }
 
     /**
      * Создает папку по указанному пути
@@ -46,20 +74,11 @@ class Helpers
             $dst = $dst . DS . basename($src);
         }
 
-        $srcLength = filesize($src);
-        $srcFile = fopen($src, 'r');
-        $dstFile = fopen($dst, 'w+');
-        $copyLength = stream_copy_to_stream($srcFile, $dstFile);
-        fclose($srcFile);
-        fclose($dstFile);
-
-        if ($copyLength != $srcLength) {
-            unlink($dst);
+        $res = copy($src, $dst);
+        if (!$res)
             throw new Exception('Can not copy file ' . $src . ' to ' . $dst);
-        }
-
-        chmod($dst, $mode);
-        return $copyLength;
+        @chmod($dst, $mode);
+        return true;
 
     }
 
@@ -90,18 +109,18 @@ class Helpers
             throw new Exception('' . $dst . ' is not a directory');
         }
 
-        foreach (scandir($src) as $filename) {
-            if ( '.'==$filename || '..'==$filename ) {
+        foreach (self::listDir($src) as $file) {
+            $fileName = basename($file);
+            if ( '.'==$fileName || '..'==$fileName ) {
                 continue;
             }
-            $fullFileName = $src.DS.$filename;
-            if ( !is_readable($fullFileName) ) {
-                throw new Exception($fullFileName . ' is not readable');
+            if ( !is_readable($file) ) {
+                throw new Exception($file . ' is not readable');
             }
-            if (is_dir($fullFileName)) {
-                self::copyDir($fullFileName, $dst.DS.$filename);
+            if (is_dir($file)) {
+                self::copyDir($file, $dst.DS.$fileName);
             } else {
-                self::copyFile($fullFileName, $dst);
+                self::copyFile($file, $dst);
             }
         }
     }
@@ -132,11 +151,11 @@ class Helpers
     static public function dirMTime($path)
     {
         $mtime = 0;
-        $itr = new \RecursiveIteratorIterator( new \RecursiveDirectoryIterator($path) );
-        foreach ($itr as $file) {
-            $mt = $file->getMTime();
-            if ($mt > $mtime)
-                $mtime = $mt;
+        clearstatcache();
+        foreach (self::listDirRecursive($path) as $file) {
+            $m = filemtime($file);
+            if ($m > $mtime)
+                $mtime = $m;
         }
         return $mtime;
     }

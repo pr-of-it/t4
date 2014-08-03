@@ -38,16 +38,19 @@ class View
 
     public function render($template, $data = [])
     {
+        if ($data instanceof Std)
+            $data = $data->getData();
+        else
+            $data = (array)$data;
+
         return $this->postProcess(
-            $this->twig->render($template, (array)$data)
+            $this->twig->render($template, $data)
         );
     }
 
     public function display($template, $data = [])
     {
-        print $this->postProcess(
-            $this->twig->render($template, (array)$data)
-        );
+        print $this->render($template, $data);
     }
 
     protected function postProcess($content)

@@ -11,21 +11,19 @@ abstract class Model
 
     use TMagic, TCrud, TRelations;
 
-    /**
-     * Имя поля первичного ключа
-     */
     const PK = '__id';
 
-    /**
-     * Типы связей
-     */
+    public function getPk()
+    {
+        return $this->{static::PK};
+    }
+
     const HAS_ONE = 'hasOne';
     const BELONGS_TO = 'belongsTo';
     const HAS_MANY = 'hasMany';
     const MANY_TO_MANY = 'manyToMany';
 
     /**
-     * Схема модели
      * db: name of DB connection from application config
      * table: table name
      * columns[] : columns
@@ -40,17 +38,14 @@ abstract class Model
     static protected $schema = [];
 
     /**
-     * Расширения, подключаемые к модели
      * @var array
      */
     static protected $extensions = [];
 
     /**
-     * Схема модели
-     * с учетом изменений, внесенных расширениями
      * @return array
      */
-    public static function getSchema()
+    static public function getSchema()
     {
         static $schema = null;
         if (null === $schema) {
@@ -68,30 +63,17 @@ abstract class Model
     }
 
     /**
-     * Список полей модели
      * @return array
      */
-    public static function getColumns() {
+    static public function getColumns() {
         $schema = static::getSchema();
         return $schema['columns'];
     }
 
     /**
-     * Список расширений, подключаемых к модели
-     * @return array
+     * @return string
      */
-    public static function getExtensions()
-    {
-        return !empty(static::$extensions) ?
-            array_merge(['standard'], static::$extensions) :
-            ['standard'];
-    }
-
-    /**
-     * Имя таблицы в БД, соответствующей данной модели
-     * @return string Имя таблицы в БД
-     */
-    public static function getTableName()
+    static public function getTableName()
     {
         $schema = static::getSchema();
         if (isset($schema['table']))
@@ -102,30 +84,51 @@ abstract class Model
         }
     }
 
-    public static function getDbDriver()
+    /**
+     * @return string
+     */
+    static public function getDbConnectionName()
     {
         $schema = static::getSchema();
-        $dbConnectionName = !empty($schema['db']) ? $schema['db'] : 'default';
-        if ('cli'==PHP_SAPI) {
-            $app = \T4\Console\Application::getInstance();
-        } else {
-            $app = \T4\Mvc\Application::getInstance();
-        }
-        $driver = $app->config->db->{$dbConnectionName}->driver;
-        return DriverFactory::getDriver($driver);
+        return !empty($schema['db']) ? $schema['db'] : 'default';
     }
 
-    public static function getDbConnection()
+    /**
+     * @return \T4\Dbal\Connection
+     */
+    static public function getDbConnection()
     {
-        $schema = static::getSchema();
-        $dbConnectionName = !empty($schema['db']) ? $schema['db'] : 'default';
-        if ('cli'==PHP_SAPI) {
+        if ('cli' == PHP_SAPI) {
             $app = \T4\Console\Application::getInstance();
         } else {
             $app = \T4\Mvc\Application::getInstance();
         }
-        $connection = $app->db[$dbConnectionName];
+        $connection = $app->db->{static::getDbConnectionName()};
         return $connection;
+    }
+
+    /**
+     * @return \T4\Dbal\IDriver
+     */
+    static public function getDbDriver()
+    {
+        if ('cli' == PHP_SAPI) {
+            $app = \T4\Console\Application::getInstance();
+        } else {
+            $app = \T4\Mvc\Application::getInstance();
+        }
+        $driverName = $app->config->db->{static::getDbConnectionName()}->driver;
+        return DriverFactory::getDriver($driverName);
+    }
+
+    /**
+     * @return array
+     */
+    static public function getExtensions()
+    {
+        return !empty(static::$extensions) ?
+            array_merge(['standard'], static::$extensions) :
+            ['standard'];
     }
 
 }

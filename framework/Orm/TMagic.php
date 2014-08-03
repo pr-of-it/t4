@@ -8,6 +8,9 @@ trait TMagic {
 
     public function __isset($key)
     {
+        if (parent::__isset($key))
+            return true;
+
         $class = get_class($this);
 
         // Такое свойство есть в перечне полей модели, но установлено не было
@@ -29,11 +32,6 @@ trait TMagic {
     {
         $class = get_class($this);
 
-        // Такое свойство есть в перечне полей модели, но установлено не было
-        $columns = $class::getColumns();
-        if (isset($columns[$key]))
-            return null;
-
         // Такое свойство есть в перечне связей, но установлено не было
         $relations = $class::getRelations();
         $keys = explode('.', $key);
@@ -51,8 +49,17 @@ trait TMagic {
             }
         }
 
+        return parent::__get($key);
+
+        // Такое свойство есть в перечне полей модели, но установлено не было
+        /*
+        $columns = $class::getColumns();
+        if (isset($columns[$key]))
+            return parent::__get($key);
+        */
+
         // Ни один из вариантов не сработал
-        throw new Exception('No such column or relation: ' . $key . ' in model of ' . $class . ' class');
+        //throw new Exception('No such column or relation: ' . $key . ' in model of ' . $class . ' class');
 
     }
 
@@ -69,7 +76,8 @@ trait TMagic {
         }
 
         // Все другие случаи
-        $this->{$key} = $value;
+        parent::__set($key, $value);
+        //$this->{$key} = $value;
     }
 
     /**

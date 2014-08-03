@@ -102,6 +102,9 @@ class Mysql
                 $indexesDDL[] = 'PRIMARY KEY (`' . $name . '`)';
                 $hasPK = true;
             }
+            if ('link' == $options['type']) {
+                $indexesDDL[] = 'KEY (`' . $name . '`)';
+            }
         }
         if (!$hasPK) {
             array_unshift($columnsDDL, '`' . Model::PK . '` ' . $this->createColumnDDL(['type' => 'pk']));
