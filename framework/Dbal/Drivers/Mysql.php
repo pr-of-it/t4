@@ -103,7 +103,7 @@ class Mysql
                 $hasPK = true;
             }
             if ('link' == $options['type']) {
-                $indexesDDL[] = 'KEY (`' . $name . '`)';
+                $indexesDDL[] = 'INDEX `' . $name . '`' . ' (`' . $name . '`)';
             }
         }
         if (!$hasPK) {
@@ -116,8 +116,8 @@ class Mysql
         }
 
         $sql .= ' ( ' .
-            implode(', ', $columnsDDL) . ', ' .
-            implode(', ', $indexesDDL) .
+            implode(', ', array_unique($columnsDDL)) . ', ' .
+            implode(', ', array_unique($indexesDDL)) .
             ' )';
         $connection->execute($sql);
 
