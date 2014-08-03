@@ -21,8 +21,33 @@ class Uploader
         $this->uploadPath = $path;
     }
 
+    public function isUploaded($name='')
+    {
+        if (!empty($this->formFieldName) && empty($name))
+            $name = $this->formFieldName;
+
+        if (empty($name))
+            throw new Exception('Empty form field name for file upload');
+
+        if (empty($_FILES[$name]) || 0 == $_FILES[$name]['size'])
+            return false;
+
+        if (\UPLOAD_ERR_OK != $_FILES[$this->formFieldName]['error'])
+            return false;
+
+        return true;
+
+    }
+
     public function __invoke($name = '')
     {
+
+        if (empty($this->formFieldName) && !empty($name))
+            $this->formFieldName = $name;
+
+        if (empty($this->formFieldName))
+            throw new Exception('Empty form field name for file upload');
+
         if (empty($this->uploadPath))
             throw new Exception('Invalid upload path');
 
@@ -35,29 +60,36 @@ class Uploader
             }
         }
 
-        if (empty($this->formFieldName) && !empty($name))
-            $this->formFieldName = $name;
-
-        if (empty($this->formFieldName))
-            throw new Exception('Empty form field name for file upload');
-
         if (empty($_FILES[$this->formFieldName]) || 0 == $_FILES[$this->formFieldName]['size'])
-            throw new Exception('File \'' . $this->formFieldName . '\' is not uploaded');
+            throw new Exception('File for \'' . $this->formFieldName . '\' is not uploaded');
 
         if (\UPLOAD_ERR_OK != $_FILES[$this->formFieldName]['error'])
             throw new Exception('Upload error while uploading file \'' . $this->formFieldName . '\': ' . $_FILES[$this->formFieldName]['error']);
 
-        $uploadedFileName = basename($_FILES[$this->formFieldName]['name']);
-        while ( file_exists($realUploadPath . DS . $uploadedFileName) ) {
-            $uploadedFileName = pathinfo($uploadedFileName, PATHINFO_FILENAME) . '_.' . pathinfo($uploadedFileName, PATHINFO_EXTENSION);
-        };
-        $ret = str_replace(DS, '/', $this->uploadPath) . '/' . $uploadedFileName;
+        $uploadedFileName = $this->suggestUploadedFileName($realUploadPath, $_FILES[$this->formFieldName]['name']);
 
         if (!move_uploaded_file($_FILES[$this->formFieldName]['tmp_name'], $realUploadPath . DS . $uploadedFileName)) {
             throw new Exception('Save uploaded file error');
         }
 
-        return $ret;
+        return $this->uploadPath . '/' . $uploadedFileName;
+
+    }
+
+    protected function suggestUploadedFileName($path, $name)
+    {
+        if (!file_exists($path.DS.$name))
+            return $name;
+
+        $filename = pathinfo($name, \PATHINFO_FILENAME);
+        $extension = pathinfo($name, \PATHINFO_EXTENSION);
+        preg_match('~(.*?)(_(\d+))?$~', $filename, $m);
+        $i = isset($m[3]) ? (int)$m[3]+1 : 1;
+
+        while (file_exists($path.DS.($file = $m[1] . '_' . $i . '.' . $extension)))
+            $i++;
+
+        return $file;
 
     }
 

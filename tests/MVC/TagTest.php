@@ -3,7 +3,7 @@
 require_once realpath(__DIR__ . '/../../framework/boot.php');
 
 class TestTag extends \T4\Mvc\Tag {
-    protected function render() {}
+    public function render() {}
 };
 
 class TagTest extends PHPUnit_Framework_TestCase
