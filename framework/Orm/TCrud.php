@@ -6,6 +6,7 @@ trait TCrud
 {
 
     protected $isNew = true;
+    protected $wasNew = false;
     protected $isDeleted = false;
 
     public function setNew($new)
@@ -17,6 +18,11 @@ trait TCrud
     public function isNew()
     {
         return $this->isNew;
+    }
+
+    public function wasNew()
+    {
+        return $this->wasNew;
     }
 
     public function setDeleted($deleted)
@@ -114,6 +120,8 @@ trait TCrud
             $class = get_class($this);
             $driver = $class::getDbDriver();
             $driver->save($this);
+            if ($this->isNew())
+                $this->wasNew = true;
             $this->setNew(false);
         } else {
             return false;
