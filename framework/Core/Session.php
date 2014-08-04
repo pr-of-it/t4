@@ -9,7 +9,8 @@ class Session
 
     public static function init()
     {
-        session_start();
+        if (!session_id())
+            session_start();
     }
 
     public static function set($key, $val)

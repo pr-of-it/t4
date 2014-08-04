@@ -28,12 +28,10 @@ class QueryBuilder
 
     public function from($from)
     {
-        /*
-        if (!is_array($this->from)) {
-            $this->from = preg_split('~[\s]*\,[\s]*~', $this->from, -1, \PREG_SPLIT_NO_EMPTY);
-        }
-        */
-        $this->from[] = $from;
+        if (is_array($from))
+            $this->from = array_merge($this->from, $from);
+        else
+            $this->from(preg_split('~[\s]*\,[\s]*~', $from));
         return $this;
     }
 

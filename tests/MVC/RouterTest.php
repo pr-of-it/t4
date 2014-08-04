@@ -17,6 +17,9 @@ class MyRouter extends \T4\MVC\Router {
 class RouterTest extends PHPUnit_Framework_TestCase
 {
 
+    /**
+     * @expectedException PHPUnit_Framework_Error_Warning
+     */
     public function testSplitExternalPath()
     {
 
@@ -115,68 +118,68 @@ class RouterTest extends PHPUnit_Framework_TestCase
 
         $url = '/mod/ctrl/act';
         $this->assertEquals(
-            new \T4\MVC\Route(['module' => 'mod', 'controller' => 'ctrl', 'action' => 'act', 'params' => []]),
+            new \T4\MVC\Route(['module' => 'Mod', 'controller' => 'Ctrl', 'action' => 'Act', 'params' => []]),
             $reflector->invoke($router, $url)
         );
         $url = '//ctrl/act';
         $this->assertEquals(
-            new \T4\MVC\Route(['module' => '', 'controller' => 'ctrl', 'action' => 'act', 'params' => []]),
+            new \T4\MVC\Route(['module' => '', 'controller' => 'Ctrl', 'action' => 'Act', 'params' => []]),
             $reflector->invoke($router, $url)
         );
         $url = '/mod//act';
         $this->assertEquals(
-            new \T4\MVC\Route(['module' => 'mod', 'controller' => 'Index', 'action' => 'act', 'params' => []]),
+            new \T4\MVC\Route(['module' => 'Mod', 'controller' => 'Index', 'action' => 'Act', 'params' => []]),
             $reflector->invoke($router, $url)
         );
         $url = '/mod/ctrl/';
         $this->assertEquals(
-            new \T4\MVC\Route(['module' => 'mod', 'controller' => 'ctrl', 'action' => 'default', 'params' => []]),
+            new \T4\MVC\Route(['module' => 'Mod', 'controller' => 'Ctrl', 'action' => 'Default', 'params' => []]),
             $reflector->invoke($router, $url)
         );
         $url = '///act';
         $this->assertEquals(
-            new \T4\MVC\Route(['module' => '', 'controller' => 'Index', 'action' => 'act', 'params' => []]),
+            new \T4\MVC\Route(['module' => '', 'controller' => 'Index', 'action' => 'Act', 'params' => []]),
             $reflector->invoke($router, $url)
         );
         $url = '///';
         $this->assertEquals(
-            new \T4\MVC\Route(['module' => '', 'controller' => 'Index', 'action' => 'default', 'params' => []]),
+            new \T4\MVC\Route(['module' => '', 'controller' => 'Index', 'action' => 'Default', 'params' => []]),
             $reflector->invoke($router, $url)
         );
 
         $url = '/mod/ctrl/act(a=1)';
         $this->assertEquals(
-            new \T4\MVC\Route(['module' => 'mod', 'controller' => 'ctrl', 'action' => 'act', 'params' => ['a' => 1]]),
+            new \T4\MVC\Route(['module' => 'Mod', 'controller' => 'Ctrl', 'action' => 'Act', 'params' => ['a' => 1]]),
             $reflector->invoke($router, $url)
         );
         $url = '/mod/ctrl/act(a=1,b=2)';
         $this->assertEquals(
-            new \T4\MVC\Route(['module' => 'mod', 'controller' => 'ctrl', 'action' => 'act', 'params' => ['a' => 1, 'b' => 2]]),
+            new \T4\MVC\Route(['module' => 'Mod', 'controller' => 'Ctrl', 'action' => 'Act', 'params' => ['a' => 1, 'b' => 2]]),
             $reflector->invoke($router, $url)
         );
         $url = '//ctrl/act(a=1,b=2)';
         $this->assertEquals(
-            new \T4\MVC\Route(['module' => '', 'controller' => 'ctrl', 'action' => 'act', 'params' => ['a' => 1, 'b' => 2]]),
+            new \T4\MVC\Route(['module' => '', 'controller' => 'Ctrl', 'action' => 'Act', 'params' => ['a' => 1, 'b' => 2]]),
             $reflector->invoke($router, $url)
         );
         $url = '/mod//act(a=1,b=2)';
         $this->assertEquals(
-            new \T4\MVC\Route(['module' => 'mod', 'controller' => 'Index', 'action' => 'act', 'params' => ['a' => 1, 'b' => 2]]),
+            new \T4\MVC\Route(['module' => 'Mod', 'controller' => 'Index', 'action' => 'Act', 'params' => ['a' => 1, 'b' => 2]]),
             $reflector->invoke($router, $url)
         );
         $url = '/mod/ctrl/(a=1,b=2)';
         $this->assertEquals(
-            new \T4\MVC\Route(['module' => 'mod', 'controller' => 'ctrl', 'action' => 'default', 'params' => ['a' => 1, 'b' => 2]]),
+            new \T4\MVC\Route(['module' => 'Mod', 'controller' => 'Ctrl', 'action' => 'Default', 'params' => ['a' => 1, 'b' => 2]]),
             $reflector->invoke($router, $url)
         );
         $url = '///act(a=1,b=2)';
         $this->assertEquals(
-            new \T4\MVC\Route(['module' => '', 'controller' => 'Index', 'action' => 'act', 'params' => ['a' => 1, 'b' => 2]]),
+            new \T4\MVC\Route(['module' => '', 'controller' => 'Index', 'action' => 'Act', 'params' => ['a' => 1, 'b' => 2]]),
             $reflector->invoke($router, $url)
         );
         $url = '///(a=1,b=2)';
         $this->assertEquals(
-            new \T4\MVC\Route(['module' => '', 'controller' => 'Index', 'action' => 'default', 'params' => ['a' => 1, 'b' => 2]]),
+            new \T4\MVC\Route(['module' => '', 'controller' => 'Index', 'action' => 'Default', 'params' => ['a' => 1, 'b' => 2]]),
             $reflector->invoke($router, $url)
         );
     }
@@ -187,22 +190,22 @@ class RouterTest extends PHPUnit_Framework_TestCase
         $router = MyRouter::getInstance();
 
         $this->assertEquals(
-            new \T4\MVC\Route(['module'=>'', 'controller'=>'Index', 'action'=>'default', 'params'=>[], 'format'=>'html']),
+            new \T4\MVC\Route(['module'=>'', 'controller'=>'Index', 'action'=>'Default', 'params'=>[], 'format'=>'html']),
             $router->parseUrl('')
         );
 
         $this->assertEquals(
-            new \T4\MVC\Route(['module'=>'Shop', 'controller'=>'Goods', 'action'=>'default', 'params'=>[], 'format'=>'html']),
+            new \T4\MVC\Route(['module'=>'Shop', 'controller'=>'Goods', 'action'=>'Default', 'params'=>[], 'format'=>'html']),
             $router->parseUrl('goods')
         );
 
         $this->assertEquals(
-            new \T4\MVC\Route(['module'=>'Shop', 'controller'=>'Goods', 'action'=>'view', 'params'=>['id'=>13], 'format'=>'html']),
+            new \T4\MVC\Route(['module'=>'Shop', 'controller'=>'Goods', 'action'=>'View', 'params'=>['id'=>13], 'format'=>'html']),
             $router->parseUrl('goods/13.html')
         );
 
         $this->assertEquals(
-            new \T4\MVC\Route(['module'=>'Shop', 'controller'=>'Goods', 'action'=>'view', 'params'=>['vendor'=>'volvo', 'id'=>42], 'format'=>'html']),
+            new \T4\MVC\Route(['module'=>'Shop', 'controller'=>'Goods', 'action'=>'View', 'params'=>['vendor'=>'volvo', 'id'=>42], 'format'=>'html']),
             $router->parseUrl('shop/volvo/42.html')
         );
 
