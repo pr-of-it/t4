@@ -2,7 +2,7 @@
 
 require_once realpath(__DIR__ . '/../../framework/boot.php');
 
-class HelpersTest extends PHPUnit_Framework_TestCase {
+class CoreHelpersTest extends PHPUnit_Framework_TestCase {
 
     public function testStrings()
     {

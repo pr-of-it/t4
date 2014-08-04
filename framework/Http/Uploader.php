@@ -3,7 +3,6 @@
 namespace T4\Http;
 
 use T4\Core\Exception;
-use T4\Fs\Helpers;
 
 class Uploader
 {
@@ -54,7 +53,7 @@ class Uploader
         $realUploadPath = ROOT_PATH_PUBLIC . str_replace('/', DS, $this->uploadPath);
         if (!is_dir($realUploadPath)) {
             try {
-                Helpers::mkDir($realUploadPath);
+                \T4\Fs\Helpers::mkDir($realUploadPath);
             } catch (\T4\Fs\Exception $e) {
                 throw new Exception($e->getMessage());
             }
