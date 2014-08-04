@@ -41,6 +41,28 @@ trait TCrud
      */
 
     /**
+     * @param string|\T4\Dbal\QueryBuilder $query
+     * @param array $params
+     * @return \T4\Orm\Model
+     */
+    public static function findAllByQuery($query, $params = [])
+    {
+        $driver = static::getDbDriver();
+        return $driver->findAllByQuery(get_called_class(), $query, $params);
+    }
+
+    /**
+     * @param string|\T4\Dbal\QueryBuilder $query
+     * @param array $params
+     * @return \T4\Orm\Model
+     */
+    public static function findByQuery($query, $params = [])
+    {
+        $driver = static::getDbDriver();
+        return $driver->findByQuery(get_called_class(), $query, $params);
+    }
+
+    /**
      * @param array $options
      * @return \T4\Core\Collection
      */

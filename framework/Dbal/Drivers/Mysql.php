@@ -209,6 +209,34 @@ class Mysql
         $connection->execute($sql);
     }
 
+    public function findAllByQuery($class, $query, $params=[])
+    {
+        if ($query instanceof QueryBuilder) {
+            $params = $query->getParams();
+            $query = $query->getQuery();
+        }
+        $result = $class::getDbConnection()->query($query, $params)->fetchAll(\PDO::FETCH_CLASS, $class);
+        if (!empty($result)) {
+            $ret = new Collection($result);
+            $ret->setNew(false);
+        } else {
+            $ret = new Collection();
+        }
+        return $ret;
+    }
+
+    public function findByQuery($class, $query, $params = [])
+    {
+        if ($query instanceof QueryBuilder) {
+            $params = $query->getParams();
+            $query = $query->getQuery();
+        }
+        $result = $class::getDbConnection()->query($query, $params)->fetchObject($class);
+        if (!empty($result))
+            $result->setNew(false);
+        return $result;
+    }
+
     public function findAll($class, $options = [])
     {
         $query = new QueryBuilder();
@@ -219,18 +247,9 @@ class Mysql
             ->order(!empty($options['order']) ? $options['order'] : '')
             ->limit(!empty($options['limit']) ? $options['limit'] : '')
             ->params(!empty($options['params']) ? $options['params'] : []);
-
-        $result = $class::getDbConnection()->query($query->getQuery(), $query->getParams())->fetchAll(\PDO::FETCH_CLASS, $class);
-        if (!empty($result)) {
-            $ret = new Collection($result);
-            $ret->setNew(false);
-        } else {
-            $ret = new Collection();
-        }
-        return $ret;
+        return $this->findAllByQuery($class, $query);
     }
 
-    // TODO: полноценная реализация options, сейчас фактически только order
     public function findAllByColumn($class, $column, $value, $options = [])
     {
         $query = new QueryBuilder();
@@ -241,17 +260,9 @@ class Mysql
             ->order(!empty($options['order']) ? $options['order'] : '')
             ->limit(!empty($options['limit']) ? $options['limit'] : '')
             ->params([':value' => $value]);
-        $result = $class::getDbConnection()->query($query->getQuery(), $query->getParams())->fetchAll(\PDO::FETCH_CLASS, $class);
-        if (!empty($result)) {
-            $ret = new Collection($result);
-            $ret->setNew(false);
-        } else {
-            $ret = new Collection();
-        }
-        return $ret;
+        return $this->findAllByQuery($class, $query);
     }
 
-    // TODO: полноценная реализация options, сейчас фактически только order
     public function findByColumn($class, $column, $value, $options = [])
     {
         $query = new QueryBuilder();
@@ -262,11 +273,7 @@ class Mysql
             ->order(!empty($options['order']) ? $options['order'] : '')
             ->limit(1)
             ->params([':value' => $value]);
-
-        $result = $class::getDbConnection()->query($query->getQuery(), $query->getParams())->fetchObject($class);;
-        if (!empty($result))
-            $result->setNew(false);
-        return $result;
+        return $this->findByQuery($class, $query);
     }
 
     public function countAll($class, $options = [])
