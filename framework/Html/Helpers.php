@@ -19,6 +19,13 @@ class Helpers
                 return self::inputInt(is_null($value) ? $options['default'] : $value, $options, $htmlOptions);
             case 'text':
                 return self::inputText(is_null($value) ? $options['default'] : $value, $options, $htmlOptions);
+            case 'select':
+                $values = new Collection();
+                foreach ($options['values'] as $key=>$val) {
+                    $values->append(['value'=>$key, 'title'=>$val]);
+                }
+                $options['valueColumn'] = 'value';
+                return self::select($values, is_null($value) ? $options['default'] : $value, $options, $htmlOptions);
             case 'select:tree':
                 return self::selectTreeByModel($options['model'], is_null($value) ? $options['default'] : $value, $options, $htmlOptions);
         }
@@ -81,6 +88,9 @@ class Helpers
         }
         if (empty($options['disabled']))
             $options['disabled'] = [];
+
+        if ($options instanceof Std)
+            $options = $options->getData();
 
         $html = '<select' .
             (isset($htmlOptions['id']) ? ' id="' . $htmlOptions['id'] . '"' : '') .
