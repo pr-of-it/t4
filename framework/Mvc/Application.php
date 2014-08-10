@@ -168,7 +168,7 @@ class Application
             switch ($route->format) {
                 case 'json':
                     header('Content-Type: application/json');
-                    echo json_encode($controller->getData());
+                    echo json_encode($controller->getData()->toArray());
                     die;
                 default:
                 case 'html':
