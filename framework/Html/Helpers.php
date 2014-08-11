@@ -21,17 +21,11 @@ class Helpers
             case 'text':
                 return self::inputText(is_null($value) ? $options['default'] : $value, $options, $htmlOptions);
             case 'select':
-                $select = new Select($name, $options, $htmlOptions);
+                $select = new Select();
+                $select->setName($name);
+                $select->setOption('values', $options['values']->toArray());
                 $select->setSelected(is_null($value) ? $options['default'] : $value);
                 return $select->render();
-                /*
-                $values = new Collection();
-                foreach ($options['values'] as $key=>$val) {
-                    $values->append(['value'=>$key, 'title'=>$val]);
-                }
-                $options['valueColumn'] = 'value';
-                return self::select($values, is_null($value) ? $options['default'] : $value, $options, $htmlOptions);
-                */
             case 'select:tree':
                 return self::selectTreeByModel($options['model'], is_null($value) ? $options['default'] : $value, $options, $htmlOptions);
         }

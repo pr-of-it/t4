@@ -51,16 +51,6 @@ trait TMagic {
 
         return parent::__get($key);
 
-        // Такое свойство есть в перечне полей модели, но установлено не было
-        /*
-        $columns = $class::getColumns();
-        if (isset($columns[$key]))
-            return parent::__get($key);
-        */
-
-        // Ни один из вариантов не сработал
-        //throw new Exception('No such column or relation: ' . $key . ' in model of ' . $class . ' class');
-
     }
 
     public function __set($key, $value)
