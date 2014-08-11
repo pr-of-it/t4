@@ -23,6 +23,7 @@ class Application
     /*
      * Protected properties for getters and setters
      */
+
     protected $__user;
 
     /*

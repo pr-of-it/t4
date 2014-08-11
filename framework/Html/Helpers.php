@@ -4,6 +4,7 @@ namespace T4\Html;
 
 use T4\Core\Collection;
 use T4\Core\Std;
+use T4\Html\Elements\Select;
 use T4\Orm\Model;
 
 class Helpers
@@ -20,12 +21,17 @@ class Helpers
             case 'text':
                 return self::inputText(is_null($value) ? $options['default'] : $value, $options, $htmlOptions);
             case 'select':
+                $select = new Select($name, $options, $htmlOptions);
+                $select->setSelected(is_null($value) ? $options['default'] : $value);
+                return $select->render();
+                /*
                 $values = new Collection();
                 foreach ($options['values'] as $key=>$val) {
                     $values->append(['value'=>$key, 'title'=>$val]);
                 }
                 $options['valueColumn'] = 'value';
                 return self::select($values, is_null($value) ? $options['default'] : $value, $options, $htmlOptions);
+                */
             case 'select:tree':
                 return self::selectTreeByModel($options['model'], is_null($value) ? $options['default'] : $value, $options, $htmlOptions);
         }
