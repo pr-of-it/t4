@@ -4,7 +4,9 @@ namespace T4\Html;
 
 use T4\Core\Collection;
 use T4\Core\Std;
+use T4\Html\Elements\Int;
 use T4\Html\Elements\Select;
+use T4\Html\Elements\Text;
 use T4\Orm\Model;
 
 class Helpers
@@ -17,11 +19,17 @@ class Helpers
         $htmlOptions['name'] = $name;
         switch ($options['type']) {
             case 'int':
-                return self::inputInt(is_null($value) ? $options['default'] : $value, $options, $htmlOptions);
+                $input = new Int($options, $htmlOptions);
+                $input->setName($name);
+                $input->setValue(is_null($value) ? $options['default'] : $value);
+                return $input->render();
             case 'text':
-                return self::inputText(is_null($value) ? $options['default'] : $value, $options, $htmlOptions);
+                $input = new Text($options, $htmlOptions);
+                $input->setName($name);
+                $input->setValue(is_null($value) ? $options['default'] : $value);
+                return $input->render();
             case 'select':
-                $select = new Select();
+                $select = new Select($options, $htmlOptions);
                 $select->setName($name);
                 $select->setOption('values', $options['values']->toArray());
                 $select->setSelected(is_null($value) ? $options['default'] : $value);
@@ -29,42 +37,6 @@ class Helpers
             case 'select:tree':
                 return self::selectTreeByModel($options['model'], is_null($value) ? $options['default'] : $value, $options, $htmlOptions);
         }
-    }
-
-    /**
-     * Формирует <input type="int"> с заданным значением
-     * @param int $value
-     * @param array $options
-     * @param array $htmlOptions
-     * @return string
-     */
-    static public function inputInt($value = 0, $options = [], $htmlOptions = [])
-    {
-        $html = '<input type="number"' .
-            (isset($htmlOptions['id']) ? ' id="' . $htmlOptions['id'] . '"' : '') .
-            (isset($htmlOptions['name']) ? ' name="' . $htmlOptions['name'] . '"' : '') .
-            (isset($htmlOptions['class']) ? ' class="' . $htmlOptions['class'] . '"' : '') .
-            (in_array('disabled', $htmlOptions) ? ' disabled="disabled"' : '') .
-            ' value="' . $value . '">' . "\n";
-        return $html;
-    }
-
-    /**
-     * Формирует <textarea> с заданным значением
-     * @param string $value
-     * @param array $options
-     * @param array $htmlOptions
-     * @return string
-     */
-    static public function inputText($value = '', $options = [], $htmlOptions = [])
-    {
-        $html = '<textarea' .
-            (isset($htmlOptions['id']) ? ' id="' . $htmlOptions['id'] . '"' : '') .
-            (isset($htmlOptions['name']) ? ' name="' . $htmlOptions['name'] . '"' : '') .
-            (isset($htmlOptions['class']) ? ' class="' . $htmlOptions['class'] . '"' : '') .
-            (in_array('disabled', $htmlOptions) ? ' disabled="disabled"' : '') .
-            '>' . $value . '</textarea>'."\n";
-        return $html;
     }
 
     /**

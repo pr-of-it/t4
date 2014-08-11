@@ -28,10 +28,9 @@ abstract class Element {
             $this->setOption($name, $value);
 
         $this->attributes = new Std();
+        $this->setName($name);
         foreach ($attributes as $name => $value)
             $this->setAttribute($name, $value);
-
-        $this->setName($name);
     }
 
     /**
@@ -63,6 +62,16 @@ abstract class Element {
     public function setName($val)
     {
         $this->attributes->name = $val;
+        return $this;
+    }
+
+    /**
+     * @param string $val
+     * @return \T4\Html\Element $this
+     */
+    public function setValue($val)
+    {
+        $this->options->value = $val;
         return $this;
     }
 
