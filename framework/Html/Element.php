@@ -71,7 +71,7 @@ abstract class Element {
      */
     public function setValue($val)
     {
-        $this->options->value = $val;
+        $this->options->value = htmlentities($val);
         return $this;
     }
 
