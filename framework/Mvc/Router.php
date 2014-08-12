@@ -239,7 +239,7 @@ class Router
                         'format' => $url->extension ? : 'html',
                     ]);
                 }
-            } elseif ($this->app->existsController($urlParts[0])) {
+            } elseif ($this->app->existsController('', $urlParts[0])) {
                 return new Route([
                     'module' => '',
                     'controller' => ucfirst($urlParts[0]),
