@@ -23,7 +23,7 @@ class Router
      * Распознаваемые расширения в URL
      * @var array
      */
-    protected $extensions = ['html', 'json'];
+    protected $allowedExtensions = ['html', 'json'];
 
     protected function __construct()
     {
@@ -90,7 +90,7 @@ class Router
     protected function splitExternalPath($url)
     {
         $urlExtension = '';
-        foreach ($this->extensions as $ext) {
+        foreach ($this->allowedExtensions as $ext) {
             if (false !== strpos($url, '.' . $ext)) {
                 $urlExtension = $ext;
                 break;
