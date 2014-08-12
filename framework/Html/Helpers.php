@@ -6,7 +6,7 @@ use T4\Core\Collection;
 use T4\Core\Std;
 use T4\Html\Elements\Int;
 use T4\Html\Elements\Select;
-use T4\Html\Elements\Text;
+use T4\Html\Elements\Textarea;
 use T4\Orm\Model;
 
 class Helpers
@@ -24,7 +24,7 @@ class Helpers
                 $input->setValue(is_null($value) ? $options['default'] : $value);
                 return $input->render();
             case 'text':
-                $input = new Text($options, $htmlOptions);
+                $input = new Textarea($options, $htmlOptions);
                 $input->setName($name);
                 $input->setValue(is_null($value) ? $options['default'] : $value);
                 return $input->render();
