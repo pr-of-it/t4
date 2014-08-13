@@ -18,7 +18,9 @@ use T4\Dbal\Connection;
  */
 class Application
 {
-    use TSingleton;
+    use
+        TSingleton,
+        TApplicationPaths;
 
     /*
      * Protected properties for getters and setters
@@ -29,8 +31,6 @@ class Application
     /*
      * Public properties
      */
-
-    public $path = \ROOT_PATH_PROTECTED;
 
     /**
      * @var \T4\Core\Config
@@ -53,47 +53,12 @@ class Application
     public $extensions;
 
     /**
-     * Возвращает абсолютный путь до папки приложения
-     * Обычно это папка protected
-     * @return string
-     */
-    public function getPath()
-    {
-        return $this->path;
-    }
-
-    /**
      * Возвращает конфиг роутинга приложения
      * @return \T4\Core\Config Объект конфига роутинга
      */
     public function getRouteConfig()
     {
         return new Config($this->getPath() . DS . 'routes.php');
-    }
-
-    /**
-     * Проверка существования модуля веб-приложения
-     * @param string $module
-     * @return bool
-     */
-    public function existsModule($module = '')
-    {
-        if (empty($module))
-            return true;
-        $modulePath = $this->getPath() . DS . 'Modules' . DS . ucfirst($module);
-        return is_dir($modulePath) && is_readable($modulePath);
-    }
-
-    /**
-     * Проверка существования контроллера в веб-приложении или его модуле
-     * @param string $module
-     * @param string $controller
-     * @return bool
-     */
-    public function existsController($module = '', $controller = Router::DEFAULT_CONTROLLER)
-    {
-        $controllerClassName = (empty($module) ? '\\App\\Controllers\\' : '\\App\\Modules\\' . ucfirst($module) . '\\Controllers\\') . ucfirst($controller);
-        return $this->existsModule($module) && class_exists($controllerClassName) && is_subclass_of($controllerClassName, '\\T4\\Mvc\\Controller');
     }
 
     /**
