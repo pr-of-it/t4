@@ -2,7 +2,7 @@
 
 namespace T4\Mvc;
 
-use T4\Core\Config;
+use T4\Core\Std;
 use T4\Core\TSingleton;
 
 class Router
@@ -37,10 +37,10 @@ class Router
     }
 
     /**
-     * @param \T4\Core\Config $config
+     * @param \T4\Core\Std $config
      * @return \T4\Mvc\Router $this
      */
-    public function setConfig(Config $config)
+    public function setConfig(Std $config)
     {
         $this->config = $config;
         return $this;
@@ -59,32 +59,24 @@ class Router
 
         $url = $this->splitExternalPath($url);
 
-        /**
-         * Попытка найти роут в файле конфигурации роутинга
-         */
-        foreach ($this->config as $urlTemplate => $internalPath) {
-            if (false !== $params = $this->matchUrlTemplate($urlTemplate, $url->base)) {
-                $internalPath = preg_replace_callback(
-                    '~\<(\d+)\>~',
-                    function ($m) use ($params) {
-                        return $params[$m[1]];
-                    },
-                    $internalPath
-                );
-                $route = $this->splitInternalPath($internalPath);
-                $route->format = $url->extension ? : 'html';
-                return $route;
+        if (!empty($this->config)) {
+            foreach ($this->config as $urlTemplate => $internalPath) {
+                if (false !== $params = $this->matchUrlTemplate($urlTemplate, $url->base)) {
+                    $internalPath = preg_replace_callback(
+                        '~\<(\d+)\>~',
+                        function ($m) use ($params) {
+                            return $params[$m[1]];
+                        },
+                        $internalPath
+                    );
+                    $route = $this->splitInternalPath($internalPath);
+                    $route->format = $url->extension ? : 'html';
+                    return $route;
+                }
             }
         }
 
-        /**
-         * Попытка разобрать URL самостоятельно
-         */
-        try {
-            return $this->guessInternalPath($url);
-        } catch (RouterException $e) {
-            throw new RouterException('Route to path \'' . $url->base . '\' is not found');
-        }
+        return $this->guessInternalPath($url);
 
     }
 
@@ -172,7 +164,7 @@ class Router
      * @param Route $route
      * @return string
      */
-    public function mergeInternalPath(Route $route)
+    public function makeInternalPath(Route $route)
     {
         return '/' . $route->module . '/' .
         ($route->controller == self::DEFAULT_CONTROLLER ? '' : $route->controller) . '/' .

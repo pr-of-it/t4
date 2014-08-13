@@ -2,16 +2,15 @@
 
 require_once realpath(__DIR__ . '/../../framework/boot.php');
 
-class MyRouter extends \T4\MVC\Router {
-    protected function getRoutes() {
-        return new \T4\MVC\Route([
-            '/'=>'///',
-            'index'=>'///',
-            'goods'=>'/Shop/Goods/default',
-            'goods/<1>'=>'/Shop/Goods/view(id=<1>)',
-            'shop/<2>/<1>'=>'/Shop/Goods/view(id=<1>,vendor=<2>)',
-        ]);
-    }
+function getRouteConfig()
+{
+    return new \T4\Core\Std([
+        '/'=>'///',
+        'index'=>'///',
+        'goods'=>'/Shop/Goods/default',
+        'goods/<1>'=>'/Shop/Goods/view(id=<1>)',
+        'shop/<2>/<1>'=>'/Shop/Goods/view(id=<1>,vendor=<2>)',
+    ]);
 }
 
 class RouterTest extends PHPUnit_Framework_TestCase
@@ -187,7 +186,8 @@ class RouterTest extends PHPUnit_Framework_TestCase
     public function testParseUrl()
     {
 
-        $router = MyRouter::getInstance();
+        $router = \T4\MVC\Router::getInstance();
+        $router->setConfig(getRouteConfig());
 
         $this->assertEquals(
             new \T4\MVC\Route(['module'=>'', 'controller'=>'Index', 'action'=>'Default', 'params'=>[], 'format'=>'html']),

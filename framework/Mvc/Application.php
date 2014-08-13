@@ -166,7 +166,7 @@ class Application
         $route = $router->splitInternalPath($path);
         $route->params->merge($params);
 
-        $canonicalPath = $router->mergeInternalPath($route);
+        $canonicalPath = $router->makeInternalPath($route);
         if (!isset($this->config->blocks) || !isset($this->config->blocks[$canonicalPath]))
             throw new Exception('No config for block ' . $canonicalPath);
 
