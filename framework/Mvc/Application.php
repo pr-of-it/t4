@@ -58,7 +58,7 @@ class Application
      */
     public function getRouteConfig()
     {
-        return new Config($this->getPath() . DS . 'routes.php');
+        return new Config($this->getRouteConfigPath());
     }
 
     /**
@@ -127,7 +127,10 @@ class Application
     {
         try {
 
-            $route = Router::getInstance()->parseUrl($_GET['__path']);
+            $route =
+                Router::getInstance()
+                ->setConfig($this->getRouteConfig())
+                ->parseUrl($_GET['__path']);
             $controller = $this->createController($route->module, $route->controller);
             $controller->action($route->action, $route->params);
 

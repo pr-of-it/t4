@@ -16,6 +16,14 @@ trait TApplicationPaths
     }
 
     /**
+     * @return string
+     */
+    public function getRouteConfigPath()
+    {
+        return $this->getPath() . DS . 'routes.php';
+    }
+
+    /**
      * @param string $module
      * @return string
      */

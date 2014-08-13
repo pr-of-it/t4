@@ -2,6 +2,7 @@
 
 namespace T4\Mvc;
 
+use T4\Core\Config;
 use T4\Core\TSingleton;
 
 class Router
@@ -20,6 +21,11 @@ class Router
     protected $app;
 
     /**
+     * @var \T4\Core\Config
+     */
+    protected $config;
+
+    /**
      * Распознаваемые расширения в URL
      * @var array
      */
@@ -28,6 +34,16 @@ class Router
     protected function __construct()
     {
         $this->app = Application::getInstance();
+    }
+
+    /**
+     * @param \T4\Core\Config $config
+     * @return \T4\Mvc\Router $this
+     */
+    public function setConfig(Config $config)
+    {
+        $this->config = $config;
+        return $this;
     }
 
     /**
@@ -42,12 +58,11 @@ class Router
     {
 
         $url = $this->splitExternalPath($url);
-        $routes = $this->getRoutes();
 
         /**
          * Попытка найти роут в файле конфигурации роутинга
          */
-        foreach ($routes as $urlTemplate => $internalPath) {
+        foreach ($this->config as $urlTemplate => $internalPath) {
             if (false !== $params = $this->matchUrlTemplate($urlTemplate, $url->base)) {
                 $internalPath = preg_replace_callback(
                     '~\<(\d+)\>~',
@@ -71,15 +86,6 @@ class Router
             throw new RouterException('Route to path \'' . $url->base . '\' is not found');
         }
 
-    }
-
-    /**
-     * Конфиг с правилами роутинга
-     * @return \T4\Core\Config
-     */
-    protected function getRoutes()
-    {
-        return $this->app->getRouteConfig();
     }
 
     /**
