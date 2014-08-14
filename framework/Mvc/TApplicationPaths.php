@@ -29,7 +29,7 @@ trait TApplicationPaths
      */
     public function getModulePath($module='')
     {
-        return $this->getPath() . (empty($module) ? '' : 'Modules' . DS . ucfirst($module));
+        return $this->getPath() . (empty($module) ? '' : DS . 'Modules' . DS . ucfirst($module));
     }
 
     /**
@@ -62,7 +62,7 @@ trait TApplicationPaths
     public function existsController($module = '', $controller = Router::DEFAULT_CONTROLLER)
     {
         $controllerClassName = (empty($module) ? '\\App\\Controllers\\' : '\\App\\Modules\\' . ucfirst($module) . '\\Controllers\\') . ucfirst($controller);
-        return $this->existsModule($module) && class_exists($controllerClassName) && is_subclass_of($controllerClassName, '\\T4\\Mvc\\Controller');
+        return $this->existsModule($module) && class_exists($controllerClassName) && is_subclass_of($controllerClassName, '\T4\Mvc\Controller');
     }
 
     /**
