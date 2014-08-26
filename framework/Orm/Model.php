@@ -3,6 +3,7 @@
 namespace T4\Orm;
 
 use T4\Core\Std;
+use T4\Dbal\Connection;
 use T4\Dbal\DriverFactory;
 
 abstract class Model
@@ -41,6 +42,11 @@ abstract class Model
      * @var array
      */
     static protected $extensions = [];
+
+    /**
+     * @var \T4\Dbal\Connection
+     */
+    static protected $connection;
 
     /**
      * @return array
@@ -94,17 +100,31 @@ abstract class Model
     }
 
     /**
+     * @param string|\T4\Dbal\Connection $connection
+     */
+    static public function setConnection($connection)
+    {
+        if (is_string($connection)) {
+            if ('cli' == PHP_SAPI) {
+                $app = \T4\Console\Application::getInstance();
+            } else {
+                $app = \T4\Mvc\Application::getInstance();
+            }
+            static::$connection = $app->db->{$connection};
+        } elseif ($connection instanceof Connection) {
+            static::$connection = $connection;
+        }
+    }
+
+    /**
      * @return \T4\Dbal\Connection
      */
     static public function getDbConnection()
     {
-        if ('cli' == PHP_SAPI) {
-            $app = \T4\Console\Application::getInstance();
-        } else {
-            $app = \T4\Mvc\Application::getInstance();
+        if (null == static::$connection) {
+            static::setConnection(static::getDbConnectionName());
         }
-        $connection = $app->db->{static::getDbConnectionName()};
-        return $connection;
+        return static::$connection;
     }
 
     /**
