@@ -124,6 +124,56 @@ class OrmModelTest extends PHPUnit_Extensions_Database_TestCase
         $this->assertEquals(['standard'], Book::getExtensions());
     }
 
+    public function testModelStaticMethods()
+    {
+        $connection = $this->getT4Connection();
+        Book::setConnection($connection);
+
+        $query = $connection->prepare("INSERT INTO `books` (`title`, `author`) VALUES (:title, :author)");
+        $query->execute([':title' => 'Foo', ':author' => 'Bar']);
+        $query->execute([':title' => 'Baz', ':author' => 'Bla']);
+
+        $book1attributes = ['__id'=>1, 'title'=>'Foo', 'author'=>'Bar'];
+        $book2attributes = ['__id'=>2, 'title'=>'Baz', 'author'=>'Bla'];
+
+        $books = Book::findAllByQuery("SELECT * FROM `books`");
+        $this->assertInstanceOf('\T4\Core\Collection', $books);
+        $this->assertCount(2, $books);
+        $this->assertInstanceOf('Book', $books[0]);
+        $this->assertInstanceOf('Book', $books[1]);
+        $this->assertEquals($book1attributes, $books[0]->toArray());
+        $this->assertEquals($book2attributes, $books[1]->toArray());
+
+        $book = Book::findByQuery("SELECT * FROM `books` WHERE `__id`=:id", [':id'=>1]);
+        $this->assertInstanceOf('Book', $book);
+        $this->assertEquals($book1attributes, $book->toArray());
+
+        $books1 = Book::findAllByQuery("SELECT * FROM `books`");
+        $books2 = Book::findAll();
+        $this->assertEquals($books1, $books2);
+
+        $book1 = Book::findByPK(1);
+        $this->assertEquals(
+            'Foo',
+            $book1->title
+        );
+        $this->assertEquals(
+            'Bar',
+            $book1->author
+        );
+
+        $book1 = Book::findByColumn('__id', 2);
+        $this->assertEquals(
+            'Baz',
+            $book1->title
+        );
+        $this->assertEquals(
+            'Bla',
+            $book1->author
+        );
+
+    }
+
     public function testCreateDelete()
     {
         $connection = $this->getT4Connection();
