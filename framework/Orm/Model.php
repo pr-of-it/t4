@@ -77,6 +77,14 @@ abstract class Model
     }
 
     /**
+     * @return array
+     */
+    static public function getRelations() {
+        $schema = static::getSchema();
+        return $schema['relations'];
+    }
+
+    /**
      * @return string
      */
     static public function getTableName()

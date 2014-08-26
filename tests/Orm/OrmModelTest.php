@@ -100,6 +100,30 @@ class OrmModelTest extends PHPUnit_Extensions_Database_TestCase
         );
     }
 
+    public function testModelSchema()
+    {
+        $schema = Book::getSchema();
+        $this->assertEquals([
+            'columns' => [
+                'title' => ['type'=>'string'],
+                'author' => ['type'=>'string'],
+            ],
+            'relations' => []
+        ], $schema);
+
+        $columns = Book::getColumns();
+        $this->assertEquals([
+                'title' => ['type'=>'string'],
+                'author' => ['type'=>'string'],
+        ], $columns);
+
+        $this->assertEquals([], Book::getRelations());
+
+        $this->assertEquals('books', Book::getTableName());
+        $this->assertEquals('default', Book::getDbConnectionName());
+        $this->assertEquals(['standard'], Book::getExtensions());
+    }
+
     public function testCreateDelete()
     {
         $connection = $this->getT4Connection();
