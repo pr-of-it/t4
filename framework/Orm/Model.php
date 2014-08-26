@@ -60,9 +60,11 @@ abstract class Model
             $extensions = $class::getExtensions();
             foreach ( $extensions as $extension ) {
                 $extensionClassName = '\\T4\\Orm\\Extensions\\'.ucfirst($extension);
-                $extension = new $extensionClassName;
-                $schema['columns'] = $extension->prepareColumns($schema['columns'], $class);
-                $schema['relations'] = $extension->prepareRelations(isset($schema['relations']) ? $schema['relations'] : [], $class);
+                if (class_exists($extensionClassName)) {
+                    $extension = new $extensionClassName;
+                    $schema['columns'] = $extension->prepareColumns($schema['columns'], $class);
+                    $schema['relations'] = $extension->prepareRelations(isset($schema['relations']) ? $schema['relations'] : [], $class);
+                }
             }
         }
         return $schema;
