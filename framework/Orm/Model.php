@@ -74,16 +74,14 @@ abstract class Model
      * @return array
      */
     static public function getColumns() {
-        $schema = static::getSchema();
-        return $schema['columns'];
+        return static::getSchema()['columns'];
     }
 
     /**
      * @return array
      */
     static public function getRelations() {
-        $schema = static::getSchema();
-        return $schema['relations'];
+        return static::getSchema()['relations'];
     }
 
     /**
