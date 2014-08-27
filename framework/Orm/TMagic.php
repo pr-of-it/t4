@@ -30,9 +30,12 @@ trait TMagic {
 
     public function __get($key)
     {
-        $class = get_class($this);
+        $st = parent::__get($key);
+        if (null !== $st)
+            return $st;
 
         // Такое свойство есть в перечне связей, но установлено не было
+        $class = get_class($this);
         $relations = $class::getRelations();
         $keys = explode('.', $key);
         $key = array_shift($keys);
@@ -48,8 +51,6 @@ trait TMagic {
                     return null;
             }
         }
-
-        return parent::__get($key);
 
     }
 
@@ -67,7 +68,6 @@ trait TMagic {
 
         // Все другие случаи
         parent::__set($key, $value);
-        //$this->{$key} = $value;
     }
 
     /**

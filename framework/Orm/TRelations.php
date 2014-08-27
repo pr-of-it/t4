@@ -79,7 +79,7 @@ trait TRelations {
 
             case $class::HAS_ONE:
             case $class::BELONGS_TO:
-                $relationClass = (false !== strpos($relation['model'], 'App\\')) ? $relation['model'] : '\\App\\Models\\' . $relation['model'];
+                $relationClass = $relation['model'];
                 $link = $class::getRelationLinkName($relation);
                 $subModel = $relationClass::findByPK($this->{$link});
                 if (empty($subModel))
@@ -89,13 +89,13 @@ trait TRelations {
                 break;
 
             case $class::HAS_MANY:
-                $relationClass = (false !== strpos($relation['model'], 'App\\')) ? $relation['model'] : '\\App\\Models\\' . $relation['model'];
+                $relationClass = $relation['model'];
                 $link = $class::getRelationLinkName($relation);
                 return $relationClass::findAllByColumn($link, $this->getPk());
                 break;
 
             case $class::MANY_TO_MANY:
-                $relationClass = (false !== strpos($relation['model'], 'App\\')) ? $relation['model'] : '\\App\\Models\\' . $relation['model'];
+                $relationClass = $relation['model'];
                 $linkTable = $class::getRelationLinkName($relation);
                 $query = new QueryBuilder();
                 $query
@@ -129,7 +129,7 @@ trait TRelations {
 
             case $class::HAS_ONE:
             case $class::BELONGS_TO:
-                $relationClass = (false !== strpos($relation['model'], 'App\\')) ? $relation['model'] : '\\App\\Models\\' . $relation['model'];
+                $relationClass = $relation['model'];
                 if ($value instanceof $relationClass) {
                     $this->$key = $value;
                 } else {

@@ -58,7 +58,7 @@ class Tree
      * @param \T4\Orm\Model $element
      * @return bool
      */
-    public function insertModelBeforeElement(Model &$model, Model &$element)
+    protected function insertModelBeforeElement(Model &$model, Model &$element)
     {
         /** @var \T4\Orm\Model $class */
         $class = get_class($model);
@@ -91,7 +91,7 @@ class Tree
      * @param \T4\Orm\Model $element
      * @return bool
      */
-    public function insertModelAfterElement(Model &$model, Model &$element)
+    protected function insertModelAfterElement(Model &$model, Model &$element)
     {
         /** @var \T4\Orm\Model $class */
         $class = get_class($model);
@@ -124,9 +124,13 @@ class Tree
      * Подготовка модели к вставке в дерево в качестве первого потомка заданного элемента
      * @param \T4\Orm\Model $model
      * @param \T4\Orm\Model $parent
+     * @throws \T4\Orm\Exception
      */
     protected function insertModelAsFirstChildOf(Model &$model, Model &$parent)
     {
+        if ($parent->isNew())
+            throw new \T4\Orm\Exception('Parent model should be saved before child insert');
+
         /** @var \T4\Orm\Model $class */
         $class = get_class($model);
         $tableName = $class::getTableName();
@@ -157,9 +161,14 @@ class Tree
      * Подготовка модели к вставке в дерево в качестве последнего потомка заданного элемента
      * @param \T4\Orm\Model $model
      * @param \T4\Orm\Model $parent
+     * @throws \T4\Orm\Exception
      */
     protected function insertModelAsLastChildOf(Model &$model, Model &$parent)
     {
+
+        if ($parent->isNew())
+            throw new \T4\Orm\Exception('Parent model should be saved before child insert');
+
         /** @var \T4\Orm\Model $class */
         $class = get_class($model);
         $tableName = $class::getTableName();
@@ -200,14 +209,37 @@ class Tree
         /** @var \T4\Dbal\Connection $connection */
         $connection = $class::getDbConnection();
 
+        if (!$model->isNew()) {
+
+            $oldLft = $model->__lft;
+            $oldRgt = $model->__rgt;
+            $modelWidth = $oldRgt - $oldLft;
+
+            $sql = "
+                UPDATE `" . $tableName . "`
+                SET
+                    `__lft` = IF(`__lft` > :rgt, `__lft` - (:width + 1), `__lft`),
+                    `__rgt` = `__rgt` - (:width + 1)
+                WHERE `__rgt` > :rgt
+            ";
+            $connection->execute($sql, [':rgt' => $oldRgt, ':width' => $modelWidth]);
+
+        } else {
+            $modelWidth = 1;
+        }
+
         $query = new QueryBuilder();
         $query->select('MAX(`__rgt`)')->from($tableName);
         $maxRgt = (int)$connection->query($query->getQuery())->fetchScalar();
 
         $model->__lft = $maxRgt + 1;
-        $model->__rgt = $maxRgt + 2;
+        $model->__rgt = $model->__lft + $modelWidth;
         $model->__lvl = 0;
         $model->__prt = 0;
+
+        if (!$model->isNew()) {
+            // TODO: move subtree into new place of $model
+        }
 
     }
 
@@ -218,6 +250,29 @@ class Tree
     public function beforeSave(&$model)
     {
 
+        if ($model->isNew()) {
+            if (empty($model->parent)) {
+                $this->insertModelAsLastRoot($model);
+            } else {
+                $this->insertModelAsLastChildOf($model, $model->parent);
+            }
+            return true;
+        } else {
+            /** @var \T4\Orm\Model $class */
+            $class = get_class($model);
+            $oldParent = empty($model->__prt) ? null : $class::findByPk($model->__prt);
+            if ($oldParent == $model->parent) {
+                return true;
+            } else {
+                if (empty($model->parent)) {
+                    $this->insertModelAsLastRoot($model);
+                } else {
+                    $this->insertModelAsLastChildOf($model, $model->parent);
+                }
+                return true;
+            }
+        }
+
         if (empty($model->parent)) {
             $parent = null;
             $parentId = 0;
@@ -225,19 +280,6 @@ class Tree
             $parent = $model->parent;
             $parentId = $model->parent->getPk();
         }
-
-        if ($model->isNew()) {
-            if (null == $parent) {
-                $this->insertModelAsLastRoot($model);
-            } else {
-                $this->insertModelAsLastChildOf($model, $parent);
-            }
-            return true;
-        }
-
-        /**
-         *
-         */
 
         /** @var \T4\Orm\Model $class */
         $class = get_class($model);
