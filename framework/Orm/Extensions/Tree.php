@@ -3,6 +3,7 @@
 namespace T4\Orm\Extensions;
 
 use T4\Core\Collection;
+use T4\Dbal\Connection;
 use T4\Dbal\QueryBuilder;
 use T4\Orm\Extension;
 use T4\Orm\Model;
@@ -51,6 +52,26 @@ class Tree
     /**
      * Манипуляции с деревом nested sets
      */
+
+    /**
+     * "Удаление" из дерева элементов в заданном диапазоне с "закрытием" дыры
+     * @param \T4\Dbal\Connection $connection
+     * @param string $table
+     * @param int $lft
+     * @param int $rgt
+     */
+    protected function removeFromTree(Connection $connection, $table, $lft, $rgt)
+    {
+        $width = $rgt - $lft;
+        $sql = "
+                UPDATE `" . $table . "`
+                SET
+                    `__lft` = IF(`__lft` > :rgt, `__lft` - (:width + 1), `__lft`),
+                    `__rgt` = `__rgt` - (:width + 1)
+                WHERE `__rgt` > :rgt
+            ";
+        $connection->execute($sql, [':rgt' => $rgt, ':width' => $width]);
+    }
 
     /**
      * Подготовка модели к вставке в дерево перед заданным элементом, в то же поддерево, что и заданный элемент
@@ -210,20 +231,8 @@ class Tree
         $connection = $class::getDbConnection();
 
         if (!$model->isNew()) {
-
-            $oldLft = $model->__lft;
-            $oldRgt = $model->__rgt;
-            $modelWidth = $oldRgt - $oldLft;
-
-            $sql = "
-                UPDATE `" . $tableName . "`
-                SET
-                    `__lft` = IF(`__lft` > :rgt, `__lft` - (:width + 1), `__lft`),
-                    `__rgt` = `__rgt` - (:width + 1)
-                WHERE `__rgt` > :rgt
-            ";
-            $connection->execute($sql, [':rgt' => $oldRgt, ':width' => $modelWidth]);
-
+            $this->removeFromTree($connection, $tableName, $model->__lft, $model->__rgt);
+            $modelWidth = $model->__rgt - $model->__lft;
         } else {
             $modelWidth = 1;
         }
