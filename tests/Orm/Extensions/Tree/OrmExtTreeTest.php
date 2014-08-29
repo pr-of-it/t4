@@ -187,7 +187,7 @@ class Test extends PHPUnit_Extensions_Database_TestCase
         $comment44->parent = $comment4;
         $comment44->save();
 
-        $comment2->refresh()->delete();
+        $comment2->delete();
 
         $id = $comment1->getPk();
         $res = $this->getT4Connection()->query("SELECT * FROM `comments` WHERE `__id`=:id", [':id'=>$id])->fetch();
@@ -220,7 +220,7 @@ class Test extends PHPUnit_Extensions_Database_TestCase
         $this->assertEquals(1, $res['__lvl']);
         $this->assertEquals($comment4->getPk(), $res['__prt']);
 
-        $comment1->refresh()->delete();
+        $comment1->delete();
 
         $id = $comment3->getPk();
         $res = $this->getT4Connection()->query("SELECT * FROM `comments` WHERE `__id`=:id", [':id'=>$id])->fetch();
@@ -241,7 +241,7 @@ class Test extends PHPUnit_Extensions_Database_TestCase
         $this->assertEquals(1, $res['__lvl']);
         $this->assertEquals($comment4->getPk(), $res['__prt']);
 
-        $comment3->refresh()->delete();
+        $comment3->delete();
 
         $id = $comment4->getPk();
         $res = $this->getT4Connection()->query("SELECT * FROM `comments` WHERE `__id`=:id", [':id'=>$id])->fetch();
