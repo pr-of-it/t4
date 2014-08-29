@@ -185,7 +185,6 @@ class Tree
      */
     protected function insertModelAsLastChildOf(Model &$model, Model &$parent)
     {
-
         if ($parent->isNew())
             throw new \T4\Orm\Exception('Parent model should be saved before child insert');
 
@@ -195,25 +194,34 @@ class Tree
         /** @var \T4\Dbal\Connection $connection */
         $connection = $class::getDbConnection();
 
+        if (!$model->isNew()) {
+            $this->removeFromTree($connection, $tableName, $model->__lft, $model->__rgt);
+            $modelWidth = $model->__rgt - $model->__lft;
+        } else {
+            $modelWidth = 1;
+        }
+
+        $parent->refresh();
+
         $sql = "
             UPDATE `" . $tableName . "`
-            SET `__rgt` = `__rgt` + 2
+            SET `__rgt` = `__rgt` + :width + 1
             WHERE `__rgt` >= :rgt
         ";
-        $connection->execute($sql, [':rgt' => $parent->__rgt]);
+        $connection->execute($sql, [':width' => $modelWidth, ':rgt' => $parent->__rgt]);
         $sql = "
             UPDATE `" . $tableName . "`
-            SET `__lft` = `__lft` + 2
+            SET `__lft` = `__lft` + :width + 1
             WHERE `__lft` > :rgt
         ";
-        $connection->execute($sql, [':rgt' => $parent->__rgt]);
+        $connection->execute($sql, [':width' => $modelWidth, ':rgt' => $parent->__rgt]);
 
         $model->__lft = $parent->__rgt;
-        $model->__rgt = $parent->__rgt + 1;
+        $model->__rgt = $parent->__rgt + $modelWidth;
         $model->__lvl = $parent->__lvl + 1;
         $model->__prt = $parent->getPk();
 
-        $parent->__rgt += 2;
+        $parent->__rgt += $modelWidth + 1;
 
     }
 
