@@ -450,7 +450,31 @@ class Tree
      */
     public function afterDelete(&$model)
     {
-        return $this->deleteSubTree(get_class($model), $model->__lft, $model->__rgt);
+        /** @var \T4\Orm\Model $class */
+        $class = get_class($model);
+        $tableName = $class::getTableName();
+        /** @var \T4\Dbal\Connection $connection */
+        $connection = $class::getDbConnection();
+
+        $width = $model->__rgt - $model->__lft;
+
+        $sql = "
+            DELETE FROM `" . $tableName . "`
+            WHERE `__lft` > :lft
+                AND `__rgt` < :rgt
+        ";
+        $connection->execute($sql, [':lft' => $model->__lft, ':rgt' => $model->__rgt]);
+        $sql = "
+            UPDATE `" . $tableName . "`
+            SET `__lft` = `__lft` - (:width + 1),
+                `__rgt` = `__rgt` - (:width + 1)
+            WHERE `__lft` > :rgt OR `__rgt` > :rgt
+        ";
+        $connection->execute($sql, [':width' => $width, ':rgt' => $model->__rgt]);
+        $model->__lft = 0;
+        $model->__rgt = 0;
+        $model->__lvl = 0;
+        $model->__prt = 0;
     }
 
     public function callStatic($class, $method, $argv)
@@ -521,33 +545,6 @@ class Tree
             'where'=>'__lft>='.$lft.' AND __rgt<='.$rgt,
             'order'=>'__lft'
         ]);
-    }
-
-    /**
-     * Удаляет поддерева начиная (и включая!) с данного элемента
-     * @param \T4\Orm\Model $class
-     * @param int $lft
-     * @param int $rgt
-     * @return boolean
-     */
-    protected function deleteSubTree($class, $lft, $rgt)
-    {
-        $tableName = $class::getTableName();
-        /** @var $connection \T4\Dbal\Connection */
-        $connection = $class::getDbConnection();
-        $sql = "
-            DELETE FROM `" . $tableName . "`
-            WHERE __lft >= :lft AND __rgt <= :rgt
-            ";
-        $result = $connection->execute($sql, [':lft' => $lft, ':rgt' => $rgt]);
-        $sql = "
-            UPDATE `" . $tableName . "`
-                SET __lft = IF(__lft > :lft, __lft - (:rgt - :lft + 1), __lft),
-                __rgt = __rgt - (:rgt - :lft + 1)
-            WHERE __rgt > :rgt
-            ";
-        $result = $result && $connection->execute($sql, [':lft' => $lft, ':rgt' => $rgt]);
-        return $result;
     }
 
 }

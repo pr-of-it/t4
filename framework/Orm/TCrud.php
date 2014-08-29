@@ -36,6 +36,15 @@ trait TCrud
         return $this->isDeleted;
     }
 
+    public function refresh()
+    {
+        if ($this->isNew())
+            return $this;
+        $class = get_class($this);
+        $this->fromArray($class::findByPk($this->getPk())->toArray());
+        return $this;
+    }
+
     /*
      * Find methods
      */
