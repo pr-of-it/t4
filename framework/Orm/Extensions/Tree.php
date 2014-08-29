@@ -62,7 +62,6 @@ class Tree
      */
     protected function removeFromTree(Connection $connection, $table, $lft, $rgt)
     {
-        $width = $rgt - $lft;
         $sql = "
                 UPDATE `" . $table . "`
                 SET
@@ -70,7 +69,7 @@ class Tree
                     `__rgt` = `__rgt` - (:width + 1)
                 WHERE `__rgt` > :rgt
             ";
-        $connection->execute($sql, [':rgt' => $rgt, ':width' => $width]);
+        $connection->execute($sql, [':rgt' => $rgt, ':width' => $rgt - $lft]);
     }
 
     /**
