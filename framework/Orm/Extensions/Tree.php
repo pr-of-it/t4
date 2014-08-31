@@ -76,10 +76,14 @@ class Tree
      * Подготовка модели к вставке в дерево перед заданным элементом, в то же поддерево, что и заданный элемент
      * @param \T4\Orm\Model $model
      * @param \T4\Orm\Model $element
+     * @throws \T4\Orm\Exception
      * @return bool
      */
     protected function insertModelBeforeElement(Model &$model, Model &$element)
     {
+        if ($element->isNew())
+            throw new \T4\Orm\Exception('Target model should be saved before insert');
+
         /** @var \T4\Orm\Model $class */
         $class = get_class($model);
         $tableName = $class::getTableName();
@@ -109,10 +113,14 @@ class Tree
      * Подготовка модели к вставке в дерево сразу после заданного элемента, в то же поддерево, что и заданный элемент
      * @param \T4\Orm\Model $model
      * @param \T4\Orm\Model $element
+     * @throws \T4\Orm\Exception
      * @return bool
      */
     protected function insertModelAfterElement(Model &$model, Model &$element)
     {
+        if ($element->isNew())
+            throw new \T4\Orm\Exception('Target model should be saved before insert');
+
         /** @var \T4\Orm\Model $class */
         $class = get_class($model);
         $tableName = $class::getTableName();
@@ -272,181 +280,20 @@ class Tree
             } else {
                 $this->insertModelAsLastChildOf($model, $model->parent);
             }
-            return true;
         } else {
             /** @var \T4\Orm\Model $class */
             $class = get_class($model);
             $oldParent = empty($model->__prt) ? null : $class::findByPk($model->__prt);
-            if ($oldParent == $model->parent) {
-                return true;
-            } else {
+            if ($oldParent != $model->parent) {
                 if (empty($model->parent)) {
                     $this->insertModelAsLastRoot($model);
                 } else {
                     $this->insertModelAsLastChildOf($model, $model->parent);
                 }
-                return true;
             }
         }
 
-        if (empty($model->parent)) {
-            $parent = null;
-            $parentId = 0;
-        } else {
-            $parent = $model->parent;
-            $parentId = $model->parent->getPk();
-        }
-
-        /** @var \T4\Orm\Model $class */
-        $class = get_class($model);
-        $tableName = $class::getTableName();
-        /** @var \T4\Dbal\Connection $connection */
-        $connection = $class::getDbConnection();
-
-        /**
-         * Вставка новой записи в таблицу
-         */
-        if ($model->isNew()) {
-
-            /*
-             * Запись вставляется, как новый корень дерева
-             */
-            if ( 0 == $parentId ) {
-                $query = new QueryBuilder();
-                $query->select('MAX(__rgt)')->from($tableName);
-                $rgt = (int)$connection->query($query->getQuery())->fetchScalar() + 1;
-                $lvl = 0;
-                /*
-                 * У записи будет существующий родитель
-                 */
-            } else {
-                $rgt = $parent->__rgt;
-                $lvl = $parent->__lvl;
-            }
-
-            $model->__lft = $rgt;
-            $model->__rgt = $rgt + 1;
-            $model->__lvl = $lvl + 1;
-            $model->__prt = $parentId;
-            $model->__parent = null;
-
-            $sql = "UPDATE `" . $tableName . "`
-                    SET
-                    `__rgt`=__rgt+2,
-                    `__lft` = IF( `__lft`>:rgt, `__lft` + 2, `__lft` )
-                    WHERE `__rgt`>=:rgt
-                    ";
-            $result = $connection->execute($sql, [':rgt' => $rgt]);
-            return $result;
-
-            /**
-             * Перенос в дереве уже существующей записи
-             */
-        } else {
-
-            $skewTree = $model->__rgt - $model->__lft + 1;
-
-            if (isset($parent)) {
-                $lft = $parent->__rgt;
-                $lvl = $parent->__lvl + 1;
-            } else {
-                $query = new QueryBuilder();
-                $query->select('MAX(__rgt)')->from($tableName);
-                $lft = (int)$connection->query($query->getQuery())->fetchScalar() + 1;
-                $lvl = 0;
-            }
-
-            // Перемещение в диапазон перемещаемого узла запрещено!
-            if ( $lft>0 && $lft>$model->__lft && $lft<=$model->__rgt) {
-                return false;
-            }
-
-            $skewLvl = $lvl - $model->__lvl;
-
-            if ($lft > $model->__lft) {
-                /*
-                 * Перемещение вверх по дереву
-                 */
-                $skewEdit = $lft - $model->__lft - $skewTree;
-
-                $sql = "
-                UPDATE `" . $tableName . "`
-                SET __lft = CASE WHEN __rgt <= " . $model->__rgt . "
-                                     THEN __lft + :skewEdit
-                                     ELSE CASE WHEN __lft > " . $model->__rgt . "
-                                               THEN __lft - :skewTree
-                                               ELSE __lft
-                                          END
-                               END,
-                    __lvl =  CASE WHEN __rgt <= " . $model->__rgt . "
-                                    THEN __lvl + :skewLvl
-                                    ELSE __lvl
-                               END,
-                    __rgt = CASE WHEN __rgt <= " . $model->__rgt . "
-                                     THEN __rgt + :skewEdit
-                                     ELSE CASE WHEN __rgt < :lft
-                                               THEN __rgt - :skewTree
-                                               ELSE __rgt
-                                          END
-                                END
-                WHERE __rgt > " . $model->__lft . " AND
-                      __lft < :lft
-                ";
-                $result = $connection->query($sql, [
-                    ':skewTree'=>$skewTree, ':skewLvl'=>$skewLvl, ':skewEdit'=>$skewEdit,
-                    ':lft' => $lft,
-                ]);
-                if (!$result)
-                    return false;
-                $lft = $lft - $skewTree;
-
-            } else {
-                /*
-                 * Перемещение вниз по дереву
-                 */
-                $skewEdit = $lft - $model->__lft;
-
-                $sql = "
-                UPDATE `" . $tableName . "`
-                    SET
-                        __rgt = CASE WHEN __lft >= " . $model->__lft . "
-                                         THEN __rgt + :skewEdit
-                                         ELSE CASE WHEN __rgt < " . $model->__lft . "
-                                                   THEN __rgt + :skewTree
-                                                   ELSE __rgt
-                                              END
-                                    END,
-                        __lvl = CASE WHEN __lft >= " . $model->__lft . "
-                                         THEN __lvl + :skewLvl
-                                         ELSE __lvl
-                                    END,
-                        __lft =  CASE WHEN __lft >= " . $model->__lft . "
-                                         THEN __lft + :skewEdit
-                                         ELSE CASE WHEN __lft >= :lft
-                                                   THEN __lft + :skewTree
-                                                   ELSE __lft
-                                              END
-                                    END
-                    WHERE __rgt >= :lft AND
-                          __lft < " . $model->__rgt . "
-                ";
-                $result = $connection->query($sql, [
-                    ':skewTree'=>$skewTree, ':skewLvl'=>$skewLvl, ':skewEdit'=>$skewEdit,
-                    ':lft' => $lft,
-                ]);
-                if (!$result)
-                    return false;
-
-            }
-
-            $model->__lft = $lft;
-            $model->__lvl = $lvl;
-            $model->__rgt = $lft + $skewTree - 1;
-            $model->__prt = $parentId;
-
-            return true;
-
-        }
+        return true;
 
     }
 
@@ -476,21 +323,15 @@ class Tree
         /** @var \T4\Dbal\Connection $connection */
         $connection = $class::getDbConnection();
 
-        $width = $model->__rgt - $model->__lft;
-
         $sql = "
             DELETE FROM `" . $tableName . "`
             WHERE `__lft` > :lft
                 AND `__rgt` < :rgt
         ";
         $connection->execute($sql, [':lft' => $model->__lft, ':rgt' => $model->__rgt]);
-        $sql = "
-            UPDATE `" . $tableName . "`
-            SET `__lft` = `__lft` - (:width + 1),
-                `__rgt` = `__rgt` - (:width + 1)
-            WHERE `__lft` > :rgt OR `__rgt` > :rgt
-        ";
-        $connection->execute($sql, [':width' => $width, ':rgt' => $model->__rgt]);
+
+        $this->removeFromTree($connection, $tableName, $model->__lft, $model->__rgt);
+
         $model->__lft = 0;
         $model->__rgt = 0;
         $model->__lvl = 0;
@@ -526,22 +367,6 @@ class Tree
                     ->order('__lft')
                     ->params([':lft'=>$model->__lft, ':rgt'=>$model->__rgt]);
                 return $connection->query($query->getQuery(), $query->getParams())->fetchAll(\PDO::FETCH_CLASS, $class);
-
-            case 'findAllChildren':
-                return $this->getSubTree($class, $model->__lft+1, $model->__rgt-1);
-                break;
-
-            case 'findSubTree':
-                return $this->getSubTree($class, $model->__lft, $model->__rgt);
-                break;
-
-            case 'insertAfter':
-                if ($argv[0] instanceof Model) {
-                    $this->insertAfter(new Collection([$model]), $argv[0]);
-                } else {
-                    $this->insertAfter(new Collection([$model]), $class::findByPk($argv[0]));
-                }
-                break;
         }
         throw new Exception('Method ' . $method . ' is not found in extension ' . __CLASS__);
     }
