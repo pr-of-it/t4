@@ -245,24 +245,32 @@ class Tree
         /** @var \T4\Dbal\Connection $connection */
         $connection = $class::getDbConnection();
 
-        if (!$model->isNew()) {
-            $this->removeFromTree($connection, $tableName, $model->__lft, $model->__rgt);
-            $modelWidth = $model->__rgt - $model->__lft;
-        } else {
-            $modelWidth = 1;
-        }
-
         $query = new QueryBuilder();
         $query->select('MAX(`__rgt`)')->from($tableName);
         $maxRgt = (int)$connection->query($query->getQuery())->fetchScalar();
 
-        $model->__lft = $maxRgt + 1;
-        $model->__rgt = $model->__lft + $modelWidth;
-        $model->__lvl = 0;
-        $model->__prt = 0;
+        if ($model->isNew()) {
 
-        if (!$model->isNew()) {
-            // TODO: move subtree into new place of $model
+            $model->__lft = $maxRgt + 1;
+            $model->__rgt = $model->__lft + 1;
+            $model->__lvl = 0;
+            $model->__prt = 0;
+
+        } else {
+            $width = $model->__rgt - $model->__lft;
+            $sql = "
+                UPDATE `" . $tableName . "`
+                SET `__lft` = `__lft` + (:max - :lft + 1),
+                `__rgt` = `__rgt` + (:max - :lft + 1),
+                `__lvl` = `__lvl` - :lvl
+                WHERE `__lft` >= :lft AND `__rgt` <= :rgt
+            ";
+            $connection->execute($sql, [':max' => $maxRgt, ':lft' => $model->__lft, ':rgt' => $model->__rgt, ':lvl' => $model->__lvl]);
+            $this->removeFromTree($connection, $tableName, $model->__lft, $model->__rgt);
+            // TODO: calculate new __lft, __rgt!
+            $model->refresh();
+            $model->__lvl = 0;
+            $model->__prt = 0;
         }
 
     }
@@ -285,6 +293,7 @@ class Tree
             $class = get_class($model);
             $oldParent = empty($model->__prt) ? null : $class::findByPk($model->__prt);
             if ($oldParent != $model->parent) {
+                $model->refresh();
                 if (empty($model->parent)) {
                     $this->insertModelAsLastRoot($model);
                 } else {

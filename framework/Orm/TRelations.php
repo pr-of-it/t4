@@ -130,7 +130,7 @@ trait TRelations {
             case $class::HAS_ONE:
             case $class::BELONGS_TO:
                 $relationClass = $relation['model'];
-                if ($value instanceof $relationClass) {
+                if (empty($value) || $value instanceof $relationClass) {
                     $this->$key = $value;
                 } else {
                     $this->$key = $relationClass::findByPk($value);

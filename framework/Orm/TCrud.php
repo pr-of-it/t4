@@ -41,7 +41,7 @@ trait TCrud
         if ($this->isNew())
             return $this;
         $class = get_class($this);
-        $this->fromArray($class::findByPk($this->getPk())->toArray());
+        $this->merge($class::findByPk($this->getPk())->toArray());
         return $this;
     }
 
