@@ -2,7 +2,6 @@
 
 namespace T4\Orm\Extensions;
 
-use T4\Core\Collection;
 use T4\Dbal\Connection;
 use T4\Dbal\QueryBuilder;
 use T4\Orm\Extension;
@@ -52,6 +51,26 @@ class Tree
     /**
      * Манипуляции с деревом nested sets
      */
+
+    /**
+     * "Обновление" служебных полей модели из хранилища
+     * @param Model $model
+     */
+    protected function refreshTreeColumns(Model &$model)
+    {
+        /** @var \T4\Orm\Model $class */
+        $class = get_class($model);
+        $tableName = $class::getTableName();
+        /** @var \T4\Dbal\Connection $connection */
+        $connection = $class::getDbConnection();
+
+        $sql = new QueryBuilder();
+        $sql->select(['__lft', '__rgt', '__lvl', '__prt'])
+            ->from($tableName)
+            ->where('`' . $class::PK . '`=:id');
+        $columns = $connection->query($sql->getQuery(), [':id' => $model->getPk()])->fetch();
+        $model->merge($columns);
+    }
 
     /**
      * "Удаление" из дерева элементов в заданном диапазоне с "закрытием" дыры
@@ -209,7 +228,7 @@ class Tree
             $modelWidth = 1;
         }
 
-        $parent->refresh();
+        $this->refreshTreeColumns($parent);
 
         $sql = "
             UPDATE `" . $tableName . "`
@@ -268,7 +287,7 @@ class Tree
             $connection->execute($sql, [':max' => $maxRgt, ':lft' => $model->__lft, ':rgt' => $model->__rgt, ':lvl' => $model->__lvl]);
             $this->removeFromTree($connection, $tableName, $model->__lft, $model->__rgt);
             // TODO: calculate new __lft, __rgt!
-            $model->refresh();
+            $this->refreshTreeColumns($model);
             $model->__lvl = 0;
             $model->__prt = 0;
         }
@@ -293,7 +312,7 @@ class Tree
             $class = get_class($model);
             $oldParent = empty($model->__prt) ? null : $class::findByPk($model->__prt);
             if ($oldParent != $model->parent) {
-                $model->refresh();
+                $this->refreshTreeColumns($model);
                 if (empty($model->parent)) {
                     $this->insertModelAsLastRoot($model);
                 } else {
@@ -314,7 +333,7 @@ class Tree
      */
     public function beforeDelete(&$model)
     {
-        $model->refresh();
+        $this->refreshTreeColumns($model);
         return true;
     }
 
