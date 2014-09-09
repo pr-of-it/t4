@@ -92,6 +92,26 @@ class Tree
     }
 
     /**
+     * Создает пустое место в дереве заданной ширины
+     * Место создается ПЕРЕД элементом с заданным lft
+     * @param Connection $connection
+     * @param string $table
+     * @param int $lft
+     * @param int $width
+     */
+    protected function expandTree(Connection $connection, $table, $lft, $width)
+    {
+        $sql = "
+                UPDATE `" . $table . "`
+                SET
+                    `__lft` = IF(`__lft` >= :lft, `__lft` + (:width + 1), `__lft`),
+                    `__rgt` = `__rgt` + (:width + 1)
+                WHERE `__rgt` > :lft
+            ";
+        $connection->execute($sql, [':lft' => $lft, ':width' => $width]);
+    }
+
+    /**
      * Подготовка модели к вставке в дерево перед заданным элементом, в то же поддерево, что и заданный элемент
      * @param \T4\Orm\Model $model
      * @param \T4\Orm\Model $element
@@ -109,22 +129,37 @@ class Tree
         /** @var \T4\Dbal\Connection $connection */
         $connection = $class::getDbConnection();
 
-        $sql = "
-            UPDATE `" . $tableName . "`
-            SET
-                `__rgt` = `__rgt` + 2,
-                `__lft` = `__lft` + 2
-            WHERE `__lft`>=:lft
-        ";
-        $connection->execute($sql, [':lft' => $element->__lft]);
+        if ($model->isNew()) {
+            $width = 1;
+        } else {
+            $width = $model->__rgt - $model->__lft;
+        }
+
+        $this->expandTree($connection, $tableName, $element->__lft, $width);
+
+        if (!$model->isNew()) {
+            $this->refreshTreeColumns($model);
+            $diff = $element->__lft - $model->__lft;
+            $lvldiff = $element->__lvl - $model->__lvl;
+            $sql = "
+                UPDATE `" . $tableName . "`
+                SET
+                    `__lft` = `__lft` + :diff,
+                    `__rgt` = `__rgt` + :diff,
+                    `__lvl` = `__lvl` + :lvldiff,
+                    `__prt` = IF(`__id`=:id, :parentid, `__prt`)
+                WHERE `__lft` >= :lft AND `__rgt` <= :rgt
+            ";
+            $connection->execute($sql, [':id' => $model->getPk(), 'parentid'=>$element->__prt, ':lft' => $model->__lft, ':rgt' => $model->__rgt, ':diff' => $diff, ':lvldiff' => $lvldiff]);
+            $this->removeFromTree($connection, $tableName, $model->__lft, $model->__rgt);
+        }
 
         $model->__lft = $element->__lft;
-        $model->__rgt = $element->__lft + 1;
+        $model->__rgt = $element->__lft + $width + 1;
         $model->__lvl = $element->__lvl;
         $model->__prt = $element->__prt;
 
-        $element->__lft += 2;
-        $element->__rgt += 2;
+        $this->refreshTreeColumns($element);
 
     }
 
@@ -385,7 +420,9 @@ class Tree
         $class = get_class($model);
         /* @var \T4\Dbal\Connection $connection */
         $connection = $class::getDbConnection();
+
         switch ($method) {
+
             case 'findAllParents':
                 $query = new QueryBuilder;
                 $query
@@ -395,8 +432,16 @@ class Tree
                     ->order('__lft')
                     ->params([':lft'=>$model->__lft, ':rgt'=>$model->__rgt]);
                 return $connection->query($query->getQuery(), $query->getParams())->fetchAll(\PDO::FETCH_CLASS, $class);
+
+            case 'insertBefore':
+                $element = $argv[0];
+                $this->insertModelBeforeElement($model, $element);
+                break;
+
         }
+
         throw new Exception('Method ' . $method . ' is not found in extension ' . __CLASS__);
+
     }
 
 }
