@@ -399,25 +399,4 @@ class Tree
         throw new Exception('Method ' . $method . ' is not found in extension ' . __CLASS__);
     }
 
-
-    /**
-     * Служебные методы
-     */
-
-
-    /**
-     * Возвращает подмножество (поддерево в частном случае) дерева с заданным границами ключей (включительно!)
-     * @param \T4\Orm\Model $class
-     * @param int $lft
-     * @param int $rgt
-     * @return \T4\Core\Collection
-     */
-    protected function getSubTree($class, $lft, $rgt)
-    {
-        return $class::findAll([
-            'where'=>'__lft>='.$lft.' AND __rgt<='.$rgt,
-            'order'=>'__lft'
-        ]);
-    }
-
 }
