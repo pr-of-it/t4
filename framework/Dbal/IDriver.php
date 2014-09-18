@@ -24,6 +24,8 @@ interface IDriver
 
     public function dropIndex(Connection $connection, $tableName, array $indexes);
 
+    public function insert(Connection $connection, $tableName, array $data);
+
     public function findAllByQuery($class, $query, $params = []);
 
     public function findByQuery($class, $query, $params = []);

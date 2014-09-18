@@ -216,6 +216,19 @@ class Mysql
         $connection->execute($sql);
     }
 
+    public function insert(Connection $connection, $tableName, array $data)
+    {
+        $sql  = 'INSERT INTO `' . $tableName . '`';
+        $sql .= ' (`' . implode('`, `', array_keys($data)) . '`)';
+        $sql .= ' VALUES';
+        $values = [];
+        foreach ($data as $key => $val)
+            $values[':'.$key] = $val;
+        $sql .= ' (' . implode(', ', array_keys($values)) . ')';
+        $connection->execute($sql, $values);
+        return $connection->lastInsertId();
+    }
+
     public function findAllByQuery($class, $query, $params=[])
     {
         if ($query instanceof QueryBuilder) {
