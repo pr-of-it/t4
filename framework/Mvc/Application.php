@@ -170,12 +170,28 @@ class Application
         if (!isset($this->config->blocks) || !isset($this->config->blocks[$canonicalPath]))
             throw new Exception('No config for block ' . $canonicalPath);
 
-        $controller = $this->createController($route->module, $route->controller);
-        $controller->action($route->action, $route->params);
-        return $controller->view->render(
-            $route->action . (!empty($template) ? '.' . $template : '') . '.block.html',
-            $controller->getData()
-        );
+        $blockOptions = $this->config->blocks[$canonicalPath];
+
+        $getBlock = function() use ($template, $route) {
+            $controller = $this->createController($route->module, $route->controller);
+            $controller->action($route->action, $route->params);
+            return $controller->view->render(
+                $route->action . (!empty($template) ? '.' . $template : '') . '.block.html',
+                $controller->getData()
+            );
+        };
+
+        if (isset($blockOptions['cache'])) {
+            $cache = \T4\Cache\Factory::getInstance();
+            if (isset($blockOptions['cache']['time'])) {
+                return $cache($canonicalPath, $getBlock, $blockOptions['cache']['time']);
+            } else {
+                return $cache($canonicalPath, $getBlock);
+            }
+        } else {
+            return $getBlock();
+        }
+
     }
 
     /**
