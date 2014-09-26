@@ -56,6 +56,7 @@ class TwigExtension extends \Twig_Extension
     {
         return [
             new \Twig_SimpleFilter('repeat', 'str_repeat'),
+            new \Twig_SimpleFilter('count', 'count'),
         ];
     }
 
