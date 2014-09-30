@@ -183,10 +183,11 @@ class Application
 
         if (isset($blockOptions['cache'])) {
             $cache = \T4\Cache\Factory::getInstance();
+            $key = md5($canonicalPath . serialize($route->params));
             if (isset($blockOptions['cache']['time'])) {
-                return $cache($canonicalPath, $getBlock, $blockOptions['cache']['time']);
+                return $cache($key, $getBlock, $blockOptions['cache']['time']);
             } else {
-                return $cache($canonicalPath, $getBlock);
+                return $cache($key, $getBlock);
             }
         } else {
             return $getBlock();
