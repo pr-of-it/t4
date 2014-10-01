@@ -13,7 +13,7 @@ class Extension
             $assets->publish($this->assetsPath.'/lib');
             $assets->publishCssFile($this->assetsPath.'/lib/css/bootstrap.min.css');
             if ( !empty($this->options->theme) ) {
-                $assets->publishCssFile($this->options->theme->css);
+                $assets->registerCssUrl($this->options->theme->css);
             } else {
                 $assets->publishCssFile($this->assetsPath.'/lib/css/bootstrap-theme.min.css');
             }
