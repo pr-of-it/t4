@@ -2,6 +2,9 @@
 
 return [
     '///' => [
-        'name' => 'Тестовый блок главной страницы'
-    ]
+        'name' => 'Main page block'
+    ],
+    '///Login' => [
+        'name' => 'Login block'
+    ],
 ];
