@@ -108,7 +108,6 @@ class Std
         }
         foreach ($obj as $key=>$value)
             $this->$key = $value;
-        //$this->__data = array_merge($this->toArray(), $obj);
         return $this;
     }
 
