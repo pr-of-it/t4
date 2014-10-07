@@ -137,6 +137,17 @@ trait TRelations {
                 }
                 break;
 
+            case $class::HAS_MANY:
+                if (empty($value) || $value instanceof Collection) {
+                    $this->$key = $value;
+                } elseif (is_array($value)) {
+                    $relationClass = $relation['model'];
+                    $this->$key = new Collection();
+                    foreach ($value as $pk)
+                        $this->key->append($relationClass::findByPk($pk));
+                }
+                break;
+
             default:
                 $this->$key = $value;
                 break;
