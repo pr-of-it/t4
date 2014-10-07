@@ -14,6 +14,13 @@ class Helpers
 
     const TREE_LEVEL_SYMBOL = '-';
 
+    static public function element($el, $name='', $options=[], $attrs=[])
+    {
+        $elClass = '\T4\Html\Elements\\' . ucfirst($el);
+        $el = new $elClass($name, $options, $attrs);
+        return $el->render();
+    }
+
     static public function blockOptionInput($name, $options, $value = null, $htmlOptions = [])
     {
         $htmlOptions['name'] = $name;
