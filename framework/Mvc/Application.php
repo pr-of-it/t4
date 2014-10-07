@@ -9,6 +9,7 @@ use T4\Core\Session;
 use T4\Core\Std;
 use T4\Core\TSingleton;
 use T4\Dbal\Connection;
+use T4\Http\Request;
 
 /**
  * Class Application
@@ -31,6 +32,11 @@ class Application
     /*
      * Public properties
      */
+
+    /**
+     * @var \T4\Http\Request
+     */
+    public $request;
 
     /**
      * @var \T4\Core\Config
@@ -72,6 +78,8 @@ class Application
      */
     protected function __construct()
     {
+        $this->request = new Request();
+
         Session::init();
         $this->flash = new Flash();
 
