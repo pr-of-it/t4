@@ -2,12 +2,11 @@
 
 namespace T4\Core;
 
-use ArrayAccess;
-use Traversable;
-
 class Std
-    implements ArrayAccess, \Countable, \IteratorAggregate, IArrayable
+    implements \ArrayAccess, \Countable, \IteratorAggregate, IArrayable
 {
+
+    use TStdGetSet;
 
     protected $__data = [];
 
@@ -21,30 +20,6 @@ class Std
     public function getData()
     {
         return $this->__data;
-    }
-
-    /**
-     * ArrayAccess implementation
-     */
-
-    public function offsetExists($offset)
-    {
-        return isset($this->__data[$offset]);
-    }
-
-    public function offsetGet($offset)
-    {
-        return $this->__data[$offset];
-    }
-
-    public function offsetSet($offset, $value)
-    {
-        $this->__data[$offset] = $value;
-    }
-
-    public function offsetUnset($offset)
-    {
-        unset($this->__data[$offset]);
     }
 
     /**
@@ -132,53 +107,6 @@ class Std
     public function getIterator()
     {
         return new \ArrayIterator($this->__data);
-    }
-
-    /*
-     * "Magic" methods
-     */
-
-    public function __isset($key)
-    {
-        return
-            isset($this->__data[$key]) || method_exists($this, 'get' . ucfirst($key));
-    }
-
-    public function __unset($key)
-    {
-        unset($this->__data[$key]);
-    }
-
-    public function __get($key)
-    {
-        if (!$this->__isset($key)) {
-            $debug =  debug_backtrace(\DEBUG_BACKTRACE_PROVIDE_OBJECT, 1)[0];
-            if ($debug['function'] == '__get' && $debug['object'] === $this && $debug['type'] == '->') {
-                $property = $debug['args']['0'];
-                $line = (file($debug['file'])[$debug['line']-1]);
-                if (preg_match('~\-\>' . $property . '\-\>.+\=~', $line, $m)) {
-                    $this->__data[$property] = new static;
-                    return $this->__data[$property];
-                }
-            }
-            //trigger_error('Undefined property: ' . get_class($this) . '::' . $key, \E_USER_NOTICE);
-            return;
-        }
-
-        $method = 'get' . ucfirst($key);
-        if ( method_exists($this, $method) )
-            return $this->$method();
-
-        return isset($this->__data[$key]) ? $this->__data[$key] : null;
-    }
-
-    public function __set($key, $value)
-    {
-        $method = 'set' . ucfirst($key);
-        if ( method_exists($this, $method) )
-            $this->$method($value);
-        else
-            $this->__data[$key] = $value;
     }
 
 }

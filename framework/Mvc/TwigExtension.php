@@ -35,6 +35,11 @@ class TwigExtension extends \Twig_Extension
                         return $this->helper($name, array_slice(func_get_args(), 1));
                     },  ['is_safe' => ['html']]),
 
+            'element' => new \Twig_Function_Function(
+                    function ($el, $name='', $options=[], $attrs=[]) {
+                        return Helpers::element($el, $name, $options, $attrs);
+                    },  ['is_safe' => ['html']]),
+
             // DEPRECATED
             'selectTreeByModel' => new \Twig_Function_Function(
                     function ($model, $selected = 0, $htmlOptions = [], $options = []) {
