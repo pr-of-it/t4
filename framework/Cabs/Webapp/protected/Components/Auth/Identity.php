@@ -15,13 +15,22 @@ class Identity
 
     public function authenticate($data)
     {
+        if (empty($data->email)) {
+            throw new Exception('Empty email', self::ERROR_INVALID_EMAIL);
+        }
+        if (empty($data->password)) {
+            throw new Exception('Empty password', self::ERROR_INVALID_PASSWORD);
+        }
+
         $user = User::findByEmail($data->email);
         if (empty($user)) {
             throw new Exception('User with email ' . $data->email . ' does not exists', self::ERROR_INVALID_EMAIL);
         }
+
         if (!\T4\Crypt\Helpers::checkPassword($data->password, $user->password)) {
             throw new Exception('Invalid password', self::ERROR_INVALID_PASSWORD);
         }
+
         $this->login($user);
         Application::getInstance()->user = $user;
         return $user;
@@ -46,7 +55,28 @@ class Identity
         }
 
         return $session->user;
+    }
 
+    public function register($data)
+    {
+        if (empty($data->email)) {
+            throw new Exception('Empty email', self::ERROR_INVALID_EMAIL);
+        }
+        if (empty($data->password)) {
+            throw new Exception('Empty password', self::ERROR_INVALID_PASSWORD);
+        }
+
+        $user = User::findByEmail($data->email);
+        if (!empty($user)) {
+            throw new Exception('Email already exists', self::ERROR_INVALID_EMAIL);
+        }
+
+        $user = new User();
+        $user->email = $data->email;
+        $user->password = \T4\Crypt\Helpers::hashPassword($data->password);
+        $user->save();
+
+        return $user;
     }
 
     /**
@@ -65,10 +95,8 @@ class Identity
         $session = new UserSession();
         $session->hash = $hash;
         $session->userAgentHash = md5($_SERVER['HTTP_USER_AGENT']);
-        // TODO: $session->user = $user;
-        $session->__user_id = $user->getPk();
+        $session->user = $user;
         $session->save();
-
     }
 
     public function logout()

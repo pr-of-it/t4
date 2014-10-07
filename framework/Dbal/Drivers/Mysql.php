@@ -22,6 +22,9 @@ class Mysql
             case 'link':
                 return 'BIGINT UNSIGNED NOT NULL DEFAULT \'0\'';
                 break;
+            case 'boolean':
+                return 'BOOLEAN';
+                break;
             case 'int':
                 return 'INT(11) NOT NULL';
                 break;

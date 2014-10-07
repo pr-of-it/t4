@@ -8,20 +8,33 @@ class Flash
 
     const FLASH_KEY = '__flash';
 
+    public function __construct($data=null)
+    {
+        if (null != $data)
+            $this->fromArray($data);
+        $this->merge(Session::get(self::FLASH_KEY));
+    }
+
     public function __set($key, $val)
     {
-        Session::set(self::FLASH_KEY.':'.$key, $val);
-        $this->{$key} = $val;
+        parent::__set($key, $val);
+        Session::set(self::FLASH_KEY, $this->getData());
     }
 
     public function __get($key)
     {
         if (!isset($this->{$key}))
-            $this->{$key} = Session::get(self::FLASH_KEY.':'.$key);
-        $val = $this->{$key};
+            return null;
+        $val = parent::__get($key);
         unset($this->{$key});
-        Session::clear(self::FLASH_KEY.':'.$key);
+        Session::set(self::FLASH_KEY, $this->getData());
         return $val;
     }
+
+    public function offsetGet($offset)
+    {
+        return $this->__get($offset);
+    }
+
 
 }
