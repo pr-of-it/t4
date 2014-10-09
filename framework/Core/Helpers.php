@@ -5,6 +5,19 @@ namespace T4\Core;
 class Helpers
 {
 
+    public static function getRealPath($path)
+    {
+        if (0 === strpos($path, '///')) {
+            return ROOT_PATH . DS . str_replace('/', DS, substr($path, 3));
+        } elseif (0 === strpos($path, '//')) {
+            return ROOT_PATH_PROTECTED . DS . str_replace('/', DS, substr($path, 2));
+        } elseif (0 === strpos($path, '/')) {
+            return ROOT_PATH_PUBLIC . DS . str_replace('/', DS, substr($path, 1));
+        } else {
+            return false;
+        }
+    }
+
     public static function canonize($some)
     {
         if (is_string($some)) {
