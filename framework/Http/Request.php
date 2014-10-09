@@ -62,7 +62,7 @@ class Request
 
     public function isUploaded($file)
     {
-        return (isset($this->files->{$file})) && ( is_array($this->files->{$file}) || \UPLOAD_ERR_OK == $this->files->{$file}->error );
+        return isset($this->files->{$file}) && ( is_array($this->files->{$file}) || \UPLOAD_ERR_OK == $this->files->{$file}->error );
     }
 
     public function isUploadedArray($file)

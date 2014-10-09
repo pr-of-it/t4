@@ -3,6 +3,7 @@
 namespace T4\Http;
 
 use T4\Core\Exception;
+use T4\Mvc\Application;
 
 class Uploader
 {
@@ -20,7 +21,7 @@ class Uploader
         $this->uploadPath = $path;
     }
 
-    public function isUploaded($name='')
+    public function isUploaded($name = '')
     {
         if (!empty($this->formFieldName) && empty($name))
             $name = $this->formFieldName;
@@ -28,14 +29,22 @@ class Uploader
         if (empty($name))
             throw new Exception('Empty form field name for file upload');
 
-        if (empty($_FILES[$name]) || 0 == $_FILES[$name]['size'])
+        $request = Application::getInstance()->request;
+        if (!$request->isUploaded($name))
             return false;
 
-        if (\UPLOAD_ERR_OK != $_FILES[$this->formFieldName]['error'])
+        if (
+            !$request->isUploadedArray($name)
+            && (
+                0 == $request->files->{$name}->size
+                ||
+                \UPLOAD_ERR_OK != $request->files->{$name}->error
+            )
+        ) {
             return false;
+        }
 
         return true;
-
     }
 
     public function __invoke($name = '')
@@ -59,37 +68,53 @@ class Uploader
             }
         }
 
-        if (empty($_FILES[$this->formFieldName]) || 0 == $_FILES[$this->formFieldName]['size'])
+        $request = Application::getInstance()->request;
+        if (!$request->isUploaded($this->formFieldName))
             throw new Exception('File for \'' . $this->formFieldName . '\' is not uploaded');
 
-        if (\UPLOAD_ERR_OK != $_FILES[$this->formFieldName]['error'])
-            throw new Exception('Upload error while uploading file \'' . $this->formFieldName . '\': ' . $_FILES[$this->formFieldName]['error']);
+        if (!$this->isUploaded($this->formFieldName))
+            throw new Exception('Error while uploading file \'' . $this->formFieldName . '\': ' . $request->files->{$this->formFieldName}->error);
 
-        $uploadedFileName = $this->suggestUploadedFileName($realUploadPath, $_FILES[$this->formFieldName]['name']);
+        if ($request->isUploadedArray($this->formFieldName)) {
 
-        if (!move_uploaded_file($_FILES[$this->formFieldName]['tmp_name'], $realUploadPath . DS . $uploadedFileName)) {
-            throw new Exception('Save uploaded file error');
+            $ret = [];
+            foreach ($request->files->{$this->formFieldName} as $n => $file) {
+                $uploadedFileName = $this->suggestUploadedFileName($realUploadPath, $file->name);
+                if (move_uploaded_file($file->tmp_name, $realUploadPath . DS . $uploadedFileName)) {
+                    $ret[$n] = $this->uploadPath . '/' . $uploadedFileName;
+                } else {
+                    $ret[$n] = false;
+                }
+            }
+            return $ret;
+
+        } else {
+
+            $file = $request->files->{$this->formFieldName};
+            $uploadedFileName = $this->suggestUploadedFileName($realUploadPath, $file->name);
+            if (move_uploaded_file($file->tmp_name, $realUploadPath . DS . $uploadedFileName)) {
+                return $this->uploadPath . '/' . $uploadedFileName;
+            } else {
+                return false;
+            }
+
         }
-
-        return $this->uploadPath . '/' . $uploadedFileName;
-
     }
 
     protected function suggestUploadedFileName($path, $name)
     {
-        if (!file_exists($path.DS.$name))
+        if (!file_exists($path . DS . $name))
             return strtolower($name);
 
         $filename = pathinfo($name, \PATHINFO_FILENAME);
         $extension = pathinfo($name, \PATHINFO_EXTENSION);
         preg_match('~(.*?)(_(\d+))?$~', $filename, $m);
-        $i = isset($m[3]) ? (int)$m[3]+1 : 1;
+        $i = isset($m[3]) ? (int)$m[3] + 1 : 1;
 
-        while (file_exists($path.DS.($file = $m[1] . '_' . $i . '.' . $extension)))
+        while (file_exists($path . DS . ($file = $m[1] . '_' . $i . '.' . $extension)))
             $i++;
 
         return strtolower($file);
-
     }
 
 }
