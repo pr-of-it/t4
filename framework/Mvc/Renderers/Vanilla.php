@@ -9,6 +9,14 @@ class Vanilla
     extends ARenderer
 {
 
+    protected $controller;
+
+    // TODO: непонятно что с этим делать. Вообще-то надо во View этот метод использовать, а не здесь
+    public function setController(Controller $controller)
+    {
+        $this->controller = $controller;
+    }
+
     public function render($template, $data = [])
     {
         if ($data instanceof Std) {

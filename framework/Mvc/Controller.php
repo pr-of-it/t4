@@ -42,6 +42,7 @@ abstract class Controller
         $this->app = Application::getInstance();
         // TODO: use View class
         $this->view = new \T4\Mvc\Renderers\Twig($this->getTemplatePaths());
+        $this->view = new View('twig', $this->getTemplatePaths());
         $this->view->setController($this);
     }
 

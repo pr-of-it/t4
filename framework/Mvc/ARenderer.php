@@ -16,11 +16,6 @@ abstract class ARenderer
         }
     }
 
-    public function setController(Controller $controller)
-    {
-        $this->controller = $controller;
-    }
-
     final public function addTemplatePath($path)
     {
         $this->paths[] = Helpers::getRealPath($path);
@@ -36,10 +31,5 @@ abstract class ARenderer
     }
 
     abstract public function render($template, $data = []);
-
-    final public function display($template, $data = [])
-    {
-        print $this->render($template, $data);
-    }
 
 } 

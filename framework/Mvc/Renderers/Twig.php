@@ -11,8 +11,6 @@ class Twig
     extends ARenderer
 {
 
-    const TAG_PATTERN = '~<t4:(?P<tag>[^>\s]+)[\s]*(?P<params>[\s\S]*?)(/>|>)((?P<html>[\s\S]*?)</t4:(?P=tag)>)?~i';
-
     protected $twig;
     protected $links;
 
@@ -29,9 +27,9 @@ class Twig
         $this->twig->addGlobal('app', $this->links->app);
     }
 
+    // TODO: непонятно что с этим делать. Вообще-то надо во View этот метод использовать, а не здесь
     public function setController(Controller $controller)
     {
-        parent::setController($controller);
         $this->links->controller = $controller;
         $this->twig->addGlobal('controller', $this->links->controller);
     }
@@ -43,31 +41,7 @@ class Twig
         else
             $data = (array)$data;
 
-        return $this->postProcess(
-            $this->twig->render($template, $data)
-        );
-    }
-
-    protected function postProcess($content)
-    {
-        $content = $this->parseTags($content);
-        return $content;
-    }
-
-    protected function parseTags($content)
-    {
-        preg_match_all(self::TAG_PATTERN, $content, $m);
-        foreach ($m['tag'] as $n => $tag) {
-            $tagClassName = '\T4\Mvc\Tags\\'.ucfirst($tag);
-            $tag = new $tagClassName($m['params'][$n], $m['html'][$n]);
-            try {
-                $content = str_replace($m[0][$n], $tag->render(), $content);
-            } catch (Exception $e) {
-                echo $e->getMessage();
-                $content = str_replace($m[0][$n], '', $content);
-            }
-        }
-        return $content;
+        return $this->twig->render($template, $data);
     }
 
 }
