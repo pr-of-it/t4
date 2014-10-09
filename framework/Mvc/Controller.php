@@ -32,7 +32,7 @@ abstract class Controller
 
     /**
      * Ссылка на настроенный на данный контроллер объект View
-     * @var \T4\Mvc\View
+     * @var \T4\Mvc\ARenderer
      */
     public $view;
 
@@ -40,7 +40,8 @@ abstract class Controller
     {
         $this->data = new Std();
         $this->app = Application::getInstance();
-        $this->view = new View($this->getTemplatePaths());
+        // TODO: use View class
+        $this->view = new \T4\Mvc\Renderers\Twig($this->getTemplatePaths());
         $this->view->setController($this);
     }
 

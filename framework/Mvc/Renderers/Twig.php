@@ -1,23 +1,24 @@
 <?php
 
-namespace T4\Mvc;
+namespace T4\Mvc\Renderers;
 
-use T4\Core\Exception;
 use T4\Core\Std;
+use T4\Mvc\Application;
+use T4\Mvc\ARenderer;
+use T4\Mvc\Controller;
+use T4\Mvc\TwigExtension;
 
-class View
+class Twig
+    extends ARenderer
 {
 
     const TAG_PATTERN = '~<t4:(?P<tag>[^>\s]+)[\s]*(?P<params>[\s\S]*?)(/>|>)((?P<html>[\s\S]*?)</t4:(?P=tag)>)?~i';
 
-    protected $paths = [];
     protected $twig;
-
     protected $links;
 
     public function __construct($paths = [])
     {
-
         $this->paths = (array)$paths;
         $this->links = new Std;
         $this->links->app = Application::getInstance();
@@ -27,11 +28,11 @@ class View
         $this->twig->addExtension(new TwigExtension());
 
         $this->twig->addGlobal('app', $this->links->app);
-
     }
 
     public function setController(Controller $controller)
     {
+        parent::setController($controller);
         $this->links->controller = $controller;
         $this->twig->addGlobal('controller', $this->links->controller);
     }
@@ -48,11 +49,6 @@ class View
         );
     }
 
-    public function display($template, $data = [])
-    {
-        print $this->render($template, $data);
-    }
-
     protected function postProcess($content)
     {
         $content = $this->parseTags($content);
@@ -63,7 +59,7 @@ class View
     {
         preg_match_all(self::TAG_PATTERN, $content, $m);
         foreach ($m['tag'] as $n => $tag) {
-            $tagClassName = '\\' . __NAMESPACE__ . '\\Tags\\'.ucfirst($tag);
+            $tagClassName = '\T4\Mvc\Tags\\'.ucfirst($tag);
             $tag = new $tagClassName($m['params'][$n], $m['html'][$n]);
             try {
                 $content = str_replace($m[0][$n], $tag->render(), $content);
