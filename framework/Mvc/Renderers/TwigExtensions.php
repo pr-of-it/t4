@@ -1,11 +1,13 @@
 <?php
 
-namespace T4\Mvc;
+namespace T4\Mvc\Renderers;
 
 use T4\Html\Helpers;
+use T4\Mvc\Application;
 use T4\Widgets\Factory as WidgetsFactory;
 
-class TwigExtension extends \Twig_Extension
+class TwigExtensions
+    extends \Twig_Extension
 {
 
     public function getName()
@@ -24,35 +26,35 @@ class TwigExtension extends \Twig_Extension
             'publishJs' => new \Twig_Function_Function(function () use ($app) { return $app->assets->getPublishedJs();},  ['is_safe' => ['html']]),
 
             'widget' =>  new \Twig_Function_Function(
-                    function ($name, $options=[]) {
-                        $widget = WidgetsFactory::getInstance($name, $options);
-                        return $widget->render();
-                    },  ['is_safe' => ['html']]
-                ),
+                function ($name, $options=[]) {
+                    $widget = WidgetsFactory::getInstance($name, $options);
+                    return $widget->render();
+                },  ['is_safe' => ['html']]
+            ),
 
             'helper' => new \Twig_Function_Function(
-                    function ($name) {
-                        return $this->helper($name, array_slice(func_get_args(), 1));
-                    },  ['is_safe' => ['html']]),
+                function ($name) {
+                    return $this->helper($name, array_slice(func_get_args(), 1));
+                },  ['is_safe' => ['html']]),
 
             'element' => new \Twig_Function_Function(
-                    function ($el, $name='', $options=[], $attrs=[]) {
-                        return Helpers::element($el, $name, $options, $attrs);
-                    },  ['is_safe' => ['html']]),
+                function ($el, $name='', $options=[], $attrs=[]) {
+                    return Helpers::element($el, $name, $options, $attrs);
+                },  ['is_safe' => ['html']]),
 
             // DEPRECATED
             'selectTreeByModel' => new \Twig_Function_Function(
-                    function ($model, $selected = 0, $htmlOptions = [], $options = []) {
-                        return Helpers::selectTreeByModel($model, $selected, $htmlOptions, $options);
-                    },  ['is_safe' => ['html']]
-                ),
+                function ($model, $selected = 0, $htmlOptions = [], $options = []) {
+                    return Helpers::selectTreeByModel($model, $selected, $htmlOptions, $options);
+                },  ['is_safe' => ['html']]
+            ),
 
             // DEPRECATED
             'blockOptionInput' => new \Twig_Function_Function(
-                    function ($name, $settings, $value=null, $htmlOptions=[]) {
-                        return Helpers::blockOptionInput($name, $settings, $value, $htmlOptions);
-                    },  ['is_safe' => ['html']]
-                ),
+                function ($name, $settings, $value=null, $htmlOptions=[]) {
+                    return Helpers::blockOptionInput($name, $settings, $value, $htmlOptions);
+                },  ['is_safe' => ['html']]
+            ),
 
         ];
     }

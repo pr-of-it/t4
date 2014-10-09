@@ -6,7 +6,6 @@ use T4\Core\Std;
 use T4\Mvc\Application;
 use T4\Mvc\ARenderer;
 use T4\Mvc\Controller;
-use T4\Mvc\TwigExtension;
 
 class Twig
     extends ARenderer
@@ -25,7 +24,7 @@ class Twig
 
         $loader = new \Twig_Loader_Filesystem($paths);
         $this->twig = new \Twig_Environment($loader);
-        $this->twig->addExtension(new TwigExtension());
+        $this->twig->addExtension(new TwigExtensions());
 
         $this->twig->addGlobal('app', $this->links->app);
     }
