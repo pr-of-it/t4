@@ -24,12 +24,6 @@ class Application
         TApplicationPaths;
 
     /*
-     * Protected properties for getters and setters
-     */
-
-    protected $__user;
-
-    /*
      * Public properties
      */
 
@@ -234,18 +228,17 @@ class Application
     public function __get($key)
     {
         switch ($key) {
-            // current user
-            // TODO: если пользователь не залогинен, так и будет бесконечно его запрашивать из базы! (возможно...)
             case 'user':
-                if (null === $this->__user) {
+                static $user = null;
+                if (null === $user) {
                     if (class_exists('\\App\Components\Auth\Identity')) {
                         $identity = new \App\Components\Auth\Identity();
-                        $this->__user = $identity->getUser();
+                        $user = $identity->getUser();
                     } else {
                         return null;
                     }
                 }
-                return $this->__user;
+                return $user;
                 break;
             case 'assets':
                 return AssetsManager::getInstance();
