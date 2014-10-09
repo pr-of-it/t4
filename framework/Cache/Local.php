@@ -10,7 +10,7 @@ class Local
 
     public function __invoke($key, $callback, $time = self::DEFAULT_CACHE_TIME)
     {
-        $cachePath = ROOT_PATH_PROTECTED . DS . 'Cache';
+        $cachePath = ROOT_PATH_PUBLIC . DS . 'Cache';
         if (!is_readable($cachePath))
             Helpers::mkDir($cachePath);
         $fileName = $cachePath . DS . md5($key) . '.cache';
@@ -22,4 +22,5 @@ class Local
             return unserialize(file_get_contents($fileName));
         }
     }
+
 }
