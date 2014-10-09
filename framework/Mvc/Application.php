@@ -14,8 +14,11 @@ use T4\Http\Request;
 /**
  * Class Application
  * @package T4\Mvc
+ * @property \T4\Core\Config $config
+ * @property \T4\Http\Request $request
  * @property \App\Models\User $user
  * @property \T4\Mvc\AssetsManager $assets
+ * @property \T4\Core\Flash $flash
  */
 class Application
 {
@@ -28,24 +31,9 @@ class Application
      */
 
     /**
-     * @var \T4\Http\Request
-     */
-    public $request;
-
-    /**
-     * @var \T4\Core\Config
-     */
-    public $config;
-
-    /**
      * @var \T4\Core\Std
      */
     public $db;
-
-    /**
-     * @var \T4\Core\Flash
-     */
-    public $flash;
 
     /**
      * @var \T4\Core\Std
@@ -72,20 +60,9 @@ class Application
      */
     protected function __construct()
     {
-        $this->request = new Request();
-
-        Session::init();
-        $this->flash = new Flash();
-
         try {
 
-            /*
-             * Application config setup
-             * Setup sections and blocks
-             */
-            $this->config = new Config($this->getPath() . DS . 'config.php');
-            $this->config->sections = new Config($this->getPath() . DS . 'sections.php');
-            $this->config->blocks = new Config($this->getPath() . DS . 'blocks.php');
+            Session::init();
 
             /*
              * DB connections setup
@@ -219,15 +196,26 @@ class Application
     }
 
     /**
-     * Получение некоторых свойств через магию
-     * чтобы развязать узел с бесконечным вызовом конструктора
-     * и сделать их инициализацию ленивой
+     * Lazy properties load
      * @param $key
      * @return mixed
      */
     public function __get($key)
     {
         switch ($key) {
+            case 'config':
+                static $config = null;
+                if (null == $config) {
+                    $config = new Config($this->getPath() . DS . 'config.php');
+                    $config->sections = new Config($this->getPath() . DS . 'sections.php');
+                    $config->blocks = new Config($this->getPath() . DS . 'blocks.php');
+                }
+                return $config;
+            case 'request':
+                static $request = null;
+                if (null === $request)
+                    $request = new Request();
+                return $request;
             case 'user':
                 static $user = null;
                 if (null === $user) {
@@ -239,14 +227,21 @@ class Application
                     }
                 }
                 return $user;
-                break;
             case 'assets':
                 return AssetsManager::getInstance();
-                break;
-
+            case 'flash':
+                static $flash = null;
+                if (null === $flash)
+                    $flash = new Flash();
+                return $flash;
         }
     }
 
+    /**
+     * Lazy properties isset
+     * @param $key
+     * @return bool
+     */
     public function __isset($key)
     {
         switch ($key) {
@@ -255,6 +250,9 @@ class Application
                 return null !== $this->user;
                 break;
             case 'assets':
+            case 'request':
+            case 'config':
+            case 'flash':
                 return true;
                 break;
         }
