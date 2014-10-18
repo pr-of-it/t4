@@ -50,12 +50,21 @@ class Test extends PHPUnit_Extensions_Database_TestCase
 
     protected function getT4ConnectionConfig()
     {
-        return new \T4\Core\Std(['driver' => 'mysql', 'host' => 'localhost', 'dbname' => 't4test', 'user' => 'root', 'password' => '']);
+        return new \T4\Core\Std(['driver' => 'mysql', 'host' => '127.0.0.1', 'dbname' => 't4test', 'user' => 'root', 'password' => '']);
     }
 
     protected function getT4Connection()
     {
         return new \T4\Dbal\Connection($this->getT4ConnectionConfig());
+    }
+
+    protected function _testDbElement($id, $lft, $rgt, $lvl, $prt)
+    {
+        $res = $this->getT4Connection()->query("SELECT * FROM `comments` WHERE `__id`=:id", [':id'=>$id])->fetch();
+        $this->assertEquals($lft, $res['__lft']);
+        $this->assertEquals($rgt, $res['__rgt']);
+        $this->assertEquals($lvl, $res['__lvl']);
+        $this->assertEquals($prt, $res['__prt']);
     }
 
     public function testMigrationUp()
@@ -72,89 +81,33 @@ class Test extends PHPUnit_Extensions_Database_TestCase
 
     public function testInsert()
     {
-
         $this->connection->query('TRUNCATE TABLE `comments`');
 
         CommentTestModel::setConnection($this->getT4Connection());
 
         $comment1 = new CommentTestModel();
         $comment1->save();
-
-        $id = $comment1->getPk();
-        $res = $this->getT4Connection()->query("SELECT * FROM `comments` WHERE `__id`=:id", [':id'=>$id])->fetch();
-        $this->assertEquals(1, $res['__lft']);
-        $this->assertEquals(2, $res['__rgt']);
-        $this->assertEquals(0, $res['__lvl']);
-        $this->assertEquals(0, $res['__prt']);
+        $this->_testDbElement($comment1->getPk(), 1, 2, 0, 0);
 
         $comment2 = new CommentTestModel();
         $comment2->save();
-
-        $id = $comment1->getPk();
-        $res = $this->getT4Connection()->query("SELECT * FROM `comments` WHERE `__id`=:id", [':id'=>$id])->fetch();
-        $this->assertEquals(1, $res['__lft']);
-        $this->assertEquals(2, $res['__rgt']);
-        $this->assertEquals(0, $res['__lvl']);
-        $this->assertEquals(0, $res['__prt']);
-        $id = $comment2->getPk();
-        $res = $this->getT4Connection()->query("SELECT * FROM `comments` WHERE `__id`=:id", [':id'=>$id])->fetch();
-        $this->assertEquals(3, $res['__lft']);
-        $this->assertEquals(4, $res['__rgt']);
-        $this->assertEquals(0, $res['__lvl']);
-        $this->assertEquals(0, $res['__prt']);
+        $this->_testDbElement($comment1->getPk(), 1, 2, 0, 0);
+        $this->_testDbElement($comment2->getPk(), 3, 4, 0, 0);
 
         $comment11 = new CommentTestModel();
         $comment11->parent = $comment1;
         $comment11->save();
-
-        $id = $comment1->getPk();
-        $res = $this->getT4Connection()->query("SELECT * FROM `comments` WHERE `__id`=:id", [':id'=>$id])->fetch();
-        $this->assertEquals(1, $res['__lft']);
-        $this->assertEquals(4, $res['__rgt']);
-        $this->assertEquals(0, $res['__lvl']);
-        $this->assertEquals(0, $res['__prt']);
-        $id = $comment11->getPk();
-        $res = $this->getT4Connection()->query("SELECT * FROM `comments` WHERE `__id`=:id", [':id'=>$id])->fetch();
-        $this->assertEquals(2, $res['__lft']);
-        $this->assertEquals(3, $res['__rgt']);
-        $this->assertEquals(1, $res['__lvl']);
-        $this->assertEquals($comment1->getPk(), $res['__prt']);
-        $id = $comment2->getPk();
-        $res = $this->getT4Connection()->query("SELECT * FROM `comments` WHERE `__id`=:id", [':id'=>$id])->fetch();
-        $this->assertEquals(5, $res['__lft']);
-        $this->assertEquals(6, $res['__rgt']);
-        $this->assertEquals(0, $res['__lvl']);
-        $this->assertEquals(0, $res['__prt']);
+        $this->_testDbElement($comment1->getPk(),  1, 4, 0, 0);
+        $this->_testDbElement($comment11->getPk(), 2, 3, 1, $comment1->getPk());
+        $this->_testDbElement($comment2->getPk(),  5, 6, 0, 0);
 
         $comment111 = new CommentTestModel();
         $comment111->parent = $comment11;
         $comment111->save();
-
-        $id = $comment1->getPk();
-        $res = $this->getT4Connection()->query("SELECT * FROM `comments` WHERE `__id`=:id", [':id'=>$id])->fetch();
-        $this->assertEquals(1, $res['__lft']);
-        $this->assertEquals(6, $res['__rgt']);
-        $this->assertEquals(0, $res['__lvl']);
-        $this->assertEquals(0, $res['__prt']);
-        $id = $comment11->getPk();
-        $res = $this->getT4Connection()->query("SELECT * FROM `comments` WHERE `__id`=:id", [':id'=>$id])->fetch();
-        $this->assertEquals(2, $res['__lft']);
-        $this->assertEquals(5, $res['__rgt']);
-        $this->assertEquals(1, $res['__lvl']);
-        $this->assertEquals($comment1->getPk(), $res['__prt']);
-        $id = $comment111->getPk();
-        $res = $this->getT4Connection()->query("SELECT * FROM `comments` WHERE `__id`=:id", [':id'=>$id])->fetch();
-        $this->assertEquals(3, $res['__lft']);
-        $this->assertEquals(4, $res['__rgt']);
-        $this->assertEquals(2, $res['__lvl']);
-        $this->assertEquals($comment11->getPk(), $res['__prt']);
-        $id = $comment2->getPk();
-        $res = $this->getT4Connection()->query("SELECT * FROM `comments` WHERE `__id`=:id", [':id'=>$id])->fetch();
-        $this->assertEquals(7, $res['__lft']);
-        $this->assertEquals(8, $res['__rgt']);
-        $this->assertEquals(0, $res['__lvl']);
-        $this->assertEquals(0, $res['__prt']);
-
+        $this->_testDbElement($comment1->getPk(),   1, 6, 0, 0);
+        $this->_testDbElement($comment11->getPk(),  2, 5, 1, $comment1->getPk());
+        $this->_testDbElement($comment111->getPk(), 3, 4, 2, $comment11->getPk());
+        $this->_testDbElement($comment2->getPk(),   7, 8, 0, 0);
     }
 
     public function testDelete()
@@ -184,75 +137,33 @@ class Test extends PHPUnit_Extensions_Database_TestCase
             $comment44->parent = $comment4;
             $comment44->save();
 
+        $this->_testDbElement($comment1->getPk(),   1, 4, 0, 0);
+        $this->_testDbElement($comment11->getPk(),  2, 3, 1, $comment1->getPk());
+        $this->_testDbElement($comment2->getPk(),   5, 10, 0, 0);
+        $this->_testDbElement($comment22->getPk(),  6, 9, 1, $comment2->getPk());
+        $this->_testDbElement($comment222->getPk(), 7, 8, 2, $comment22->getPk());
+        $this->_testDbElement($comment3->getPk(),   11, 12, 0, 0);
+        $this->_testDbElement($comment4->getPk(),   13, 16, 0, 0);
+        $this->_testDbElement($comment44->getPk(),  14, 15, 1, $comment4->getPk());
+
         $comment2->delete();
 
-        $id = $comment1->getPk();
-        $res = $this->getT4Connection()->query("SELECT * FROM `comments` WHERE `__id`=:id", [':id'=>$id])->fetch();
-        $this->assertEquals(1, $res['__lft']);
-        $this->assertEquals(4, $res['__rgt']);
-        $this->assertEquals(0, $res['__lvl']);
-        $this->assertEquals(0, $res['__prt']);
-        $id = $comment11->getPk();
-        $res = $this->getT4Connection()->query("SELECT * FROM `comments` WHERE `__id`=:id", [':id'=>$id])->fetch();
-        $this->assertEquals(2, $res['__lft']);
-        $this->assertEquals(3, $res['__rgt']);
-        $this->assertEquals(1, $res['__lvl']);
-        $this->assertEquals($comment1->getPk(), $res['__prt']);
-        $id = $comment3->getPk();
-        $res = $this->getT4Connection()->query("SELECT * FROM `comments` WHERE `__id`=:id", [':id'=>$id])->fetch();
-        $this->assertEquals(5, $res['__lft']);
-        $this->assertEquals(6, $res['__rgt']);
-        $this->assertEquals(0, $res['__lvl']);
-        $this->assertEquals(0, $res['__prt']);
-        $id = $comment4->getPk();
-        $res = $this->getT4Connection()->query("SELECT * FROM `comments` WHERE `__id`=:id", [':id'=>$id])->fetch();
-        $this->assertEquals(7, $res['__lft']);
-        $this->assertEquals(10, $res['__rgt']);
-        $this->assertEquals(0, $res['__lvl']);
-        $this->assertEquals(0, $res['__prt']);
-        $id = $comment44->getPk();
-        $res = $this->getT4Connection()->query("SELECT * FROM `comments` WHERE `__id`=:id", [':id'=>$id])->fetch();
-        $this->assertEquals(8, $res['__lft']);
-        $this->assertEquals(9, $res['__rgt']);
-        $this->assertEquals(1, $res['__lvl']);
-        $this->assertEquals($comment4->getPk(), $res['__prt']);
+        $this->_testDbElement($comment1->getPk(),  1, 4, 0, 0);
+        $this->_testDbElement($comment11->getPk(), 2, 3, 1, $comment1->getPk());
+        $this->_testDbElement($comment3->getPk(),  5, 6, 0, 0);
+        $this->_testDbElement($comment4->getPk(),  7, 10, 0, 0);
+        $this->_testDbElement($comment44->getPk(),  8, 9, 1, $comment4->getPk());
 
         $comment1->delete();
 
-        $id = $comment3->getPk();
-        $res = $this->getT4Connection()->query("SELECT * FROM `comments` WHERE `__id`=:id", [':id'=>$id])->fetch();
-        $this->assertEquals(1, $res['__lft']);
-        $this->assertEquals(2, $res['__rgt']);
-        $this->assertEquals(0, $res['__lvl']);
-        $this->assertEquals(0, $res['__prt']);
-        $id = $comment4->getPk();
-        $res = $this->getT4Connection()->query("SELECT * FROM `comments` WHERE `__id`=:id", [':id'=>$id])->fetch();
-        $this->assertEquals(3, $res['__lft']);
-        $this->assertEquals(6, $res['__rgt']);
-        $this->assertEquals(0, $res['__lvl']);
-        $this->assertEquals(0, $res['__prt']);
-        $id = $comment44->getPk();
-        $res = $this->getT4Connection()->query("SELECT * FROM `comments` WHERE `__id`=:id", [':id'=>$id])->fetch();
-        $this->assertEquals(4, $res['__lft']);
-        $this->assertEquals(5, $res['__rgt']);
-        $this->assertEquals(1, $res['__lvl']);
-        $this->assertEquals($comment4->getPk(), $res['__prt']);
+        $this->_testDbElement($comment3->getPk(),  1, 2, 0, 0);
+        $this->_testDbElement($comment4->getPk(),  3, 6, 0, 0);
+        $this->_testDbElement($comment44->getPk(), 4, 5, 1, $comment4->getPk());
 
         $comment3->delete();
 
-        $id = $comment4->getPk();
-        $res = $this->getT4Connection()->query("SELECT * FROM `comments` WHERE `__id`=:id", [':id'=>$id])->fetch();
-        $this->assertEquals(1, $res['__lft']);
-        $this->assertEquals(4, $res['__rgt']);
-        $this->assertEquals(0, $res['__lvl']);
-        $this->assertEquals(0, $res['__prt']);
-        $id = $comment44->getPk();
-        $res = $this->getT4Connection()->query("SELECT * FROM `comments` WHERE `__id`=:id", [':id'=>$id])->fetch();
-        $this->assertEquals(2, $res['__lft']);
-        $this->assertEquals(3, $res['__rgt']);
-        $this->assertEquals(1, $res['__lvl']);
-        $this->assertEquals($comment4->getPk(), $res['__prt']);
-
+        $this->_testDbElement($comment4->getPk(),  1, 4, 0, 0);
+        $this->_testDbElement($comment44->getPk(), 2, 3, 1, $comment4->getPk());
     }
 
     public function testParentChange()
@@ -290,110 +201,38 @@ class Test extends PHPUnit_Extensions_Database_TestCase
             $comment44->parent = $comment4;
             $comment44->save();
 
+        $this->_testDbElement($comment1->getPk(),   1, 4, 0, 0);
+        $this->_testDbElement($comment11->getPk(),  2, 3, 1, $comment1->getPk());
+        $this->_testDbElement($comment2->getPk(),   5, 10, 0, 0);
+        $this->_testDbElement($comment22->getPk(),  6, 9, 1, $comment2->getPk());
+        $this->_testDbElement($comment222->getPk(), 7, 8, 2, $comment22->getPk());
+        $this->_testDbElement($comment3->getPk(),   11, 12, 0, 0);
+        $this->_testDbElement($comment4->getPk(),   13, 16, 0, 0);
+        $this->_testDbElement($comment44->getPk(),  14, 15, 1, $comment4->getPk());
+
         $comment3->parent = $comment1;
         $comment3->save();
 
-        $id = $comment1->getPk();
-        $res = $this->getT4Connection()->query("SELECT * FROM `comments` WHERE `__id`=:id", [':id'=>$id])->fetch();
-        $this->assertEquals(1, $res['__lft']);
-        $this->assertEquals(6, $res['__rgt']);
-        $this->assertEquals(0, $res['__lvl']);
-        $this->assertEquals(0, $res['__prt']);
-        $id = $comment11->getPk();
-        $res = $this->getT4Connection()->query("SELECT * FROM `comments` WHERE `__id`=:id", [':id'=>$id])->fetch();
-        $this->assertEquals(2, $res['__lft']);
-        $this->assertEquals(3, $res['__rgt']);
-        $this->assertEquals(1, $res['__lvl']);
-        $this->assertEquals($comment1->getPk(), $res['__prt']);
-        $id = $comment3->getPk();
-        $res = $this->getT4Connection()->query("SELECT * FROM `comments` WHERE `__id`=:id", [':id'=>$id])->fetch();
-        $this->assertEquals(4, $res['__lft']);
-        $this->assertEquals(5, $res['__rgt']);
-        $this->assertEquals(1, $res['__lvl']);
-        $this->assertEquals($comment1->getPk(), $res['__prt']);
-        $id = $comment2->getPk();
-        $res = $this->getT4Connection()->query("SELECT * FROM `comments` WHERE `__id`=:id", [':id'=>$id])->fetch();
-        $this->assertEquals(7, $res['__lft']);
-        $this->assertEquals(12, $res['__rgt']);
-        $this->assertEquals(0, $res['__lvl']);
-        $this->assertEquals(0, $res['__prt']);
-        $id = $comment22->getPk();
-        $res = $this->getT4Connection()->query("SELECT * FROM `comments` WHERE `__id`=:id", [':id'=>$id])->fetch();
-        $this->assertEquals(8, $res['__lft']);
-        $this->assertEquals(11, $res['__rgt']);
-        $this->assertEquals(1, $res['__lvl']);
-        $this->assertEquals($comment2->getPk(), $res['__prt']);
-        $id = $comment222->getPk();
-        $res = $this->getT4Connection()->query("SELECT * FROM `comments` WHERE `__id`=:id", [':id'=>$id])->fetch();
-        $this->assertEquals(9, $res['__lft']);
-        $this->assertEquals(10, $res['__rgt']);
-        $this->assertEquals(2, $res['__lvl']);
-        $this->assertEquals($comment22->getPk(), $res['__prt']);
-        $id = $comment4->getPk();
-        $res = $this->getT4Connection()->query("SELECT * FROM `comments` WHERE `__id`=:id", [':id'=>$id])->fetch();
-        $this->assertEquals(13, $res['__lft']);
-        $this->assertEquals(16, $res['__rgt']);
-        $this->assertEquals(0, $res['__lvl']);
-        $this->assertEquals(0, $res['__prt']);
-        $id = $comment44->getPk();
-        $res = $this->getT4Connection()->query("SELECT * FROM `comments` WHERE `__id`=:id", [':id'=>$id])->fetch();
-        $this->assertEquals(14, $res['__lft']);
-        $this->assertEquals(15, $res['__rgt']);
-        $this->assertEquals(1, $res['__lvl']);
-        $this->assertEquals($comment4->getPk(), $res['__prt']);
+        $this->_testDbElement($comment1->getPk(),   1, 6, 0, 0);
+        $this->_testDbElement($comment11->getPk(),  2, 3, 1, $comment1->getPk());
+        $this->_testDbElement($comment3->getPk(),   4, 5, 1, $comment1->getPk());
+        $this->_testDbElement($comment2->getPk(),   7, 12, 0, 0);
+        $this->_testDbElement($comment22->getPk(),  8, 11, 1, $comment2->getPk());
+        $this->_testDbElement($comment222->getPk(), 9, 10, 2, $comment22->getPk());
+        $this->_testDbElement($comment4->getPk(),   13, 16, 0, 0);
+        $this->_testDbElement($comment44->getPk(),  14, 15, 1, $comment4->getPk());
 
         $comment22->parent = null;
         $comment22->save();
 
-        $id = $comment1->getPk();
-        $res = $this->getT4Connection()->query("SELECT * FROM `comments` WHERE `__id`=:id", [':id'=>$id])->fetch();
-        $this->assertEquals(1, $res['__lft']);
-        $this->assertEquals(6, $res['__rgt']);
-        $this->assertEquals(0, $res['__lvl']);
-        $this->assertEquals(0, $res['__prt']);
-        $id = $comment11->getPk();
-        $res = $this->getT4Connection()->query("SELECT * FROM `comments` WHERE `__id`=:id", [':id'=>$id])->fetch();
-        $this->assertEquals(2, $res['__lft']);
-        $this->assertEquals(3, $res['__rgt']);
-        $this->assertEquals(1, $res['__lvl']);
-        $this->assertEquals($comment1->getPk(), $res['__prt']);
-        $id = $comment3->getPk();
-        $res = $this->getT4Connection()->query("SELECT * FROM `comments` WHERE `__id`=:id", [':id'=>$id])->fetch();
-        $this->assertEquals(4, $res['__lft']);
-        $this->assertEquals(5, $res['__rgt']);
-        $this->assertEquals(1, $res['__lvl']);
-        $this->assertEquals($comment1->getPk(), $res['__prt']);
-        $id = $comment2->getPk();
-        $res = $this->getT4Connection()->query("SELECT * FROM `comments` WHERE `__id`=:id", [':id'=>$id])->fetch();
-        $this->assertEquals(7, $res['__lft']);
-        $this->assertEquals(8, $res['__rgt']);
-        $this->assertEquals(0, $res['__lvl']);
-        $this->assertEquals(0, $res['__prt']);
-        $id = $comment4->getPk();
-        $res = $this->getT4Connection()->query("SELECT * FROM `comments` WHERE `__id`=:id", [':id'=>$id])->fetch();
-        $this->assertEquals(9, $res['__lft']);
-        $this->assertEquals(12, $res['__rgt']);
-        $this->assertEquals(0, $res['__lvl']);
-        $this->assertEquals(0, $res['__prt']);
-        $id = $comment44->getPk();
-        $res = $this->getT4Connection()->query("SELECT * FROM `comments` WHERE `__id`=:id", [':id'=>$id])->fetch();
-        $this->assertEquals(10, $res['__lft']);
-        $this->assertEquals(11, $res['__rgt']);
-        $this->assertEquals(1, $res['__lvl']);
-        $this->assertEquals($comment4->getPk(), $res['__prt']);
-        $id = $comment22->getPk();
-        $res = $this->getT4Connection()->query("SELECT * FROM `comments` WHERE `__id`=:id", [':id'=>$id])->fetch();
-        $this->assertEquals(13, $res['__lft']);
-        $this->assertEquals(16, $res['__rgt']);
-        $this->assertEquals(0, $res['__lvl']);
-        $this->assertEquals(0, $res['__prt']);
-        $id = $comment222->getPk();
-        $res = $this->getT4Connection()->query("SELECT * FROM `comments` WHERE `__id`=:id", [':id'=>$id])->fetch();
-        $this->assertEquals(14, $res['__lft']);
-        $this->assertEquals(15, $res['__rgt']);
-        $this->assertEquals(1, $res['__lvl']);
-        $this->assertEquals($comment22->getPk(), $res['__prt']);
-
+        $this->_testDbElement($comment1->getPk(),   1, 6, 0, 0);
+        $this->_testDbElement($comment11->getPk(),  2, 3, 1, $comment1->getPk());
+        $this->_testDbElement($comment3->getPk(),   4, 5, 1, $comment1->getPk());
+        $this->_testDbElement($comment2->getPk(),   7, 8, 0, 0);
+        $this->_testDbElement($comment4->getPk(),   9, 12, 0, 0);
+        $this->_testDbElement($comment44->getPk(),  10, 11, 1, $comment4->getPk());
+        $this->_testDbElement($comment22->getPk(),  13, 16, 0, 0);
+        $this->_testDbElement($comment222->getPk(), 14, 15, 1, $comment22->getPk());
     }
 
     public function testMoveBefore()
@@ -432,64 +271,25 @@ class Test extends PHPUnit_Extensions_Database_TestCase
             $comment44->parent = $comment4;
             $comment44->save();
 
+        $this->_testDbElement($comment1->getPk(),   1, 4, 0, 0);
+        $this->_testDbElement($comment11->getPk(),  2, 3, 1, $comment1->getPk());
+        $this->_testDbElement($comment2->getPk(),   5, 10, 0, 0);
+        $this->_testDbElement($comment22->getPk(),  6, 9, 1, $comment2->getPk());
+        $this->_testDbElement($comment222->getPk(), 7, 8, 2, $comment22->getPk());
+        $this->_testDbElement($comment3->getPk(),   11, 12, 0, 0);
+        $this->_testDbElement($comment4->getPk(),   13, 16, 0, 0);
+        $this->_testDbElement($comment44->getPk(),  14, 15, 1, $comment4->getPk());
+
         $comment22->insertBefore($comment11);
 
-        $id = $comment1->getPk();
-        $res = $this->getT4Connection()->query("SELECT * FROM `comments` WHERE `__id`=:id", [':id'=>$id])->fetch();
-        $this->assertEquals(1, $res['__lft']);
-        $this->assertEquals(8, $res['__rgt']);
-        $this->assertEquals(0, $res['__lvl']);
-        $this->assertEquals(0, $res['__prt']);
-
-        $id = $comment22->getPk();
-        $res = $this->getT4Connection()->query("SELECT * FROM `comments` WHERE `__id`=:id", [':id'=>$id])->fetch();
-        $this->assertEquals(2, $res['__lft']);
-        $this->assertEquals(5, $res['__rgt']);
-        $this->assertEquals(1, $res['__lvl']);
-        $this->assertEquals($comment1->getPk(), $res['__prt']);
-
-        $id = $comment222->getPk();
-        $res = $this->getT4Connection()->query("SELECT * FROM `comments` WHERE `__id`=:id", [':id'=>$id])->fetch();
-        $this->assertEquals(3, $res['__lft']);
-        $this->assertEquals(4, $res['__rgt']);
-        $this->assertEquals(2, $res['__lvl']);
-        $this->assertEquals($comment22->getPk(), $res['__prt']);
-
-        $id = $comment11->getPk();
-        $res = $this->getT4Connection()->query("SELECT * FROM `comments` WHERE `__id`=:id", [':id'=>$id])->fetch();
-        $this->assertEquals(6, $res['__lft']);
-        $this->assertEquals(7, $res['__rgt']);
-        $this->assertEquals(1, $res['__lvl']);
-        $this->assertEquals($comment1->getPk(), $res['__prt']);
-
-        $id = $comment2->getPk();
-        $res = $this->getT4Connection()->query("SELECT * FROM `comments` WHERE `__id`=:id", [':id'=>$id])->fetch();
-        $this->assertEquals(9, $res['__lft']);
-        $this->assertEquals(10, $res['__rgt']);
-        $this->assertEquals(0, $res['__lvl']);
-        $this->assertEquals(0, $res['__prt']);
-
-        $id = $comment3->getPk();
-        $res = $this->getT4Connection()->query("SELECT * FROM `comments` WHERE `__id`=:id", [':id'=>$id])->fetch();
-        $this->assertEquals(11, $res['__lft']);
-        $this->assertEquals(12, $res['__rgt']);
-        $this->assertEquals(0, $res['__lvl']);
-        $this->assertEquals(0, $res['__prt']);
-
-        $id = $comment4->getPk();
-        $res = $this->getT4Connection()->query("SELECT * FROM `comments` WHERE `__id`=:id", [':id'=>$id])->fetch();
-        $this->assertEquals(13, $res['__lft']);
-        $this->assertEquals(16, $res['__rgt']);
-        $this->assertEquals(0, $res['__lvl']);
-        $this->assertEquals(0, $res['__prt']);
-
-        $id = $comment44->getPk();
-        $res = $this->getT4Connection()->query("SELECT * FROM `comments` WHERE `__id`=:id", [':id'=>$id])->fetch();
-        $this->assertEquals(14, $res['__lft']);
-        $this->assertEquals(15, $res['__rgt']);
-        $this->assertEquals(1, $res['__lvl']);
-        $this->assertEquals($comment4->getPk(), $res['__prt']);
-
+        $this->_testDbElement($comment1->getPk(),   1, 8, 0, 0);
+        $this->_testDbElement($comment22->getPk(),  2, 5, 1, $comment1->getPk());
+        $this->_testDbElement($comment222->getPk(), 3, 4, 2, $comment22->getPk());
+        $this->_testDbElement($comment11->getPk(),  6, 7, 1, $comment1->getPk());
+        $this->_testDbElement($comment2->getPk(),   9, 10, 0, 0);
+        $this->_testDbElement($comment3->getPk(),   11, 12, 0, 0);
+        $this->_testDbElement($comment4->getPk(),   13, 16, 0, 0);
+        $this->_testDbElement($comment44->getPk(),  14, 15, 1, $comment4->getPk());
     }
 
     /**
