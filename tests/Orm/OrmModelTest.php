@@ -19,7 +19,7 @@ class OrmModelTest extends PHPUnit_Extensions_Database_TestCase
 
     protected function getT4ConnectionConfig()
     {
-        return new \T4\Core\Std(['driver' => 'mysql', 'host' => 'localhost', 'dbname' => 't4test', 'user' => 'root', 'password' => '']);
+        return new \T4\Core\Std(['driver' => 'mysql', 'host' => '127.0.0.1', 'dbname' => 't4test', 'user' => 'root', 'password' => '']);
     }
 
     protected function getT4Connection()

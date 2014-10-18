@@ -431,7 +431,7 @@ class Tree
                     ->where('__lft<:lft AND __rgt>:rgt')
                     ->order('__lft')
                     ->params([':lft'=>$model->__lft, ':rgt'=>$model->__rgt]);
-                return $connection->query($query->getQuery(), $query->getParams())->fetchAll(\PDO::FETCH_CLASS, $class);
+                return $class::findAllByQuery($query);
 
             case 'findAllChildren':
                 $query = new QueryBuilder();
@@ -441,7 +441,7 @@ class Tree
                     ->where('__lft>:lft AND __rgt<:rgt')
                     ->order('__lft')
                     ->params([':lft'=>$model->__lft, ':rgt'=>$model->__rgt]);
-                return $connection->query($query->getQuery(), $query->getParams())->fetchAll(\PDO::FETCH_CLASS, $class);
+                return $class::findAllByQuery($query);
 
             case 'findSubTree':
                 $query = new QueryBuilder();
@@ -451,7 +451,7 @@ class Tree
                     ->where('__lft>=:lft AND __rgt<=:rgt')
                     ->order('__lft')
                     ->params([':lft'=>$model->__lft, ':rgt'=>$model->__rgt]);
-                return $connection->query($query->getQuery(), $query->getParams())->fetchAll(\PDO::FETCH_CLASS, $class);
+                return $class::findAllByQuery($query);
 
             case 'insertBefore':
                 $element = $argv[0];

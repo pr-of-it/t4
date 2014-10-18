@@ -290,6 +290,17 @@ class Test extends PHPUnit_Extensions_Database_TestCase
         $this->_testDbElement($comment3->getPk(),   11, 12, 0, 0);
         $this->_testDbElement($comment4->getPk(),   13, 16, 0, 0);
         $this->_testDbElement($comment44->getPk(),  14, 15, 1, $comment4->getPk());
+
+        $comment4->insertBefore($comment1);
+
+        $this->_testDbElement($comment4->getPk(),   1, 4, 0, 0);
+        $this->_testDbElement($comment44->getPk(),  2, 3, 1, $comment4->getPk());
+        $this->_testDbElement($comment1->getPk(),   5, 12, 0, 0);
+        $this->_testDbElement($comment22->getPk(),  6, 9, 1, $comment1->getPk());
+        $this->_testDbElement($comment222->getPk(), 7, 8, 2, $comment22->getPk());
+        $this->_testDbElement($comment11->getPk(),  10, 11, 1, $comment1->getPk());
+        $this->_testDbElement($comment2->getPk(),   13, 14, 0, 0);
+        $this->_testDbElement($comment3->getPk(),   15, 16, 0, 0);
     }
 
     /**
