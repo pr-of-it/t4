@@ -401,21 +401,48 @@ class Tree
         $model->__prt = 0;
     }
 
-    public function callStatic($class, $method, $argv)
+    public static function hasMagicStaticMethod($method)
     {
-        /**
-         * @var \T4\Orm\Model $class
-         */
         switch (true) {
             case 'findAllTree' == $method:
-                return $class::findAll(['order'=>'__lft']);
-                break;
+                return true;
         }
-        throw new Exception('Method ' . $method . ' is not found in extension ' . __CLASS__);
+        return false;
     }
 
-    public function call(&$model, $method, $argv)
+    public static function __callStatic($method, $argv)
     {
+        /** @var \T4\Orm\Model $class */
+        $class = $argv[0];
+        array_shift($argv);
+        switch (true) {
+            case 'findAllTree' == $method:
+                $class::findAll(['order'=>'__lft']);
+                break;
+        }
+    }
+
+    public function hasMagicDynamicMethod($method)
+    {
+        switch ($method) {
+            case 'findAllParents':
+                return true;
+            case 'findAllChildren':
+                return true;
+            case 'findSubTree':
+                return true;
+            case 'insertBefore':
+                return true;
+        }
+        return false;
+    }
+
+    public function __call($method, $argv)
+    {
+        /** @var \T4\Orm\Model $model */
+        $model = $argv[0];
+        array_shift($argv);
+
         /* @var \T4\Orm\Model $class */
         $class = get_class($model);
         /* @var \T4\Dbal\Connection $connection */
@@ -456,12 +483,10 @@ class Tree
             case 'insertBefore':
                 $element = $argv[0];
                 $this->insertModelBeforeElement($model, $element);
+                return $model;
                 break;
 
         }
-
-        throw new Exception('Method ' . $method . ' is not found in extension ' . __CLASS__);
-
     }
 
 }

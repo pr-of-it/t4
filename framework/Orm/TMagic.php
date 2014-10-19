@@ -74,6 +74,7 @@ trait TMagic {
      * Вызов статических методов модели, определенных в расширениях
      * @param string $method
      * @param array $argv
+     * @throws \T4\Orm\Exception
      */
     public static function __callStatic($method, $argv)
     {
@@ -81,24 +82,20 @@ trait TMagic {
         $class = get_called_class();
         $extensions = $class::getExtensions();
         foreach ( $extensions as $extension ) {
+            /** @var \T4\Orm\Extension $extensionClassName */
             $extensionClassName = '\\T4\\Orm\\Extensions\\'.ucfirst($extension);
-            /** @var \T4\Orm\Extension $extension */
-            $extension = new $extensionClassName;
-            try {
-                if (method_exists($extension, 'callStatic')) {
-                    $result = $extension->callStatic($class, $method, $argv);
-                    return $result;
-                }
-            } catch (\T4\Orm\Extensions\Exception $e) {
-                continue;
+            if ($extensionClassName::hasMagicStaticMethod($method)) {
+                return call_user_func_array([$extensionClassName, $method], array_merge([$class], $argv));
             }
         }
+        throw new Exception('No static method ' . $method . ' found in ORM extensions in model class ' . $class);
     }
 
     /**
      * Вызов динамических методов модели, определенных в расширениях
      * @param string $method
      * @param array $argv
+     * @throws \T4\Orm\Exception
      */
     public function __call($method, $argv)
     {
@@ -109,15 +106,11 @@ trait TMagic {
             $extensionClassName = '\\T4\\Orm\\Extensions\\'.ucfirst($extension);
             /** @var \T4\Orm\Extension $extension */
             $extension = new $extensionClassName;
-            try {
-                if (method_exists($extension, 'call')) {
-                    $result = $extension->call($this, $method, $argv);
-                    return $result;
-                }
-            } catch (\T4\Orm\Extensions\Exception $e) {
-                continue;
+            if ($extension->hasMagicDynamicMethod($method)) {
+                return call_user_func_array([$extension, $method], array_merge([$this], $argv));
             }
         }
+        throw new Exception('No dynamic method ' . $method . ' found in ORM extensions in model class ' . $class);
     }
 
 }

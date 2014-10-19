@@ -86,30 +86,14 @@ abstract class Extension
         return true;
     }
 
-    /**
-     * Метод-коллекция статических методов, добавляемых к модели
-     * Должен выбрасывать соответствующее исключение, если в данном расширении указанный метод не найден
-     * @param $class string
-     * @param $method string
-     * @param $argv array
-     * @throws \T4\Orm\Extensions\Exception
-     */
-    public function callStatic($class, $method, $argv)
+    public static function hasMagicStaticMethod($method)
     {
-        throw new Exception('Method ' . $method . ' is not found in extension ' . get_called_class());
+        return false;
     }
 
-    /**
-     * Метод-коллекция динамических методов, добавляемых к модели
-     * Должен выбрасывать соответствующее исключение, если в данном расширении указанный метод не найден
-     * @param $model \T4\Orm\Model
-     * @param $method string
-     * @param $argv array
-     * @throws \T4\Orm\Extensions\Exception
-     */
-    public function call(&$model, $method, $argv)
+    public function hasMagicDynamicMethod($method)
     {
-        throw new Exception('Method ' . $method . ' is not found in extension ' . get_called_class());
+        return false;
     }
 
 }
