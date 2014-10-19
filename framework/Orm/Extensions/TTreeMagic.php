@@ -23,7 +23,7 @@ trait TTreeMagic
         array_shift($argv);
         switch (true) {
             case 'findAllTree' == $method:
-                $class::findAll(['order'=>'__lft']);
+                return $class::findAll(['order'=>'__lft']);
                 break;
         }
     }
