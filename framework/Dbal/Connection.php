@@ -53,34 +53,45 @@ class Connection
     }
 
     /**
-     * @param $sql
+     * @param $query
      * @return Statement
      */
-    public function prepare($sql)
+    public function prepare($query)
     {
-        $statement = $this->pdo->prepare($sql);
+        if ($query instanceof QueryBuilder) {
+            $query = $query->getQuery();
+        }
+        $statement = $this->pdo->prepare($query);
         return $statement;
     }
 
     /**
-     * @param $sql
+     * @param $query
      * @param array $params
      * @return bool
      */
-    public function execute($sql, array $params = [])
+    public function execute($query, array $params = [])
     {
-        $statement = $this->pdo->prepare($sql);
+        if ($query instanceof QueryBuilder) {
+            $params = $query->getParams();
+            $query = $query->getQuery();
+        }
+        $statement = $this->pdo->prepare($query);
         return $statement->execute($params);
     }
 
     /**
-     * @param $sql
+     * @param $query
      * @param array $params
      * @return Statement
      */
-    public function query($sql, array $params = [])
+    public function query($query, array $params = [])
     {
-        $statement = $this->pdo->prepare($sql);
+        if ($query instanceof QueryBuilder) {
+            $params = $query->getParams();
+            $query = $query->getQuery();
+        }
+        $statement = $this->pdo->prepare($query);
         $statement->execute($params);
         return $statement;
     }

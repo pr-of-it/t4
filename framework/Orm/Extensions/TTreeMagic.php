@@ -32,11 +32,12 @@ trait TTreeMagic
     {
         switch ($method) {
             case 'findAllParents':
-                return true;
             case 'findAllChildren':
-                return true;
             case 'findSubTree':
-                return true;
+            case 'hasPrevSibling':
+            case 'getPrevSibling':
+            case 'hasNextSibling':
+            case 'getNextSibling':
             case 'insertBefore':
                 return true;
         }
@@ -85,6 +86,46 @@ trait TTreeMagic
                     ->order('__lft')
                     ->params([':lft'=>$model->__lft, ':rgt'=>$model->__rgt]);
                 return $class::findAllByQuery($query);
+
+            case 'hasPrevSibling':
+                $query = new QueryBuilder();
+                $query
+                    ->select('COUNT(*)')
+                    ->from($class::getTableName())
+                    ->where('__rgt<:lft AND __prt=:prt')
+                    ->params([':lft'=>$model->__lft, ':prt'=>$model->__prt]);
+                return 0 != $class::getDbConnection()->query($query)->fetchScalar();
+
+            case 'getPrevSibling':
+                $query = new QueryBuilder();
+                $query
+                    ->select('*')
+                    ->from($class::getTableName())
+                    ->where('__rgt<:lft AND __prt=:prt')
+                    ->order('__lft DESC')
+                    ->limit(1)
+                    ->params([':lft'=>$model->__lft, ':prt'=>$model->__prt]);
+                return $class::findByQuery($query);
+
+            case 'hasNextSibling':
+                $query = new QueryBuilder();
+                $query
+                    ->select('COUNT(*)')
+                    ->from($class::getTableName())
+                    ->where('__lft>:rgt AND __prt=:prt')
+                    ->params([':rgt'=>$model->__rgt, ':prt'=>$model->__prt]);
+                return 0 != $class::getDbConnection()->query($query)->fetchScalar();
+
+            case 'getNextSibling':
+                $query = new QueryBuilder();
+                $query
+                    ->select('*')
+                    ->from($class::getTableName())
+                    ->where('__lft>:rgt AND __prt=:prt')
+                    ->order('__lft')
+                    ->limit(1)
+                    ->params([':rgt'=>$model->__rgt, ':prt'=>$model->__prt]);
+                return $class::findByQuery($query);
 
             case 'insertBefore':
                 $element = $argv[0];

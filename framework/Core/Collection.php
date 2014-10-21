@@ -5,14 +5,31 @@ namespace T4\Core;
 class Collection extends \ArrayObject
 {
 
-    function prepend($value) {
+    public function prepend($value)
+    {
         return $this->exchangeArray(array_merge([$value], $this->getArrayCopy()));
     }
 
-    function append($value) {
-        return $this->exchangeArray(array_merge($this->getArrayCopy(),[$value]));
+    public function append($value)
+    {
+        return $this->exchangeArray(array_merge($this->getArrayCopy(), [$value]));
     }
 
+    public function existsElement(array $properties=[])
+    {
+        if (empty($properties))
+            return false;
+        foreach ($this as $element) {
+            $elementProperties = [];
+            foreach ($element as $key => $val) {
+                if (array_key_exists($key, $properties))
+                    $elementProperties[$key] = $val;
+            }
+            if ($properties == $elementProperties)
+                return true;
+        }
+        return false;
+    }
 
     /**
      * Проброс метода ко всем объектам коллекции
