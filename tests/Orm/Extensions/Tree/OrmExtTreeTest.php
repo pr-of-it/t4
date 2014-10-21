@@ -249,6 +249,10 @@ class Test extends PHPUnit_Extensions_Database_TestCase
             $comment11->num = 11;
             $comment11->parent = $comment1;
             $comment11->save();
+            $comment12 = new CommentTestModel();
+            $comment12->num = 12;
+            $comment12->parent = $comment1;
+            $comment12->save();
         $comment2 = new CommentTestModel();
         $comment2->num = 2;
         $comment2->save();
@@ -271,36 +275,58 @@ class Test extends PHPUnit_Extensions_Database_TestCase
             $comment44->parent = $comment4;
             $comment44->save();
 
-        $this->_testDbElement($comment1->getPk(),   1, 4, 0, 0);
+        $this->_testDbElement($comment1->getPk(),   1, 6, 0, 0);
         $this->_testDbElement($comment11->getPk(),  2, 3, 1, $comment1->getPk());
-        $this->_testDbElement($comment2->getPk(),   5, 10, 0, 0);
-        $this->_testDbElement($comment22->getPk(),  6, 9, 1, $comment2->getPk());
-        $this->_testDbElement($comment222->getPk(), 7, 8, 2, $comment22->getPk());
-        $this->_testDbElement($comment3->getPk(),   11, 12, 0, 0);
-        $this->_testDbElement($comment4->getPk(),   13, 16, 0, 0);
-        $this->_testDbElement($comment44->getPk(),  14, 15, 1, $comment4->getPk());
+        $this->_testDbElement($comment12->getPk(),  4, 5, 1, $comment1->getPk());
+        $this->_testDbElement($comment2->getPk(),   7, 12, 0, 0);
+        $this->_testDbElement($comment22->getPk(),  8, 11, 1, $comment2->getPk());
+        $this->_testDbElement($comment222->getPk(), 9, 10, 2, $comment22->getPk());
+        $this->_testDbElement($comment3->getPk(),   13, 14, 0, 0);
+        $this->_testDbElement($comment4->getPk(),   15, 18, 0, 0);
+        $this->_testDbElement($comment44->getPk(),  16, 17, 1, $comment4->getPk());
 
-        $comment22->insertBefore($comment11);
+        $comment12->insertBefore($comment11);
 
-        $this->_testDbElement($comment1->getPk(),   1, 8, 0, 0);
-        $this->_testDbElement($comment22->getPk(),  2, 5, 1, $comment1->getPk());
-        $this->_testDbElement($comment222->getPk(), 3, 4, 2, $comment22->getPk());
-        $this->_testDbElement($comment11->getPk(),  6, 7, 1, $comment1->getPk());
-        $this->_testDbElement($comment2->getPk(),   9, 10, 0, 0);
-        $this->_testDbElement($comment3->getPk(),   11, 12, 0, 0);
-        $this->_testDbElement($comment4->getPk(),   13, 16, 0, 0);
-        $this->_testDbElement($comment44->getPk(),  14, 15, 1, $comment4->getPk());
+        $this->_testDbElement($comment1->getPk(),   1, 6, 0, 0);
+        $this->_testDbElement($comment12->getPk(),  2, 3, 1, $comment1->getPk());
+        $this->_testDbElement($comment11->getPk(),  4, 5, 1, $comment1->getPk());
 
-        $comment4->insertBefore($comment1);
+        $this->_testDbElement($comment2->getPk(),   7, 12, 0, 0);
+        $this->_testDbElement($comment22->getPk(),  8, 11, 1, $comment2->getPk());
+        $this->_testDbElement($comment222->getPk(), 9, 10, 2, $comment22->getPk());
 
-        $this->_testDbElement($comment4->getPk(),   1, 4, 0, 0);
-        $this->_testDbElement($comment44->getPk(),  2, 3, 1, $comment4->getPk());
-        $this->_testDbElement($comment1->getPk(),   5, 12, 0, 0);
-        $this->_testDbElement($comment22->getPk(),  6, 9, 1, $comment1->getPk());
-        $this->_testDbElement($comment222->getPk(), 7, 8, 2, $comment22->getPk());
-        $this->_testDbElement($comment11->getPk(),  10, 11, 1, $comment1->getPk());
-        $this->_testDbElement($comment2->getPk(),   13, 14, 0, 0);
-        $this->_testDbElement($comment3->getPk(),   15, 16, 0, 0);
+        $this->_testDbElement($comment3->getPk(),   13, 14, 0, 0);
+
+        $this->_testDbElement($comment4->getPk(),   15, 18, 0, 0);
+        $this->_testDbElement($comment44->getPk(),  16, 17, 1, $comment4->getPk());
+
+        $comment22->insertBefore($comment1);
+
+        $this->_testDbElement($comment22->getPk(),  1, 4, 0, 0);
+        $this->_testDbElement($comment222->getPk(), 2, 3, 1, $comment22->getPk());
+
+        $this->_testDbElement($comment1->getPk(),   5, 10, 0, 0);
+        $this->_testDbElement($comment12->getPk(),  6, 7, 1, $comment1->getPk());
+        $this->_testDbElement($comment11->getPk(),  8, 9, 1, $comment1->getPk());
+
+        $this->_testDbElement($comment2->getPk(),   11, 12, 0, 0);
+
+        $this->_testDbElement($comment3->getPk(),   13, 14, 0, 0);
+
+        $this->_testDbElement($comment4->getPk(),   15, 18, 0, 0);
+        $this->_testDbElement($comment44->getPk(),  16, 17, 1, $comment4->getPk());
+
+        $comment4->insertBefore($comment11);
+
+        $this->_testDbElement($comment22->getPk(),  1, 4, 0, 0);
+        $this->_testDbElement($comment222->getPk(), 2, 3, 1, $comment22->getPk());
+        $this->_testDbElement($comment1->getPk(),   5, 14, 0, 0);
+        $this->_testDbElement($comment12->getPk(),  6, 7, 1, $comment1->getPk());
+        $this->_testDbElement($comment4->getPk(),   8, 11, 1, $comment1->getPk());
+        $this->_testDbElement($comment44->getPk(),  9, 10, 2, $comment4->getPk());
+        $this->_testDbElement($comment11->getPk(),  12, 13, 1, $comment1->getPk());
+        $this->_testDbElement($comment2->getPk(),   15, 16, 0, 0);
+        $this->_testDbElement($comment3->getPk(),   17, 18, 0, 0);
     }
 
     /**

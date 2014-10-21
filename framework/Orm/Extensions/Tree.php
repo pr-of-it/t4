@@ -75,7 +75,7 @@ class Tree
     }
 
     /**
-     * "Удаление" из дерева элементов в заданном диапазоне с "закрытием" дыры
+     * "Удаление" из дерева элементов в заданном диапазоне (включительно) с "закрытием" дыры
      * @param \T4\Dbal\Connection $connection
      * @param string $table
      * @param int $lft
@@ -87,8 +87,7 @@ class Tree
                 UPDATE `" . $table . "`
                 SET
                     `__lft` = IF(`__lft` > :rgt, `__lft` - (:width + 1), `__lft`),
-                    `__rgt` = `__rgt` - (:width + 1)
-                WHERE `__rgt` > :rgt
+                    `__rgt` = IF(`__rgt` > :rgt, `__rgt` - (:width + 1), `__rgt`)
             ";
         $connection->execute($sql, [':rgt' => $rgt, ':width' => $rgt - $lft]);
     }
@@ -101,16 +100,38 @@ class Tree
      * @param int $lft
      * @param int $width
      */
-    protected function expandTree(Connection $connection, $table, $lft, $width)
+    protected function expandTreeLeft(Connection $connection, $table, $lft, $width)
     {
         $sql = "
                 UPDATE `" . $table . "`
                 SET
-                    `__lft` = IF(`__lft` >= :lft, `__lft` + (:width + 1), `__lft`),
-                    `__rgt` = `__rgt` + (:width + 1)
-                WHERE `__rgt` > :lft
+                    `__lft` = IF(`__lft`>=:lft, `__lft` + (:width + 1), `__lft`),
+                    `__rgt` = IF(`__rgt`>=:lft, `__rgt` + (:width + 1), `__rgt`)
+                WHERE `__lft`>=:lft OR `__rgt`>=:lft
+                ORDER BY `__lft` DESC
             ";
         $connection->execute($sql, [':lft' => $lft, ':width' => $width]);
+    }
+
+    /**
+     * Создает пустое место в дереве заданной ширины
+     * Место создается ПОСЛЕ элемента с заданным rgt
+     * @param Connection $connection
+     * @param string $table
+     * @param int $rgt
+     * @param int $width
+     */
+    protected function expandTreeRight(Connection $connection, $table, $rgt, $width)
+    {
+        $sql = "
+                UPDATE `" . $table . "`
+                SET
+                    `__lft` = IF(`__lft`>:rgt, `__lft` + (:width + 1), `__lft`),
+                    `__rgt` = IF(`__rgt`>:rgt, `__rgt` + (:width + 1), `__rgt`)
+                WHERE `__lft`>:rgt OR `__rgt`>:rgt
+                ORDER BY `__lft` DESC
+            ";
+        $connection->execute($sql, [':rgt' => $rgt, ':width' => $width]);
     }
 
     /**
@@ -125,6 +146,8 @@ class Tree
         if ($element->isNew())
             throw new \T4\Orm\Exception('Target model should be saved before insert');
 
+        $this->refreshTreeColumns($element);
+
         /** @var \T4\Orm\Model $class */
         $class = get_class($model);
         $tableName = $class::getTableName();
@@ -137,7 +160,7 @@ class Tree
             $width = $model->__rgt - $model->__lft;
         }
 
-        $this->expandTree($connection, $tableName, $element->__lft, $width);
+        $this->expandTreeLeft($connection, $tableName, $element->__lft, $width);
 
         if (!$model->isNew()) {
             $this->refreshTreeColumns($model);
@@ -154,13 +177,13 @@ class Tree
             ";
             $connection->execute($sql, [':id' => $model->getPk(), 'parentid'=>$element->__prt, ':lft' => $model->__lft, ':rgt' => $model->__rgt, ':diff' => $diff, ':lvldiff' => $lvldiff]);
             $this->removeFromTree($connection, $tableName, $model->__lft, $model->__rgt);
+        } else {
+            // TODO: этот вариант тоже рассмотреть
+            throw new \T4\Orm\Exception('Save this model before move');
         }
 
-        $model->__lft = $element->__lft;
-        $model->__rgt = $element->__lft + $width + 1;
-        $model->__lvl = $element->__lvl;
-        $model->__prt = $element->__prt;
-
+        // TODO: рассчитывать
+        $this->refreshTreeColumns($model);
         $this->refreshTreeColumns($element);
 
     }
@@ -177,30 +200,45 @@ class Tree
         if ($element->isNew())
             throw new \T4\Orm\Exception('Target model should be saved before insert');
 
+        $this->refreshTreeColumns($element);
+
         /** @var \T4\Orm\Model $class */
         $class = get_class($model);
         $tableName = $class::getTableName();
         /** @var \T4\Dbal\Connection $connection */
         $connection = $class::getDbConnection();
 
-        $sql = "
-            UPDATE `" . $tableName . "`
-            SET `__rgt` = `__rgt` + 2
-            WHERE `__rgt`>:rgt
-        ";
-        $connection->execute($sql, [':rgt' => $element->__rgt]);
-        $sql = "
-            UPDATE `" . $tableName . "`
-            SET `__lft` = `__lft` + 2
-            WHERE `__lft`>:rgt
-        ";
-        $connection->execute($sql, [':rgt' => $element->__rgt]);
+        if ($model->isNew()) {
+            $width = 1;
+        } else {
+            $width = $model->__rgt - $model->__lft;
+        }
 
-        $model->__lft = $element->__rgt + 1;
-        $model->__rgt = $element->__rgt + 2;
-        $model->__lvl = $element->__lvl;
-        $model->__prt = $element->__prt;
+        $this->expandTreeRight($connection, $tableName, $element->__rgt, $width);
 
+        if (!$model->isNew()) {
+            $this->refreshTreeColumns($model);
+            $diff = $element->__rgt - $model->__lft + 1;
+            $lvldiff = $element->__lvl - $model->__lvl;
+            $sql = "
+                UPDATE `" . $tableName . "`
+                SET
+                    `__lft` = `__lft` + :diff,
+                    `__rgt` = `__rgt` + :diff,
+                    `__lvl` = `__lvl` + :lvldiff,
+                    `__prt` = IF(`__id`=:id, :parentid, `__prt`)
+                WHERE `__lft` >= :lft AND `__rgt` <= :rgt
+            ";
+            $connection->execute($sql, [':id' => $model->getPk(), 'parentid'=>$element->__prt, ':lft' => $model->__lft, ':rgt' => $model->__rgt, ':diff' => $diff, ':lvldiff' => $lvldiff]);
+            $this->removeFromTree($connection, $tableName, $model->__lft, $model->__rgt);
+        } else {
+            // TODO: этот вариант тоже рассмотреть
+            throw new \T4\Orm\Exception('Save this model before move');
+        }
+
+        // TODO: рассчитывать
+        $this->refreshTreeColumns($model);
+        $this->refreshTreeColumns($element);
     }
 
 

@@ -39,6 +39,7 @@ trait TTreeMagic
             case 'hasNextSibling':
             case 'getNextSibling':
             case 'insertBefore':
+            case 'insertAfter':
                 return true;
         }
         return false;
@@ -52,8 +53,6 @@ trait TTreeMagic
 
         /* @var \T4\Orm\Model $class */
         $class = get_class($model);
-        /* @var \T4\Dbal\Connection $connection */
-        $connection = $class::getDbConnection();
 
         switch ($method) {
 
@@ -130,6 +129,12 @@ trait TTreeMagic
             case 'insertBefore':
                 $element = $argv[0];
                 $this->insertModelBeforeElement($model, $element);
+                return $model;
+                break;
+
+            case 'insertAfter':
+                $element = $argv[0];
+                $this->insertModelAfterElement($model, $element);
                 return $model;
                 break;
 
