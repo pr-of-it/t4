@@ -121,11 +121,17 @@ abstract class Controller
     final public function checkAccess($action)
     {
         // Правила контроля доступа не заданы вообще либо не заданы для данного action
-        if (empty($this->access) || empty($this->access[$action]))
+        if ( ! (method_exists($this, 'access') || (!empty($this->access) && !empty($this->access[$action]))) )
             return true;
 
+        if (method_exists($this, 'access')) {
+            $rule = $this->access($action);
+        } else {
+            $rule = $this->access[$action];
+        }
+
         // Задано правило "требуется авторизация"
-        if ('@'==$this->access[$action]) {
+        if ('@' == $rule) {
             if (empty($this->app->user)) {
                 throw new ControllerException('User is not logged in. Access denied.', self::ERROR_NO_ACCESS);
             } else {
@@ -133,14 +139,23 @@ abstract class Controller
             }
         }
 
+        // Правило представляет собой колл-бэк
+        if (is_callable($rule)) {
+            if ($rule()) {
+                return true;
+            } else {
+                throw new ControllerException('Access denied.', self::ERROR_NO_ACCESS);
+            }
+        }
+
         // Задано сложное правило в виде массива. При этом автоматически требуется авторизация.
-        if (is_array($this->access[$action])) {
+        if ( is_array($rule) ) {
             if (empty($this->app->user)) {
                 throw new ControllerException('User is not logged in. Access denied.', self::ERROR_NO_ACCESS);
             }
 
             $user = $this->app->user;
-            foreach ($this->access[$action] as $column => $value) {
+            foreach ($rule as $column => $value) {
 
                 // Каждый ключ массива - поле модели $this->app->user
                 if (!isset($user->{$column})) {
