@@ -59,9 +59,13 @@ class Migrate
 
         try {
             echo $migration->getName() . ' down...' . "\n";
-            $migration->down();
-            $this->delete($migration);
-            echo $migration->getName() . ' is down successfully' . "\n";
+            $result = $migration->down();
+            if (false !== $result) {
+                $this->delete($migration);
+                echo $migration->getName() . ' is down successfully' . "\n";
+            } else {
+                echo $migration->getName() . ' is not downable' . "\n";
+            }
         } catch (\PDOException $e) {
             throw new Exception($e->getMessage());
         }

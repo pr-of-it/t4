@@ -46,7 +46,7 @@ class m_0000000001_CreateWebApp
 
     public function down()
     {
-        echo 'CreateWebApp migration is not down-able!';
+        return false;
     }
 
 }
