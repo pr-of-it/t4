@@ -17,52 +17,40 @@ class Mysql
         switch ($options['type']) {
             case 'pk':
                 return 'BIGINT UNSIGNED NOT NULL AUTO_INCREMENT';
-                break;
             case 'relation':
             case 'link':
                 return 'BIGINT UNSIGNED NOT NULL DEFAULT \'0\'';
-                break;
             case 'boolean':
                 return 'BOOLEAN';
-                break;
             case 'int':
                 return 'INT(11) NOT NULL';
-                break;
             case 'float':
                 return 'FLOAT NOT NULL';
-                break;
             case 'text':
                 $options['length'] = isset($options['length']) ? $options['length'] : '';
                 switch (strtolower($options['length'])) {
                     case 'tiny':
                     case 'small':
                         return 'TINYTEXT';
-                        break;
                     case 'medium':
                         return 'MEDIUMTEXT';
-                        break;
                     case 'long':
                     case 'big':
                         return 'LONGTEXT';
-                        break;
                     default:
                         return 'TEXT';
-                        break;
                 }
-                break;
             case 'datetime':
                 return 'DATETIME';
-                break;
             case 'date':
                 return 'DATE';
-                break;
             case 'time':
                 return 'TIME';
-                break;
+            case 'char':
+                return 'CHAR(' . (isset($options['length']) ? (int)$options['length'] : 255) . ')';
             case 'string':
             default:
                 return 'VARCHAR(' . (isset($options['length']) ? (int)$options['length'] : 255) . ') NOT NULL';
-                break;
         }
     }
 
