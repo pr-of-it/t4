@@ -11,6 +11,7 @@ use T4\Core\Std;
  * @var \T4\Core\Std $get
  * @var \T4\Core\Std $post
  * @var \T4\Core\Std $files
+ * @var \T4\Core\Std $headers
  */
 class Request
     extends Std
@@ -43,6 +44,9 @@ class Request
                 }
             }
         }
+
+        $this->headers = new Std;
+        $this->headers->merge(getallheaders());
     }
 
     public function existsGetData()
