@@ -19,12 +19,10 @@ class Request
 
     public function __construct()
     {
-        $this->get = new Std();
-        $this->get->merge($_GET);
+        $this->get = new Std($_GET);
         unset($this->get->__path);
 
-        $this->post = new Std();
-        $this->post->merge($_POST);
+        $this->post = new Std($_POST);
 
         $this->files = new Std();
         if (!empty($_FILES)) {
@@ -45,8 +43,7 @@ class Request
             }
         }
 
-        $this->headers = new Std;
-        $this->headers->merge(getallheaders());
+        $this->headers = new Std($this->getHttpHeaders());
     }
 
     public function existsGetData()
@@ -72,6 +69,21 @@ class Request
     public function isUploadedArray($file)
     {
         return $this->isUploaded($file) && is_array($this->files->{$file});
+    }
+
+    protected function getHttpHeaders()
+    {
+        if (function_exists('getallheaders'))
+            return getallheaders();
+
+        $ret = [];
+        foreach ($_SERVER as $key => $value) {
+            if ('HTTP_' == substr($key, 0, 5)) {
+                $key = str_replace(' ', '-', ucwords(strtolower(str_replace('_', ' ', substr($key, 5)))));
+                $ret[$key] = $value;
+            }
+        }
+        return $ret;
     }
 
 }
