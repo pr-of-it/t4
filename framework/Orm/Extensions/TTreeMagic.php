@@ -31,6 +31,7 @@ trait TTreeMagic
     public function hasMagicDynamicMethod($method)
     {
         switch ($method) {
+            case 'getTreeWidth':
             case 'findAllParents':
             case 'findAllChildren':
             case 'findSubTree':
@@ -40,6 +41,8 @@ trait TTreeMagic
             case 'getNextSibling':
             case 'insertBefore':
             case 'insertAfter':
+            case 'moveToFirstPosition':
+            case 'moveToLastPosition':
                 return true;
         }
         return false;
@@ -55,6 +58,12 @@ trait TTreeMagic
         $class = get_class($model);
 
         switch ($method) {
+
+            case 'getTreeWidth':
+                if ($model->isNew())
+                    return 1;
+                else
+                    return $model->__rgt - $model->__lft;
 
             case 'findAllParents':
                 $query = new QueryBuilder();
@@ -137,6 +146,24 @@ trait TTreeMagic
                 $this->insertModelAfterElement($model, $element);
                 return $model;
                 break;
+
+            case 'moveToFirstPosition':
+                $parent = $model->parent;
+                if (empty($parent)) {
+                    $this->insertModelAsFirstRoot($model);
+                } else {
+                    $this->insertModelAsFirstChildOf($model, $parent);
+                }
+                return $model;
+
+            case 'moveToLastPosition':
+                $parent = $model->parent;
+                if (empty($parent)) {
+                    $this->insertModelAsLastRoot($model);
+                } else {
+                    $this->insertModelAsLastChildOf($model, $parent);
+                }
+                return $model;
 
         }
     }

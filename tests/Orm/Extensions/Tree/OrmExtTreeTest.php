@@ -1,71 +1,11 @@
 <?php
 
 require_once realpath(__DIR__ . '/../../../../framework/boot.php');
+require_once __DIR__ . '/testClasses.php';
+require_once __DIR__ . '/DbTestClass.php';
 
-class mTestMigration extends T4\Orm\Migration
+class Test extends DbTestClass
 {
-    public function up()
-    {
-        $this->createTable('comments',
-            [
-                'num' => ['type' => 'int'],
-            ],
-            [],
-            ['tree']
-        );
-    }
-
-    public function down()
-    {
-        $this->dropTable('comments');
-    }
-}
-
-class CommentTestModel extends T4\Orm\Model
-{
-    static protected $schema = [
-        'table' => 'comments',
-        'columns' => [
-            'num' => ['type' => 'int'],
-        ]
-    ];
-    static protected $extensions = ['tree'];
-}
-
-class Test extends PHPUnit_Extensions_Database_TestCase
-
-{
-    protected $connection;
-
-    public function __construct()
-    {
-        $config = $this->getT4ConnectionConfig();
-        $this->connection = new \Pdo('mysql:dbname=' . $config->dbname . ';host=' . $config->host . '', $config->user, $config->password);
-        $this->connection->query('DROP TABLE `comments`');
-
-        $migration = new mTestMigration();
-        $migration->setDb($this->getT4Connection());
-        $migration->up();
-    }
-
-    protected function getT4ConnectionConfig()
-    {
-        return new \T4\Core\Std(['driver' => 'mysql', 'host' => '127.0.0.1', 'dbname' => 't4test', 'user' => 'root', 'password' => '']);
-    }
-
-    protected function getT4Connection()
-    {
-        return new \T4\Dbal\Connection($this->getT4ConnectionConfig());
-    }
-
-    protected function _testDbElement($id, $lft, $rgt, $lvl, $prt)
-    {
-        $res = $this->getT4Connection()->query("SELECT * FROM `comments` WHERE `__id`=:id", [':id'=>$id])->fetch();
-        $this->assertEquals($lft, $res['__lft']);
-        $this->assertEquals($rgt, $res['__rgt']);
-        $this->assertEquals($lvl, $res['__lvl']);
-        $this->assertEquals($prt, $res['__prt']);
-    }
 
     public function testMigrationUp()
     {
@@ -81,10 +21,6 @@ class Test extends PHPUnit_Extensions_Database_TestCase
 
     public function testInsert()
     {
-        $this->connection->query('TRUNCATE TABLE `comments`');
-
-        CommentTestModel::setConnection($this->getT4Connection());
-
         $comment1 = new CommentTestModel();
         $comment1->save();
         $this->_testDbElement($comment1->getPk(), 1, 2, 0, 0);
@@ -112,10 +48,6 @@ class Test extends PHPUnit_Extensions_Database_TestCase
 
     public function testDelete()
     {
-        $this->connection->query('TRUNCATE TABLE `comments`');
-
-        CommentTestModel::setConnection($this->getT4Connection());
-
         $comment1 = new CommentTestModel();
         $comment1->save();
             $comment11 = new CommentTestModel();
@@ -168,10 +100,6 @@ class Test extends PHPUnit_Extensions_Database_TestCase
 
     public function testParentChange()
     {
-        $this->connection->query('TRUNCATE TABLE `comments`');
-
-        CommentTestModel::setConnection($this->getT4Connection());
-
         $comment1 = new CommentTestModel();
         $comment1->num = 1;
         $comment1->save();
@@ -237,11 +165,6 @@ class Test extends PHPUnit_Extensions_Database_TestCase
 
     public function testMoveBefore()
     {
-
-        $this->connection->query('TRUNCATE TABLE `comments`');
-
-        CommentTestModel::setConnection($this->getT4Connection());
-
         $comment1 = new CommentTestModel();
         $comment1->num = 1;
         $comment1->save();
@@ -327,24 +250,6 @@ class Test extends PHPUnit_Extensions_Database_TestCase
         $this->_testDbElement($comment11->getPk(),  12, 13, 1, $comment1->getPk());
         $this->_testDbElement($comment2->getPk(),   15, 16, 0, 0);
         $this->_testDbElement($comment3->getPk(),   17, 18, 0, 0);
-    }
-
-    /**
-     * Returns the test database connection.
-     * @return PHPUnit_Extensions_Database_DB_IDatabaseConnection
-     */
-    protected function getConnection()
-    {
-        return $this->createDefaultDBConnection($this->connection, 'mysql');
-    }
-
-    /**
-     * Returns the test dataset.
-     * @return PHPUnit_Extensions_Database_DataSet_IDataSet
-     */
-    protected function getDataSet()
-    {
-        return $this->createXMLDataSet(__DIR__ . '/OrmExtTreeTest.data.xml');
     }
 
 }
