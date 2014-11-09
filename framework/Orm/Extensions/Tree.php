@@ -166,33 +166,34 @@ class Tree
         /** @var \T4\Dbal\Connection $connection */
         $connection = $class::getDbConnection();
 
+        $parent->refreshTreeColumns();
+        $width = $model->getTreeWidth();
+        $this->expandTreeInElementFirst($parent, $width);
         if (!$model->isNew()) {
             $model->refreshTreeColumns();
         }
-        $parent->refreshTreeColumns();
 
-        $width = $model->getTreeWidth();
+        $diff = $parent->__lft - $model->__lft + 1;
+        $lvlDiff = $parent->__lvl - $model->__lvl + 1;
 
-        $sql = "
+        if (!$model->isNew()) {
+            $sql = "
             UPDATE `" . $tableName . "`
-            SET `__rgt` = `__rgt` + :width + 1
-            WHERE `__lft` >= :lft
-        ";
-        $connection->execute($sql, [':lft' => $parent->__lft, ':width' => $width]);
-        $sql = "
-            UPDATE `" . $tableName . "`
-            SET `__lft` = `__lft` + :width + 1
-            WHERE `__lft` > :lft
-        ";
-        $connection->execute($sql, [':lft' => $parent->__lft, ':width' => $width]);
+            SET
+                `__lft` = `__lft` + :diff,
+                `__rgt` = `__rgt` + :diff,
+                `__lvl` = `__lvl` + :lvlDiff,
+                `__prt` = IF(`__id`=:id, :parent, `__id`)
+            WHERE `__lft`>=:lft AND `__rgt`<=:rgt
+            ";
+            $connection->execute($sql, [':lft'=>$model->__lft, ':rgt'=>$model->__rgt, ':diff'=>$diff, ':lvlDiff'=>$lvlDiff, ':id'=>$model->getPk(), ':parent'=>$parent->getPk()]);
+            $this->removeFromTreeByElement($model);
+        }
 
         $model->__lft = $parent->__lft + 1;
         $model->__rgt = $parent->__lft + $width + 1;
         $model->__lvl = $parent->__lvl + 1;
         $model->__prt = $parent->getPk();
-
-        $parent->__rgt += $width + 1;
-
     }
 
     /**
