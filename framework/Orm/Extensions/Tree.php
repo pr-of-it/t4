@@ -10,7 +10,6 @@ use T4\Orm\Model;
 class Tree
     extends Extension
 {
-
     use TTreeService, TTreeMagic;
 
     public function prepareColumns($columns, $class='')
