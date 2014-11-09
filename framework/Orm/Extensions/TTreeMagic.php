@@ -31,6 +31,7 @@ trait TTreeMagic
     public function hasMagicDynamicMethod($method)
     {
         switch ($method) {
+            case 'refreshTreeColumns':
             case 'getTreeWidth':
             case 'findAllParents':
             case 'findAllChildren':
@@ -56,8 +57,20 @@ trait TTreeMagic
 
         /* @var \T4\Orm\Model $class */
         $class = get_class($model);
+        $tableName = $class::getTableName();
+        /** @var \T4\Dbal\Connection $connection */
+        $connection = $class::getDbConnection();
 
         switch ($method) {
+
+            case 'refreshTreeColumns':
+                $sql = new QueryBuilder();
+                $sql->select(['__lft', '__rgt', '__lvl', '__prt'])
+                    ->from($tableName)
+                    ->where('`' . $class::PK . '`=:id');
+                $columns = $connection->query($sql->getQuery(), [':id' => $model->getPk()])->fetch();
+                $model->merge($columns);
+                return $model;
 
             case 'getTreeWidth':
                 if ($model->isNew())
@@ -102,7 +115,7 @@ trait TTreeMagic
                     ->from($class::getTableName())
                     ->where('__rgt<:lft AND __prt=:prt')
                     ->params([':lft'=>$model->__lft, ':prt'=>$model->__prt]);
-                return 0 != $class::getDbConnection()->query($query)->fetchScalar();
+                return 0 != $connection->query($query)->fetchScalar();
 
             case 'getPrevSibling':
                 $query = new QueryBuilder();
@@ -122,7 +135,7 @@ trait TTreeMagic
                     ->from($class::getTableName())
                     ->where('__lft>:rgt AND __prt=:prt')
                     ->params([':rgt'=>$model->__rgt, ':prt'=>$model->__prt]);
-                return 0 != $class::getDbConnection()->query($query)->fetchScalar();
+                return 0 != $connection->query($query)->fetchScalar();
 
             case 'getNextSibling':
                 $query = new QueryBuilder();

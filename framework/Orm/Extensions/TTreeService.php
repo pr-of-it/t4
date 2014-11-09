@@ -8,25 +8,6 @@ use T4\Orm\Model;
 
 trait TTreeService
 {
-    /**
-     * "Обновление" служебных полей модели из хранилища
-     * @param \T4\Orm\Model $model
-     */
-    protected function refreshTreeColumns(Model &$model)
-    {
-        /** @var \T4\Orm\Model $class */
-        $class = get_class($model);
-        $tableName = $class::getTableName();
-        /** @var \T4\Dbal\Connection $connection */
-        $connection = $class::getDbConnection();
-
-        $sql = new QueryBuilder();
-        $sql->select(['__lft', '__rgt', '__lvl', '__prt'])
-            ->from($tableName)
-            ->where('`' . $class::PK . '`=:id');
-        $columns = $connection->query($sql->getQuery(), [':id' => $model->getPk()])->fetch();
-        $model->merge($columns);
-    }
 
     /**
      * "Удаление" из дерева элементов в заданном диапазоне (включительно) с "закрытием" дыры
@@ -208,8 +189,7 @@ trait TTreeService
         $tableName = $class::getTableName();
         /** @var \T4\Dbal\Connection $connection */
         $connection = $class::getDbConnection();
-        $this->expandTreeBeforeRgt($connection, $tableName, $element->__lft, $width);
+        $this->expandTreeBeforeRgt($connection, $tableName, $element->__rgt, $width);
     }
-
 
 }

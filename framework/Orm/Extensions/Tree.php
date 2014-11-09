@@ -66,7 +66,7 @@ class Tree
         if ($element->isNew())
             throw new Exception('Target model should be saved before insert');
 
-        $this->refreshTreeColumns($element);
+        $element->refreshTreeColumns();
 
         /** @var \T4\Orm\Model $class */
         $class = get_class($model);
@@ -77,7 +77,7 @@ class Tree
         $this->expandTreeBeforeElement($element, $model->getTreeWidth());
 
         if (!$model->isNew()) {
-            $this->refreshTreeColumns($model);
+            $model->refreshTreeColumns();
             $diff = $element->__lft - $model->__lft;
             $lvldiff = $element->__lvl - $model->__lvl;
             $sql = "
@@ -97,8 +97,8 @@ class Tree
         }
 
         // TODO: рассчитывать
-        $this->refreshTreeColumns($model);
-        $this->refreshTreeColumns($element);
+        $model->refreshTreeColumns();
+        $element->refreshTreeColumns();
 
     }
 
@@ -114,7 +114,7 @@ class Tree
         if ($element->isNew())
             throw new Exception('Target model should be saved before insert');
 
-        $this->refreshTreeColumns($element);
+        $element->refreshTreeColumns();
 
         /** @var \T4\Orm\Model $class */
         $class = get_class($model);
@@ -125,7 +125,7 @@ class Tree
         $this->expandTreeAfterElement($element, $model->getTreeWidth());
 
         if (!$model->isNew()) {
-            $this->refreshTreeColumns($model);
+            $model->refreshTreeColumns();
             $diff = $element->__rgt - $model->__lft + 1;
             $lvldiff = $element->__lvl - $model->__lvl;
             $sql = "
@@ -145,8 +145,8 @@ class Tree
         }
 
         // TODO: рассчитывать
-        $this->refreshTreeColumns($model);
-        $this->refreshTreeColumns($element);
+        $model->refreshTreeColumns();
+        $element->refreshTreeColumns();
     }
 
 
@@ -168,9 +168,9 @@ class Tree
         $connection = $class::getDbConnection();
 
         if (!$model->isNew()) {
-            $this->refreshTreeColumns($model);
+            $model->refreshTreeColumns();
         }
-        $this->refreshTreeColumns($parent);
+        $parent->refreshTreeColumns();
 
         $width = $model->getTreeWidth();
 
@@ -214,10 +214,10 @@ class Tree
         $connection = $class::getDbConnection();
 
         if (!$model->isNew()) {
-            $this->refreshTreeColumns($model);
+            $model->refreshTreeColumns();
             $this->removeFromTreeByElement($model);
         }
-        $this->refreshTreeColumns($parent);
+        $parent->refreshTreeColumns();
 
         $width = $model->getTreeWidth();
 
@@ -263,7 +263,7 @@ class Tree
         $this->expandTreeBeforeLft($connection, $tableName, $minLft, $width);
 
         if (!$model->isNew()) {
-            $this->refreshTreeColumns($model);
+            $model->refreshTreeColumns();
             $sql = "
                 UPDATE `" . $tableName . "`
                 SET
@@ -316,7 +316,7 @@ class Tree
             $connection->execute($sql, [':max' => $maxRgt, ':lft' => $model->__lft, ':rgt' => $model->__rgt, ':lvl' => $model->__lvl]);
             $this->removeFromTreeByElement($model);
             // TODO: calculate new __lft, __rgt!
-            $this->refreshTreeColumns($model);
+            $model->refreshTreeColumns();
             $model->__lvl = 0;
             $model->__prt = 0;
         }
@@ -340,7 +340,7 @@ class Tree
             $class = get_class($model);
             $oldParent = empty($model->__prt) ? null : $class::findByPk($model->__prt);
             if ($oldParent != $model->parent) {
-                $this->refreshTreeColumns($model);
+                $model->refreshTreeColumns();
                 if (empty($model->parent)) {
                     $this->insertModelAsLastRoot($model);
                 } else {
@@ -361,7 +361,7 @@ class Tree
      */
     public function beforeDelete(&$model)
     {
-        $this->refreshTreeColumns($model);
+        $model->refreshTreeColumns();
         return true;
     }
 
