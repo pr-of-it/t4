@@ -9,6 +9,7 @@ use T4\Core\Session;
 use T4\Core\Std;
 use T4\Core\TSingleton;
 use T4\Dbal\Connection;
+use T4\Http\E404Exception;
 use T4\Http\Request;
 
 /**
@@ -105,29 +106,48 @@ class Application
     public function run()
     {
         try {
-
-            $route =
-                Router::getInstance()
-                ->setConfig($this->getRouteConfig())
-                ->parseUrl($_GET['__path']);
-            $controller = $this->createController($route->module, $route->controller);
-            $controller->action($route->action, $route->params);
-
-            switch ($route->format) {
-                case 'json':
-                    header('Content-Type: application/json');
-                    echo json_encode($controller->getData()->toArray());
-                    die;
-                default:
-                case 'html':
-                    header('Content-Type: text/html; charset=utf-8');
-                    $controller->view->display($route->action . '.' . $route->format, $controller->getData());
-                    break;
-            }
-
+            $this->runInternalPath($_GET['__path']);
         } catch (Exception $e) {
-            echo $e->getMessage();
-            die;
+            try {
+                if ($e instanceof E404Exception && !empty($this->config->errors['404'])) {
+                    $this->runInternalPath($this->config->errors['404']);
+                } else {
+                    echo $e->getMessage();
+                    die;
+                }
+            } catch (Exception $e2) {
+                echo $e2->getMessage();
+                die;
+            }
+        }
+    }
+
+    /**
+     * @param string $path
+     * @throws ControllerException
+     * @throws Exception
+     * @internal param Route $route
+     */
+    private function runInternalPath($path)
+    {
+        $route =
+            Router::getInstance()
+                ->setConfig($this->getRouteConfig())
+                ->parseUrl($path);
+        $controller = $this->createController($route->module, $route->controller);
+        $controller->action($route->action, $route->params);
+        $data = $controller->getData();
+
+        switch ($route->format) {
+            case 'json':
+                header('Content-Type: application/json');
+                echo json_encode($data->toArray());
+                die;
+            default:
+            case 'html':
+                header('Content-Type: text/html; charset=utf-8');
+                $controller->view->display($route->action . '.' . $route->format, $data);
+                break;
         }
     }
 
