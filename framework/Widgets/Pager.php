@@ -38,7 +38,14 @@ class Pager
         if (!$pagesCount)
             return;
 
-        $displayed = array_unique([1, $pagesCount>1 ? 2 : 1, $pagesCount>2 ? 3 : 1, $this->options->active - 1 ?: 1, $this->options->active, $this->options->active + 1, $pagesCount - 2 ?: 1, $pagesCount - 1 ?: 1, $pagesCount]);
+        $displayed = [
+            1, 2, 3,
+            $this->options->active - 1, $this->options->active, $this->options->active + 1,
+            $pagesCount - 2, $pagesCount - 1, $pagesCount
+        ];
+        $displayed = array_unique(array_filter($displayed, function ($d) use ($pagesCount) {
+            return $d >= 1 && $d <= $pagesCount;
+        }));
 
         if ( ($this->options->active - 1)-3 == 2 ) {
             $displayed[] = 4;
