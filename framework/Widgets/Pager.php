@@ -26,7 +26,7 @@ class Pager
             $this->options->active = 1;
 
         if (!isset($this->options->url) || empty($this->options->url)) {
-            $uri = preg_replace('~(\?)?page=\d~', '', $_SERVER['REQUEST_URI']);
+            $uri = preg_replace('~(\?)?page=\d+~', '', $_SERVER['REQUEST_URI']);
             $this->options->url = $uri . (false === strpos($uri, '?') ? '?page=%d' : '&page=%d');
         }
 
