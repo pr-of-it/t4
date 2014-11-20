@@ -110,6 +110,7 @@ class Application
         } catch (Exception $e) {
             try {
                 if ($e instanceof E404Exception && !empty($this->config->errors['404'])) {
+                    header("HTTP/1.0 404 Not Found", true, 404);
                     $this->runInternalPath($this->config->errors['404']);
                 } else {
                     echo $e->getMessage();
