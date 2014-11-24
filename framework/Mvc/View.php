@@ -2,6 +2,7 @@
 
 namespace T4\Mvc;
 
+use T4\Html\Meta;
 use T4\Mvc\Renderers\Vanilla;
 
 class View
@@ -12,8 +13,14 @@ class View
      */
     protected $renderer;
 
+    /**
+     * @var \T4\Html\Meta
+     */
+    public $meta;
+
     public function __construct($renderer = '', $paths=[])
     {
+        $this->meta = new Meta();
         if (empty($renderer) || 'vanilla' == $renderer) {
             $this->renderer = new Vanilla($paths);
         } else {
@@ -23,6 +30,9 @@ class View
             } else {
                 $this->renderer = new Vanilla($paths);
             }
+        }
+        if (method_exists($this->renderer, 'setView')) {
+            $this->renderer->setView($this);
         }
     }
 

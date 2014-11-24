@@ -6,6 +6,7 @@ use T4\Core\Helpers;
 
 abstract class ARenderer
 {
+    protected $view;
     protected $controller;
     protected $paths = [];
 
@@ -14,6 +15,11 @@ abstract class ARenderer
         foreach ((array)$paths as $path) {
             $this->addTemplatePath($path);
         }
+    }
+
+    public function setView(View $view)
+    {
+        $this->view = $view;
     }
 
     final public function addTemplatePath($path)

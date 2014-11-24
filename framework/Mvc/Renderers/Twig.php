@@ -6,6 +6,7 @@ use T4\Core\Std;
 use T4\Mvc\Application;
 use T4\Mvc\ARenderer;
 use T4\Mvc\Controller;
+use T4\Mvc\View;
 
 class Twig
     extends ARenderer
@@ -18,13 +19,19 @@ class Twig
     {
         $this->paths = (array)$paths;
         $this->links = new Std;
+
         $this->links->app = Application::getInstance();
 
         $loader = new \Twig_Loader_Filesystem($paths);
         $this->twig = new \Twig_Environment($loader);
         $this->twig->addExtension(new TwigExtensions());
+    }
 
-        $this->twig->addGlobal('app', $this->links->app);
+    public function setView(View $view)
+    {
+        parent::setView($view);
+        $this->links->view = $this->view;
+        $this->twig->addGlobal('view', $this->links->view);
     }
 
     // TODO: непонятно что с этим делать. Вообще-то надо во View этот метод использовать, а не здесь
