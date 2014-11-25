@@ -126,7 +126,7 @@ class Pgsql
 
     public function existsTable(Connection $connection, $tableName)
     {
-        $sql = 'SELECT * FROM pg_tables where tablename=:table';
+        $sql = 'SELECT COUNT(*) FROM pg_tables where tablename=:table';
         $result = $connection->query($sql, [':table' => $tableName]);
         return 0 != $result->fetchScalar();
     }
