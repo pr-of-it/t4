@@ -28,7 +28,11 @@ class Connection
         $this->config = $config;
         try {
             $dsn = $config->driver . ':host=' . $config->host . ';dbname=' . $config->dbname;
-            $this->pdo = new \PDO($dsn, $config->user, $config->password);
+            $options = [];
+            if (!empty($config->options)) {
+                $options = $config->options->toArray();
+            }
+            $this->pdo = new \PDO($dsn, $config->user, $config->password, $options);
             $this->pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
             $this->pdo->setAttribute(\PDO::ATTR_STATEMENT_CLASS, [__NAMESPACE__.'\\Statement']);
         } catch (\PDOException $e) {
