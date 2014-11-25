@@ -103,25 +103,24 @@ FILE;
 
     protected function isInstalled()
     {
-        $this->app = Application::getInstance(true);
-        // TODO: заменить на вызов через драйвер
-        $st = $this->app->db->default->query('SHOW TABLES LIKE \'' . self::TABLE_NAME . '\'');
-        if ([] == $st->fetchAll())
-            return false;
-        else
-            return true;
+        $connection = Application::getInstance(true)->db->default;
+        $driver = $connection->getDriver();
+        return $driver->existsTable($connection, self::TABLE_NAME);
     }
 
     protected function install()
     {
-        // TODO: заменить на вызов через драйвер
-        $this->app->db->default->execute('
-            CREATE TABLE  `' . self::TABLE_NAME . '` (
-            `' . Model::PK . '` SERIAL,
-              `time` int(10) unsigned NOT NULL,
-              UNIQUE KEY `time` (`time`)
-            )
-        ');
+        $connection = Application::getInstance(true)->db->default;
+        $driver = $connection->getDriver();
+        $driver->createTable($connection, self::TABLE_NAME,
+            [
+                Model::PK => ['type' => 'pk'],
+                'time' => ['type' => 'int'],
+            ],
+            [
+                ['type' => 'unique', 'columns' => ['time']]
+            ]
+        );
         echo 'Migration table `' . self::TABLE_NAME . '` is created' . "\n";
     }
 
