@@ -4,6 +4,7 @@ namespace T4\Dbal\Drivers;
 
 use T4\Core\Collection;
 use T4\Dbal\Connection;
+use T4\Dbal\Exception;
 use T4\Dbal\IDriver;
 use T4\Dbal\QueryBuilder;
 use T4\Orm\Model;
@@ -22,6 +23,10 @@ class Pgsql
 
     protected function makeQuerySelect(QueryBuilder $query)
     {
+        if (empty($query->select) || empty($query->from)) {
+            throw new Exception('SELECT statement must have both \'select\' and \'from\' parts');
+        }
+
         $sql  = 'SELECT ';
         $sql .= !empty($query->select) ? ('"' . implode('", "', $query->select) . '"') : '*';
 
@@ -29,8 +34,15 @@ class Pgsql
         $sql .= '"' . implode('", "', $query->from) . '"';
 
         if (!empty($query->where)) {
-            $sql .= ' WHERE ';
-            $sql .= $query->where;
+            $sql .= ' WHERE ' . $query->where;
+        }
+
+        if (!empty($query->offset)) {
+            $sql .= ' OFFSET ' . $query->offset;
+        }
+
+        if (!empty($query->limit)) {
+            $sql .= ' LIMIT ' . $query->limit;
         }
 
         return $sql;

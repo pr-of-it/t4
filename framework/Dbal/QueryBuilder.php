@@ -11,8 +11,6 @@ class QueryBuilder
     protected $leftJoin = [];
     protected $rightJoin = [];
     protected $order;
-    protected $limitFrom;
-    protected $limitCount;
 
     protected $params = [];
 
@@ -21,26 +19,59 @@ class QueryBuilder
         return trim($s, " \"'`\t\n\r\0\x0B");
     }
 
-    public function select($select)
+    public function select($what)
     {
-        if (is_array($select)) {
-            $select = array_map([get_called_class(), 'trim'], $select);
+        if (func_num_args()>1) {
+            $what = func_get_args();
         } else {
-            $select = array_map([get_called_class(), 'trim'], preg_split('~[\s]*\,[\s]*~', $select));
+            if (is_array($what)) {
+                $what = $what;
+            } else {
+                $what = preg_split('~[\s]*\,[\s]*~', $what);
+            }
         }
-        $this->select = array_merge(!empty($this->select) ? $this->select : [], $select);
+        $what = array_map([get_called_class(), 'trim'], $what);
+
+        $this->select = array_merge(!empty($this->select) ? $this->select : [], $what);
         $this->mode = 'select';
         return $this;
     }
 
-    public function from($from)
+    public function from($what)
     {
-        if (is_array($from)) {
-            $from = array_map([get_called_class(), 'trim'], $from);
+        if (func_num_args()>1) {
+            $what = func_get_args();
         } else {
-            $from = array_map([get_called_class(), 'trim'], preg_split('~[\s]*\,[\s]*~', $from));
+            if (is_array($what)) {
+                $what = $what;
+            } else {
+                $what = preg_split('~[\s]*\,[\s]*~', $what);
+            }
         }
-        $this->from = array_merge(!empty($this->from) ? $this->from : [], $from);
+        $what = array_map([get_called_class(), 'trim'], $what);
+
+        $this->from = array_merge(!empty($this->from) ? $this->from : [], $what);
+        return $this;
+    }
+
+    /**
+     * @todo: split this
+     */
+    public function where($where)
+    {
+        $this->where = $where;
+        return $this;
+    }
+
+    public function offset($offset)
+    {
+        $this->offset = (int)$offset;
+        return $this;
+    }
+
+    public function limit($limit)
+    {
+        $this->limit = (int)$limit;
         return $this;
     }
 
@@ -60,34 +91,9 @@ class QueryBuilder
         return $this;
     }
 
-    public function where($where)
-    {
-        $this->where = $where;
-        return $this;
-    }
-
     public function order($order)
     {
         $this->order = $order;
-        return $this;
-    }
-
-    public function limit($limit)
-    {
-        if (empty($limit))
-            return $this;
-
-        if (!is_array($limit)) {
-            $limit = preg_split('~\,[\s]*~', $limit, -1, \PREG_SPLIT_NO_EMPTY);
-        }
-
-        if (count($limit) == 1) {
-            $this->limitCount = $limit[0];
-        } else {
-            $this->limitFrom = $limit[0];
-            $this->limitCount = $limit[1];
-        }
-
         return $this;
     }
 
@@ -177,8 +183,8 @@ class QueryBuilder
             /*
              * LIMIT part
              */
-            if (!empty($this->limitFrom) || !empty($this->limitCount)) {
-                $sql .= "LIMIT ". (!empty($this->limitFrom) ? intval($this->limitFrom).", ".intval($this->limitCount) : intval($this->limitCount)) ."\n";
+            if (!empty($this->offset) || !empty($this->limit)) {
+                $sql .= "LIMIT ". (!empty($this->offset) ? $this->offset.", ". $this->limit : $this->limit) ."\n";
             }
 
             return $sql;
