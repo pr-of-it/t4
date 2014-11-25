@@ -108,9 +108,9 @@ class Pgsql
         foreach ($indexes as $name => $options) {
             if (is_numeric($name)) {
                 if ($options['type'] == 'primary') {
-                    $name = $tableName . '_' . implode('_', $options['columns']) . '_pkey';
+                    $name = $tableName . '__' . implode('_', $options['columns']) . '_pkey';
                 } else {
-                    $name = $tableName . '_' . implode('_', $options['columns']) . '_key';
+                    $name = $tableName . '__' . implode('_', $options['columns']) . '_key';
                 }
             }
             $indexesDDL[] = $this->createIndexDDL($name, $options);
