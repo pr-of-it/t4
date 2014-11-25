@@ -12,6 +12,30 @@ class Pgsql
     implements IDriver
 {
 
+    public function makeQuery(QueryBuilder $query)
+    {
+        switch ($query->mode) {
+            case 'select':
+                return $this->makeQuerySelect($query);
+        }
+    }
+
+    protected function makeQuerySelect(QueryBuilder $query)
+    {
+        $sql  = 'SELECT ';
+        $sql .= !empty($query->select) ? ('"' . implode('", "', $query->select) . '"') : '*';
+
+        $sql .= ' FROM ';
+        $sql .= '"' . implode('", "', $query->from) . '"';
+
+        if (!empty($query->where)) {
+            $sql .= ' WHERE ';
+            $sql .= $query->where;
+        }
+
+        return $sql;
+    }
+
     protected function createColumnDDL($options)
     {
         switch ($options['type']) {

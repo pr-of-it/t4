@@ -6,6 +6,9 @@ use T4\Orm\Model;
 
 interface IDriver
 {
+
+    public function makeQuery(QueryBuilder $query);
+
     public function createTable(Connection $connection, $tableName, $columns = [], $indexes = [], $extensions = []);
 
     public function existsTable(Connection $connection, $tableName);

@@ -2,36 +2,45 @@
 
 namespace T4\Dbal;
 
+use T4\Core\Std;
 
 class QueryBuilder
+    extends Std
 {
 
-    protected $mode = 'select';
-
-    protected $select;
-    protected $from = [];
     protected $leftJoin = [];
     protected $rightJoin = [];
-    protected $where;
     protected $order;
     protected $limitFrom;
     protected $limitCount;
 
     protected $params = [];
 
+    protected function trim($s)
+    {
+        return trim($s, " \"'`\t\n\r\0\x0B");
+    }
+
     public function select($select)
     {
-        $this->select = $select;
+        if (is_array($select)) {
+            $select = array_map([get_called_class(), 'trim'], $select);
+        } else {
+            $select = array_map([get_called_class(), 'trim'], preg_split('~[\s]*\,[\s]*~', $select));
+        }
+        $this->select = array_merge(!empty($this->select) ? $this->select : [], $select);
         $this->mode = 'select';
         return $this;
     }
 
     public function from($from)
     {
-        if (is_array($from))
-            $this->from = array_merge($this->from, $from);
-        else
-            $this->from(preg_split('~[\s]*\,[\s]*~', $from));
+        if (is_array($from)) {
+            $from = array_map([get_called_class(), 'trim'], $from);
+        } else {
+            $from = array_map([get_called_class(), 'trim'], preg_split('~[\s]*\,[\s]*~', $from));
+        }
+        $this->from = array_merge(!empty($this->from) ? $this->from : [], $from);
         return $this;
     }
 
@@ -63,12 +72,6 @@ class QueryBuilder
         return $this;
     }
 
-    public function params($params)
-    {
-        $this->params = $params;
-        return $this;
-    }
-
     public function limit($limit)
     {
         if (empty($limit))
@@ -85,6 +88,12 @@ class QueryBuilder
             $this->limitCount = $limit[1];
         }
 
+        return $this;
+    }
+
+    public function params($params)
+    {
+        $this->params = $params;
         return $this;
     }
 
