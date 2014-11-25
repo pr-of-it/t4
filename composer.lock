@@ -4,7 +4,7 @@
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "d07bc0f38964d00a75087a78e2b81596",
+    "hash": "8e6fe732b4c4333d244f97303826979c",
     "packages": [
         {
             "name": "phpmailer/phpmailer",
@@ -12,12 +12,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/PHPMailer/PHPMailer.git",
-                "reference": "09d40c428f11092f7cce16405594df3f0a348d5a"
+                "reference": "58c862c0a6330c0b2a5bde8ac8dbaf8f89b0d068"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/PHPMailer/PHPMailer/zipball/09d40c428f11092f7cce16405594df3f0a348d5a",
-                "reference": "09d40c428f11092f7cce16405594df3f0a348d5a",
+                "url": "https://api.github.com/repos/PHPMailer/PHPMailer/zipball/58c862c0a6330c0b2a5bde8ac8dbaf8f89b0d068",
+                "reference": "58c862c0a6330c0b2a5bde8ac8dbaf8f89b0d068",
                 "shasum": ""
             },
             "require": {
@@ -57,7 +57,7 @@
                 }
             ],
             "description": "PHPMailer is a full-featured email creation and transfer class for PHP",
-            "time": "2014-10-15 09:06:58"
+            "time": "2014-11-24 12:07:23"
         },
         {
             "name": "twig/twig",
@@ -545,17 +545,17 @@
         },
         {
             "name": "symfony/yaml",
-            "version": "v2.5.5",
+            "version": "v2.5.7",
             "target-dir": "Symfony/Component/Yaml",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/Yaml.git",
-                "reference": "b1dbc53593b98c2d694ebf383660ac9134d30b96"
+                "reference": "900d38bc8f74a50343ce65dd1c1e9819658ee56b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/Yaml/zipball/b1dbc53593b98c2d694ebf383660ac9134d30b96",
-                "reference": "b1dbc53593b98c2d694ebf383660ac9134d30b96",
+                "url": "https://api.github.com/repos/symfony/Yaml/zipball/900d38bc8f74a50343ce65dd1c1e9819658ee56b",
+                "reference": "900d38bc8f74a50343ce65dd1c1e9819658ee56b",
                 "shasum": ""
             },
             "require": {
@@ -588,7 +588,7 @@
             ],
             "description": "Symfony Yaml Component",
             "homepage": "http://symfony.com",
-            "time": "2014-09-22 09:14:18"
+            "time": "2014-11-20 13:22:25"
         }
     ],
     "aliases": [],
