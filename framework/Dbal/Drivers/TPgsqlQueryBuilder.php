@@ -113,4 +113,43 @@ trait TPgsqlQueryBuilder
         return $sql;
     }
 
+    protected function makeQueryDelete(QueryBuilder $query)
+    {
+        if (empty($query->deleteTables)) {
+            throw new Exception('DELETE statement must have \'delete tables\' part');
+        }
+
+        $sql  = 'DELETE FROM ';
+        $driver = $this;
+        $from = array_map(function ($x) use ($driver) {
+            static $c = 1;
+            return $this->aliasTableName($x, 'main', $c++);
+        }, $query->deleteTables);
+        $sql .= implode(', ', $from);
+        $sql .= "\n";
+
+        if (!empty($query->where)) {
+            $sql .= 'WHERE ' . $query->where;
+            $sql .= "\n";
+        }
+
+        if (!empty($query->order)) {
+            $sql .= 'ORDER BY ' . $query->order;
+            $sql .= "\n";
+        }
+
+        if (!empty($query->offset)) {
+            $sql .= ' OFFSET ' . $query->offset;
+            $sql .= "\n";
+        }
+
+        if (!empty($query->limit)) {
+            $sql .= ' LIMIT ' . $query->limit;
+            $sql .= "\n";
+        }
+
+        $sql = preg_replace('~\n$~', '', $sql);
+        return $sql;
+    }
+
 }

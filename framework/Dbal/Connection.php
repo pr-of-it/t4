@@ -8,20 +8,18 @@ class Connection
 {
 
     /**
-     * Конфигурация соединения
      * @var \T4\Core\Config
      */
     protected $config;
 
     /**
-     * Объект соединения с базой данных
      * @var \PDO
      */
     protected $pdo;
 
     /**
-     * @param Std $config
-     * @throws Exception
+     * @param \T4\Core\Std $config
+     * @throws \T4\Dbal\Exception
      */
     public function __construct(Std $config)
     {
@@ -49,7 +47,7 @@ class Connection
     }
 
     /**
-     * @return IDriver
+     * @return \T4\Dbal\IDriver
      */
     public function getDriver()
     {
@@ -57,20 +55,20 @@ class Connection
     }
 
     /**
-     * @param $query
-     * @return Statement
+     * @param string|\T4\Dbal\QueryBuilder $query
+     * @return \T4\Dbal\Statement
      */
     public function prepare($query)
     {
         if ($query instanceof QueryBuilder) {
-            $query = $query->getQuery();
+            $query = $query->makeQuery($this->getDriver());
         }
         $statement = $this->pdo->prepare($query);
         return $statement;
     }
 
     /**
-     * @param $query
+     * @param string|\T4\Dbal\QueryBuilder $query
      * @param array $params
      * @return bool
      */
@@ -78,16 +76,16 @@ class Connection
     {
         if ($query instanceof QueryBuilder) {
             $params = $query->getParams();
-            $query = $query->getQuery();
+            $query = $query->makeQuery($this->getDriver());
         }
         $statement = $this->pdo->prepare($query);
         return $statement->execute($params);
     }
 
     /**
-     * @param $query
+     * @param string|\T4\Dbal\QueryBuilder $query
      * @param array $params
-     * @return Statement
+     * @return \T4\Dbal\Statement
      */
     public function query($query, array $params = [])
     {

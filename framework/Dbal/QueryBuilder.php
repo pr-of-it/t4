@@ -55,6 +55,14 @@ class QueryBuilder
         return $this;
     }
 
+    public function delete($what)
+    {
+        $what = $this->prepareWhat(func_get_args());
+        $this->deleteTables = array_merge(!empty($this->deleteTables) ? $this->deleteTables : [], $what);
+        $this->mode = 'delete';
+        return $this;
+    }
+
     public function from($what)
     {
         $what = $this->prepareWhat(func_get_args());

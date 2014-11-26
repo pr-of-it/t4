@@ -127,10 +127,9 @@ FILE;
 
     protected function getLastMigrationTime()
     {
-        $connection = Application::getInstance()->db->default;
         $query = new QueryBuilder();
         $query->select('time')->from(self::TABLE_NAME)->order(Model::PK . ' DESC')->limit(1);
-        return $connection->query($query)->fetchScalar() ?: 0;
+        return $this->app->db->default->query($query)->fetchScalar() ?: 0;
     }
 
     protected function getMigrationsAfter($time)
@@ -167,19 +166,16 @@ FILE;
 
     protected function save(Migration $migration)
     {
-        $connection = Application::getInstance()->db->default;
         $query = new QueryBuilder();
-
         $query->insert(self::TABLE_NAME)->values(['time' => ':time'])->params([':time' => $migration->getTimestamp()]);
-        $connection->query($query);
+        $this->app->db->default->execute($query);
     }
 
     protected function delete(Migration $migration)
     {
-        $this->app->db->default->execute('
-            DELETE FROM `' . self::TABLE_NAME . '`
-            WHERE `time`=\'' . $migration->getTimestamp() . '\'
-        ');
+        $query = new QueryBuilder();
+        $query->delete(self::TABLE_NAME)->where('t1.time=:time')->params([':time' => $migration->getTimestamp()]);
+        $this->app->db->default->execute($query);
     }
 
 }

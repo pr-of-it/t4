@@ -160,4 +160,11 @@ class QueryBuilderTest extends PHPUnit_Framework_TestCase {
         $this->assertEquals("INSERT INTO \"test\"\n(\"foo\", \"bar\")\nVALUES (:foo, :bar)", $query);
     }
 
+    public function testPgslqMakeDeleteQuery()
+    {
+        $builder = new \T4\Dbal\QueryBuilder();
+        $query = $builder->delete('test1, test2')->where('foo=:foo')->makeQuery('pgsql');
+        $this->assertEquals("DELETE FROM \"test1\" AS t1, \"test2\" AS t2\nWHERE foo=:foo", $query);
+    }
+
 }
