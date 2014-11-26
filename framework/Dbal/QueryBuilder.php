@@ -55,12 +55,6 @@ class QueryBuilder
         return $this;
     }
 
-    public function values($what)
-    {
-        $this->values = $what;
-        return $this;
-    }
-
     public function from($what)
     {
         $what = $this->prepareWhat(func_get_args());
@@ -92,6 +86,12 @@ class QueryBuilder
     public function limit($limit)
     {
         $this->limit = (int)$limit;
+        return $this;
+    }
+
+    public function values($what)
+    {
+        $this->values = $what;
         return $this;
     }
 

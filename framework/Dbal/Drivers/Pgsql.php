@@ -103,7 +103,7 @@ class Pgsql
             }
         }
         if (!$hasPK) {
-            array_unshift($columnsDDL, '`' . Model::PK . '` ' . $this->createColumnDDL(['type' => 'pk']));
+            array_unshift($columnsDDL, '"' . Model::PK . '" ' . $this->createColumnDDL(['type' => 'pk']));
             $indexesDDL[] = 'PRIMARY KEY ("' . Model::PK . '")';
         }
 
