@@ -12,41 +12,7 @@ use T4\Orm\Model;
 class Pgsql
     implements IDriver
 {
-
-    public function makeQuery(QueryBuilder $query)
-    {
-        switch ($query->mode) {
-            case 'select':
-                return $this->makeQuerySelect($query);
-        }
-    }
-
-    protected function makeQuerySelect(QueryBuilder $query)
-    {
-        if (empty($query->select) || empty($query->from)) {
-            throw new Exception('SELECT statement must have both \'select\' and \'from\' parts');
-        }
-
-        $sql  = 'SELECT ';
-        $sql .= !empty($query->select) ? ('"' . implode('", "', $query->select) . '"') : '*';
-
-        $sql .= ' FROM ';
-        $sql .= '"' . implode('", "', $query->from) . '"';
-
-        if (!empty($query->where)) {
-            $sql .= ' WHERE ' . $query->where;
-        }
-
-        if (!empty($query->offset)) {
-            $sql .= ' OFFSET ' . $query->offset;
-        }
-
-        if (!empty($query->limit)) {
-            $sql .= ' LIMIT ' . $query->limit;
-        }
-
-        return $sql;
-    }
+    use TPgsqlQueryBuilder;
 
     protected function createColumnDDL($options)
     {

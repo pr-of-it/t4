@@ -4,13 +4,17 @@ namespace T4\Dbal;
 
 use T4\Core\Std;
 
+/**
+ * Class QueryBuilder
+ * @package T4\Dbal
+ *
+ */
 class QueryBuilder
     extends Std
 {
 
     protected $leftJoin = [];
     protected $rightJoin = [];
-    protected $order;
 
     protected $params = [];
 
@@ -19,47 +23,50 @@ class QueryBuilder
         return trim($s, " \"'`\t\n\r\0\x0B");
     }
 
-    public function select($what)
+    protected function prepareWhat($what)
     {
-        if (func_num_args()>1) {
-            $what = func_get_args();
-        } else {
-            if (is_array($what)) {
-                $what = $what;
+        if (1 == count($what)) {
+            if (is_array($what[0])) {
+                $what = $what[0];
             } else {
-                $what = preg_split('~[\s]*\,[\s]*~', $what);
+                $what = preg_split('~[\s]*\,[\s]*~', $what[0]);
             }
         }
         $what = array_map([get_called_class(), 'trim'], $what);
+        return $what;
+    }
 
-        $this->select = array_merge(!empty($this->select) ? $this->select : [], $what);
+    public function select($what='*')
+    {
+        if ('*' == $what) {
+            $this->select = ['*'];
+        } else {
+            $what = $this->prepareWhat(func_get_args());
+            $this->select = array_values(array_diff( array_merge(!empty($this->select) ? $this->select : [], $what), ['*']));
+        }
         $this->mode = 'select';
         return $this;
     }
 
     public function from($what)
     {
-        if (func_num_args()>1) {
-            $what = func_get_args();
-        } else {
-            if (is_array($what)) {
-                $what = $what;
-            } else {
-                $what = preg_split('~[\s]*\,[\s]*~', $what);
-            }
-        }
-        $what = array_map([get_called_class(), 'trim'], $what);
-
+        $what = $this->prepareWhat(func_get_args());
         $this->from = array_merge(!empty($this->from) ? $this->from : [], $what);
         return $this;
     }
 
     /**
-     * @todo: split this
+     * @todo: split this???
      */
     public function where($where)
     {
         $this->where = $where;
+        return $this;
+    }
+
+    public function order($order)
+    {
+        $this->order = $order;
         return $this;
     }
 
@@ -91,54 +98,24 @@ class QueryBuilder
         return $this;
     }
 
-    public function order($order)
-    {
-        $this->order = $order;
-        return $this;
-    }
-
     public function params($params)
     {
         $this->params = $params;
         return $this;
     }
 
-    public function getQuery()
+    public function makeQuery($driver)
     {
+        if (!$driver instanceof IDriver) {
+            $driver = DriverFactory::getDriver($driver);
+        }
+        return $driver->makeQuery($this);
+
         /*
          * SELECT statement
          */
         if ( $this->mode == 'select' )
         {
-            if (empty($this->select) || empty($this->from)) {
-                throw new Exception('SELECT statement must have both \'select\' and \'from\' parts');
-            }
-
-            /*
-             * SELECT part
-             */
-            if ( $this->select == '*') {
-                $sql = "SELECT *\n";
-            } else {
-                if (!is_array($this->select)) {
-                    $this->select = preg_split('~[\s]\,[\s]*~', $this->select, -1, \PREG_SPLIT_NO_EMPTY);
-                }
-                // TODO: грамотное экранирование имен полей
-                //$sql = "SELECT `" . implode('`, `', $this->select). "`\n";
-                $sql = "SELECT " . implode(', ', $this->select). "\n";
-            }
-
-            /*
-             * FROM part
-             */
-            $this->from = array_map(function ($x) {
-                static $i = 0;
-                $i++;
-                return $x . ' AS t' . $i;
-            }, $this->from);
-            // TODO: грамотное экранирование имен таблиц
-            //$sql .= "FROM `" . implode('`, `', $this->from). "`\n";
-            $sql .= "FROM " . implode(', ', $this->from). "\n";
 
             /*
              * LEFT JOIN PART
@@ -166,27 +143,6 @@ class QueryBuilder
                 $sql .= "RIGHT JOIN " . $join['table'] . " ON " . $join['on'] . "\n";
             }
 
-            /*
-             * WHERE part
-             */
-            if (!empty($this->where)) {
-                $sql .= "WHERE ".$this->where."\n";
-            }
-
-            /*
-             * ORDER part
-             */
-            if (!empty($this->order)) {
-                $sql .= "ORDER BY ".$this->order."\n";
-            }
-
-            /*
-             * LIMIT part
-             */
-            if (!empty($this->offset) || !empty($this->limit)) {
-                $sql .= "LIMIT ". (!empty($this->offset) ? $this->offset.", ". $this->limit : $this->limit) ."\n";
-            }
-
             return $sql;
         }
         return '';
@@ -195,11 +151,6 @@ class QueryBuilder
     public function getParams()
     {
         return $this->params;
-    }
-
-    public function __toString()
-    {
-        return $this->getQuery();
     }
 
 }

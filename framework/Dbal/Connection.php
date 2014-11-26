@@ -93,7 +93,7 @@ class Connection
     {
         if ($query instanceof QueryBuilder) {
             $params = $query->getParams();
-            $query = $query->getQuery();
+            $query = $query->makeQuery($this->getDriver());
         }
         $statement = $this->pdo->prepare($query);
         $statement->execute($params);

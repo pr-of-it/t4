@@ -5,6 +5,7 @@ namespace T4\Commands;
 use T4\Console\Application;
 use T4\Console\Command;
 use T4\Console\Exception;
+use T4\Dbal\QueryBuilder;
 use T4\Orm\Migration;
 use T4\Orm\Model;
 
@@ -110,7 +111,7 @@ FILE;
 
     protected function install()
     {
-        $connection = Application::getInstance(true)->db->default;
+        $connection = Application::getInstance()->db->default;
         $driver = $connection->getDriver();
         $driver->createTable($connection, self::TABLE_NAME,
             [
@@ -126,14 +127,10 @@ FILE;
 
     protected function getLastTime()
     {
-        $st = $this->app->db->default->query('
-            SELECT `time`
-            FROM `' . self::TABLE_NAME . '`
-            ORDER BY `' . Model::PK . '` DESC
-            LIMIT 1
-        ');
-        $time = $st->fetchScalar() ?: 0;
-        return $time;
+        $connection = Application::getInstance()->db->default;
+        $query = new QueryBuilder();
+        $query->select('time')->from(self::TABLE_NAME)->order(Model::PK . ' DESC')->limit(1);
+        return $connection->query($query)->fetchScalar() ?: 0;
     }
 
     protected function getMigrationsAfter($time)

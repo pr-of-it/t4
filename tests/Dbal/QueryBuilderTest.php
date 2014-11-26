@@ -4,104 +4,136 @@ require_once realpath(__DIR__ . '/../../framework/boot.php');
 
 class QueryBuilderTest extends PHPUnit_Framework_TestCase {
 
-    /**
-     * @expectedException \T4\Dbal\Exception
-     */
-    public function testSelectEmptyWhereException()
+    public function testAssignSelect()
     {
         $builder = new \T4\Dbal\QueryBuilder();
-        $builder->select('*');
-        echo $builder->getQuery();
+
+        $b = $builder->select();
+        $this->assertInstanceOf('\T4\Dbal\QueryBuilder', $b);
+        $this->assertEquals($b, $builder);
+        $this->assertEquals(['*'], $builder->select);
+        $this->assertEquals('select', $builder->mode);
+
+        $b = $builder->select('foo1, bar1');
+        $this->assertInstanceOf('\T4\Dbal\QueryBuilder', $b);
+        $this->assertEquals($b, $builder);
+        $this->assertEquals(['foo1', 'bar1'], $builder->select);
+        $this->assertEquals('select', $builder->mode);
+
+        $b = $builder->select('foo2', 'bar2');
+        $this->assertInstanceOf('\T4\Dbal\QueryBuilder', $b);
+        $this->assertEquals($b, $builder);
+        $this->assertEquals(['foo1', 'bar1', 'foo2', 'bar2'], $builder->select);
+        $this->assertEquals('select', $builder->mode);
+
+        $b = $builder->select(['foo3', 'bar3']);
+        $this->assertInstanceOf('\T4\Dbal\QueryBuilder', $b);
+        $this->assertEquals($b, $builder);
+        $this->assertEquals(['foo1', 'bar1', 'foo2', 'bar2', 'foo3', 'bar3'], $builder->select);
+        $this->assertEquals('select', $builder->mode);
+
+        $b = $builder->select();
+        $this->assertInstanceOf('\T4\Dbal\QueryBuilder', $b);
+        $this->assertEquals($b, $builder);
+        $this->assertEquals(['*'], $builder->select);
+        $this->assertEquals('select', $builder->mode);
     }
 
-    /**
-     * @expectedException \T4\Dbal\Exception
-     */
-    public function testSelectEmptySelectException()
+    public function testAssignFrom()
     {
         $builder = new \T4\Dbal\QueryBuilder();
-        $builder->from('test');
-        echo $builder->getQuery();
+
+        $b = $builder->from('foo');
+        $this->assertInstanceOf('\T4\Dbal\QueryBuilder', $b);
+        $this->assertEquals($b, $builder);
+        $this->assertEquals(['foo'], $builder->from);
+        $this->assertEmpty($builder->mode);
+
+        $b = $builder->from('foo1, bar1');
+        $this->assertInstanceOf('\T4\Dbal\QueryBuilder', $b);
+        $this->assertEquals($b, $builder);
+        $this->assertEquals(['foo', 'foo1', 'bar1'], $builder->from);
+
+        $b = $builder->from('foo2', 'bar2');
+        $this->assertInstanceOf('\T4\Dbal\QueryBuilder', $b);
+        $this->assertEquals($b, $builder);
+        $this->assertEquals(['foo', 'foo1', 'bar1', 'foo2', 'bar2'], $builder->from);
+
+        $b = $builder->from(['foo3', 'bar3']);
+        $this->assertInstanceOf('\T4\Dbal\QueryBuilder', $b);
+        $this->assertEquals($b, $builder);
+        $this->assertEquals(['foo', 'foo1', 'bar1', 'foo2', 'bar2', 'foo3', 'bar3'], $builder->from);
     }
 
-    public function testSelect()
+    public function testAssignWhere()
     {
+        $builder = new \T4\Dbal\QueryBuilder();
+
+        $b = $builder->select()->from('test')->where('id=:id');
+        $this->assertInstanceOf('\T4\Dbal\QueryBuilder', $b);
+        $this->assertEquals($b, $builder);
+        $this->assertEquals(['*'], $builder->select);
+        $this->assertEquals(['test'], $builder->from);
+        $this->assertEquals('id=:id', $builder->where);
+    }
+
+    public function testAssignOrder()
+    {
+        $builder = new \T4\Dbal\QueryBuilder();
+
+        $b = $builder->select()->from('test')->where('id=:id')->order('id DESC');
+        $this->assertInstanceOf('\T4\Dbal\QueryBuilder', $b);
+        $this->assertEquals($b, $builder);
+        $this->assertEquals(['*'], $builder->select);
+        $this->assertEquals(['test'], $builder->from);
+        $this->assertEquals('id=:id', $builder->where);
+        $this->assertEquals('id DESC', $builder->order);
+    }
+
+    public function testAssignOffsetLimit()
+    {
+        $builder = new \T4\Dbal\QueryBuilder();
+
+        $b = $builder->offset(0);
+        $this->assertInstanceOf('\T4\Dbal\QueryBuilder', $b);
+        $this->assertEquals($b, $builder);
+        $this->assertEquals(0, $builder->offset);
+
+        $b = $builder->offset(10);
+        $this->assertInstanceOf('\T4\Dbal\QueryBuilder', $b);
+        $this->assertEquals($b, $builder);
+        $this->assertEquals(10, $builder->offset);
+
+        $b = $builder->offset('abcd');
+        $this->assertInstanceOf('\T4\Dbal\QueryBuilder', $b);
+        $this->assertEquals($b, $builder);
+        $this->assertEquals(0, $builder->offset);
+
+        $b = $builder->limit(0);
+        $this->assertInstanceOf('\T4\Dbal\QueryBuilder', $b);
+        $this->assertEquals($b, $builder);
+        $this->assertEquals(0, $builder->limit);
+
+        $b = $builder->limit(10);
+        $this->assertInstanceOf('\T4\Dbal\QueryBuilder', $b);
+        $this->assertEquals($b, $builder);
+        $this->assertEquals(10, $builder->limit);
+
+        $b = $builder->limit('abcd');
+        $this->assertInstanceOf('\T4\Dbal\QueryBuilder', $b);
+        $this->assertEquals($b, $builder);
+        $this->assertEquals(0, $builder->limit);
+    }
+
+    public function testPgslqMakeQuery()
+    {
+        $builder = new \T4\Dbal\QueryBuilder();
+        $query = $builder->select()->from('test')->makeQuery('pgsql');
+        $this->assertEquals("SELECT *\nFROM \"test\" AS t1", $query);
 
         $builder = new \T4\Dbal\QueryBuilder();
-        $builder->select('*')->from('test');
-        $this->assertEquals(
-            "SELECT *\nFROM test AS t1\n",
-            $builder->getQuery()
-        );
-
-        $builder = new \T4\Dbal\QueryBuilder();
-        $builder->select('a1, a2')->from('test');
-        $this->assertEquals(
-            "SELECT a1, a2\nFROM test AS t1\n",
-            $builder->getQuery()
-        );
-
-        $builder = new \T4\Dbal\QueryBuilder();
-        $builder->select(['a1', 'a2'])->from('test1, test2');
-        $this->assertEquals(
-            "SELECT a1, a2\nFROM test1 AS t1, test2 AS t2\n",
-            $builder->getQuery()
-        );
-
-        $builder = new \T4\Dbal\QueryBuilder();
-        $builder->select(['a1', 'a2'])->from(['test1', 'test2']);
-        $this->assertEquals(
-            "SELECT a1, a2\nFROM test1 AS t1, test2 AS t2\n",
-            $builder->getQuery()
-        );
-
-        $builder = new \T4\Dbal\QueryBuilder();
-        $builder->select('*')->from('test')->limit(1);
-        $this->assertEquals(
-            "SELECT *\nFROM test AS t1\nLIMIT 1\n",
-            $builder->getQuery()
-        );
-
-        $builder = new \T4\Dbal\QueryBuilder();
-        $builder->select('*')->from('test')->limit('1, 2');
-        $this->assertEquals(
-            "SELECT *\nFROM test AS t1\nLIMIT 1, 2\n",
-            $builder->getQuery()
-        );
-
-        $builder = new \T4\Dbal\QueryBuilder();
-        $builder->select('*')->from('test')->limit([1, 2]);
-        $this->assertEquals(
-            "SELECT *\nFROM test AS t1\nLIMIT 1, 2\n",
-            $builder->getQuery()
-        );
-
-        $builder = new \T4\Dbal\QueryBuilder();
-        $builder->select('*')->from('test')->where('t1=:t1')->limit([1, 2]);
-        $this->assertEquals(
-            "SELECT *\nFROM test AS t1\nWHERE t1=:t1\nLIMIT 1, 2\n",
-            $builder->getQuery()
-        );
-
-        $builder = new \T4\Dbal\QueryBuilder();
-        $builder->select('*')->from('test')->where('t1=:t1')->order('t2 DESC')->limit([1, 2]);
-        $this->assertEquals(
-            "SELECT *\nFROM test AS t1\nWHERE t1=:t1\nORDER BY t2 DESC\nLIMIT 1, 2\n",
-            $builder->getQuery()
-        );
-
-        $builder = new \T4\Dbal\QueryBuilder();
-        $builder->select('*')->from('test')->where('t1=:t1')->order('t2 DESC')->limit([1, 2])->params([':t1'=>123]);
-        $this->assertEquals(
-            "SELECT *\nFROM test AS t1\nWHERE t1=:t1\nORDER BY t2 DESC\nLIMIT 1, 2\n",
-            $builder->getQuery()
-        );
-        $this->assertEquals(
-            [':t1'=>123],
-            $builder->getParams()
-        );
-
+        $query = $builder->select('t1.a1, t2.a2')->from('test1', 'test2')->where('a1=:a1')->makeQuery('pgsql');
+        $this->assertEquals("SELECT t1.\"a1\", t2.\"a2\"\nFROM \"test1\" AS t1, \"test2\" AS t2\nWHERE a1=:a1", $query);
     }
 
 }
- 
