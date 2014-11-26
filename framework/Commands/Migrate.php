@@ -35,7 +35,7 @@ class Migrate
             if (!$this->isInstalled()) {
                 $this->install();
             }
-            $migrations = $this->getMigrationsAfter($this->getLastTime());
+            $migrations = $this->getMigrationsAfter($this->getLastMigrationTime());
             foreach ($migrations as $migration) {
                 echo $migration->getName() . ' up...' . "\n";
                 $migration->up();
@@ -125,7 +125,7 @@ FILE;
         echo 'Migration table `' . self::TABLE_NAME . '` is created' . "\n";
     }
 
-    protected function getLastTime()
+    protected function getLastMigrationTime()
     {
         $connection = Application::getInstance()->db->default;
         $query = new QueryBuilder();
@@ -152,7 +152,7 @@ FILE;
      */
     protected function getLastMigration()
     {
-        $lastMigrationTime = $this->getLastTime();
+        $lastMigrationTime = $this->getLastMigrationTime();
         if (empty($lastMigrationTime))
             return false;
 
@@ -167,11 +167,11 @@ FILE;
 
     protected function save(Migration $migration)
     {
-        $this->app->db->default->execute('
-            INSERT INTO `' . self::TABLE_NAME . '`
-            (`time`)
-            VALUES (\'' . $migration->getTimestamp() . '\')
-        ');
+        $connection = Application::getInstance()->db->default;
+        $query = new QueryBuilder();
+
+        $query->insert(self::TABLE_NAME)->values(['time' => ':time'])->params([':time' => $migration->getTimestamp()]);
+        $connection->query($query);
     }
 
     protected function delete(Migration $migration)

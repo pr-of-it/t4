@@ -125,7 +125,24 @@ class QueryBuilderTest extends PHPUnit_Framework_TestCase {
         $this->assertEquals(0, $builder->limit);
     }
 
-    public function testPgslqMakeQuery()
+    public function testAssignInsert()
+    {
+        $builder = new \T4\Dbal\QueryBuilder();
+
+        $b = $builder->insert('test');
+        $this->assertInstanceOf('\T4\Dbal\QueryBuilder', $b);
+        $this->assertEquals($b, $builder);
+        $this->assertEquals('insert', $builder->mode);
+        $this->assertEquals('test', $builder->insertTable);
+
+        $b = $builder->values(['foo' => ':foo', 'bar' => ':bar']);
+        $this->assertInstanceOf('\T4\Dbal\QueryBuilder', $b);
+        $this->assertEquals($b, $builder);
+        $this->assertEquals(['foo' => ':foo', 'bar' => ':bar'], $builder->values);
+
+    }
+
+    public function testPgslqMakeSelectQuery()
     {
         $builder = new \T4\Dbal\QueryBuilder();
         $query = $builder->select()->from('test')->makeQuery('pgsql');
@@ -134,6 +151,13 @@ class QueryBuilderTest extends PHPUnit_Framework_TestCase {
         $builder = new \T4\Dbal\QueryBuilder();
         $query = $builder->select('t1.a1, t2.a2')->from('test1', 'test2')->where('a1=:a1')->makeQuery('pgsql');
         $this->assertEquals("SELECT t1.\"a1\", t2.\"a2\"\nFROM \"test1\" AS t1, \"test2\" AS t2\nWHERE a1=:a1", $query);
+    }
+
+    public function testPgslqMakeInsertQuery()
+    {
+        $builder = new \T4\Dbal\QueryBuilder();
+        $query = $builder->insert('test')->values(['foo' => ':foo', 'bar' => ':bar'])->makeQuery('pgsql');
+        $this->assertEquals("INSERT INTO \"test\"\n(\"foo\", \"bar\")\nVALUES (:foo, :bar)", $query);
     }
 
 }

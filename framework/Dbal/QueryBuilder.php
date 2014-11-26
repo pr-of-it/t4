@@ -48,6 +48,19 @@ class QueryBuilder
         return $this;
     }
 
+    public function insert($table)
+    {
+        $this->insertTable = $table;
+        $this->mode = 'insert';
+        return $this;
+    }
+
+    public function values($what)
+    {
+        $this->values = $what;
+        return $this;
+    }
+
     public function from($what)
     {
         $what = $this->prepareWhat(func_get_args());
