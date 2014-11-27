@@ -38,7 +38,7 @@ class Pgsql
                 break;
             case 'relation':
             case 'link':
-                $ddl = 'BIGINT UNSIGNED NOT NULL DEFAULT \'0\'';
+                $ddl = 'BIGINT NOT NULL DEFAULT \'0\'';
                 break;
             case 'serial':
                 $ddl = 'SERIAL';
@@ -135,8 +135,12 @@ class Pgsql
         }
 
         $indexesDDL = [];
+        $columnsUsed = [];
 
         foreach ($indexes as $name => $options) {
+            if (in_array($options['columns'], $columnsUsed)) {
+                break;
+            }
             if (is_numeric($name)) {
                 $name = '';
                 /*
@@ -148,6 +152,7 @@ class Pgsql
                 */
             }
             $indexesDDL[] = 'CREATE '. $this->createIndexDDL($tableName, $name, $options);
+            $columnsUsed[] = $options['columns'];
         }
 
         $createTableDDL = 'CREATE TABLE ' . $this->quoteName($tableName) . "\n" . '(' . implode(', ', array_unique($columnsDDL)) . ')';
