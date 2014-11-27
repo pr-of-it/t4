@@ -13,60 +13,100 @@ class Pgsql
 {
     use TPgsqlQueryBuilder;
 
-    protected function createColumnDDL($options)
+    protected function quoteName($name)
     {
-        switch ($options['type']) {
-            case 'pk':
-                return 'BIGSERIAL PRIMARY KEY';
-            case 'relation':
-            case 'link':
-                return 'BIGINT UNSIGNED NOT NULL DEFAULT \'0\'';
-            case 'serial':
-                return 'SERIAL';
-            case 'boolean':
-                return 'BOOLEAN';
-            case 'int':
-                return 'INTEGER';
-            case 'float':
-            case 'real':
-                return 'REAL';
-            case 'text':
-                return 'TEXT';
-            case 'datetime':
-                return 'TIMESTAMP';
-            case 'date':
-                return 'DATE';
-            case 'time':
-                return 'TIME';
-            case 'char':
-                return 'CHARACTER(' . (isset($options['length']) ? (int)$options['length'] : 255) . ')';
-            case 'string':
-            default:
-                return 'VARCHAR(' . (isset($options['length']) ? (int)$options['length'] : 255) . ') NOT NULL';
+        $parts = explode('.', $name);
+        $lastIndex = count($parts)-1;
+        foreach ($parts as $index => &$part) {
+            if (
+                $index == $lastIndex
+                ||
+                !preg_match('~^(t|j)[\d]+$~', $part)
+            ) {
+                $part = '"' . $part . '"';
+            }
         }
+        return implode('.', $parts);
     }
 
-    protected function createIndexDDL($name, $options)
+    protected function createColumnDDL($name, $options)
+    {
+        $name = $this->quoteName($name);
+        switch ($options['type']) {
+            case 'pk':
+                $ddl = 'BIGSERIAL PRIMARY KEY';
+                break;
+            case 'relation':
+            case 'link':
+                $ddl = 'BIGINT UNSIGNED NOT NULL DEFAULT \'0\'';
+                break;
+            case 'serial':
+                $ddl = 'SERIAL';
+                break;
+            case 'boolean':
+                $ddl = 'BOOLEAN';
+                break;
+            case 'int':
+            case 'integer':
+                $ddl = 'INTEGER';
+                break;
+            case 'float':
+            case 'real':
+                $ddl = 'REAL';
+                break;
+            case 'text':
+                $ddl = 'TEXT';
+                break;
+            case 'datetime':
+                $ddl = 'TIMESTAMP';
+                break;
+            case 'date':
+                $ddl = 'DATE';
+                break;
+            case 'time':
+                $ddl = 'TIME';
+                break;
+            case 'char':
+                $ddl = 'CHARACTER(' . (isset($options['length']) ? (int)$options['length'] : 255) . ')';
+                break;
+            case 'string':
+            default:
+                if (isset($options['length'])) {
+                    $ddl = 'VARCHAR(' . (int)$options['length'] . ')';
+                } else {
+                    $ddl = 'VARCHAR';
+                }
+                break;
+        }
+        return $name . ' ' . $ddl;
+    }
+
+    protected function createIndexDDL($tableName, $name='', $options='')
     {
 
         if (!isset($options['type']))
             $options['type'] = '';
 
-        $ddl = '("' . implode('","', $options['columns']) . '")';
-
-        switch ($options['type']) {
-            case 'primary':
-                return 'CONSTRAINT ' . $name . ' PRIMARY KEY ' . $ddl;
-            case 'unique':
-                return 'CONSTRAINT ' . $name . ' UNIQUE ' . $ddl;
-            default:
-                assert(false);
-                return 'INDEX ' . $ddl;
+        $ddl  = 'INDEX ' . (!empty($name) ? $this->quoteName($name) . ' ' : '') . 'ON ' . $this->quoteName($tableName);
+        if ('unique' == $options['type']) {
+            $ddl = 'UNIQUE ' . $ddl;
         }
+
+        $driver = $this;
+        $options['columns'] = array_map(function ($x) use ($driver) {
+            return $driver->quoteName($x);
+        }, $options['columns']);
+        $ddl .= ' (' . implode(', ', $options['columns']) . ')';
+
+        if (!empty($options['where'])) {
+            $ddl .= ' WHERE ' . $options['where'];
+        }
+
+        return $ddl;
 
     }
 
-    public function createTable(Connection $connection, $tableName, $columns = [], $indexes = [], $extensions = [])
+    protected function createTableDDL($tableName, $columns = [], $indexes = [], $extensions = [])
     {
 
         foreach ($extensions as $extension) {
@@ -76,42 +116,49 @@ class Pgsql
             $indexes = $extension->prepareIndexes($indexes);
         }
 
-        $sql = 'CREATE TABLE "' . $tableName . '"';
-
         $columnsDDL = [];
-        $indexesDDL = [];
 
         $hasPK = false;
         foreach ($columns as $name => $options) {
-            $columnsDDL[] = '"' . $name . '" ' . $this->createColumnDDL($options);
+            $columnsDDL[] = $this->createColumnDDL($name, $options);
             if ('pk' == $options['type']) {
                 $hasPK = true;
             }
+
             if ('link' == $options['type']) {
-                $indexesDDL[] = 'INDEX "' . $name . '`' . ' (`' . $name . '")';
+                $indexes[] = ['type'=>'index', 'columns'=>[$name]];
             }
         }
+
         if (!$hasPK) {
-            array_unshift($columnsDDL, '"' . Model::PK . '" ' . $this->createColumnDDL(['type' => 'pk']));
-       }
+            array_unshift($columnsDDL, $this->createColumnDDL(Model::PK, ['type' => 'pk']));
+        }
+
+        $indexesDDL = [];
 
         foreach ($indexes as $name => $options) {
             if (is_numeric($name)) {
+                $name = '';
+                /*
                 if ($options['type'] == 'primary') {
                     $name = $tableName . '__' . implode('_', $options['columns']) . '_pkey';
                 } else {
                     $name = $tableName . '__' . implode('_', $options['columns']) . '_key';
                 }
+                */
             }
-            $indexesDDL[] = $this->createIndexDDL($name, $options);
+            $indexesDDL[] = 'CREATE '. $this->createIndexDDL($tableName, $name, $options);
         }
 
-        $sql .= ' ( ' .
-            implode(', ', array_unique($columnsDDL)) . ', ' .
-            implode(', ', array_unique($indexesDDL)) .
-            ' )';
-        $connection->execute($sql);
+        $createTableDDL = 'CREATE TABLE ' . $this->quoteName($tableName) . "\n" . '(' . implode(', ', array_unique($columnsDDL)) . ')';
+        return array_merge([$createTableDDL], $indexesDDL);
+    }
 
+    public function createTable(Connection $connection, $tableName, $columns = [], $indexes = [], $extensions = [])
+    {
+        foreach ($this->createTableDDL($tableName, $columns, $indexes, $extensions) as $query) {
+            $connection->execute($query);
+        }
     }
 
     public function existsTable(Connection $connection, $tableName)
@@ -142,7 +189,7 @@ class Pgsql
         $sql = 'ALTER TABLE `' . $tableName . '`';
         $columnsDDL = [];
         foreach ($columns as $name => $options) {
-            $columnsDDL[] = 'ADD COLUMN `' . $name . '` ' . $this->createColumnDDL($options);
+            $columnsDDL[] = 'ADD COLUMN ' . $this->createColumnDDL($name, $options);
         }
         $sql .= ' ' .
             implode(', ', $columnsDDL) .
@@ -179,7 +226,7 @@ class Pgsql
         $sql = 'ALTER TABLE `' . $tableName . '`';
         $indexesDDL = [];
         foreach ($indexes as $name => $options) {
-            $indexesDDL[] = 'ADD ' . $this->createIndexDDL($name, $options);
+            $indexesDDL[] = 'ADD ' . $this->createIndexDDL($tableName, $name, $options);
         }
         $sql .= ' ' .
             implode(', ', $indexesDDL) .

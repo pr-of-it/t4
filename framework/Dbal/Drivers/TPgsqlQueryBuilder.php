@@ -19,22 +19,6 @@ trait TPgsqlQueryBuilder
         }
     }
 
-    protected function quoteName($name)
-    {
-        $parts = explode('.', $name);
-        $lastIndex = count($parts)-1;
-        foreach ($parts as $index => &$part) {
-            if (
-                $index == $lastIndex
-                ||
-                !preg_match('~^(t|j)[\d]+$~', $part)
-            ) {
-                $part = '"' . $part . '"';
-            }
-        }
-        return implode('.', $parts);
-    }
-
     protected function aliasTableName($name, $type='main', $counter)
     {
         $typeAliases = ['main' => 't', 'join' => 'j'];
