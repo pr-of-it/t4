@@ -65,6 +65,17 @@ class QueryBuilderTest extends PHPUnit_Framework_TestCase {
         $this->assertEquals(['foo', 'foo1', 'bar1', 'foo2', 'bar2', 'foo3', 'bar3'], $builder->from);
     }
 
+    public function testAssignJoin()
+    {
+        $builder = new \T4\Dbal\QueryBuilder();
+
+        $b = $builder->select()->from('test1')->join('test2', 'j1.id=t1.id');
+        $this->assertInstanceOf('\T4\Dbal\QueryBuilder', $b);
+        $this->assertEquals($b, $builder);
+        $this->assertEquals(['test1'], $builder->from);
+        $this->assertEquals([['table'=>'test2', 'on'=>'j1.id=t1.id', 'type'=>'full']], $builder->joins);
+    }
+
     public function testAssignWhere()
     {
         $builder = new \T4\Dbal\QueryBuilder();

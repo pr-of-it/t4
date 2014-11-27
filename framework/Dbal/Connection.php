@@ -61,7 +61,7 @@ class Connection
     public function prepare($query)
     {
         if ($query instanceof QueryBuilder) {
-            $query = $query->makeQuery($this->getDriver());
+            $query = $query->getQuery($this->getDriver());
         }
         $statement = $this->pdo->prepare($query);
         return $statement;
@@ -76,7 +76,7 @@ class Connection
     {
         if ($query instanceof QueryBuilder) {
             $params = $query->getParams();
-            $query = $query->makeQuery($this->getDriver());
+            $query = $query->getQuery($this->getDriver());
         }
         $statement = $this->pdo->prepare($query);
         return $statement->execute($params);
@@ -91,7 +91,7 @@ class Connection
     {
         if ($query instanceof QueryBuilder) {
             $params = $query->getParams();
-            $query = $query->makeQuery($this->getDriver());
+            $query = $query->getQuery($this->getDriver());
         }
         $statement = $this->pdo->prepare($query);
         $statement->execute($params);

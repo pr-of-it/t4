@@ -70,6 +70,20 @@ class QueryBuilder
         return $this;
     }
 
+    public function join($table, $on, $type='full')
+    {
+        if (!isset($this->joins)) {
+            $this->joins = [];
+        }
+        $join = [[
+            'table' => $table,
+            'on' => $on,
+            'type' => $type,
+        ]];
+        $this->joins = array_merge($this->joins, $join);
+        return $this;
+    }
+
     /**
      * @todo: split this???
      */
@@ -103,70 +117,18 @@ class QueryBuilder
         return $this;
     }
 
-    public function leftJoin($table, $on)
-    {
-        $join = &$this->leftJoin[];
-        $join['table'] = $table;
-        $join['on'] = $on;
-        return $this;
-    }
-
-    public function rightJoin($table, $on)
-    {
-        $join = &$this->rightJoin[];
-        $join['table'] = $table;
-        $join['on'] = $on;
-        return $this;
-    }
-
     public function params($params)
     {
         $this->params = $params;
         return $this;
     }
 
-    public function makeQuery($driver)
+    public function getQuery($driver)
     {
         if (!$driver instanceof IDriver) {
             $driver = DriverFactory::getDriver($driver);
         }
         return $driver->makeQuery($this);
-
-        /*
-         * SELECT statement
-         */
-        if ( $this->mode == 'select' )
-        {
-
-            /*
-             * LEFT JOIN PART
-             */
-            $this->leftJoin = array_map(function ($x) {
-                static $i = 0;
-                $i++;
-                $x['table'] = $x['table'] . ' AS lj' . $i;
-                return $x;
-            }, $this->leftJoin);
-            foreach ($this->leftJoin as $join) {
-                $sql .= "LEFT JOIN " . $join['table'] . " ON " . $join['on'] . "\n";
-            }
-
-            /*
-             * RIGHT JOIN PART
-             */
-            $this->rightJoin = array_map(function ($x) {
-                static $i = 0;
-                $i++;
-                $x['table'] = $x['table'] . ' AS rj' . $i;
-                return $x;
-            }, $this->rightJoin);
-            foreach ($this->rightJoin as $join) {
-                $sql .= "RIGHT JOIN " . $join['table'] . " ON " . $join['on'] . "\n";
-            }
-
-            return $sql;
-        }
-        return '';
     }
 
     public function getParams()
