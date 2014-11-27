@@ -47,7 +47,7 @@ class PgsqlDriverTest extends PHPUnit_Framework_TestCase {
             $reflector->invokeArgs($driver, ['foo', ['type' => 'pk']])
         );
         $this->assertEquals(
-            '"foo" BIGINT UNSIGNED NOT NULL DEFAULT \'0\'',
+            '"foo" BIGINT NOT NULL DEFAULT \'0\'',
             $reflector->invokeArgs($driver, ['foo', ['type' => 'relation']])
         );
         $this->assertEquals(
@@ -140,7 +140,7 @@ class PgsqlDriverTest extends PHPUnit_Framework_TestCase {
         );
         $this->assertEquals(
             [
-                'CREATE TABLE "foo"' . "\n" . '("__id" BIGSERIAL PRIMARY KEY, "lnk" BIGINT UNSIGNED NOT NULL DEFAULT \'0\', "foo" INTEGER, "bar" VARCHAR)',
+                'CREATE TABLE "foo"' . "\n" . '("__id" BIGSERIAL PRIMARY KEY, "lnk" BIGINT NOT NULL DEFAULT \'0\', "foo" INTEGER, "bar" VARCHAR)',
                 'CREATE INDEX ON "foo" ("lnk")',
             ],
             $reflector->invokeArgs($driver, ['foo', ['lnk'=>['type'=>'link'], 'foo'=>['type'=>'int'], 'bar'=>['type'=>'string']]])

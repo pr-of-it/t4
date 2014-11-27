@@ -5,9 +5,8 @@ namespace T4\Dbal;
 use T4\Orm\Model;
 
 interface IDriver
+    extends IDriverQueryBuilder
 {
-
-    public function makeQuery(QueryBuilder $query);
 
     public function createTable(Connection $connection, $tableName, $columns = [], $indexes = [], $extensions = []);
 
