@@ -170,7 +170,7 @@ class Pgsql
 
     public function renameTable(Connection $connection, $tableName, $tableNewName)
     {
-        $sql = 'RENAME TABLE `' . $tableName . '` TO `' . $tableNewName . '`';
+        $sql = 'ALTER TABLE ' . $this->quoteName($tableName) . ' RENAME TO ' . $this->quoteName($tableNewName);
         $connection->execute($sql);
     }
 
