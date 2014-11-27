@@ -21,34 +21,25 @@ class Pgsql
             case 'relation':
             case 'link':
                 return 'BIGINT UNSIGNED NOT NULL DEFAULT \'0\'';
+            case 'serial':
+                return 'SERIAL';
             case 'boolean':
                 return 'BOOLEAN';
             case 'int':
-                return 'INT';
+                return 'INTEGER';
             case 'float':
-                return 'FLOAT';
+            case 'real':
+                return 'REAL';
             case 'text':
-                $options['length'] = isset($options['length']) ? $options['length'] : '';
-                switch (strtolower($options['length'])) {
-                    case 'tiny':
-                    case 'small':
-                        return 'TINYTEXT';
-                    case 'medium':
-                        return 'MEDIUMTEXT';
-                    case 'long':
-                    case 'big':
-                        return 'LONGTEXT';
-                    default:
-                        return 'TEXT';
-                }
+                return 'TEXT';
             case 'datetime':
-                return 'DATETIME';
+                return 'TIMESTAMP';
             case 'date':
                 return 'DATE';
             case 'time':
                 return 'TIME';
             case 'char':
-                return 'CHAR(' . (isset($options['length']) ? (int)$options['length'] : 255) . ')';
+                return 'CHARACTER(' . (isset($options['length']) ? (int)$options['length'] : 255) . ')';
             case 'string':
             default:
                 return 'VARCHAR(' . (isset($options['length']) ? (int)$options['length'] : 255) . ') NOT NULL';
