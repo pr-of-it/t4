@@ -27,7 +27,7 @@ trait TPgsqlQueryBuilder
             if (
                 $index == $lastIndex
                 ||
-                !preg_match('~^t[\d]+$~', $part)
+                !preg_match('~^(t|j)[\d]+$~', $part)
             ) {
                 $part = '"' . $part . '"';
             }
@@ -37,7 +37,7 @@ trait TPgsqlQueryBuilder
 
     protected function aliasTableName($name, $type='main', $counter)
     {
-        $typeAliases = ['main' => 't'];
+        $typeAliases = ['main' => 't', 'join' => 'j'];
         return $this->quoteName($name) . ' AS ' . $typeAliases[$type] . $counter;
     }
 
@@ -67,6 +67,33 @@ trait TPgsqlQueryBuilder
 
         if (!empty($query->where)) {
             $sql .= 'WHERE ' . $query->where;
+            $sql .= "\n";
+        }
+
+        if (!empty($query->joins)) {
+            $driver = $this;
+            $joins = array_map(function ($x) use ($driver) {
+                static $c = 1;
+                $table =  $this->aliasTableName($x['table'], 'join', $c++);
+                $x['table'] = $table;
+                return $x;
+            }, $query->joins);
+            $j = [];
+            foreach ($joins as $join) {
+                switch ($join['type']) {
+                    case 'full':
+                        $ret = 'FULL JOIN';
+                        break;
+                    case 'left':
+                        $ret = 'LEFT JOIN';
+                        break;
+                    case 'right':
+                        $ret = 'RIGHT JOIN';
+                        break;
+                }
+                $j[] = $ret . ' ' . $join['table'] . ' ON ' . $join['on'];
+            };
+            $sql .= implode("\n", $j);
             $sql .= "\n";
         }
 
