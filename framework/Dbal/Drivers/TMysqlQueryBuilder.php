@@ -86,14 +86,14 @@ trait TMysqlQueryBuilder
             $sql .= "\n";
         }
 
-        if (!empty($query->offset)) {
-            $sql .= 'OFFSET ' . $query->offset;
-            $sql .= "\n";
-        }
-
         if (!empty($query->limit)) {
-            $sql .= 'LIMIT ' . $query->limit;
-            $sql .= "\n";
+            if (!empty($query->offset)) {
+                $sql .= 'LIMIT ' . $query->offset . ', ' . $query->limit;
+                $sql .= "\n";
+            } else {
+                $sql .= 'LIMIT ' . $query->limit;
+                $sql .= "\n";
+            }
         }
 
         $sql = preg_replace('~\n$~', '', $sql);
@@ -149,14 +149,14 @@ trait TMysqlQueryBuilder
             $sql .= "\n";
         }
 
-        if (!empty($query->offset)) {
-            $sql .= ' OFFSET ' . $query->offset;
-            $sql .= "\n";
-        }
-
         if (!empty($query->limit)) {
-            $sql .= ' LIMIT ' . $query->limit;
-            $sql .= "\n";
+            if (!empty($query->offset)) {
+                $sql .= 'LIMIT ' . $query->offset . ', ' . $query->limit;
+                $sql .= "\n";
+            } else {
+                $sql .= 'LIMIT ' . $query->limit;
+                $sql .= "\n";
+            }
         }
 
         $sql = preg_replace('~\n$~', '', $sql);
