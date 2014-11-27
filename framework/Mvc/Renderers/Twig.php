@@ -24,6 +24,7 @@ class Twig
 
         $loader = new \Twig_Loader_Filesystem($paths);
         $this->twig = new \Twig_Environment($loader);
+        $this->twig->addGlobal('app', $this->links->app);
         $this->twig->addExtension(new TwigExtensions());
     }
 
