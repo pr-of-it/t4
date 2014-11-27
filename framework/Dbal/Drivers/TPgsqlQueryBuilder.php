@@ -76,12 +76,12 @@ trait TPgsqlQueryBuilder
         }
 
         if (!empty($query->offset)) {
-            $sql .= ' OFFSET ' . $query->offset;
+            $sql .= 'OFFSET ' . $query->offset;
             $sql .= "\n";
         }
 
         if (!empty($query->limit)) {
-            $sql .= ' LIMIT ' . $query->limit;
+            $sql .= 'LIMIT ' . $query->limit;
             $sql .= "\n";
         }
 

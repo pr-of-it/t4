@@ -4,7 +4,6 @@ namespace T4\Dbal\Drivers;
 
 use T4\Core\Collection;
 use T4\Dbal\Connection;
-use T4\Dbal\Exception;
 use T4\Dbal\IDriver;
 use T4\Dbal\QueryBuilder;
 use T4\Orm\Model;
@@ -18,7 +17,7 @@ class Pgsql
     {
         switch ($options['type']) {
             case 'pk':
-                return 'BIGSERIAL';
+                return 'BIGSERIAL PRIMARY KEY';
             case 'relation':
             case 'link':
                 return 'BIGINT UNSIGNED NOT NULL DEFAULT \'0\'';
@@ -95,7 +94,6 @@ class Pgsql
         foreach ($columns as $name => $options) {
             $columnsDDL[] = '"' . $name . '" ' . $this->createColumnDDL($options);
             if ('pk' == $options['type']) {
-                $indexesDDL[] = 'PRIMARY KEY ("' . $name . '")';
                 $hasPK = true;
             }
             if ('link' == $options['type']) {
@@ -104,8 +102,7 @@ class Pgsql
         }
         if (!$hasPK) {
             array_unshift($columnsDDL, '"' . Model::PK . '" ' . $this->createColumnDDL(['type' => 'pk']));
-            $indexesDDL[] = 'PRIMARY KEY ("' . Model::PK . '")';
-        }
+       }
 
         foreach ($indexes as $name => $options) {
             if (is_numeric($name)) {

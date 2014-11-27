@@ -142,29 +142,27 @@ class QueryBuilderTest extends PHPUnit_Framework_TestCase {
 
     }
 
-    public function testPgslqMakeSelectQuery()
+    public function testAssignDelete()
     {
         $builder = new \T4\Dbal\QueryBuilder();
-        $query = $builder->select()->from('test')->makeQuery('pgsql');
-        $this->assertEquals("SELECT *\nFROM \"test\" AS t1", $query);
+        $b = $builder->delete('test')->where('foo=:foo');
+
+        $this->assertInstanceOf('\T4\Dbal\QueryBuilder', $b);
+        $this->assertEquals($b, $builder);
+        $this->assertEquals('delete', $builder->mode);
+        $this->assertEquals(['test'], $builder->deleteTables);
+        $this->assertEquals('foo=:foo', $builder->where);
 
         $builder = new \T4\Dbal\QueryBuilder();
-        $query = $builder->select('t1.a1, t2.a2')->from('test1', 'test2')->where('a1=:a1')->makeQuery('pgsql');
-        $this->assertEquals("SELECT t1.\"a1\", t2.\"a2\"\nFROM \"test1\" AS t1, \"test2\" AS t2\nWHERE a1=:a1", $query);
-    }
+        $b = $builder->delete('test1, test2')->where('foo=:foo AND bar<:bar')->order('id')->limit(10);
 
-    public function testPgslqMakeInsertQuery()
-    {
-        $builder = new \T4\Dbal\QueryBuilder();
-        $query = $builder->insert('test')->values(['foo' => ':foo', 'bar' => ':bar'])->makeQuery('pgsql');
-        $this->assertEquals("INSERT INTO \"test\"\n(\"foo\", \"bar\")\nVALUES (:foo, :bar)", $query);
-    }
-
-    public function testPgslqMakeDeleteQuery()
-    {
-        $builder = new \T4\Dbal\QueryBuilder();
-        $query = $builder->delete('test1, test2')->where('foo=:foo')->makeQuery('pgsql');
-        $this->assertEquals("DELETE FROM \"test1\" AS t1, \"test2\" AS t2\nWHERE foo=:foo", $query);
+        $this->assertInstanceOf('\T4\Dbal\QueryBuilder', $b);
+        $this->assertEquals($b, $builder);
+        $this->assertEquals('delete', $builder->mode);
+        $this->assertEquals(['test1', 'test2'], $builder->deleteTables);
+        $this->assertEquals('foo=:foo AND bar<:bar', $builder->where);
+        $this->assertEquals('id', $builder->order);
+        $this->assertEquals(10, $builder->limit);
     }
 
 }
