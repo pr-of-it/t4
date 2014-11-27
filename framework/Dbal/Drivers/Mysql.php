@@ -12,46 +12,86 @@ class Mysql
     implements IDriver
 {
 
-    protected function createColumnDDL($options)
+    use TMysqlQueryBuilder;
+
+    protected function quoteName($name)
     {
+        $parts = explode('.', $name);
+        $lastIndex = count($parts)-1;
+        foreach ($parts as $index => &$part) {
+            if (
+                $index == $lastIndex
+                ||
+                !preg_match('~^(t|j)[\d]+$~', $part)
+            ) {
+                $part = '`' . $part . '`';
+            }
+        }
+        return implode('.', $parts);
+    }
+
+    protected function createColumnDDL($name, $options)
+    {
+        $name = $this->quoteName($name);
+
         switch ($options['type']) {
             case 'pk':
-                return 'BIGINT UNSIGNED NOT NULL AUTO_INCREMENT';
+                $ddl = 'BIGINT UNSIGNED NOT NULL AUTO_INCREMENT';
+                break;
             case 'relation':
             case 'link':
-                return 'BIGINT UNSIGNED NOT NULL DEFAULT \'0\'';
+                $ddl = 'BIGINT UNSIGNED NOT NULL DEFAULT \'0\'';
+                break;
+            case 'serial':
+                $ddl = 'SERIAL';
+                break;
             case 'boolean':
-                return 'BOOLEAN';
+                $ddl = 'BOOLEAN';
+                break;
             case 'int':
-                return 'INT(11) NOT NULL';
+                $ddl = 'INT(11)';
+                break;
             case 'float':
-                return 'FLOAT NOT NULL';
+                $ddl = 'FLOAT';
+                break;
             case 'text':
                 $options['length'] = isset($options['length']) ? $options['length'] : '';
                 switch (strtolower($options['length'])) {
                     case 'tiny':
                     case 'small':
-                        return 'TINYTEXT';
+                        $ddl = 'TINYTEXT';
+                        break;
                     case 'medium':
-                        return 'MEDIUMTEXT';
+                        $ddl = 'MEDIUMTEXT';
+                        break;
                     case 'long':
                     case 'big':
-                        return 'LONGTEXT';
+                        $ddl = 'LONGTEXT';
+                        break;
                     default:
-                        return 'TEXT';
+                        $ddl = 'TEXT';
+                        break;
                 }
+                break;
             case 'datetime':
-                return 'DATETIME';
+                $ddl = 'DATETIME';
+                break;
             case 'date':
-                return 'DATE';
+                $ddl = 'DATE';
+                break;
             case 'time':
-                return 'TIME';
+                $ddl = 'TIME';
+                break;
             case 'char':
-                return 'CHAR(' . (isset($options['length']) ? (int)$options['length'] : 255) . ')';
+                $ddl = 'CHAR(' . (isset($options['length']) ? (int)$options['length'] : 255) . ')';
+                break;
             case 'string':
             default:
-                return 'VARCHAR(' . (isset($options['length']) ? (int)$options['length'] : 255) . ') NOT NULL';
+                $ddl = 'VARCHAR(' . (isset($options['length']) ? (int)$options['length'] : 255) . ')';
+                break;
         }
+
+        return $name . ' ' . $ddl;
     }
 
     protected function createIndexDDL($name, $options)
@@ -86,16 +126,16 @@ class Mysql
             $indexes = $extension->prepareIndexes($indexes);
         }
 
-        $sql = 'CREATE TABLE `' . $tableName . '`';
+        $sql = 'CREATE TABLE `' . $this->quoteName($tableName) . '`';
 
         $columnsDDL = [];
         $indexesDDL = [];
 
         $hasPK = false;
         foreach ($columns as $name => $options) {
-            $columnsDDL[] = '`' . $name . '` ' . $this->createColumnDDL($options);
+            $columnsDDL[] = $this->createColumnDDL($name, $options);
             if ('pk' == $options['type']) {
-                $indexesDDL[] = 'PRIMARY KEY (`' . $name . '`)';
+                $indexesDDL[] = 'PRIMARY KEY (' . $this->quoteName($name) . ')';
                 $hasPK = true;
             }
             if ('link' == $options['type']) {
@@ -103,7 +143,7 @@ class Mysql
             }
         }
         if (!$hasPK) {
-            array_unshift($columnsDDL, '`' . Model::PK . '` ' . $this->createColumnDDL(['type' => 'pk']));
+            array_unshift($columnsDDL, $this->createColumnDDL(Model::PK, ['type' => 'pk']));
             $indexesDDL[] = 'PRIMARY KEY (`' . Model::PK . '`)';
         }
 
@@ -118,7 +158,6 @@ class Mysql
             implode(', ', array_unique($indexesDDL)) .
             ' )';
         $connection->execute($sql);
-
     }
 
     public function existsTable(Connection $connection, $tableName)
@@ -130,7 +169,7 @@ class Mysql
 
     public function renameTable(Connection $connection, $tableName, $tableNewName)
     {
-        $sql = 'RENAME TABLE `' . $tableName . '` TO `' . $tableNewName . '`';
+        $sql = 'RENAME TABLE ' . $this->quoteName($tableName) . ' TO ' . $this->quoteName($tableNewName);
         $connection->execute($sql);
     }
 
