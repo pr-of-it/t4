@@ -188,20 +188,20 @@ class Mysql
 
     public function truncateTable(Connection $connection, $tableName)
     {
-        $connection->execute('TRUNCATE TABLE `' . $tableName . '`');
+        $connection->execute('TRUNCATE TABLE ' . $this->quoteName($tableName));
     }
 
     public function dropTable(Connection $connection, $tableName)
     {
-        $connection->execute('DROP TABLE `' . $tableName . '`');
+        $connection->execute('DROP TABLE ' . $this->quoteName($tableName));
     }
 
     public function addColumn(Connection $connection, $tableName, array $columns)
     {
-        $sql = 'ALTER TABLE `' . $tableName . '`';
+        $sql = 'ALTER TABLE ' . $this->quoteName($tableName);
         $columnsDDL = [];
         foreach ($columns as $name => $options) {
-            $columnsDDL[] = 'ADD COLUMN `' . $name . '` ' . $this->createColumnDDL($options);
+            $columnsDDL[] = 'ADD COLUMN ' . $this->createColumnDDL($name, $options);
         }
         $sql .= ' ' .
             implode(', ', $columnsDDL) .
@@ -211,10 +211,10 @@ class Mysql
 
     public function dropColumn(Connection $connection, $tableName, array $columns)
     {
-        $sql = 'ALTER TABLE `' . $tableName . '`';
+        $sql = 'ALTER TABLE ' . $this->quoteName($tableName);
         $columnsDDL = [];
         foreach ($columns as $name) {
-            $columnsDDL[] = 'DROP COLUMN `' . $name . '`';
+            $columnsDDL[] = 'DROP COLUMN ' . $this->quoteName($tableName);
         }
         $sql .= ' ' .
             implode(', ', $columnsDDL) .
@@ -224,18 +224,18 @@ class Mysql
 
     public function renameColumn(Connection $connection, $tableName, $oldName, $newName)
     {
-        $sql = 'SHOW CREATE TABLE `' . $tableName . '`';
+        $sql = 'SHOW CREATE TABLE ' . $this->quoteName($tableName);
         $result = $connection->query($sql)->fetch()['Create Table'];
         preg_match('~^[\s]+\`'.$oldName.'\`[\s]+(.*?)[\,]?$~m', $result, $m);
         $sql = '
-            ALTER TABLE `' . $tableName . '`
-            CHANGE `' . $oldName . '` `' . $newName . '` ' . $m[1];
+            ALTER TABLE ' . $this->quoteName($tableName) . '
+            CHANGE ' . $this->quoteName($oldName) . ' ' . $this->quoteName($newName) . ' ' . $m[1];
         $connection->execute($sql);
     }
 
     public function addIndex(Connection $connection, $tableName, array $indexes)
     {
-        $sql = 'ALTER TABLE `' . $tableName . '`';
+        $sql = 'ALTER TABLE ' . $this->quoteName($tableName);
         $indexesDDL = [];
         foreach ($indexes as $name => $options) {
             $indexesDDL[] = 'ADD ' . $this->createIndexDDL($name, $options);
@@ -248,10 +248,10 @@ class Mysql
 
     public function dropIndex(Connection $connection, $tableName, array $indexes)
     {
-        $sql = 'ALTER TABLE `' . $tableName . '`';
+        $sql = 'ALTER TABLE ' . $this->quoteName($tableName);
         $indexesDDL = [];
         foreach ($indexes as $name) {
-            $indexesDDL[] = 'DROP INDEX `' . $name . '`';
+            $indexesDDL[] = 'DROP INDEX ' . $this->quoteName($name) . '';
         }
         $sql .= ' ' .
             implode(', ', $indexesDDL) .
@@ -261,7 +261,7 @@ class Mysql
 
     public function insert(Connection $connection, $tableName, array $data)
     {
-        $sql  = 'INSERT INTO `' . $tableName . '`';
+        $sql  = 'INSERT INTO ' . $this->quoteName($tableName);
         $sql .= ' (`' . implode('`, `', array_keys($data)) . '`)';
         $sql .= ' VALUES';
         $values = [];
@@ -276,7 +276,7 @@ class Mysql
     {
         if ($query instanceof QueryBuilder) {
             $params = $query->getParams();
-            $query = $query->getQuery();
+            $query = $query->getQuery($this);
         }
         $result = $class::getDbConnection()->query($query, $params)->fetchAll(\PDO::FETCH_CLASS, $class);
         if (!empty($result)) {
@@ -292,7 +292,7 @@ class Mysql
     {
         if ($query instanceof QueryBuilder) {
             $params = $query->getParams();
-            $query = $query->getQuery();
+            $query = $query->getQuery($this);
         }
         $result = $class::getDbConnection()->query($query, $params)->fetchObject($class);
         if (!empty($result))
@@ -348,7 +348,7 @@ class Mysql
             ->where(!empty($options['where']) ? $options['where'] : '')
             ->params(!empty($options['params']) ? $options['params'] : []);
 
-        return $class::getDbConnection()->query($query->getQuery(), $query->getParams())->fetchScalar();
+        return $class::getDbConnection()->query($query->getQuery($this), $query->getParams())->fetchScalar();
     }
 
     public function countAllByColumn($class, $column, $value, $options = [])
@@ -360,7 +360,7 @@ class Mysql
             ->where('`' . $column . '`=:value')
             ->params([':value' => $value]);
 
-        return $class::getDbConnection()->query($query->getQuery(), $query->getParams())->fetchScalar();
+        return $class::getDbConnection()->query($query->getQuery($this), $query->getParams())->fetchScalar();
     }
 
     /**
