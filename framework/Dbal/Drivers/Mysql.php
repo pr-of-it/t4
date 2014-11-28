@@ -49,9 +49,11 @@ class Mysql
                 $ddl = 'BOOLEAN';
                 break;
             case 'int':
+            case 'integer':
                 $ddl = 'INT(11)';
                 break;
             case 'float':
+            case 'real':
                 $ddl = 'FLOAT';
                 break;
             case 'text':
@@ -94,16 +96,25 @@ class Mysql
         return $name . ' ' . $ddl;
     }
 
-    protected function createIndexDDL($name, $options)
+    protected function createIndexDDL($name='', $options)
     {
+        if (empty($name)) {
+            $name = implode('_', $options['columns']) . '_idx';
+        }
 
         if (!isset($options['type']))
             $options['type'] = '';
 
-        if ($options['type'] == 'primary')
-            $ddl = '(`' . implode('`,`', $options['columns']) . '`)';
-        else
-            $ddl = '`' . $name . '` (`' . implode('`,`', $options['columns']) . '`)';
+        $driver = $this;
+        $columns = array_map(function ($x) use ($driver) {
+            return $driver->quoteName($x);
+        }, $options['columns']);
+
+        if ($options['type'] == 'primary') {
+            $ddl = '(' . implode(', ', $columns) . ')';
+        } else {
+            $ddl = $this->quoteName($name) . ' (' . implode(', ', $columns) . ')';
+        }
 
         switch ($options['type']) {
             case 'primary':
@@ -116,9 +127,8 @@ class Mysql
 
     }
 
-    public function createTable(Connection $connection, $tableName, $columns = [], $indexes = [], $extensions = [])
+    protected function createTableDDL($tableName, $columns = [], $indexes = [], $extensions = [])
     {
-
         foreach ($extensions as $extension) {
             $extensionClassName = '\\T4\\Orm\\Extensions\\' . ucfirst($extension);
             $extension = new $extensionClassName;
@@ -126,7 +136,7 @@ class Mysql
             $indexes = $extension->prepareIndexes($indexes);
         }
 
-        $sql = 'CREATE TABLE `' . $this->quoteName($tableName) . '`';
+        $sql = 'CREATE TABLE ' . $this->quoteName($tableName) . "\n";
 
         $columnsDDL = [];
         $indexesDDL = [];
@@ -135,29 +145,32 @@ class Mysql
         foreach ($columns as $name => $options) {
             $columnsDDL[] = $this->createColumnDDL($name, $options);
             if ('pk' == $options['type']) {
-                $indexesDDL[] = 'PRIMARY KEY (' . $this->quoteName($name) . ')';
+                $indexesDDL[] = $this->createIndexDDL('', ['type'=>'primary', 'columns'=>[$name]]);
                 $hasPK = true;
             }
             if ('link' == $options['type']) {
-                $indexesDDL[] = 'INDEX `' . $name . '`' . ' (`' . $name . '`)';
+                $indexesDDL[] = $this->createIndexDDL('', ['type'=>'index', 'columns'=>[$name]]);
             }
         }
         if (!$hasPK) {
             array_unshift($columnsDDL, $this->createColumnDDL(Model::PK, ['type' => 'pk']));
-            $indexesDDL[] = 'PRIMARY KEY (`' . Model::PK . '`)';
+            array_unshift($indexesDDL, $this->createIndexDDL('', ['type'=>'primary', 'columns'=>[Model::PK]]));
         }
 
         foreach ($indexes as $name => $options) {
-            if (is_numeric($name))
-                $name = implode('_', $options['columns']);
-            $indexesDDL[] = $this->createIndexDDL($name, $options);
+            $indexesDDL[] = $this->createIndexDDL(is_numeric($name) ? '' : $name, $options);
         }
 
-        $sql .= ' ( ' .
-            implode(', ', array_unique($columnsDDL)) . ', ' .
-            implode(', ', array_unique($indexesDDL)) .
-            ' )';
-        $connection->execute($sql);
+        $sql .= "(\n" .
+            implode(",\n", array_unique($columnsDDL)) . ",\n" .
+            implode(",\n", array_unique($indexesDDL)) .
+            "\n)";
+        return $sql;
+    }
+
+    public function createTable(Connection $connection, $tableName, $columns = [], $indexes = [], $extensions = [])
+    {
+        $connection->execute($this->createTableDDL($tableName, $columns, $indexes, $extensions));
     }
 
     public function existsTable(Connection $connection, $tableName)

@@ -109,52 +109,69 @@ class MysqlDriverTest extends PHPUnit_Framework_TestCase {
             $reflector->invokeArgs($driver, ['foo', ['type' => 'string', 'length' => 123]])
         );
     }
-/*
+
     public function testCreateIndexDDL()
     {
-        $driver = new \T4\Dbal\Drivers\Pgsql();
+        $driver = new \T4\Dbal\Drivers\Mysql();
         $reflector = new ReflectionMethod($driver, 'createIndexDDL');
         $reflector->setAccessible(true);
 
         $this->assertEquals(
-            'INDEX ON "foo" ("bar")',
-            $reflector->invokeArgs($driver, ['foo', '', ['columns' => ['bar']]])
+            'INDEX `bar_idx` (`bar`)',
+            $reflector->invokeArgs($driver, ['', ['columns' => ['bar']]])
         );
         $this->assertEquals(
-            'UNIQUE INDEX ON "foo" ("bar", "baz")',
-            $reflector->invokeArgs($driver, ['foo', '', ['type'=>'unique', 'columns' => ['bar', 'baz']]])
+            'INDEX `foo` (`bar`)',
+            $reflector->invokeArgs($driver, ['foo', ['columns' => ['bar']]])
         );
         $this->assertEquals(
-            'UNIQUE INDEX "test" ON "foo" ("bar", "baz") WHERE id>123',
-            $reflector->invokeArgs($driver, ['foo', 'test', ['type'=>'unique', 'columns' => ['bar', 'baz'], 'where' => 'id>123']])
+            'UNIQUE INDEX `bar_baz_idx` (`bar`, `baz`)',
+            $reflector->invokeArgs($driver, ['', ['type'=>'unique', 'columns' => ['bar', 'baz']]])
+        );
+        $this->assertEquals(
+            'UNIQUE INDEX `foo` (`bar`, `baz`)',
+            $reflector->invokeArgs($driver, ['foo', ['type'=>'unique', 'columns' => ['bar', 'baz']]])
+        );
+        $this->assertEquals(
+            'PRIMARY KEY (`bar`)',
+            $reflector->invokeArgs($driver, ['', ['type'=>'primary', 'columns' => ['bar']]])
+        );
+        $this->assertEquals(
+            'PRIMARY KEY (`bar`, `baz`)',
+            $reflector->invokeArgs($driver, ['foo', ['type'=>'primary', 'columns' => ['bar', 'baz']]])
         );
     }
 
     public function testCreateTableDDL()
     {
-        $driver = new \T4\Dbal\Drivers\Pgsql();
+        $driver = new \T4\Dbal\Drivers\Mysql();
         $reflector = new ReflectionMethod($driver, 'createTableDDL');
         $reflector->setAccessible(true);
 
         $this->assertEquals(
-            [
-                'CREATE TABLE "foo"' . "\n" . '("__id" BIGSERIAL PRIMARY KEY)'
-            ],
+            'CREATE TABLE `foo`' . "\n" . '(' . "\n" . '`__id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,' . "\n" . 'PRIMARY KEY (`__id`)' . "\n" . ')',
             $reflector->invokeArgs($driver, ['foo', []])
         );
         $this->assertEquals(
-            [
-                'CREATE TABLE "foo"' . "\n" . '("__id" BIGSERIAL PRIMARY KEY, "foo" INTEGER, "bar" VARCHAR)'
-            ],
+            'CREATE TABLE `foo`' . "\n" . '(' . "\n" .
+            '`__id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,' . "\n" .
+            '`foo` INT(11),' . "\n" .
+            '`bar` VARCHAR(255),' . "\n" .
+            'PRIMARY KEY (`__id`)' . "\n" .
+            ')',
             $reflector->invokeArgs($driver, ['foo', ['foo'=>['type'=>'int'], 'bar'=>['type'=>'string']]])
         );
         $this->assertEquals(
-            [
-                'CREATE TABLE "foo"' . "\n" . '("__id" BIGSERIAL PRIMARY KEY, "lnk" BIGINT NOT NULL DEFAULT \'0\', "foo" INTEGER, "bar" VARCHAR)',
-                'CREATE INDEX ON "foo" ("lnk")',
-            ],
+            'CREATE TABLE `foo`' . "\n" . '(' . "\n" .
+            '`__id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,' . "\n" .
+            '`lnk` BIGINT UNSIGNED NOT NULL DEFAULT \'0\',' . "\n" .
+            '`foo` INT(11),' . "\n" .
+            '`bar` VARCHAR(255),' . "\n" .
+            'PRIMARY KEY (`__id`),' . "\n" .
+            'INDEX `lnk_idx` (`lnk`)' . "\n" .
+            ')',
             $reflector->invokeArgs($driver, ['foo', ['lnk'=>['type'=>'link'], 'foo'=>['type'=>'int'], 'bar'=>['type'=>'string']]])
         );
     }
-*/
+
 }
