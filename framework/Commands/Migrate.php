@@ -174,7 +174,12 @@ FILE;
     protected function delete(Migration $migration)
     {
         $query = new QueryBuilder();
-        $query->delete(self::TABLE_NAME)->where('t1.time=:time')->params([':time' => $migration->getTimestamp()]);
+        if ($this->app->db->default->getDriverName() == 'mysql') {
+            $column = '`time`';
+        } else {
+            $column = '"time"';
+        }
+        $query->delete(self::TABLE_NAME)->where($column . '=:time')->params([':time' => $migration->getTimestamp()]);
         $this->app->db->default->execute($query);
     }
 
