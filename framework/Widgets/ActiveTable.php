@@ -2,7 +2,7 @@
 
 namespace T4\Widgets;
 
-use T4\Core\Widget;
+use T4\Mvc\Widget;
 
 class ActiveTable
     extends Widget

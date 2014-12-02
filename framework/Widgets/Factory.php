@@ -7,7 +7,7 @@ class Factory {
     /**
      * @param string $widget
      * @param array $options
-     * @return \T4\Core\Widget
+     * @return \T4\Mvc\Widget
      */
     public static function getInstance($widget, $options=[])
     {
