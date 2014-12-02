@@ -27,8 +27,7 @@ class Application
     protected function __construct()
     {
         if (!is_readable(ROOT_PATH_PROTECTED . DS . 'config.php')) {
-            echo 'BOOTSTRAP ERROR: Application is not installed. Install it using "t4 /create/app" command' . "\n";
-            exit(self::ERROR_CODE);
+            $this->shutdown('BOOTSTRAP ERROR: Application is not installed. Install it using "t4 /create/app" command');
         }
         $this->config = new Config(ROOT_PATH_PROTECTED . DS . 'config.php');
         try {
@@ -37,8 +36,7 @@ class Application
                 $this->db->{$connection} = new Connection($connectionConfig);
             }
         } catch (\T4\Dbal\Exception $e) {
-            echo 'BOOTSTRAP ERROR: ' . $e->getMessage() . "\n";
-            exit(self::ERROR_CODE);
+            $this->shutdown('BOOTSTRAP ERROR: ' . $e->getMessage());
         }
     }
 
@@ -71,9 +69,16 @@ class Application
             $command->action($route['action'], $params);
 
         } catch (Exception $e) {
-            echo 'ERROR: ' . $e->getMessage() . "\n";
-            exit(self::ERROR_CODE);
+            $this->shutdown('ERROR: ' . $e->getMessage());
         }
+    }
+
+    public function shutdown($message = '')
+    {
+        if (!empty($message)) {
+            echo $message . "\n";
+        }
+        exit(self::ERROR_CODE);
     }
 
     protected function parseCmd($argv)
