@@ -214,7 +214,7 @@ class Mysql
         $sql = 'ALTER TABLE ' . $this->quoteName($tableName);
         $columnsDDL = [];
         foreach ($columns as $name) {
-            $columnsDDL[] = 'DROP COLUMN ' . $this->quoteName($tableName);
+            $columnsDDL[] = 'DROP COLUMN ' . $this->quoteName($name);
         }
         $sql .= ' ' .
             implode(', ', $columnsDDL) .
