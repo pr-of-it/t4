@@ -27,8 +27,8 @@ class Application
     protected function __construct()
     {
         if (!is_readable(ROOT_PATH_PROTECTED . DS . 'config.php')) {
-            echo 'Application is not installed. Install it using "t4 /create/app" command' . "\n";
-            return;
+            echo 'BOOTSTRAP ERROR: Application is not installed. Install it using "t4 /create/app" command' . "\n";
+            exit(self::ERROR_CODE);
         }
         $this->config = new Config(ROOT_PATH_PROTECTED . DS . 'config.php');
         try {
