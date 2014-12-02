@@ -8,6 +8,7 @@ use T4\Core\Flash;
 use T4\Core\Session;
 use T4\Core\Std;
 use T4\Core\TSingleton;
+use T4\Core\TStdGetSet;
 use T4\Dbal\Connection;
 use T4\Http\E404Exception;
 use T4\Http\Request;
@@ -16,6 +17,7 @@ use T4\Http\Request;
  * Class Application
  * @package T4\Mvc
  * @property \T4\Core\Config $config
+ * @property \T4\Dbal\Connection[] $db
  * @property \T4\Http\Request $request
  * @property \App\Models\User $user
  * @property \T4\Mvc\AssetsManager $assets
@@ -24,17 +26,13 @@ use T4\Http\Request;
 class Application
 {
     use
+        TStdGetSet,
         TSingleton,
         TApplicationPaths;
 
     /*
      * Public properties
      */
-
-    /**
-     * @var \T4\Core\Std
-     */
-    public $db;
 
     /**
      * @var \T4\Core\Std
@@ -64,14 +62,6 @@ class Application
         try {
 
             Session::init();
-
-            /*
-             * DB connections setup
-             */
-            $this->db = new Std;
-            foreach ($this->config->db as $connection => $connectionConfig) {
-                $this->db->{$connection} = new Connection($connectionConfig);
-            }
 
             /*
              * Extensions setup and initialize
@@ -216,67 +206,67 @@ class Application
         return $controller;
     }
 
-    /**
-     * Lazy properties load
-     * @param $key
-     * @return mixed
+    /*
+     * Lazy properties loading
      */
-    public function __get($key)
+
+    protected function getDb()
     {
-        switch ($key) {
-            case 'config':
-                static $config = null;
-                if (null == $config) {
-                    $config = new Config($this->getPath() . DS . 'config.php');
-                    $config->sections = new Config($this->getPath() . DS . 'sections.php');
-                    $config->blocks = new Config($this->getPath() . DS . 'blocks.php');
-                }
-                return $config;
-            case 'request':
-                static $request = null;
-                if (null === $request)
-                    $request = new Request();
-                return $request;
-            case 'user':
-                static $user = null;
-                if (null === $user) {
-                    if (class_exists('\\App\Components\Auth\Identity')) {
-                        $identity = new \App\Components\Auth\Identity();
-                        $user = $identity->getUser();
-                    } else {
-                        return null;
-                    }
-                }
-                return $user;
-            case 'assets':
-                return AssetsManager::getInstance();
-            case 'flash':
-                static $flash = null;
-                if (null === $flash)
-                    $flash = new Flash();
-                return $flash;
+        static $db = null;
+        if (null === $db) {
+            $db = new Std;
+            foreach ($this->config->db as $connection => $connectionConfig) {
+                $db->{$connection} = new Connection($connectionConfig);
+            }
+            $this->db = $db;
         }
+        return $db;
     }
 
-    /**
-     * Lazy properties isset
-     * @param $key
-     * @return bool
-     */
-    public function __isset($key)
+    protected function getConfig()
     {
-        switch ($key) {
-            // current user
-            case 'user':
-                return null !== $this->user;
-                break;
-            case 'assets':
-            case 'request':
-            case 'config':
-            case 'flash':
-                return true;
-                break;
+        static $config = null;
+        if (null == $config) {
+            $config = new Config($this->getPath() . DS . 'config.php');
+            $config->sections = new Config($this->getPath() . DS . 'sections.php');
+            $config->blocks = new Config($this->getPath() . DS . 'blocks.php');
         }
+        return $config;
+    }
+
+    protected function getRequest()
+    {
+        static $request = null;
+        if (null === $request)
+            $request = new Request();
+        return $request;
+    }
+
+    protected function getUser()
+    {
+        static $user = null;
+        if (null === $user) {
+            if (class_exists('\\App\Components\Auth\Identity')) {
+                $identity = new \App\Components\Auth\Identity();
+                $user = $identity->getUser() ?: null;
+            } else {
+                return null;
+            }
+        }
+        return $user;
+    }
+
+    protected function getAssets()
+    {
+        return AssetsManager::getInstance();
+    }
+
+    protected function getFlash()
+    {
+        static $flash = null;
+        if (null === $flash)
+            $flash = new Flash();
+        return $flash;
     }
 
 }

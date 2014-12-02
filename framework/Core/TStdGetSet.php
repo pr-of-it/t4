@@ -5,6 +5,13 @@ namespace T4\Core;
 trait TStdGetSet
 {
 
+    protected $__data = [];
+
+    public function getData()
+    {
+        return $this->__data;
+    }
+
     protected function innerIsSet($key)
     {
         return isset($this->__data[$key]) || method_exists($this, 'get' . ucfirst($key));

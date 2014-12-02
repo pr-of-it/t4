@@ -6,20 +6,16 @@ class Std
     implements \ArrayAccess, \Countable, \IteratorAggregate, IArrayable
 {
 
+    /**
+     * @implement \ArrayAccess
+     */
     use TStdGetSet;
-
-    protected $__data = [];
 
     public function __construct($data=null)
     {
         if (null !== $data) {
             $this->fromArray($data);
         }
-    }
-
-    public function getData()
-    {
-        return $this->__data;
     }
 
     /**
@@ -38,22 +34,6 @@ class Std
      */
 
     /**
-     * @return array
-     */
-    public function toArray()
-    {
-        $data = [];
-        foreach ( $this->__data as $key => $value ) {
-            if ( $value instanceof self ) {
-                $data[$key] = $value->toArray();
-            } else {
-                $data[$key] = $value;
-            }
-        }
-        return $data;
-    }
-
-    /**
      * @param array $data
      * @return \T4\Core\Std $this
      */
@@ -68,6 +48,22 @@ class Std
             }
         }
         return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function toArray()
+    {
+        $data = [];
+        foreach ( $this->__data as $key => $value ) {
+            if ( $value instanceof self ) {
+                $data[$key] = $value->toArray();
+            } else {
+                $data[$key] = $value;
+            }
+        }
+        return $data;
     }
 
     /**
