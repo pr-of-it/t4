@@ -17,6 +17,8 @@ class Application
     const OPTION_PATTERN = '~^--(.+)=(.*)$~';
     const DEFAULT_ACTION = 'default';
 
+    const ERROR_CODE = 1;
+
     /**
      * @var \T4\Core\Std $db
      */
@@ -35,8 +37,8 @@ class Application
                 $this->db->{$connection} = new Connection($connectionConfig);
             }
         } catch (\T4\Dbal\Exception $e) {
-            echo $e->getMessage();
-            die;
+            echo 'BOOTSTRAP ERROR: ' . $e->getMessage() . "\n";
+            exit(self::ERROR_CODE);
         }
     }
 
@@ -69,7 +71,8 @@ class Application
             $command->action($route['action'], $params);
 
         } catch (Exception $e) {
-            die('ERROR: ' . $e->getMessage());
+            echo 'ERROR: ' . $e->getMessage() . "\n";
+            exit(self::ERROR_CODE);
         }
     }
 
