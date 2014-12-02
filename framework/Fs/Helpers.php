@@ -157,20 +157,14 @@ class Helpers
     }
 
     /**
-     * Возвращает максимальное время модификации файлов по заданному пути
+     * Max filemtime at path recursive
      * @param string $path
      * @return int
      */
     static public function dirMTime($path)
     {
-        $mtime = 0;
         clearstatcache();
-        foreach (self::listDirRecursive($path) as $file) {
-            $m = filemtime($file);
-            if ($m > $mtime)
-                $mtime = $m;
-        }
-        return $mtime;
+        return max( array_map(function ($f) {return filemtime($f);}, self::listDirRecursive($path)) );
     }
 
 }
