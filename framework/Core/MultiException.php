@@ -47,14 +47,14 @@ class MultiException
         return $this->exceptions;
     }
 
-    public function isEmpty()
-    {
-        return 0 === $this->count();
-    }
-
     public function count()
     {
         return $this->exceptions->count();
+    }
+
+    public function isEmpty()
+    {
+        return 0 === $this->count();
     }
 
     public function getIterator()
