@@ -4,7 +4,7 @@ namespace T4\Core;
 
 class MultiException
     extends Exception
-    implements \IteratorAggregate
+    implements \IteratorAggregate, \Countable
 {
 
     protected $exceptions;

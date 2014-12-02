@@ -24,6 +24,19 @@ class MultiExceptionTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($exception->isEmpty());
     }
 
+    public function testCount()
+    {
+        $exception = new MultiException;
+        $this->assertEquals(0, $exception->count());
+        $exception->add('foo');
+        $this->assertEquals(1, $exception->count());
+
+        $exception = new MultiException;
+        $this->assertEquals(0, count($exception));
+        $exception->add('foo');
+        $this->assertEquals(1, count($exception));
+    }
+
     public function testAdd()
     {
         $exception = new MultiException;
