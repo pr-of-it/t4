@@ -38,4 +38,4 @@ abstract class ARenderer
 
     abstract public function render($template, $data = []);
 
-} 
+}

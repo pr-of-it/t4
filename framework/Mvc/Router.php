@@ -15,12 +15,6 @@ class Router
     const DEFAULT_ACTION = 'Default';
 
     /**
-     * Ссылка на объект приложения
-     * @var \T4\Mvc\Application
-     */
-    protected $app;
-
-    /**
      * @var \T4\Core\Config
      */
     protected $config;
@@ -30,11 +24,6 @@ class Router
      * @var array
      */
     protected $allowedExtensions = ['html', 'json'];
-
-    protected function __construct()
-    {
-        $this->app = Application::getInstance();
-    }
 
     /**
      * @param \T4\Core\Std $config
@@ -56,7 +45,6 @@ class Router
      */
     public function parseUrl($url)
     {
-
         $url = $this->splitExternalPath($url);
 
         if (!empty($this->config)) {
@@ -77,7 +65,6 @@ class Router
         }
 
         return $this->guessInternalPath($url);
-
     }
 
     /**
@@ -87,17 +74,23 @@ class Router
      */
     protected function splitExternalPath($url)
     {
-        $urlExtension = '';
-        foreach ($this->allowedExtensions as $ext) {
-            if (false !== strpos($url, '.' . $ext)) {
-                $urlExtension = $ext;
-                break;
-            }
+        $parts = parse_url($url);
+        $basePath = isset($parts['path']) ? $parts['path'] : null;
+
+        if (empty($basePath)) {
+            $extension = null;
+        } else {
+            $extension = pathinfo($basePath, PATHINFO_EXTENSION);
+            $basePath = str_replace('.' . $extension, '', $basePath);
         }
-        $baseUrl = str_replace('.' . $urlExtension, '', $url) ? : '/';
+
+        if (!in_array($extension, $this->allowedExtensions)) {
+            $extension = '';
+        }
+
         return new Route([
-            'base' => $baseUrl,
-            'extension' => $urlExtension,
+            'base' => $basePath,
+            'extension' => $extension,
         ]);
     }
 
@@ -180,6 +173,7 @@ class Router
     protected function guessInternalPath($url)
     {
         $urlParts = preg_split('~/~', $url->base, -1, PREG_SPLIT_NO_EMPTY);
+        $app = \T4\Mvc\Application::getInstance();
 
         if (0 == count($urlParts)) {
             return new Route([
@@ -192,7 +186,7 @@ class Router
         }
 
         if (1 == count($urlParts)) {
-            if ($this->app->existsModule($urlParts[0]))
+            if ($app->existsModule($urlParts[0]))
                 return new Route([
                     'module' => ucfirst($urlParts[0]),
                     'controller' => self::DEFAULT_CONTROLLER,
@@ -200,7 +194,7 @@ class Router
                     'params' => [],
                     'format' => $url->extension ? : 'html',
                 ]);
-            elseif ($this->app->existsController('', $urlParts[0]))
+            elseif ($app->existsController('', $urlParts[0]))
                 return new Route([
                     'module' => '',
                     'controller' => ucfirst($urlParts[0]),
@@ -219,8 +213,8 @@ class Router
         }
 
         if (2 == count($urlParts)) {
-            if ($this->app->existsModule($urlParts[0])) {
-                if ($this->app->existsController($urlParts[0], $urlParts[1])) {
+            if ($app->existsModule($urlParts[0])) {
+                if ($app->existsController($urlParts[0], $urlParts[1])) {
                     return new Route([
                         'module' => ucfirst($urlParts[0]),
                         'controller' => ucfirst($urlParts[1]),
@@ -237,7 +231,7 @@ class Router
                         'format' => $url->extension ? : 'html',
                     ]);
                 }
-            } elseif ($this->app->existsController('', $urlParts[0])) {
+            } elseif ($app->existsController('', $urlParts[0])) {
                 return new Route([
                     'module' => '',
                     'controller' => ucfirst($urlParts[0]),
@@ -249,7 +243,7 @@ class Router
         }
 
         if (3 == count($urlParts)) {
-            if ($this->app->existsModule($urlParts[0]) && $this->app->existsController($urlParts[0], $urlParts[1])) {
+            if ($app->existsModule($urlParts[0]) && $app->existsController($urlParts[0], $urlParts[1])) {
                 return new Route([
                     'module' => ucfirst($urlParts[0]),
                     'controller' => ucfirst($urlParts[1]),

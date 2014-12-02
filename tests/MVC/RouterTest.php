@@ -16,9 +16,6 @@ function getRouteConfig()
 class RouterTest extends PHPUnit_Framework_TestCase
 {
 
-    /**
-     * @expectedException PHPUnit_Framework_Error_Warning
-     */
     public function testSplitExternalPath()
     {
 
@@ -62,7 +59,17 @@ class RouterTest extends PHPUnit_Framework_TestCase
             new \T4\Mvc\Route(['base' => 'shop/goods', 'extension' => 'html']),
             $reflector->invoke($router, $url)
         );
+        $url = 'shop/goods.html?foo=bar';
+        $this->assertEquals(
+            new \T4\Mvc\Route(['base' => 'shop/goods', 'extension' => 'html']),
+            $reflector->invoke($router, $url)
+        );
 
+        $url = 'shop/goods.badextension';
+        $this->assertEquals(
+            new \T4\Mvc\Route(['base' => 'shop/goods', 'extension' => '']),
+            $reflector->invoke($router, $url)
+        );
     }
 
     public function testMatchUrlTemplate()
@@ -185,7 +192,6 @@ class RouterTest extends PHPUnit_Framework_TestCase
 
     public function testParseUrl()
     {
-
         $router = \T4\Mvc\Router::getInstance();
         $router->setConfig(getRouteConfig());
 
