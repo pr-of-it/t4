@@ -30,7 +30,7 @@ trait TMixin
 
     }
 
-    public function __callStatic($name, $argv)
+    public static function __callStatic($name, $argv)
     {
         foreach (static::$_mixins as $class) {
 
