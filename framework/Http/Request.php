@@ -8,10 +8,11 @@ use T4\Core\Std;
 /**
  * Class Request
  * @package T4\Http
- * @var \T4\Core\Std $get
- * @var \T4\Core\Std $post
- * @var \T4\Core\Std $files
- * @var \T4\Core\Std $headers
+ * @property string $path
+ * @property \T4\Core\Std $get
+ * @property \T4\Core\Std $post
+ * @property \T4\Core\Std $files
+ * @property \T4\Core\Std $headers
  */
 class Request
     extends Std
@@ -20,7 +21,6 @@ class Request
     public function __construct()
     {
         $this->get = new Std($_GET);
-        unset($this->get->__path);
 
         $this->post = new Std($_POST);
 
@@ -44,6 +44,13 @@ class Request
         }
 
         $this->headers = new Std($this->getHttpHeaders());
+    }
+
+    public function getPath()
+    {
+        $domain = $_SERVER['SERVER_NAME'];
+        $path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+        return $domain . '!' . $path;
     }
 
     public function existsGetData()

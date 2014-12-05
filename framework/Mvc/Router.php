@@ -45,11 +45,14 @@ class Router
      */
     public function parseUrl($url)
     {
-        $url = $this->splitExternalPath($url);
+        $url = $this->splitRequestPath($url);
 
         if (!empty($this->config)) {
+            var_dump($this->config);
             foreach ($this->config as $urlTemplate => $internalPath) {
-                if (false !== $params = $this->matchUrlTemplate($urlTemplate, $url->base)) {
+                echo $urlTemplate;
+                /*
+                if (false !== $params = $this->matchPathTemplate($urlTemplate, $url)) {
                     $internalPath = preg_replace_callback(
                         '~\<(\d+)\>~',
                         function ($m) use ($params) {
@@ -61,6 +64,7 @@ class Router
                     $route->format = $url->extension ? : 'html';
                     return $route;
                 }
+                */
             }
         }
 
@@ -68,20 +72,29 @@ class Router
     }
 
     /**
-     * Разбирает URL, выделяя basePath и расширение
-     * @param string $url
+     * Splits canonical request path into domain, path and extension
+     * @param string $path
      * @return \T4\Mvc\Route
      */
-    protected function splitExternalPath($url)
+    protected function splitRequestPath($path)
     {
-        $parts = parse_url($url);
+        // Domain part extract
+        $parts = explode('!', $path);
+        if (count($parts) > 1) {
+            $domain = $parts[0];
+            $path = $parts[1];
+        } else {
+            $domain = null;
+        }
+
+        $parts = parse_url($path);
         $basePath = isset($parts['path']) ? $parts['path'] : null;
 
         if (empty($basePath)) {
             $extension = null;
         } else {
             $extension = pathinfo($basePath, PATHINFO_EXTENSION);
-            $basePath = str_replace('.' . $extension, '', $basePath);
+            $basePath = preg_replace('~\.' . $extension . '$~', '', $basePath);
         }
 
         if (!in_array($extension, $this->allowedExtensions)) {
@@ -89,38 +102,71 @@ class Router
         }
 
         return new Route([
-            'base' => $basePath,
+            'domain' => $domain,
+            'basepath' => $basePath,
             'extension' => $extension,
         ]);
     }
 
     /**
-     * Проверка соответствия URL (базового) его шаблону из правил роутинга
-     * Возвращает false в случае несоответствия
-     * или массив параметров (возможно - пустой) в случае совпадения URL с шаблоном
+     * Check if canonical path (splitted into Route object) is mathing to template from route config
+     * Returns false if no matches
+     * or array of request params elsewhere
      * @param string $template
-     * @param string $url
+     * @param \T4\Mvc\Route $path
      * @return array|bool
      */
-    protected function matchUrlTemplate($template, $url)
+    protected function matchPathTemplate($template, Route $path)
     {
-        $template = '~^' . preg_replace('~\<(\d+)\>~', '(?<p_$1>.+?)', $template) . '$~i';
-        if (!preg_match($template, $url, $m)) {
+        $matches = [];
+        $templateParts = explode('!', $template);
+        if (count($templateParts) > 1) {
+            $domainTemplate = $templateParts[0];
+            $basepathTemplate = $templateParts[1];
+        } else {
+            $domainTemplate = null;
+            $basepathTemplate = $templateParts[0];
+        }
+var_dump($domainTemplate);
+var_dump($basepathTemplate);
+
+        if (empty($path->domain)) {
+            if (!empty($domainTemplate)) {
+                return false;
+            }
+        } else {
+            if (!empty($domainTemplate)) {
+                echo $domainTemplate = '~^' . preg_replace('~\<(\d+)\>~', '(?<p_$1>.+?)', $domainTemplate) . '$~i';
+                if (!preg_match($domainTemplate, $path->domain, $m)) {
+                    return false;
+                } else {
+                    foreach ($m as $key => $value) {
+                        echo $value;
+                        if (substr($key, 0, 2) == 'p_') {
+                            $matches[substr($key, 2)] = $value;
+                        }
+                    }
+                }
+
+            }
+        }
+
+        $basepathTemplate = '~^' . preg_replace('~\<(\d+)\>~', '(?<p_$1>.+?)', $basepathTemplate) . '$~i';
+        if (!preg_match($basepathTemplate, $path->basepath, $n)) {
             return false;
         } else {
-            $matches = [];
-            foreach ($m as $key => $value) {
+            foreach ($n as $key => $value) {
                 if (substr($key, 0, 2) == 'p_') {
                     $matches[substr($key, 2)] = $value;
                 }
             }
-            return $matches;
         }
+
+        return $matches;
     }
 
     /**
-     * Разбирает внутренний путь /модуль/контроллер/действие(параметры)
-     * Возвращает объект роутинга
+     * Splits internal framework path like /module/controller/action(params)
      * @param string $path
      * @return \T4\Mvc\Route
      * @throws \T4\Mvc\RouterException

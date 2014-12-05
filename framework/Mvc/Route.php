@@ -8,7 +8,8 @@ use T4\Core\Std;
  * Class Route
  * @package T4\Mvc
  *
- * @property string base
+ * @property string domain
+ * @property string basepath
  * @property string extension
  *
  * @property string module
