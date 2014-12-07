@@ -313,6 +313,7 @@ class Mysql
             ->from($class::getTableName())
             ->where(!empty($options['where']) ? $options['where'] : '')
             ->order(!empty($options['order']) ? $options['order'] : '')
+            ->offset(!empty($options['offset']) ? $options['offset'] : '')
             ->limit(!empty($options['limit']) ? $options['limit'] : '')
             ->params(!empty($options['params']) ? $options['params'] : []);
         return $this->findAllByQuery($class, $query);
@@ -326,6 +327,7 @@ class Mysql
             ->from($class::getTableName())
             ->where('`' . $column . '`=:value' . (!empty($options['where']) ? ' AND (' . $options['where'] . ')' : ''))
             ->order(!empty($options['order']) ? $options['order'] : '')
+            ->offset(!empty($options['offset']) ? $options['offset'] : '')
             ->limit(!empty($options['limit']) ? $options['limit'] : '')
             ->params([':value' => $value]);
         return $this->findAllByQuery($class, $query);
