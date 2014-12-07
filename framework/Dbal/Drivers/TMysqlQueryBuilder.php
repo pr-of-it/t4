@@ -35,7 +35,7 @@ trait TMysqlQueryBuilder
         if ($query->select == ['*']) {
             $sql .= '*';
         } else {
-            $select = array_map([get_called_class(), 'quoteName'], $query->select);
+            $select = array_map([$this, 'quoteName'], $query->select);
             $sql .= implode(', ', $select);
         }
         $sql .= "\n";
