@@ -43,7 +43,6 @@ class Router
     public function parseRequestPath($requestPath)
     {
         $request = $this->splitRequestPath($requestPath);
-
         if (!empty($this->config)) {
             foreach ($this->config as $template => $internalPath) {
                 if (false !== $params = $this->matchPathTemplate($template, $request)) {
@@ -60,7 +59,6 @@ class Router
                 }
             }
         }
-
         return $this->guessInternalPath($request);
     }
 
@@ -121,9 +119,13 @@ class Router
             $basepathTemplate = $templateParts[0];
         }
 
-        $domainMatches = $this->getTemplateMatches($domainTemplate, $path->domain);
-        if (false === $domainMatches) {
-            return false;
+        if (!empty($domainTemplate)) {
+            $domainMatches = $this->getTemplateMatches($domainTemplate, $path->domain);
+            if (false === $domainMatches) {
+                return false;
+            }
+        } else {
+            $domainMatches = [];
         }
         $basepathMatches = $this->getTemplateMatches($basepathTemplate, $path->basepath);
         if (false === $basepathMatches) {
@@ -210,7 +212,7 @@ class Router
      */
     protected function guessInternalPath($url)
     {
-        $urlParts = preg_split('~/~', $url->base, -1, PREG_SPLIT_NO_EMPTY);
+        $urlParts = preg_split('~/~', $url->basepath, -1, PREG_SPLIT_NO_EMPTY);
         $app = \T4\Mvc\Application::getInstance();
 
         if (0 == count($urlParts)) {
@@ -292,7 +294,7 @@ class Router
             }
         }
 
-        throw new RouterException('Route to path \'' . $url->base . '\' is not found');
+        throw new RouterException('Route to path \'' . $url->basepath . '\' is not found');
     }
 
 }

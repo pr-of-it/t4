@@ -11,8 +11,8 @@ function getRouteConfig()
         '/index'=>'///',
         '/goods'=>'/Shop/Goods/default',
         '/goods/<1>'=>'/Shop/Goods/view(id=<1>)',
-        '/shop/<2>/<1>'=>'/Shop/Goods/view(id=<1>,vendor=<2>)',
         'auto.<1>!/shop/<3>/<2>'=>'/Shop/Goods/view(lang=<1>,id=<2>,vendor=<3>)',
+        '/shop/<2>/<1>'=>'/Shop/Goods/view(id=<1>,vendor=<2>)',
     ]);
 }
 
@@ -321,27 +321,22 @@ class RouterTest extends PHPUnit_Framework_TestCase
             new \T4\Mvc\Route(['module'=>'', 'controller'=>'Index', 'action'=>'Default', 'params'=>[], 'format'=>'html']),
             $router->parseRequestPath('/')
         );
-
         $this->assertEquals(
             new \T4\Mvc\Route(['module'=>'Shop', 'controller'=>'Goods', 'action'=>'Default', 'params'=>[], 'format'=>'html']),
             $router->parseRequestPath('/goods')
         );
-
         $this->assertEquals(
             new \T4\Mvc\Route(['module'=>'Shop', 'controller'=>'Goods', 'action'=>'View', 'params'=>['id'=>13], 'format'=>'html']),
             $router->parseRequestPath('/goods/13.html')
         );
-
         $this->assertEquals(
             new \T4\Mvc\Route(['module'=>'Shop', 'controller'=>'Goods', 'action'=>'View', 'params'=>['id'=>'42', 'vendor'=>'volvo'], 'format'=>'html']),
             $router->parseRequestPath('/shop/volvo/42.html')
         );
-
         $this->assertEquals(
             new \T4\Mvc\Route(['module'=>'Shop', 'controller'=>'Goods', 'action'=>'View', 'params'=>['lang'=>'fr', 'id'=>'42', 'vendor'=>'volvo'], 'format'=>'html']),
             $router->parseRequestPath('auto.fr!/shop/volvo/42.html')
         );
-
     }
 
 }
