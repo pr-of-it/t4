@@ -124,7 +124,7 @@ class Application
         $route =
             Router::getInstance()
                 ->setConfig($this->getRouteConfig())
-                ->parseUrl($path);
+                ->parseRequestPath($path);
         $controller = $this->createController($route->module, $route->controller);
         $controller->action($route->action, $route->params);
         $data = $controller->getData();

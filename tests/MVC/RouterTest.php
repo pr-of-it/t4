@@ -12,16 +12,15 @@ function getRouteConfig()
         '/goods'=>'/Shop/Goods/default',
         '/goods/<1>'=>'/Shop/Goods/view(id=<1>)',
         '/shop/<2>/<1>'=>'/Shop/Goods/view(id=<1>,vendor=<2>)',
-        'auto.<1>!/shop/<3>/<2>'=>'/Shop/Goods/view(lang=<1>, id=<2>,vendor=<3>)',
+        'auto.<1>!/shop/<3>/<2>'=>'/Shop/Goods/view(lang=<1>,id=<2>,vendor=<3>)',
     ]);
 }
 
 class RouterTest extends PHPUnit_Framework_TestCase
 {
-/*
+
     public function testSplitRequestPath()
     {
-
         $router = \T4\Mvc\Router::getInstance();
         $reflector = new ReflectionMethod($router, 'splitRequestPath');
         $reflector->setAccessible(true);
@@ -99,13 +98,62 @@ class RouterTest extends PHPUnit_Framework_TestCase
             new Route(['domain'=>'bar.local', 'basepath' => '/shop/goods', 'extension' => '']),
             $reflector->invoke($router, $url)
         );
+    }
 
+    public function testGetTemplateMatches()
+    {
+        $router = \T4\Mvc\Router::getInstance();
+        $reflector = new ReflectionMethod($router, 'getTemplateMatches');
+        $reflector->setAccessible(true);
 
+        $template = '/foo/bar';
+        $path = '/';
+        $this->assertEquals(
+            false,
+            $reflector->invoke($router, $template, $path)
+        );
+        $template = '/';
+        $path = '/foo/bar';
+        $this->assertEquals(
+            false,
+            $reflector->invoke($router, $template, $path)
+        );
+
+        $template = '/';
+        $path = '/';
+        $this->assertEquals(
+            [],
+            $reflector->invoke($router, $template, $path)
+        );
+        $template = '/index';
+        $path = '/index';
+        $this->assertEquals(
+            [],
+            $reflector->invoke($router, $template, $path)
+        );
+
+        $template = '/index/<1>/<2>';
+        $path = '/index/foo';
+        $this->assertEquals(
+            false,
+            $reflector->invoke($router, $template, $path)
+        );
+        $template = '/index/<1>';
+        $path = '/index/foo/bar';
+        $this->assertEquals(
+            [1=>'foo/bar'],
+            $reflector->invoke($router, $template, $path)
+        );
+        $template = '/index/<1>/<2>';
+        $path = '/index/foo/bar';
+        $this->assertEquals(
+            [1=>'foo', 2=>'bar'],
+            $reflector->invoke($router, $template, $path)
+        );
     }
 
     public function testMatchPathTemplate()
     {
-
         $router = \T4\Mvc\Router::getInstance();
         $reflector = new ReflectionMethod($router, 'matchPathTemplate');
         $reflector->setAccessible(true);
@@ -146,6 +194,20 @@ class RouterTest extends PHPUnit_Framework_TestCase
         );
 
         $template = 'test.local!/goods';
+        $path = new Route(['domain'=>null, 'basepath'=>'/']);
+        $this->assertEquals(
+            false,
+            $reflector->invoke($router, $template, $path)
+        );
+
+        $template = 'test.local!/goods';
+        $path = new Route(['domain'=>null, 'basepath'=>'/goods']);
+        $this->assertEquals(
+            false,
+            $reflector->invoke($router, $template, $path)
+        );
+
+        $template = 'test.local!/goods';
         $path = new Route(['domain'=>'test.local', 'basepath'=>'/']);
         $this->assertEquals(
             false,
@@ -167,9 +229,9 @@ class RouterTest extends PHPUnit_Framework_TestCase
         );
 
         $template = 'auto.<1>!/goods/<3>/<2>';
-        $path = new Route(['domain'=>'auto.com', 'basepath'=>'/goods/cars/volvo']);
+        $path = new Route(['domain'=>'auto.fr', 'basepath'=>'/goods/cars/volvo']);
         $this->assertEquals(
-            [1=>'com', 2=>'volvo', 3=>'cars'],
+            [1=>'fr', 2=>'volvo', 3=>'cars'],
             $reflector->invoke($router, $template, $path)
         );
 
@@ -248,30 +310,36 @@ class RouterTest extends PHPUnit_Framework_TestCase
             $reflector->invoke($router, $url)
         );
     }
-*/
+
     public function testParseUrl()
     {
+
         $router = \T4\Mvc\Router::getInstance();
         $router->setConfig(getRouteConfig());
-/*
+
         $this->assertEquals(
             new \T4\Mvc\Route(['module'=>'', 'controller'=>'Index', 'action'=>'Default', 'params'=>[], 'format'=>'html']),
-            $router->parseUrl('')
+            $router->parseRequestPath('/')
         );
 
         $this->assertEquals(
             new \T4\Mvc\Route(['module'=>'Shop', 'controller'=>'Goods', 'action'=>'Default', 'params'=>[], 'format'=>'html']),
-            $router->parseUrl('/goods')
+            $router->parseRequestPath('/goods')
         );
 
         $this->assertEquals(
             new \T4\Mvc\Route(['module'=>'Shop', 'controller'=>'Goods', 'action'=>'View', 'params'=>['id'=>13], 'format'=>'html']),
-            $router->parseUrl('/goods/13.html')
+            $router->parseRequestPath('/goods/13.html')
         );
-*/
+
         $this->assertEquals(
-            new \T4\Mvc\Route(['module'=>'Shop', 'controller'=>'Goods', 'action'=>'View', 'params'=>['lang'=>'fr', 'vendor'=>'volvo', 'id'=>'42'], 'format'=>'html']),
-            $router->parseUrl('auto.fr!/shop/volvo/42.html')
+            new \T4\Mvc\Route(['module'=>'Shop', 'controller'=>'Goods', 'action'=>'View', 'params'=>['id'=>'42', 'vendor'=>'volvo'], 'format'=>'html']),
+            $router->parseRequestPath('/shop/volvo/42.html')
+        );
+
+        $this->assertEquals(
+            new \T4\Mvc\Route(['module'=>'Shop', 'controller'=>'Goods', 'action'=>'View', 'params'=>['lang'=>'fr', 'id'=>'42', 'vendor'=>'volvo'], 'format'=>'html']),
+            $router->parseRequestPath('auto.fr!/shop/volvo/42.html')
         );
 
     }

@@ -17,10 +17,10 @@ class Router
     /**
      * @var \T4\Core\Config
      */
-    protected $config;
+    protected $config = [];
 
     /**
-     * Распознаваемые расширения в URL
+     * Allowed URL extensions
      * @var array
      */
     protected $allowedExtensions = ['html', 'json'];
@@ -36,23 +36,17 @@ class Router
     }
 
     /**
-     * Разбирает URL, поступивший из браузера,
-     * используя методы разбора URL и внутреннего пути.
-     * Возвращает объект роутинга
-     * @param string $url
+     * @param string $requestPath
+     * @throws RouterException
      * @return \T4\Mvc\Route
-     * @throws \T4\Mvc\RouterException
      */
-    public function parseUrl($url)
+    public function parseRequestPath($requestPath)
     {
-        $url = $this->splitRequestPath($url);
+        $request = $this->splitRequestPath($requestPath);
 
         if (!empty($this->config)) {
-            var_dump($this->config);
-            foreach ($this->config as $urlTemplate => $internalPath) {
-                echo $urlTemplate;
-                /*
-                if (false !== $params = $this->matchPathTemplate($urlTemplate, $url)) {
+            foreach ($this->config as $template => $internalPath) {
+                if (false !== $params = $this->matchPathTemplate($template, $request)) {
                     $internalPath = preg_replace_callback(
                         '~\<(\d+)\>~',
                         function ($m) use ($params) {
@@ -61,14 +55,13 @@ class Router
                         $internalPath
                     );
                     $route = $this->splitInternalPath($internalPath);
-                    $route->format = $url->extension ? : 'html';
+                    $route->format = $request->extension ?: $this->allowedExtensions[0];
                     return $route;
                 }
-                */
             }
         }
 
-        return $this->guessInternalPath($url);
+        return $this->guessInternalPath($request);
     }
 
     /**
@@ -118,8 +111,8 @@ class Router
      */
     protected function matchPathTemplate($template, Route $path)
     {
-        $matches = [];
         $templateParts = explode('!', $template);
+
         if (count($templateParts) > 1) {
             $domainTemplate = $templateParts[0];
             $basepathTemplate = $templateParts[1];
@@ -127,42 +120,41 @@ class Router
             $domainTemplate = null;
             $basepathTemplate = $templateParts[0];
         }
-var_dump($domainTemplate);
-var_dump($basepathTemplate);
 
-        if (empty($path->domain)) {
-            if (!empty($domainTemplate)) {
-                return false;
-            }
-        } else {
-            if (!empty($domainTemplate)) {
-                echo $domainTemplate = '~^' . preg_replace('~\<(\d+)\>~', '(?<p_$1>.+?)', $domainTemplate) . '$~i';
-                if (!preg_match($domainTemplate, $path->domain, $m)) {
-                    return false;
-                } else {
-                    foreach ($m as $key => $value) {
-                        echo $value;
-                        if (substr($key, 0, 2) == 'p_') {
-                            $matches[substr($key, 2)] = $value;
-                        }
-                    }
-                }
-
-            }
+        $domainMatches = $this->getTemplateMatches($domainTemplate, $path->domain);
+        if (false === $domainMatches) {
+            return false;
+        }
+        $basepathMatches = $this->getTemplateMatches($basepathTemplate, $path->basepath);
+        if (false === $basepathMatches) {
+            return false;
         }
 
-        $basepathTemplate = '~^' . preg_replace('~\<(\d+)\>~', '(?<p_$1>.+?)', $basepathTemplate) . '$~i';
-        if (!preg_match($basepathTemplate, $path->basepath, $n)) {
+        return $domainMatches + $basepathMatches;
+    }
+
+    /**
+     * Checks if $path is mathes to $template
+     * Returns array of matched params (like <1>)
+     * or false if no matches found
+     * @param string $template Route template
+     * @param string $path part of request path string
+     * @return array|boolean array
+     */
+    protected function getTemplateMatches($template, $path)
+    {
+        $template = '~^' . preg_replace('~\<(\d+)\>~', '(?<p_$1>.+?)', $template) . '$~i';
+        if (!preg_match($template, $path, $m)) {
             return false;
         } else {
-            foreach ($n as $key => $value) {
+            $matches = [];
+            foreach ($m as $key => $value) {
                 if (substr($key, 0, 2) == 'p_') {
                     $matches[substr($key, 2)] = $value;
                 }
             }
+            return $matches;
         }
-
-        return $matches;
     }
 
     /**
@@ -301,7 +293,6 @@ var_dump($basepathTemplate);
         }
 
         throw new RouterException('Route to path \'' . $url->base . '\' is not found');
-
     }
 
 }
