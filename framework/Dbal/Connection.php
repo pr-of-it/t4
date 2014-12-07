@@ -75,7 +75,7 @@ class Connection
     public function execute($query, array $params = [])
     {
         if ($query instanceof QueryBuilder) {
-            $params = $query->getParams();
+            $params = array_merge($params, $query->getParams());
             $query = $query->getQuery($this->getDriver());
         }
         $statement = $this->pdo->prepare($query);
@@ -90,7 +90,7 @@ class Connection
     public function query($query, array $params = [])
     {
         if ($query instanceof QueryBuilder) {
-            $params = $query->getParams();
+            $params = array_merge($params, $query->getParams());
             $query = $query->getQuery($this->getDriver());
         }
         $statement = $this->pdo->prepare($query);
