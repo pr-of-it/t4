@@ -48,7 +48,7 @@ class Request
 
     public function getPath()
     {
-        $domain = $_SERVER['SERVER_NAME'];
+        $domain = $_SERVER['SERVER_NAME'] ?: $_SERVER['HTTP_X_REWRITE_URL'];
         $path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
         $path = preg_replace('~/+$~', '', $path);
         return $domain . '!' . $path;
