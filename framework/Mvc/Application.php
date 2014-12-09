@@ -96,7 +96,7 @@ class Application
     public function run()
     {
         try {
-            $this->runInternalPath($this->request->path);
+            $this->runInternalPath($this->request->fullPath);
         } catch (Exception $e) {
             try {
                 if ($e instanceof E404Exception && !empty($this->config->errors['404'])) {

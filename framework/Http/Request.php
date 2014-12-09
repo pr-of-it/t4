@@ -8,7 +8,10 @@ use T4\Core\Std;
 /**
  * Class Request
  * @package T4\Http
+ * @property string $https
+ * @property string $domain
  * @property string $path
+ * @property string $fullPath
  * @property \T4\Core\Std $get
  * @property \T4\Core\Std $post
  * @property \T4\Core\Std $files
@@ -46,12 +49,26 @@ class Request
         $this->headers = new Std($this->getHttpHeaders());
     }
 
+    public function getHttps()
+    {
+        return !(empty($_SERVER['HTTPS']) || 'off'==$_SERVER['HTTPS']);
+    }
+
+    public function getDomain()
+    {
+        return $_SERVER['SERVER_NAME'] ?: $_SERVER['HTTP_X_REWRITE_URL'];
+    }
+
     public function getPath()
     {
-        $domain = $_SERVER['SERVER_NAME'] ?: $_SERVER['HTTP_X_REWRITE_URL'];
         $path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
         $path = preg_replace('~/+$~', '', $path);
-        return $domain . '!' . $path;
+        return $path;
+    }
+
+    public function getFullPath()
+    {
+        return $this->domain . '!' . $this->path;
     }
 
     public function existsGetData()
