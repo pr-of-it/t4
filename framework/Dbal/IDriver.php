@@ -22,6 +22,8 @@ interface IDriver
 
     public function dropColumn(Connection $connection, $tableName, array $columns);
 
+    public function renameColumn(Connection $connection, $tableName, $oldName, $newName);
+
     public function addIndex(Connection $connection, $tableName, array $indexes);
 
     public function dropIndex(Connection $connection, $tableName, array $indexes);
