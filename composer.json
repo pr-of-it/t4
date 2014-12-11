@@ -2,6 +2,7 @@
 
     "name": "pr-of-it/t4",
     "description": "T4 framework",
+    "keywords": ["php", "framework", "t4"],
     "type": "library",
 
     "require": {
@@ -16,7 +17,13 @@
     },
 
     "autoload": {
-        "psr-0": { "T4\\": "framework/" }
-    }
+        "psr-4": {
+            "T4\\": "framework/"
+        }
+    },
+
+    "bin": [
+        "framework/t4"
+    ]
 
 }
