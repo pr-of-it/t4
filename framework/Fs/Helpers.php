@@ -5,7 +5,7 @@ namespace T4\Fs;
 class Helpers
 {
 
-    public static function listDir($path)
+    public static function listDir($path, $order = \SCANDIR_SORT_NONE)
     {
         if (!is_dir($path))
             throw new Exception('No such dir: ' . $path);
@@ -13,7 +13,7 @@ class Helpers
             function ($f) use ($path) {
                 return $path.DS.$f;
             },
-            scandir($path, \SCANDIR_SORT_NONE)
+            scandir($path, $order)
         );
     }
 
