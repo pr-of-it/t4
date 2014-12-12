@@ -14,9 +14,21 @@ class ConfigTest extends PHPUnit_Framework_TestCase {
         $config = new Config(__DIR__ . DS . 'wrong.name.php');
     }
 
+    public function testLoad()
+    {
+        $conf1 = new Config(__DIR__ . DS . 'config.test.php');
+        $conf2 = new Config();
+        $conf2->load(__DIR__ . DS . 'config.test.php');
+        $this->assertEquals(
+            $conf2,
+            $conf1
+        );
+    }
+
     public function testValidConfig()
     {
-        $config = new Config(__DIR__ . DS . 'config.test.php');
+        $config = new Config;
+        $config->load(__DIR__ . DS . 'config.test.php');
         $this->assertInstanceOf(
             'T4\Core\Std',
             $config->db

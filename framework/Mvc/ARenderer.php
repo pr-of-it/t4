@@ -2,7 +2,7 @@
 
 namespace T4\Mvc;
 
-use T4\Core\Helpers;
+use T4\Fs\Helpers;
 
 abstract class ARenderer
 {
@@ -38,4 +38,4 @@ abstract class ARenderer
 
     abstract public function render($template, $data = []);
 
-} 
+}

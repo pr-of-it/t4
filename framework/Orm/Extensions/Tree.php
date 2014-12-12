@@ -257,7 +257,7 @@ class Tree
 
         $query = new QueryBuilder();
         $query->select('MIN(`__lft`)')->from($tableName);
-        $minLft = (int)$connection->query($query->getQuery())->fetchScalar();
+        $minLft = (int)$connection->query($query)->fetchScalar();
 
         $width = $model->getTreeWidth();
         $this->expandTreeBeforeLft($connection, $tableName, $minLft, $width);
@@ -296,7 +296,7 @@ class Tree
 
         $query = new QueryBuilder();
         $query->select('MAX(`__rgt`)')->from($tableName);
-        $maxRgt = (int)$connection->query($query->getQuery())->fetchScalar();
+        $maxRgt = (int)$connection->query($query)->fetchScalar();
 
         if ($model->isNew()) {
 

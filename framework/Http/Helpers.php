@@ -12,7 +12,7 @@ class Helpers
 
     public static function setCookie($name, $value, $expire=0, $allSubDomains = true)
     {
-        $domain = $_SERVER['SERVER_NAME'];
+        $domain = \T4\Mvc\Application::getInstance()->request->domain;
         if ($allSubDomains)
             $domain = self::getUniversalDomainName($domain);
         setcookie($name, $value, $expire, '/', $domain, false, true);
@@ -25,7 +25,7 @@ class Helpers
 
     public static function unsetCookie($name, $allSubDomains = true)
     {
-        $domain = $_SERVER['SERVER_NAME'];
+        $domain = \T4\Mvc\Application::getInstance()->request->domain;;
         if ($allSubDomains)
             $domain = self::getUniversalDomainName($domain);
         self::setCookie($name, '', time()-60*60*24*30, '/', $domain, false, true);
@@ -39,7 +39,8 @@ class Helpers
 
     public static function redirect($url)
     {
-        header('Location: ' . (empty($_SERVER['HTTPS']) || 'off'==$_SERVER['HTTPS'] ? 'http://' : 'https://' ).$_SERVER['HTTP_HOST'].$url, true, 302);
+        $https = \T4\Mvc\Application::getInstance()->request->https;;
+        header('Location: ' . ($https ? 'https://' : 'http://' ) . $_SERVER['HTTP_HOST'] . $url, true, 302);
         exit;
     }
 

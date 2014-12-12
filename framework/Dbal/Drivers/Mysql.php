@@ -14,15 +14,20 @@ class Mysql
 
     use TMysqlQueryBuilder;
 
+    protected $selectNoQouteTemplate = '~count|avg|group_concat|min|max|sum~i';
+
     protected function quoteName($name)
     {
         $parts = explode('.', $name);
         $lastIndex = count($parts)-1;
         foreach ($parts as $index => &$part) {
             if (
+                (
                 $index == $lastIndex
                 ||
                 !preg_match('~^(t|j)[\d]+$~', $part)
+                ) &&
+                !preg_match($this->selectNoQouteTemplate, $part)
             ) {
                 $part = '`' . $part . '`';
             }
@@ -308,6 +313,7 @@ class Mysql
             ->from($class::getTableName())
             ->where(!empty($options['where']) ? $options['where'] : '')
             ->order(!empty($options['order']) ? $options['order'] : '')
+            ->offset(!empty($options['offset']) ? $options['offset'] : '')
             ->limit(!empty($options['limit']) ? $options['limit'] : '')
             ->params(!empty($options['params']) ? $options['params'] : []);
         return $this->findAllByQuery($class, $query);
@@ -321,6 +327,7 @@ class Mysql
             ->from($class::getTableName())
             ->where('`' . $column . '`=:value' . (!empty($options['where']) ? ' AND (' . $options['where'] . ')' : ''))
             ->order(!empty($options['order']) ? $options['order'] : '')
+            ->offset(!empty($options['offset']) ? $options['offset'] : '')
             ->limit(!empty($options['limit']) ? $options['limit'] : '')
             ->params([':value' => $value]);
         return $this->findAllByQuery($class, $query);
@@ -347,7 +354,6 @@ class Mysql
             ->from($class::getTableName())
             ->where(!empty($options['where']) ? $options['where'] : '')
             ->params(!empty($options['params']) ? $options['params'] : []);
-
         return $class::getDbConnection()->query($query->getQuery($this), $query->getParams())->fetchScalar();
     }
 
@@ -359,7 +365,6 @@ class Mysql
             ->from($class::getTableName())
             ->where('`' . $column . '`=:value')
             ->params([':value' => $value]);
-
         return $class::getDbConnection()->query($query->getQuery($this), $query->getParams())->fetchScalar();
     }
 

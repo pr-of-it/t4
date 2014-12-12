@@ -1,3 +1,4 @@
+#!/usr/bin/env php
 <?php
 
 require realpath(__DIR__.'/boot.php');

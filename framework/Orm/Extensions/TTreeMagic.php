@@ -67,8 +67,8 @@ trait TTreeMagic
                 $sql = new QueryBuilder();
                 $sql->select(['__lft', '__rgt', '__lvl', '__prt'])
                     ->from($tableName)
-                    ->where('`' . $class::PK . '`=:id');
-                $columns = $connection->query($sql->getQuery(), [':id' => $model->getPk()])->fetch();
+                    ->where('t1.`' . $class::PK . '`=:id');
+                $columns = $connection->query($sql, [':id' => $model->getPk()])->fetch();
                 $model->merge($columns);
                 return $model;
 

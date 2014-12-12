@@ -15,26 +15,15 @@ class Router
     const DEFAULT_ACTION = 'Default';
 
     /**
-     * Ссылка на объект приложения
-     * @var \T4\Mvc\Application
-     */
-    protected $app;
-
-    /**
      * @var \T4\Core\Config
      */
-    protected $config;
+    protected $config = [];
 
     /**
-     * Распознаваемые расширения в URL
+     * Allowed URL extensions
      * @var array
      */
     protected $allowedExtensions = ['html', 'json'];
-
-    protected function __construct()
-    {
-        $this->app = Application::getInstance();
-    }
 
     /**
      * @param \T4\Core\Std $config
@@ -47,21 +36,16 @@ class Router
     }
 
     /**
-     * Разбирает URL, поступивший из браузера,
-     * используя методы разбора URL и внутреннего пути.
-     * Возвращает объект роутинга
-     * @param string $url
+     * @param string $requestPath
+     * @throws RouterException
      * @return \T4\Mvc\Route
-     * @throws \T4\Mvc\RouterException
      */
-    public function parseUrl($url)
+    public function parseRequestPath($requestPath)
     {
-
-        $url = $this->splitExternalPath($url);
-
+        $request = $this->splitRequestPath($requestPath);
         if (!empty($this->config)) {
-            foreach ($this->config as $urlTemplate => $internalPath) {
-                if (false !== $params = $this->matchUrlTemplate($urlTemplate, $url->base)) {
+            foreach ($this->config as $template => $internalPath) {
+                if (false !== $params = $this->matchPathTemplate($template, $request)) {
                     $internalPath = preg_replace_callback(
                         '~\<(\d+)\>~',
                         function ($m) use ($params) {
@@ -70,49 +54,99 @@ class Router
                         $internalPath
                     );
                     $route = $this->splitInternalPath($internalPath);
-                    $route->format = $url->extension ? : 'html';
+                    $route->format = $request->extension ?: $this->allowedExtensions[0];
                     return $route;
                 }
             }
         }
-
-        return $this->guessInternalPath($url);
-
+        return $this->guessInternalPath($request);
     }
 
     /**
-     * Разбирает URL, выделяя basePath и расширение
-     * @param string $url
+     * Splits canonical request path into domain, path and extension
+     * @param string $path
      * @return \T4\Mvc\Route
      */
-    protected function splitExternalPath($url)
+    protected function splitRequestPath($path)
     {
-        $urlExtension = '';
-        foreach ($this->allowedExtensions as $ext) {
-            if (false !== strpos($url, '.' . $ext)) {
-                $urlExtension = $ext;
-                break;
-            }
+        // Domain part extract
+        $parts = explode('!', $path);
+        if (count($parts) > 1) {
+            $domain = $parts[0];
+            $path = $parts[1];
+        } else {
+            $domain = null;
         }
-        $baseUrl = str_replace('.' . $urlExtension, '', $url) ? : '/';
+
+        $parts = parse_url($path);
+        $basePath = isset($parts['path']) ? $parts['path'] : null;
+
+        if (empty($basePath)) {
+            $extension = null;
+        } else {
+            $extension = pathinfo($basePath, PATHINFO_EXTENSION);
+            $basePath = preg_replace('~\.' . $extension . '$~', '', $basePath);
+        }
+
+        if (!in_array($extension, $this->allowedExtensions)) {
+            $extension = '';
+        }
+
         return new Route([
-            'base' => $baseUrl,
-            'extension' => $urlExtension,
+            'domain' => $domain,
+            'basepath' => $basePath,
+            'extension' => $extension,
         ]);
     }
 
     /**
-     * Проверка соответствия URL (базового) его шаблону из правил роутинга
-     * Возвращает false в случае несоответствия
-     * или массив параметров (возможно - пустой) в случае совпадения URL с шаблоном
+     * Check if canonical path (splitted into Route object) is mathing to template from route config
+     * Returns false if no matches
+     * or array of request params elsewhere
      * @param string $template
-     * @param string $url
+     * @param \T4\Mvc\Route $path
      * @return array|bool
      */
-    protected function matchUrlTemplate($template, $url)
+    protected function matchPathTemplate($template, Route $path)
+    {
+        $templateParts = explode('!', $template);
+
+        if (count($templateParts) > 1) {
+            $domainTemplate = $templateParts[0];
+            $basepathTemplate = $templateParts[1];
+        } else {
+            $domainTemplate = null;
+            $basepathTemplate = $templateParts[0];
+        }
+
+        if (!empty($domainTemplate)) {
+            $domainMatches = $this->getTemplateMatches($domainTemplate, $path->domain);
+            if (false === $domainMatches) {
+                return false;
+            }
+        } else {
+            $domainMatches = [];
+        }
+        $basepathMatches = $this->getTemplateMatches($basepathTemplate, $path->basepath);
+        if (false === $basepathMatches) {
+            return false;
+        }
+
+        return $domainMatches + $basepathMatches;
+    }
+
+    /**
+     * Checks if $path is mathes to $template
+     * Returns array of matched params (like <1>)
+     * or false if no matches found
+     * @param string $template Route template
+     * @param string $path part of request path string
+     * @return array|boolean array
+     */
+    protected function getTemplateMatches($template, $path)
     {
         $template = '~^' . preg_replace('~\<(\d+)\>~', '(?<p_$1>.+?)', $template) . '$~i';
-        if (!preg_match($template, $url, $m)) {
+        if (!preg_match($template, $path, $m)) {
             return false;
         } else {
             $matches = [];
@@ -126,8 +160,7 @@ class Router
     }
 
     /**
-     * Разбирает внутренний путь /модуль/контроллер/действие(параметры)
-     * Возвращает объект роутинга
+     * Splits internal framework path like /module/controller/action(params)
      * @param string $path
      * @return \T4\Mvc\Route
      * @throws \T4\Mvc\RouterException
@@ -179,7 +212,8 @@ class Router
      */
     protected function guessInternalPath($url)
     {
-        $urlParts = preg_split('~/~', $url->base, -1, PREG_SPLIT_NO_EMPTY);
+        $urlParts = preg_split('~/~', $url->basepath, -1, PREG_SPLIT_NO_EMPTY);
+        $app = \T4\Mvc\Application::getInstance();
 
         if (0 == count($urlParts)) {
             return new Route([
@@ -192,7 +226,7 @@ class Router
         }
 
         if (1 == count($urlParts)) {
-            if ($this->app->existsModule($urlParts[0]))
+            if ($app->existsModule($urlParts[0]))
                 return new Route([
                     'module' => ucfirst($urlParts[0]),
                     'controller' => self::DEFAULT_CONTROLLER,
@@ -200,7 +234,7 @@ class Router
                     'params' => [],
                     'format' => $url->extension ? : 'html',
                 ]);
-            elseif ($this->app->existsController('', $urlParts[0]))
+            elseif ($app->existsController('', $urlParts[0]))
                 return new Route([
                     'module' => '',
                     'controller' => ucfirst($urlParts[0]),
@@ -219,8 +253,8 @@ class Router
         }
 
         if (2 == count($urlParts)) {
-            if ($this->app->existsModule($urlParts[0])) {
-                if ($this->app->existsController($urlParts[0], $urlParts[1])) {
+            if ($app->existsModule($urlParts[0])) {
+                if ($app->existsController($urlParts[0], $urlParts[1])) {
                     return new Route([
                         'module' => ucfirst($urlParts[0]),
                         'controller' => ucfirst($urlParts[1]),
@@ -237,7 +271,7 @@ class Router
                         'format' => $url->extension ? : 'html',
                     ]);
                 }
-            } elseif ($this->app->existsController('', $urlParts[0])) {
+            } elseif ($app->existsController('', $urlParts[0])) {
                 return new Route([
                     'module' => '',
                     'controller' => ucfirst($urlParts[0]),
@@ -249,7 +283,7 @@ class Router
         }
 
         if (3 == count($urlParts)) {
-            if ($this->app->existsModule($urlParts[0]) && $this->app->existsController($urlParts[0], $urlParts[1])) {
+            if ($app->existsModule($urlParts[0]) && $app->existsController($urlParts[0], $urlParts[1])) {
                 return new Route([
                     'module' => ucfirst($urlParts[0]),
                     'controller' => ucfirst($urlParts[1]),
@@ -260,8 +294,7 @@ class Router
             }
         }
 
-        throw new RouterException('Route to path \'' . $url->base . '\' is not found');
-
+        throw new RouterException('Route to path \'' . $url->basepath . '\' is not found');
     }
 
 }

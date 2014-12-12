@@ -4,35 +4,61 @@ namespace T4\Core;
 
 class MultiException
     extends Exception
-    implements \IteratorAggregate
+    implements \IteratorAggregate, \Countable
 {
 
-    protected $errors = [];
+    protected $exceptions;
+    protected $class;
 
-    public function __construct($message = null, $code = 0, $severity = 1, $filename = __FILE__, $lineno = __LINE__, $previous=null)
+    /**
+     * @param string $class
+     */
+    public function __construct($class = '\T4\Core\Exception')
     {
-        if (null !== $message)
-            $this->addError($message, $code);
-        parent::__construct($message, $code, $severity, $filename, $lineno, $previous);
+        $this->class = $class;
+        $this->exceptions = new Collection();
     }
 
-    public function addError($message = "", $code = 0, $severity = 1, $filename = __FILE__, $lineno = __LINE__, $previous=null)
+    /**
+     * @param string|\T4\Core\Exception $error
+     * @param int $code
+     * @param int $severity
+     * @param string $filename
+     * @param int $lineno
+     * @param null $previous
+     * @throws \T4\Core\Exception
+     */
+    public function add($error = "", $code = 0, $severity = 1, $filename = __FILE__, $lineno = __LINE__, $previous=null)
     {
-        $this->errors[] = new Exception($message, $code, $severity, $filename, $lineno, $previous);
+        if ($error instanceof Exception) {
+            if ($error instanceof $this->class) {
+                $this->exceptions[] = $error;
+            } else {
+                throw new Exception('Incompatible exception class' . get_class($error));
+            }
+        } else {
+            $class = $this->class;
+            $this->exceptions[] = new $class($error, $code, $severity, $filename, $lineno, $previous);
+        }
+    }
+
+    public function getExceptions()
+    {
+        return $this->exceptions;
+    }
+
+    public function count()
+    {
+        return $this->exceptions->count();
     }
 
     public function isEmpty()
     {
-        return 0 === count($this->errors);
-    }
-
-    public function getErrors()
-    {
-        return $this->errors;
+        return 0 === $this->count();
     }
 
     public function getIterator()
     {
-        return new \ArrayIterator($this->errors);
+        return $this->exceptions->getIterator();
     }
 }

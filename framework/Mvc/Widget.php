@@ -1,8 +1,8 @@
 <?php
 
-namespace T4\Core;
+namespace T4\Mvc;
 
-use T4\Mvc\Application;
+use T4\Core\Std;
 
 abstract class Widget {
 

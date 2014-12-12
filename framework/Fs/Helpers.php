@@ -5,6 +5,19 @@ namespace T4\Fs;
 class Helpers
 {
 
+    public static function getRealPath($path)
+    {
+        if (0 === strpos($path, '///')) {
+            return ROOT_PATH . DS . str_replace('/', DS, substr($path, 3));
+        } elseif (0 === strpos($path, '//')) {
+            return ROOT_PATH_PROTECTED . DS . str_replace('/', DS, substr($path, 2));
+        } elseif (0 === strpos($path, '/')) {
+            return ROOT_PATH_PUBLIC . DS . str_replace('/', DS, substr($path, 1));
+        } else {
+            return false;
+        }
+    }
+
     public static function listDir($path, $order = \SCANDIR_SORT_NONE)
     {
         if (!is_dir($path))
@@ -144,20 +157,14 @@ class Helpers
     }
 
     /**
-     * Возвращает максимальное время модификации файлов по заданному пути
+     * Max filemtime at path recursive
      * @param string $path
      * @return int
      */
     static public function dirMTime($path)
     {
-        $mtime = 0;
         clearstatcache();
-        foreach (self::listDirRecursive($path) as $file) {
-            $m = filemtime($file);
-            if ($m > $mtime)
-                $mtime = $m;
-        }
-        return $mtime;
+        return max( array_map(function ($f) {return filemtime($f);}, self::listDirRecursive($path)) );
     }
 
 }

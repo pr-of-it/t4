@@ -2,12 +2,16 @@
 
     "name": "pr-of-it/t4",
     "description": "T4 framework",
+    "keywords": ["php", "framework", "t4"],
     "type": "library",
+
+    "minimum-stability": "dev",
+    "prefer-stable": true,
 
     "require": {
         "php": ">=5.4.0",
         "twig/twig": "1.*",
-        "phpmailer/phpmailer": "dev-master"
+        "phpmailer/phpmailer": "5.*"
     },
 
     "require-dev": {
@@ -16,7 +20,9 @@
     },
 
     "autoload": {
-        "psr-0": { "T4\\": "framework/" }
+        "psr-4": {
+            "T4\\": "framework/"
+        }
     }
 
 }
