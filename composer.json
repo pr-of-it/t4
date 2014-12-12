@@ -5,6 +5,9 @@
     "keywords": ["php", "framework", "t4"],
     "type": "library",
 
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+
     "require": {
         "php": ">=5.4.0",
         "twig/twig": "1.*",
