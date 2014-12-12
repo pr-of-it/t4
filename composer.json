@@ -23,10 +23,6 @@
         "psr-4": {
             "T4\\": "framework/"
         }
-    },
-
-    "bin": [
-        "framework/t4"
-    ]
+    }
 
 }
