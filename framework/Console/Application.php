@@ -7,6 +7,7 @@ use T4\Core\Exception;
 use T4\Core\Std;
 use T4\Core\TSingleton;
 use T4\Dbal\Connection;
+use T4\Threads\Helpers;
 
 class Application
 {
@@ -79,6 +80,17 @@ class Application
             echo $message . "\n";
         }
         exit(self::ERROR_CODE);
+    }
+
+    /**
+     * @param callable $callback
+     * @param array $args
+     * @throws \T4\Threads\Exception
+     * @return int Child process PID
+     */
+    public function runLater(callable $callback, $args=[])
+    {
+        return Helpers::run($callback, $args);
     }
 
     protected function parseCmd($argv)
