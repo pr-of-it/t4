@@ -12,6 +12,7 @@ use T4\Core\TStdGetSet;
 use T4\Dbal\Connection;
 use T4\Http\E404Exception;
 use T4\Http\Request;
+use T4\Threads\Helpers;
 
 /**
  * Class Application
@@ -111,6 +112,17 @@ class Application
                 die;
             }
         }
+    }
+
+    /**
+     * @param callable $callback
+     * @param array $args
+     * @throws \T4\Threads\Exception
+     * @return int Child process PID
+     */
+    public function runLater(callable $callback, $args=[])
+    {
+        return Helpers::run($callback, $args);
     }
 
     /**
