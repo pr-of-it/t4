@@ -90,7 +90,12 @@ class Application
      */
     public function runLater(callable $callback, $args=[])
     {
-        return Helpers::run($callback, $args);
+        try {
+            return Helpers::run($callback, $args);
+        } catch (Exception $e) {
+            $this->shutdown('ERROR: ' . $e->getMessage());
+        }
+
     }
 
     protected function parseCmd($argv)
