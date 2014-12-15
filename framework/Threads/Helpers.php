@@ -19,7 +19,7 @@ class Helpers
 
         $pid = pcntl_fork();
         if (-1 == $pid) {
-            throw new Exception('pcntl_fork() error');
+            throw new Exception('pcntl_fork() error: ' . pcntl_strerror(pcntl_get_last_error()));
         }
         if (0 != $pid) {
             return $pid;
