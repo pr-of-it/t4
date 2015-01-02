@@ -16,4 +16,10 @@ class Application
         $this->writeLn('- t4 command/action for your application commands');
     }
 
+    public function actionCreate()
+    {
+        $_SERVER['argv'][1] = '/create/app';
+        $this->app->run();
+    }
+
 } 
