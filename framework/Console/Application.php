@@ -6,40 +6,27 @@ use T4\Core\Config;
 use T4\Core\Exception;
 use T4\Core\Std;
 use T4\Core\TSingleton;
+use T4\Core\TStdGetSet;
 use T4\Dbal\Connection;
 use T4\Threads\Helpers;
 
+
+/**
+ * Class Application
+ * @package T4\Console
+ * @property \T4\Core\Config $config
+ * @property \T4\Dbal\Connection[] $db
+ */
 class Application
 {
 
-    use TSingleton;
+    use TSingleton, TStdGetSet;
 
     const CMD_PATTERN = '~^(\/?)([^\/]*?)(\/([^\/]*?))?$~';
     const OPTION_PATTERN = '~^--(.+)=(.*)$~';
     const DEFAULT_ACTION = 'default';
 
     const ERROR_CODE = 1;
-
-    /**
-     * @var \T4\Core\Std $db
-     */
-    public $db;
-
-    protected function __construct()
-    {
-        if (!is_readable(ROOT_PATH_PROTECTED . DS . 'config.php')) {
-            $this->shutdown('BOOTSTRAP ERROR: Application is not installed. Install it using "t4 /create/app" command');
-        }
-        $this->config = new Config(ROOT_PATH_PROTECTED . DS . 'config.php');
-        try {
-            $this->db = new Std();
-            foreach ($this->config->db as $connection => $connectionConfig) {
-                $this->db->{$connection} = new Connection($connectionConfig);
-            }
-        } catch (\T4\Dbal\Exception $e) {
-            $this->shutdown('BOOTSTRAP ERROR: ' . $e->getMessage());
-        }
-    }
 
     public function run()
     {
@@ -101,7 +88,7 @@ class Application
         preg_match(self::CMD_PATTERN, $cmd, $m);
         $commandName = $m[2];
         $actionName = isset($m[4]) ? $m[4] : self::DEFAULT_ACTION;
-        $rootCommand = !empty($m[1]);
+        $rootCommand = !empty($m[1]) || 0 == count($argv);
 
         $options = [];
         foreach ($argv as $arg) {
@@ -112,11 +99,37 @@ class Application
 
         return [
             'namespace' => $rootCommand ? 'T4' : 'App',
-            'command' => $commandName,
+            'command' => $commandName ? $commandName : 'Application',
             'action' => $actionName,
             'params' => $options,
         ];
 
+    }
+
+    /**
+     * Lazy Getters
+     */
+
+    public function getConfig()
+    {
+        try {
+            return new Config(ROOT_PATH_PROTECTED . DS . 'config.php');
+        } catch (Exception $e) {
+            $this->shutdown('BOOTSTRAP ERROR: ' . $e->getMessage());
+        }
+    }
+
+    public function getDb()
+    {
+        try {
+            $db = new Std();
+            foreach ($this->config->db as $connection => $connectionConfig) {
+                $db->{$connection} = new Connection($connectionConfig);
+            }
+            return $db;
+        } catch (Exception $e) {
+            $this->shutdown('BOOTSTRAP ERROR: ' . $e->getMessage());
+        }
     }
 
 }

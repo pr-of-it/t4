@@ -38,7 +38,7 @@ class Create
         $settings->db->default->password = $this->read('Default DB password', '', false);
 
         \T4\Fs\Helpers::copyDir($src, $dst);
-        echo 'Application files are copied'."\n";
+        $this->writeLn('Application files are copied');
 
         $configFileName = $dst.DS.'protected'.DS.'config.php';
         $configFile = file_get_contents($configFileName);
@@ -50,16 +50,16 @@ class Create
 
         $command = new Migrate();
         $command->action('up');
-        echo 'Systems tables are created'."\n";
+        $this->writeLn('Systems tables are created');
 
         $user = new User();
         $user->email = $this->read('Super user email');
         $user->password = $this->read('Super user password', '', false);
         $user->password = \T4\Crypt\Helpers::hashPassword($user->password);
         $user->save();
-        echo 'Super user is created'."\n";
+        $this->writeLn('Super user is created');
 
-        echo 'Application is installed!'."\n";
+        $this->writeLn('Application is installed!');
 
     }
 
@@ -86,7 +86,7 @@ class Extension
 }
 FILE;
         file_put_contents($fileName, $content);
-        echo 'Extension ' . $name . ' is created in ' . $dirname;
+        $this->writeLn('Extension ' . $name . ' is created in ' . $dirname);
 
     }
 

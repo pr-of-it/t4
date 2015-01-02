@@ -42,6 +42,11 @@ class Command {
         }
     }
 
+    protected function writeLn($msg)
+    {
+        echo $msg . "\n";
+    }
+
     protected function read($message, $default='', $echo=true)
     {
         echo $message . ( !empty($default) ? ' ['.$default.']' : '' ) . ': ';
