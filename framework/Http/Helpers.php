@@ -7,7 +7,12 @@ class Helpers
 
     protected static function getUniversalDomainName($domain)
     {
-        return preg_replace('~^(www\.|)(.*)$~', '.$2', $domain);
+        if (false !== strpos($domain, '.')) {
+            return preg_replace('~^(www\.|)(.*)$~', '.$2', $domain);
+        } else {
+            // @fix Chrome security policy bug
+            return '';
+        }
     }
 
     public static function setCookie($name, $value, $expire=0, $allSubDomains = true)
