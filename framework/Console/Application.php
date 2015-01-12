@@ -82,13 +82,17 @@ class Application
 
     protected function parseCmd($argv)
     {
-
         $argv = array_slice($argv, 1);
+        if (empty($argv)) {
+            $emptyCommand = true;
+        } else {
+            $emptyCommand = false;
+        }
         $cmd = array_shift($argv);
         preg_match(self::CMD_PATTERN, $cmd, $m);
         $commandName = $m[2];
         $actionName = isset($m[4]) ? $m[4] : self::DEFAULT_ACTION;
-        $rootCommand = !empty($m[1]) || 0 == count($argv);
+        $rootCommand = !empty($m[1]) || $emptyCommand;
 
         $options = [];
         foreach ($argv as $arg) {
