@@ -8,10 +8,13 @@ class Index
     extends Controller
 {
 
+    protected function access($action)
+    {
+        return !empty($this->app->user);
+    }
+
     public function actionDefault()
     {
-        echo 'TEST';
-        die;
     }
 
 } 
