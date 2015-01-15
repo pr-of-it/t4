@@ -10,6 +10,7 @@ use T4\Core\Std;
 use T4\Core\TSingleton;
 use T4\Core\TStdGetSet;
 use T4\Dbal\Connection;
+use T4\Http\E403Exception;
 use T4\Http\E404Exception;
 use T4\Http\Request;
 use T4\Threads\Helpers;
@@ -100,9 +101,20 @@ class Application
             $this->runInternalPath($this->request->fullPath);
         } catch (Exception $e) {
             try {
-                if ($e instanceof E404Exception && !empty($this->config->errors['404'])) {
+                if ($e instanceof E404Exception) {
                     header("HTTP/1.0 404 Not Found", true, 404);
-                    $this->runInternalPath($this->config->errors['404']);
+                    if (!empty($this->config->errors['404'])) {
+                        $this->runInternalPath($this->config->errors['404']);
+                    } else {
+                        echo $e->getMessage();
+                    }
+                } elseif ($e instanceof E403Exception) {
+                    header('HTTP/1.0 403 Forbidden', true, 403);
+                    if (!empty($this->config->errors['403'])) {
+                        $this->runInternalPath($this->config->errors['403']);
+                    } else {
+                        echo $e->getMessage();
+                    }
                 } else {
                     echo $e->getMessage();
                     die;
