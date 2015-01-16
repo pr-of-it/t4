@@ -33,7 +33,7 @@ class Helpers
         $domain = \T4\Mvc\Application::getInstance()->request->domain;;
         if ($allSubDomains)
             $domain = self::getUniversalDomainName($domain);
-        self::setCookie($name, '', time()-60*60*24*30, '/', $domain, false, true);
+        setcookie($name, '', time()-60*60*24*30, '/', $domain, false, true);
         unset($_COOKIE[$name]);
     }
 
