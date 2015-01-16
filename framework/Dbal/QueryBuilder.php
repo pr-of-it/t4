@@ -13,9 +13,6 @@ class QueryBuilder
     extends Std
 {
 
-    protected $leftJoin = [];
-    protected $rightJoin = [];
-
     protected $params = [];
 
     protected function trim($s)
