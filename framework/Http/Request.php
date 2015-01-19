@@ -8,6 +8,7 @@ use T4\Core\Std;
 /**
  * Class Request
  * @package T4\Http
+ * @property string $protocol
  * @property string $https
  * @property string $domain
  * @property string $path
@@ -49,9 +50,24 @@ class Request
         $this->headers = new Std($this->getHttpHeaders());
     }
 
+    public function getProtocol()
+    {
+        return $this->https ? 'https' : 'http';
+    }
+
     public function getHttps()
     {
-        return !(empty($_SERVER['HTTPS']) || 'off'==$_SERVER['HTTPS']);
+        if ( !empty($_SERVER['HTTPS']) ) {
+            if($_SERVER['HTTPS'] !== 'off')
+                return true;
+            else
+                return false;
+        } else {
+            if($_SERVER['SERVER_PORT'] == 443)
+                return true;
+            else
+                return false;
+        }
     }
 
     public function getDomain()
