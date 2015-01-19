@@ -25,7 +25,7 @@ class Route
 
     const INTERNAL_PATH_PATTERN = '~^\/([^\/]*?)\/([^\/]*?)\/([^\/]*?)\/?(\((.*)\))?$~i';
 
-    public function __construct($data=null, $simple=true)
+    public function __construct($data=null, $simple=false)
     {
         if (null !== $data) {
             if (is_array($data)) {
@@ -36,7 +36,7 @@ class Route
         }
     }
 
-    public function fromString($str, $simple=true)
+    public function fromString($str, $simple=false)
     {
         if (!preg_match(self::INTERNAL_PATH_PATTERN, $str, $m)) {
             throw new RouteException('Invalid route \'' . $str . '\'');

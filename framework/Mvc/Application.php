@@ -176,7 +176,7 @@ class Application
      */
     public function callBlock($path, $template = '', $params = [])
     {
-        $route = new Route($path, false);
+        $route = new Route($path);
         $route->params->merge($params);
 
         $canonicalPath = $route->toString();

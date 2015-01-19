@@ -8,6 +8,8 @@ class RouteTest extends PHPUnit_Framework_TestCase
     public function testFromString()
     {
         $route = new \T4\Mvc\Route('///');
+        $this->assertEquals(['module'=>'', 'controller'=>\T4\Mvc\Router::DEFAULT_CONTROLLER, 'action'=>\T4\Mvc\Router::DEFAULT_ACTION, 'params'=>[]], $route->toArray());
+        $route = new \T4\Mvc\Route('///', true);
         $this->assertEquals(['module'=>'', 'controller'=>'', 'action'=>'', 'params'=>[]], $route->toArray());
         $route = new \T4\Mvc\Route('///', false);
         $this->assertEquals(['module'=>'', 'controller'=>\T4\Mvc\Router::DEFAULT_CONTROLLER, 'action'=>\T4\Mvc\Router::DEFAULT_ACTION, 'params'=>[]], $route->toArray());

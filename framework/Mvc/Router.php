@@ -51,7 +51,7 @@ class Router
                         },
                         $internalPath
                     );
-                    $route = new Route($internalPath, false);
+                    $route = new Route($internalPath);
                     $route->format = $request->extension ?: $this->allowedExtensions[0];
                     return $route;
                 }
@@ -166,7 +166,7 @@ class Router
      */
     public function splitInternalPath($path)
     {
-        return new Route($path, false);
+        return new Route($path);
     }
 
     /**

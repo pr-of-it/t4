@@ -22,7 +22,7 @@ class Block
 
     public function getAllTemplates()
     {
-        $route = new Route($this->path, false);
+        $route = new Route($this->path);
         $controller = Application::getInstance()->createController($route->module, $route->controller);
         $templates = [];
         foreach ($controller->getTemplatePaths() as $path) {
