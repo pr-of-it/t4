@@ -180,7 +180,7 @@ class Application
         $route = $router->splitInternalPath($path);
         $route->params->merge($params);
 
-        $canonicalPath = $router->makeInternalPath($route);
+        $canonicalPath = $route->makeString();
         if (!isset($this->config->blocks) || !isset($this->config->blocks[$canonicalPath]))
             throw new Exception('No config for block ' . $canonicalPath);
 

@@ -192,19 +192,6 @@ class Router
     }
 
     /**
-     * Возвращает канонический внутренний путь, построенный из объекта роутинга
-     * Не учитывает параметры
-     * @param Route $route
-     * @return string
-     */
-    public function makeInternalPath(Route $route)
-    {
-        return '/' . $route->module . '/' .
-        ($route->controller == self::DEFAULT_CONTROLLER ? '' : $route->controller) . '/' .
-        ($route->action == self::DEFAULT_ACTION ? '' : $route->action);
-    }
-
-    /**
      * Пытается подобрать соответствующий роутинг для URL, отсутствующего в конфиге роутинга
      * @param \T4\Mvc\Route $url
      * @return Route

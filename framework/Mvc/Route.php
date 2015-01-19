@@ -23,4 +23,26 @@ class Route
     extends Std
 {
 
+    public function __construct($data=null)
+    {
+        if (null !== $data) {
+            if (is_array($data)) {
+                parent::__construct($data);
+            }
+        }
+    }
+
+    public function makeString($simple=true)
+    {
+        $base = '/' . $this->module . '/' .
+        ($simple && ($this->controller == Router::DEFAULT_CONTROLLER || empty($this->controller)) ? '' : ($this->controller ?: Router::DEFAULT_CONTROLLER)) . '/' .
+        ($simple && ($this->action == Router::DEFAULT_ACTION || empty($this->action)) ? '' : ($this->action ?: Router::DEFAULT_ACTION));
+        return $base;
+    }
+
+    public function __toString()
+    {
+        return $this->makeString();
+    }
+
 } 
