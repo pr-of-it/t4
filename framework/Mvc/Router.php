@@ -9,8 +9,6 @@ class Router
 {
     use TSingleton;
 
-    const INTERNAL_PATH_PATTERN = '~^\/([^\/]*?)\/([^\/]*?)\/([^\/]*?)\/?(\((.*)\))?$~i';
-
     const DEFAULT_CONTROLLER = 'Index';
     const DEFAULT_ACTION = 'Default';
 
@@ -53,7 +51,7 @@ class Router
                         },
                         $internalPath
                     );
-                    $route = $this->splitInternalPath($internalPath);
+                    $route = new Route($internalPath, false);
                     $route->format = $request->extension ?: $this->allowedExtensions[0];
                     return $route;
                 }
@@ -161,34 +159,14 @@ class Router
 
     /**
      * Splits internal framework path like /module/controller/action(params)
+     * @deprecated
      * @param string $path
      * @return \T4\Mvc\Route
      * @throws \T4\Mvc\RouterException
      */
     public function splitInternalPath($path)
     {
-        if (!preg_match(self::INTERNAL_PATH_PATTERN, $path, $m)) {
-            throw new RouterException('Invalid route \'' . $path . '\'');
-        };
-
-        $params = isset($m[5]) ? $m[5] : '';
-        if (!empty($params)) {
-            $params = explode(',', $params);
-            $p = [];
-            foreach ($params as $pair) {
-                list($name, $value) = explode('=', $pair);
-                $p[$name] = $value;
-            }
-            $params = $p;
-        } else $params = [];
-
-        return new Route([
-            'module' => ucfirst($m[1]),
-            'controller' => ucfirst($m[2]) ? : self::DEFAULT_CONTROLLER,
-            'action' => ucfirst($m[3]) ? : self::DEFAULT_ACTION,
-            'params' => $params
-        ]);
-
+        return new Route($path, false);
     }
 
     /**

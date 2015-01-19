@@ -176,8 +176,7 @@ class Application
      */
     public function callBlock($path, $template = '', $params = [])
     {
-        $router = Router::getInstance();
-        $route = $router->splitInternalPath($path);
+        $route = new Route($path, false);
         $route->params->merge($params);
 
         $canonicalPath = $route->makeString();
