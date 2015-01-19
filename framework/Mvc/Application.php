@@ -179,7 +179,7 @@ class Application
         $route = new Route($path, false);
         $route->params->merge($params);
 
-        $canonicalPath = $route->makeString();
+        $canonicalPath = $route->toString();
         if (!isset($this->config->blocks) || !isset($this->config->blocks[$canonicalPath]))
             throw new Exception('No config for block ' . $canonicalPath);
 

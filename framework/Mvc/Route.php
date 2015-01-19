@@ -59,7 +59,7 @@ class Route
         $this->params = new self($params);
     }
 
-    public function makeString($simple=true)
+    public function toString($simple=true)
     {
         $base = '/' . $this->module . '/' .
         ($simple && ($this->controller == Router::DEFAULT_CONTROLLER || empty($this->controller)) ? '' : ($this->controller ?: Router::DEFAULT_CONTROLLER)) . '/' .
@@ -69,7 +69,7 @@ class Route
 
     public function __toString()
     {
-        return $this->makeString();
+        return $this->toString();
     }
 
 } 
