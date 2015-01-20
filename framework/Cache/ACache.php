@@ -6,6 +6,10 @@ abstract class ACache
 {
     const DEFAULT_CACHE_TIME = 300;
 
+    public function __construct()
+    {
+    }
+
     /**
      * @param string $key
      * @param callable $callback
