@@ -17,7 +17,7 @@ class Local
         $this->path = ROOT_PATH_PUBLIC . DS . 'Cache';
         if (null !== $config) {
             if (!empty($config->path)) {
-                $this->path = $config->path;
+                $this->path = realpath($config->path);
             }
         }
     }
@@ -27,7 +27,7 @@ class Local
         $cachePath = $this->path;
         if (!is_readable($cachePath))
             Helpers::mkDir($cachePath);
-        $fileName = realpath($cachePath . DS . md5($key) . '.cache');
+        $fileName = $cachePath . DS . md5($key) . '.cache';
         clearstatcache(true, $fileName);
         if (!file_exists($fileName) || (time() - filemtime($fileName) > (int)$time)) {
             $res = call_user_func($callback);
