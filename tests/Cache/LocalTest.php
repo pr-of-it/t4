@@ -14,7 +14,7 @@ class LocalTest extends PHPUnit_Framework_TestCase
 
     public function testCache()
     {
-        $config = new \T4\Core\Std(['path' => __DIR__]);
+        $config = new \T4\Core\Config(['path' => __DIR__]);
         $cache = new \T4\Cache\Local($config);
 
         $key = 'Test';

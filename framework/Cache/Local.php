@@ -2,6 +2,7 @@
 
 namespace T4\Cache;
 
+use T4\Core\Config;
 use T4\Core\Std;
 use T4\Fs\Helpers;
 
@@ -11,7 +12,7 @@ class Local
 
     protected $path;
 
-    public function __construct(Std $config = null)
+    public function __construct(Config $config = null)
     {
         $this->path = ROOT_PATH_PUBLIC . DS . 'Cache';
         if (null !== $config) {

@@ -11,7 +11,7 @@ class Std
      */
     use TStdGetSet;
 
-    public function __construct($data=null)
+    public function __construct($data = null)
     {
         if (null !== $data) {
             $this->fromArray($data);
@@ -37,10 +37,11 @@ class Std
      * @param array $data
      * @return \T4\Core\Std $this
      */
-    public function fromArray($data) {
+    public function fromArray($data)
+    {
         $data = (array)$data;
-        foreach ( $data as $key => $value ) {
-            if ( is_null($value) || is_scalar($value) ) {
+        foreach ($data as $key => $value) {
+            if (is_null($value) || is_scalar($value)) {
                 $this->{$key} = $value;
             } else {
                 $this->{$key} = new static;
@@ -56,8 +57,8 @@ class Std
     public function toArray()
     {
         $data = [];
-        foreach ( $this->__data as $key => $value ) {
-            if ( $value instanceof self ) {
+        foreach ($this->__data as $key => $value) {
+            if ($value instanceof self) {
                 $data[$key] = $value->toArray();
             } else {
                 $data[$key] = $value;
@@ -77,7 +78,7 @@ class Std
         } else {
             $obj = (array)$obj;
         }
-        foreach ($obj as $key=>$value)
+        foreach ($obj as $key => $value)
             $this->$key = $value;
         return $this;
     }

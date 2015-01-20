@@ -2,20 +2,35 @@
 
 namespace T4\Core;
 
-class Config extends Std {
+class Config extends Std
+{
 
-    public function __construct($path=null) {
-        if ( null !== $path ) {
-            $this->load($path);
+    /**
+     * @param array|string|null $data
+     * @throws \T4\Core\Exception
+     */
+    public function __construct($data = null)
+    {
+        if (null !== $data) {
+            if (is_array($data)) {
+                parent::__construct($data);
+            } else {
+                $this->load((string)$data);
+            }
         }
     }
 
+    /**
+     * @param string $path
+     * @return \T4\Core\Config
+     * @throws \T4\Core\Exception
+     */
     public function load($path)
     {
-        if ( !is_readable($path) ) {
+        if (!is_readable($path)) {
             throw new Exception('Config file ' . $path . ' is not found or is not readable');
         }
-        $this->fromArray(include($path));
+        return $this->fromArray(include($path));
     }
 
 }

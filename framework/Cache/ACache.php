@@ -2,11 +2,13 @@
 
 namespace T4\Cache;
 
+use T4\Core\Config;
+
 abstract class ACache
 {
     const DEFAULT_CACHE_TIME = 300;
 
-    public function __construct()
+    public function __construct(Config $config = null)
     {
     }
 
