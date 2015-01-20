@@ -27,7 +27,7 @@ class Local
         $cachePath = $this->path;
         if (!is_readable($cachePath))
             Helpers::mkDir($cachePath);
-        $fileName = $cachePath . DS . md5($key) . '.cache';
+        $fileName = realpath($cachePath . DS . md5($key) . '.cache');
         clearstatcache(true, $fileName);
         if (!file_exists($fileName) || (time() - filemtime($fileName) > (int)$time)) {
             $res = call_user_func($callback);
