@@ -180,8 +180,9 @@ class Application
         $route->params->merge($params);
 
         $canonicalPath = $route->toString();
-        if (!isset($this->config->blocks) || !isset($this->config->blocks[$canonicalPath]))
+        if (!isset($this->config->blocks) || !isset($this->config->blocks[$canonicalPath])) {
             throw new Exception('No config for block ' . $canonicalPath);
+        }
 
         $blockOptions = $this->config->blocks[$canonicalPath];
 
@@ -194,10 +195,10 @@ class Application
             );
         };
 
-        if (isset($blockOptions['cache'])) {
+        if (!empty($blockOptions['cache'])) {
             $cache = \T4\Cache\Factory::getInstance();
-            $key = md5($canonicalPath . serialize($route->params));
-            if (isset($blockOptions['cache']['time'])) {
+            $key = md5($canonicalPath . serialize($route->params) . $template);
+            if (!empty($blockOptions['cache']['time'])) {
                 return $cache($key, $getBlock, $blockOptions['cache']['time']);
             } else {
                 return $cache($key, $getBlock);
