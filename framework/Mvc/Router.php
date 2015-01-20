@@ -158,18 +158,6 @@ class Router
     }
 
     /**
-     * Splits internal framework path like /module/controller/action(params)
-     * @deprecated
-     * @param string $path
-     * @return \T4\Mvc\Route
-     * @throws \T4\Mvc\RouterException
-     */
-    public function splitInternalPath($path)
-    {
-        return new Route($path);
-    }
-
-    /**
      * Пытается подобрать соответствующий роутинг для URL, отсутствующего в конфиге роутинга
      * @param \T4\Mvc\Route $url
      * @return Route

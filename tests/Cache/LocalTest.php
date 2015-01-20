@@ -41,7 +41,7 @@ class LocalTest extends PHPUnit_Framework_TestCase
             'Hello, world!',
             $cache($key, $src2, $time)
         );
-        usleep(1500000);
+        sleep(2);
         $this->assertEquals(
             'Мир, труд, май!',
             $cache($key, $src2, $time)
