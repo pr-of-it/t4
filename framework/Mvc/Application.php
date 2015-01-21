@@ -172,7 +172,7 @@ class Application
      * @param string $template Шаблон блока
      * @param array $params Параметры, передаваемые блоку
      * @throws \T4\Core\Exception
-     * @return mixed Результат рендера блока
+     * @return string Результат рендера блока
      */
     public function callBlock($path, $template = '', $params = [])
     {
