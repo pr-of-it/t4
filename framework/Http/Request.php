@@ -10,8 +10,7 @@ use T4\Core\Url;
  * Class Request
  * @package T4\Http
  * @property string $protocol
- * @property string $https
- * @property string $domain
+ * @property string $host
  * @property string $path
  * @property string $fullPath
  * @property \T4\Core\Url $url
@@ -75,12 +74,7 @@ class Request
         return $this->url->protocol;
     }
 
-    public function getHttps()
-    {
-        return 'https' == $this->url->protocol;
-    }
-
-    public function getDomain()
+    public function getHost()
     {
         return $this->url->host;
     }
@@ -94,7 +88,7 @@ class Request
 
     public function getFullPath()
     {
-        return $this->domain . '!' . $this->path;
+        return $this->host . '!' . $this->path;
     }
 
     public function existsGetData()
