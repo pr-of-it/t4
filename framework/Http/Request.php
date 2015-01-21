@@ -3,6 +3,7 @@
 namespace T4\Http;
 
 use T4\Core\Std;
+use T4\Core\Url;
 
 
 /**
@@ -13,6 +14,7 @@ use T4\Core\Std;
  * @property string $domain
  * @property string $path
  * @property string $fullPath
+ * @property \T4\Core\Url $url
  * @property \T4\Core\Std $get
  * @property \T4\Core\Std $post
  * @property \T4\Core\Std $files
@@ -24,6 +26,24 @@ class Request
 
     public function __construct()
     {
+
+        $port = $_SERVER['SERVER_PORT'];
+        if ( !empty($_SERVER['HTTPS']) ) {
+            if($_SERVER['HTTPS'] !== 'off')
+                $protocol =  'https';
+            else
+                $protocol =  'http';
+        } else {
+            if($port == 443)
+                $protocol =  'https';
+            else
+                $protocol =  'http';
+        }
+        $host = !empty($_SERVER['SERVER_NAME']) ? $_SERVER['SERVER_NAME'] : $_SERVER['HTTP_X_REWRITE_URL'];
+        $path = $_SERVER['REQUEST_URI'];
+
+        $this->url = new Url($protocol . '://' . $host . ($port!=80 && $port!=443 ? ':' . $port : '') . $path);
+
         $this->get = new Std($_GET);
 
         $this->post = new Std($_POST);
@@ -52,27 +72,17 @@ class Request
 
     public function getProtocol()
     {
-        return $this->https ? 'https' : 'http';
+        return $this->url->protocol;
     }
 
     public function getHttps()
     {
-        if ( !empty($_SERVER['HTTPS']) ) {
-            if($_SERVER['HTTPS'] !== 'off')
-                return true;
-            else
-                return false;
-        } else {
-            if($_SERVER['SERVER_PORT'] == 443)
-                return true;
-            else
-                return false;
-        }
+        return 'https' == $this->url->protocol;
     }
 
     public function getDomain()
     {
-        return $_SERVER['SERVER_NAME'] ?: $_SERVER['HTTP_X_REWRITE_URL'];
+        return $this->url->host;
     }
 
     public function getPath()
