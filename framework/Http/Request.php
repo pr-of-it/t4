@@ -10,6 +10,7 @@ use T4\Core\Url;
  * Class Request
  * @package T4\Http
  * @property string $protocol
+ * @property string $method
  * @property string $host
  * @property string $path
  * @property string $fullPath
@@ -25,7 +26,6 @@ class Request
 
     public function __construct()
     {
-
         $port = $_SERVER['SERVER_PORT'];
         if ( !empty($_SERVER['HTTPS']) ) {
             if($_SERVER['HTTPS'] !== 'off')
@@ -72,6 +72,11 @@ class Request
     public function getProtocol()
     {
         return $this->url->protocol;
+    }
+
+    public function getMethod()
+    {
+        return strtolower($_SERVER['REQUEST_METHOD']);
     }
 
     public function getHost()
