@@ -148,7 +148,7 @@ class Application
             Router::getInstance()
                 ->setConfig($this->getRouteConfig())
                 ->parseRequestPath($request->getFullPath());
-        $this->runInternalPath($route);
+        $this->runInternalPath($route, $route->format);
     }
 
     /**
