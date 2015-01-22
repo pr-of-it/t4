@@ -3,7 +3,6 @@
 namespace T4\Cache;
 
 use T4\Core\Config;
-use T4\Core\Std;
 use T4\Fs\Helpers;
 
 class Local
@@ -17,7 +16,7 @@ class Local
         $this->path = ROOT_PATH_PUBLIC . DS . 'Cache';
         if (null !== $config) {
             if (!empty($config->path)) {
-                $this->path = realpath($config->path);
+                $this->path = $config->path;
             }
         }
     }

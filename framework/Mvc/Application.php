@@ -98,7 +98,9 @@ class Application
     public function run()
     {
         try {
-            $this->runInternalPath($this->request->fullPath);
+
+            $this->runRequestPath($this->request);
+
         } catch (Exception $e) {
             try {
                 if ($e instanceof E404Exception) {
@@ -138,22 +140,35 @@ class Application
     }
 
     /**
-     * @param string $path
-     * @throws ControllerException
-     * @throws Exception
-     * @internal param Route $route
+     * @param \T4\Http\Request $request
      */
-    private function runInternalPath($path)
+    protected function runRequestPath(Request $request)
     {
         $route =
             Router::getInstance()
                 ->setConfig($this->getRouteConfig())
-                ->parseRequestPath($path);
+                ->parseRequestPath($request->getFullPath());
+        $this->runInternalPath($route, $route->format);
+    }
+
+    /**
+     * @param \T4\Mvc\Route|string $route
+     * @param string $format
+     * @throws ControllerException
+     * @throws E403Exception
+     * @throws Exception
+     */
+    protected function runInternalPath($route, $format = 'html')
+    {
+        if (!($route instanceof Route)) {
+            $route = new Route((string)$route);
+        }
+
         $controller = $this->createController($route->module, $route->controller);
         $controller->action($route->action, $route->params);
         $data = $controller->getData();
 
-        switch ($route->format) {
+        switch ($format) {
             case 'json':
                 header('Content-Type: application/json');
                 echo json_encode($data->toArray());
@@ -161,7 +176,7 @@ class Application
             default:
             case 'html':
                 header('Content-Type: text/html; charset=utf-8');
-                $controller->view->display($route->action . '.' . $route->format, $data);
+                $controller->view->display($route->action . '.' . $format, $data);
                 break;
         }
     }

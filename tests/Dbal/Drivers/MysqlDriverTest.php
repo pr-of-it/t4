@@ -51,14 +51,26 @@ class MysqlDriverTest extends PHPUnit_Framework_TestCase {
             $reflector->invokeArgs($driver, ['foo', ['type' => 'boolean']])
         );
         $this->assertEquals(
+            '`foo` INT(11) DEFAULT \'123\'',
+            $reflector->invokeArgs($driver, ['foo', ['type' => 'int', 'default' => '123']])
+        );
+        $this->assertEquals(
             '`foo` INT(11)',
             $reflector->invokeArgs($driver, ['foo', ['type' => 'int']])
+        );
+        $this->assertEquals(
+            '`foo` FLOAT(8,6)',
+            $reflector->invokeArgs($driver, ['foo', ['type' => 'float', 'dimension' => '8,6']])
         );
         $this->assertEquals(
             '`foo` FLOAT',
             $reflector->invokeArgs($driver, ['foo', ['type' => 'float']])
         );
 
+        $this->assertEquals(
+            '`foo` TEXT DEFAULT \'123\'',
+            $reflector->invokeArgs($driver, ['foo', ['type' => 'text', 'default' => '123']])
+        );
         $this->assertEquals(
             '`foo` TEXT',
             $reflector->invokeArgs($driver, ['foo', ['type' => 'text']])

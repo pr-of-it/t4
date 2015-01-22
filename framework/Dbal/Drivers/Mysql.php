@@ -59,7 +59,7 @@ class Mysql
                 break;
             case 'float':
             case 'real':
-                $ddl = 'FLOAT';
+                isset($options['dimension']) ? $ddl = 'FLOAT(' . $options['dimension'] . ')' : $ddl = 'FLOAT';
                 break;
             case 'text':
                 $options['length'] = isset($options['length']) ? $options['length'] : '';
@@ -96,6 +96,10 @@ class Mysql
             default:
                 $ddl = 'VARCHAR(' . (isset($options['length']) ? (int)$options['length'] : 255) . ')';
                 break;
+        }
+
+        if(isset($options['default'])) {
+            $ddl .= ' ' . 'DEFAULT' . ' \'' . $options['default'] .'\'';
         }
 
         return $name . ' ' . $ddl;
