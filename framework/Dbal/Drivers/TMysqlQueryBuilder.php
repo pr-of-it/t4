@@ -132,13 +132,12 @@ trait TMysqlQueryBuilder
 
         $sql  = 'DELETE FROM ';
         $driver = $this;
-        /*
+
         $from = array_map(function ($x) use ($driver) {
             static $c = 1;
             return $this->aliasTableName($x, 'main', $c++);
         }, $query->deleteTables);
-        */
-        $from = $query->deleteTables;
+
         $sql .= implode(', ', $from);
         $sql .= "\n";
 
