@@ -4,6 +4,7 @@ namespace T4\Http;
 
 use T4\Core\Std;
 use T4\Core\Url;
+use T4\Core\Session;
 
 
 /**
@@ -134,6 +135,31 @@ class Request
             }
         }
         return $ret;
+    }
+
+    public function getLocation()
+    {
+
+        if($location=Session::get(location_cache)){
+
+        } else {
+
+            $locator = new Locator();
+            $location= $locator->getLocation();
+            Session::set(location_cache, $location);
+            $location= Session::get(location_cache);
+        }
+
+        return $location;
+    }
+
+    public function getIp()
+    {
+        if(isset($_SERVER['REMOTE_ADDR'])) {
+
+            return ip2long($_SERVER['REMOTE_ADDR']);
+        }
+
     }
 
 }
