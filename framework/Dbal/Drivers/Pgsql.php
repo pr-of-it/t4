@@ -181,17 +181,17 @@ class Pgsql
 
     public function truncateTable(Connection $connection, $tableName)
     {
-        $connection->execute('TRUNCATE TABLE `' . $tableName . '`');
+        $connection->execute('TRUNCATE TABLE ' . $this->quoteName($tableName) . '');
     }
 
     public function dropTable(Connection $connection, $tableName)
     {
-        $connection->execute('DROP TABLE `' . $tableName . '`');
+        $connection->execute('DROP TABLE ' . $this->quoteName($tableName) . '');
     }
 
     public function addColumn(Connection $connection, $tableName, array $columns)
     {
-        $sql = 'ALTER TABLE `' . $tableName . '`';
+        $sql = 'ALTER TABLE ' . $this->quoteName($tableName) . '';
         $columnsDDL = [];
         foreach ($columns as $name => $options) {
             $columnsDDL[] = 'ADD COLUMN ' . $this->createColumnDDL($name, $options);
@@ -204,7 +204,7 @@ class Pgsql
 
     public function dropColumn(Connection $connection, $tableName, array $columns)
     {
-        $sql = 'ALTER TABLE `' . $tableName . '`';
+        $sql = 'ALTER TABLE ' . $this->quoteName($tableName) . '';
         $columnsDDL = [];
         foreach ($columns as $name) {
             $columnsDDL[] = 'DROP COLUMN `' . $name . '`';
