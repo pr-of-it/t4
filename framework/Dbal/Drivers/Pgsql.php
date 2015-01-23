@@ -254,8 +254,8 @@ class Pgsql
 
     public function insert(Connection $connection, $tableName, array $data)
     {
-        $sql  = 'INSERT INTO `' . $tableName . '`';
-        $sql .= ' (`' . implode('`, `', array_keys($data)) . '`)';
+        $sql  = 'INSERT INTO ' . $this->quoteName($tableName) . '';
+        $sql .= ' ("' . implode('", "', array_keys($data)) . '")';
         $sql .= ' VALUES';
         $values = [];
         foreach ($data as $key => $val)
@@ -269,7 +269,7 @@ class Pgsql
     {
         if ($query instanceof QueryBuilder) {
             $params = $query->getParams();
-            $query = $query->getQuery();
+            $query = $query->getQuery($this);
         }
         $result = $class::getDbConnection()->query($query, $params)->fetchAll(\PDO::FETCH_CLASS, $class);
         if (!empty($result)) {
@@ -285,7 +285,7 @@ class Pgsql
     {
         if ($query instanceof QueryBuilder) {
             $params = $query->getParams();
-            $query = $query->getQuery();
+            $query = $query->getQuery($this);
         }
         $result = $class::getDbConnection()->query($query, $params)->fetchObject($class);
         if (!empty($result))
@@ -312,7 +312,7 @@ class Pgsql
         $query
             ->select('*')
             ->from($class::getTableName())
-            ->where('`' . $column . '`=:value' . (!empty($options['where']) ? ' AND (' . $options['where'] . ')' : ''))
+            ->where('' . $this->quoteName($column) . '=:value' . (!empty($options['where']) ? ' AND (' . $options['where'] . ')' : ''))
             ->order(!empty($options['order']) ? $options['order'] : '')
             ->limit(!empty($options['limit']) ? $options['limit'] : '')
             ->params([':value' => $value]);
@@ -325,7 +325,7 @@ class Pgsql
         $query
             ->select('*')
             ->from($class::getTableName())
-            ->where('`' . $column . '`=:value')
+            ->where('' . $this->quoteName($column) . '=:value')
             ->order(!empty($options['order']) ? $options['order'] : '')
             ->limit(1)
             ->params([':value' => $value]);
@@ -341,7 +341,7 @@ class Pgsql
             ->where(!empty($options['where']) ? $options['where'] : '')
             ->params(!empty($options['params']) ? $options['params'] : []);
 
-        return $class::getDbConnection()->query($query->getQuery(), $query->getParams())->fetchScalar();
+        return $class::getDbConnection()->query($query->getQuery($this), $query->getParams())->fetchScalar();
     }
 
     public function countAllByColumn($class, $column, $value, $options = [])
@@ -353,7 +353,7 @@ class Pgsql
             ->where('`' . $column . '`=:value')
             ->params([':value' => $value]);
 
-        return $class::getDbConnection()->query($query->getQuery(), $query->getParams())->fetchScalar();
+        return $class::getDbConnection()->query($query->getQuery($this), $query->getParams())->fetchScalar();
     }
 
     /**
@@ -368,16 +368,20 @@ class Pgsql
         $columns = $class::getColumns();
         $relations = $class::getRelations();
         $cols = [];
+        $prep = [];
         $sets = [];
         $data = [];
 
         foreach ($columns as $column => $def) {
             if (isset($model->{$column}) && !is_null($model->{$column})) {
-                $cols[] = $column;
-                $sets[] = '`' . $column . '`=:' . $column;
+                $cols[] = $this->quoteName($column);
+                $prep[] = ':' . $column;
+                $sets[] = '' . $this->quoteName($column) . '=:' . $column;
                 $data[':'.$column] = $model->{$column};
             } elseif (isset($def['default'])) {
-                $sets[] = '`' . $column . '`=:' . $column;
+                $cols[] = $this->quoteName($column);
+                $prep[] = ':' . $column;
+                $sets[] = '' . $this->quoteName($column) . '=:' . $column;
                 $data[':'.$column] = $def['default'];
             }
         }
@@ -389,10 +393,14 @@ class Pgsql
                     $column = $class::getRelationLinkName($def);
                     if (!in_array($column, $cols)) {
                         if (isset($model->{$column}) && !is_null($model->{$column})) {
-                            $sets[] = '`' . $column . '`=:' . $column;
+                            $cols[] = $this->quoteName($column);
+                            $prep[] = ':' . $column;
+                            $sets[] = '' . $this->quoteName($column) . '=:' . $column;
                             $data[':'.$column] = $model->{$column};
                         } elseif (isset($model->{$rel}) && $model->{$rel} instanceof Model) {
-                            $sets[] = '`' . $column . '`=:' . $column;
+                            $cols[] = $this->quoteName($column);
+                            $prep[] = ':' . $column;
+                            $sets[] = '' . $this->quoteName($column) . '=:' . $column;
                             $data[':'.$column] = $model->{$rel}->getPk();
                         }
                     }
@@ -402,17 +410,19 @@ class Pgsql
 
         $connection = $class::getDbConnection();
         if ($model->isNew()) {
-            $sql = '
-                INSERT INTO `' . $class::getTableName() . '`
-                SET ' . implode(', ', $sets) . '
+            echo $sql = '
+                INSERT INTO ' . $this->quoteName($class::getTableName()) . '
+                (' . implode($cols) . ')
+                VALUES
+                (' . implode($prep) . ')
             ';
             $connection->execute($sql, $data);
             $model->{$class::PK} = $connection->lastInsertId();
         } else {
             $sql = '
-                UPDATE `' . $class::getTableName() . '`
+                UPDATE ' . $this->quoteName($class::getTableName()) . '
                 SET ' . implode(', ', $sets) . '
-                WHERE `' . $class::PK . '`=\'' . $model->{$class::PK} . '\'
+                WHERE "' . $class::PK . '"=\'' . $model->{$class::PK} . '\'
             ';
             $connection->execute($sql, $data);
         }
@@ -503,10 +513,10 @@ class Pgsql
         $connection = $class::getDbConnection();
 
         $sql = '
-            DELETE FROM `' . $class::getTableName() . '`
-            WHERE `' . $class::PK . '`=\'' . $model->{$class::PK} . '\'
+            DELETE FROM ' . $this->quoteName($class::getTableName()) . '
+            WHERE ' . $class::PK . '=:id
         ';
-        $connection->execute($sql);
+        $connection->execute($sql, [':id' => $model->getPk()]);
 
     }
 
