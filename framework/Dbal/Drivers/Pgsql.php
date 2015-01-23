@@ -18,10 +18,13 @@ class Pgsql
         $parts = explode('.', $name);
         $lastIndex = count($parts)-1;
         foreach ($parts as $index => &$part) {
+            if ('*' == $part) {
+                continue;
+            }
             if (
-                $index == $lastIndex
+                ($index == $lastIndex)
                 ||
-                !preg_match('~^(t|j)[\d]+$~', $part)
+                (!preg_match('~^(t|j)[\d]+$~', $part))
             ) {
                 $part = '"' . $part . '"';
             }

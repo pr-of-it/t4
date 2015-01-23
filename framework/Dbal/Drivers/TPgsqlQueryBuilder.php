@@ -49,11 +49,6 @@ trait TPgsqlQueryBuilder
         $sql .= implode(', ', $from);
         $sql .= "\n";
 
-        if (!empty($query->where)) {
-            $sql .= 'WHERE ' . $query->where;
-            $sql .= "\n";
-        }
-
         if (!empty($query->joins)) {
             $driver = $this;
             $joins = array_map(function ($x) use ($driver) {
@@ -78,6 +73,11 @@ trait TPgsqlQueryBuilder
                 $j[] = $ret . ' ' . $join['table'] . ' ON ' . $join['on'];
             };
             $sql .= implode("\n", $j);
+            $sql .= "\n";
+        }
+
+        if (!empty($query->where)) {
+            $sql .= 'WHERE ' . $query->where;
             $sql .= "\n";
         }
 

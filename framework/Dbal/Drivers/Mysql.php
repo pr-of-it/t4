@@ -21,6 +21,9 @@ class Mysql
         $parts = explode('.', $name);
         $lastIndex = count($parts)-1;
         foreach ($parts as $index => &$part) {
+            if ('*' == $part) {
+                continue;
+            }
             if (
                 (
                 $index == $lastIndex
