@@ -413,14 +413,15 @@ class Pgsql
 
         $connection = $class::getDbConnection();
         if ($model->isNew()) {
-            echo $sql = '
+            $sql = '
                 INSERT INTO ' . $this->quoteName($class::getTableName()) . '
                 (' . implode($cols) . ')
                 VALUES
                 (' . implode($prep) . ')
+                RETURNING ' . $class::PK . '
             ';
-            $connection->execute($sql, $data);
-            $model->{$class::PK} = $connection->lastInsertId();
+            $res = $connection->query($sql, $data);
+            $model->{$class::PK} = $res->fetch()[$class::PK];
         } else {
             $sql = '
                 UPDATE ' . $this->quoteName($class::getTableName()) . '
