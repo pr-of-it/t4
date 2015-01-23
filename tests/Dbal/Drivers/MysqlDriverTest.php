@@ -51,7 +51,7 @@ class MysqlDriverTest extends PHPUnit_Framework_TestCase {
             $reflector->invokeArgs($driver, ['foo', ['type' => 'boolean']])
         );
         $this->assertEquals(
-            '`foo` INT(11) DEFAULT \'123\'',
+            '`foo` INT(11) NOT NULL DEFAULT \'123\'',
             $reflector->invokeArgs($driver, ['foo', ['type' => 'int', 'default' => '123']])
         );
         $this->assertEquals(
@@ -68,7 +68,7 @@ class MysqlDriverTest extends PHPUnit_Framework_TestCase {
         );
 
         $this->assertEquals(
-            '`foo` TEXT DEFAULT \'123\'',
+            '`foo` TEXT NOT NULL DEFAULT \'123\'',
             $reflector->invokeArgs($driver, ['foo', ['type' => 'text', 'default' => '123']])
         );
         $this->assertEquals(
