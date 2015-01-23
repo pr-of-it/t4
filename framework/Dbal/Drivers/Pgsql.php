@@ -488,11 +488,11 @@ class Pgsql
                         }
 
                         $table = $class::getRelationLinkName($relation);
-                        $sql = 'DELETE FROM `' . $table . '` WHERE `' . $class::getManyToManyThisLinkColumnName() . '`=:id';
+                        $sql = 'DELETE FROM ' . $this->quoteName($table) . ' WHERE "' . $class::getManyToManyThisLinkColumnName() . '"=:id';
                         $connection->execute($sql, [':id'=>$model->getPk()]);
                         if (!empty($sets)) {
-                            $sql = 'INSERT INTO `' . $table . '`
-                                    (`' . $class::getManyToManyThisLinkColumnName() . '`, `' . $class::getManyToManyThatLinkColumnName($relation) . '`)
+                            $sql = 'INSERT INTO ' . $this->quoteName($table) . '
+                                    ("' . $class::getManyToManyThisLinkColumnName() . '", "' . $class::getManyToManyThatLinkColumnName($relation) . '")
                                     VALUES
                                     ' . (implode(', ', $sets)) . '
                                     ';
