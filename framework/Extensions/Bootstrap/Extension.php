@@ -21,9 +21,9 @@ class Extension
             }
             $assets->publishJsFile($this->assetsPath.'/lib/js/bootstrap.min.js');
         } else {
-            $assets->registerCssUrl('//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css');
-            $assets->registerCssUrl('//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap-theme.min.css');
-            $assets->registerJsUrl('//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js');
+            $assets->registerCssUrl('//netdna.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css');
+            $assets->registerCssUrl('//netdna.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap-theme.min.css');
+            $assets->registerJsUrl('//netdna.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js');
         }
     }
 
