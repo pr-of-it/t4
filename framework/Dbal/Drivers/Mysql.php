@@ -99,7 +99,7 @@ class Mysql
         }
 
         if(isset($options['default'])) {
-            $ddl .= ' ' . 'DEFAULT' . ' \'' . $options['default'] .'\'';
+            $ddl .= ' ' . 'NOT NULL DEFAULT' . ' \'' . $options['default'] .'\'';
         }
 
         return $name . ' ' . $ddl;
