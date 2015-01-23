@@ -10,6 +10,7 @@ use T4\Core\Session;
 /**
  * Class Request
  * @package T4\Http
+ * @property int $ip
  * @property string $protocol
  * @property string $method
  * @property string $host
@@ -156,10 +157,10 @@ class Request
     public function getIp()
     {
         if(isset($_SERVER['REMOTE_ADDR'])) {
-
             return ip2long($_SERVER['REMOTE_ADDR']);
+        } else {
+            return false;
         }
-
     }
 
 }
