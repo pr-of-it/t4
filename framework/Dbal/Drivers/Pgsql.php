@@ -415,9 +415,9 @@ class Pgsql
         if ($model->isNew()) {
             $sql = '
                 INSERT INTO ' . $this->quoteName($class::getTableName()) . '
-                (' . implode($cols) . ')
+                (' . implode(', ', $cols) . ')
                 VALUES
-                (' . implode($prep) . ')
+                (' . implode(', ', $prep) . ')
                 RETURNING ' . $class::PK . '
             ';
             $res = $connection->query($sql, $data);
