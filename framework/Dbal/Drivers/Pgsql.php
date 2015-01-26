@@ -231,15 +231,10 @@ class Pgsql
 
     public function addIndex(Connection $connection, $tableName, array $indexes)
     {
-        $sql = 'ALTER TABLE `' . $tableName . '`';
-        $indexesDDL = [];
         foreach ($indexes as $name => $options) {
-            $indexesDDL[] = 'ADD ' . $this->createIndexDDL($tableName, $name, $options);
+            $ddl = 'CREATE ' . $this->createIndexDDL($tableName, is_numeric($name) ? '' : $name, $options);
+            $connection->execute($ddl);
         }
-        $sql .= ' ' .
-            implode(', ', $indexesDDL) .
-            '';
-        $connection->execute($sql);
     }
 
     public function dropIndex(Connection $connection, $tableName, array $indexes)
