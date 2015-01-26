@@ -210,7 +210,7 @@ class Pgsql
         $sql = 'ALTER TABLE ' . $this->quoteName($tableName) . '';
         $columnsDDL = [];
         foreach ($columns as $name) {
-            $columnsDDL[] = 'DROP COLUMN `' . $name . '`';
+            $columnsDDL[] = 'DROP COLUMN ' . $this->quoteName($name) . '';
         }
         $sql .= ' ' .
             implode(', ', $columnsDDL) .
