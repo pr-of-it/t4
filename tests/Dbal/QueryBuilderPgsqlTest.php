@@ -39,14 +39,36 @@ class QueryBuilderPgsqlTest extends PHPUnit_Framework_TestCase {
     public function testPgslqMakeInsertQuery()
     {
         $builder = new \T4\Dbal\QueryBuilder();
+        $query = $builder->insert()->table('test')->values(['foo' => ':foo', 'bar' => ':bar'])->getQuery('pgsql');
+        $this->assertEquals("INSERT INTO \"test\"\n(\"foo\", \"bar\")\nVALUES (:foo, :bar)", $query);
+
+        $builder = new \T4\Dbal\QueryBuilder();
         $query = $builder->insert('test')->values(['foo' => ':foo', 'bar' => ':bar'])->getQuery('pgsql');
         $this->assertEquals("INSERT INTO \"test\"\n(\"foo\", \"bar\")\nVALUES (:foo, :bar)", $query);
+    }
+
+    public function testPgsqlMakeUpdateQuery()
+    {
+        $builder = new \T4\Dbal\QueryBuilder();
+        $query = $builder->update()->table('test')->values(['foo' => ':foo', 'bar' => ':bar'])->where('id=123')->getQuery('pgsql');
+        $this->assertEquals("UPDATE \"test\"\nSET \"foo\"=:foo, \"bar\"=:bar\nWHERE id=123", $query);
+
+        $builder = new \T4\Dbal\QueryBuilder();
+        $query = $builder->update('test')->values(['foo' => ':foo', 'bar' => ':bar'])->where('id=123')->getQuery('pgsql');
+        $this->assertEquals("UPDATE \"test\"\nSET \"foo\"=:foo, \"bar\"=:bar\nWHERE id=123", $query);
+
+        $builder = new \T4\Dbal\QueryBuilder();
+        $query = $builder->update('test')->values(['foo' => ':foo', 'bar' => ':bar'])->where('id=123')->order('id DESC')->limit(1)->getQuery('pgsql');
+        $this->assertEquals("UPDATE \"test\"\nSET \"foo\"=:foo, \"bar\"=:bar\nWHERE id=123", $query);
     }
 
     public function testPgslqMakeDeleteQuery()
     {
         $builder = new \T4\Dbal\QueryBuilder();
         $query = $builder->delete('test1, test2')->where('foo=:foo')->getQuery('pgsql');
+        $this->assertEquals("DELETE FROM \"test1\" AS t1, \"test2\" AS t2\nWHERE foo=:foo", $query);
+        $builder = new \T4\Dbal\QueryBuilder();
+        $query = $builder->delete()->tables('test1, test2')->where('foo=:foo')->getQuery('pgsql');
         $this->assertEquals("DELETE FROM \"test1\" AS t1, \"test2\" AS t2\nWHERE foo=:foo", $query);
     }
 
