@@ -140,13 +140,7 @@ abstract class Model
      */
     static public function getDbDriver()
     {
-        if ('cli' == PHP_SAPI) {
-            $app = \T4\Console\Application::getInstance();
-        } else {
-            $app = \T4\Mvc\Application::getInstance();
-        }
-        $driverName = $app->config->db->{static::getDbConnectionName()}->driver;
-        return DriverFactory::getDriver($driverName);
+        return static::getDbConnection()->getDriver();
     }
 
     /**
