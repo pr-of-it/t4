@@ -18,13 +18,16 @@ trait TTreeService
      */
     protected function removeFromTreeByLftRgt(Connection $connection, $table, $lft, $rgt)
     {
-        $sql = "
-                UPDATE `" . $table . "`
-                SET
-                    `__lft` = IF(`__lft` > :rgt, `__lft` - (:width + 1), `__lft`),
-                    `__rgt` = IF(`__rgt` > :rgt, `__rgt` - (:width + 1), `__rgt`)
-            ";
-        $connection->execute($sql, [':rgt' => $rgt, ':width' => $rgt - $lft]);
+        $query = new QueryBuilder();
+        $query
+            ->update()
+            ->table($table)
+            ->values([
+                '__lft' => 'CASE WHEN __lft>:rgt THEN __lft - (:width + 1) ELSE __lft END',
+                '__rgt' => 'CASE WHEN __rgt>:rgt THEN __rgt - (:width + 1) ELSE __rgt END',
+            ]);
+        $query->params([':rgt' => $rgt, ':width' => $rgt - $lft]);
+        $connection->execute($query);
     }
 
     /**
@@ -53,15 +56,18 @@ trait TTreeService
      */
     protected function expandTreeBeforeLft(Connection $connection, $table, $lft, $width)
     {
-        $sql = "
-                UPDATE `" . $table . "`
-                SET
-                    `__lft` = IF(`__lft`>=:lft, `__lft` + (:width + 1), `__lft`),
-                    `__rgt` = IF(`__rgt`>=:lft, `__rgt` + (:width + 1), `__rgt`)
-                WHERE `__lft`>=:lft OR `__rgt`>=:lft
-                ORDER BY `__lft` DESC
-            ";
-        $connection->execute($sql, [':lft' => $lft, ':width' => $width]);
+        $query = new QueryBuilder();
+        $query
+            ->update()
+            ->table($table)
+            ->values([
+                '__lft' => 'CASE WHEN __lft>=:lft THEN __lft + (:width + 1) ELSE __lft END',
+                '__rgt' => 'CASE WHEN __rgt>=:lft THEN __rgt + (:width + 1) ELSE  __rgt END',
+            ])
+            ->where('__lft>=:lft OR __rgt>=:lft')
+            ->order('__lft DESC');
+        $query->params([':lft' => $lft, ':width' => $width]);
+        $connection->execute($query);
     }
 
     /**
@@ -74,15 +80,18 @@ trait TTreeService
      */
     protected function expandTreeAfterLft(Connection $connection, $table, $lft, $width)
     {
-        $sql = "
-                UPDATE `" . $table . "`
-                SET
-                    `__lft` = IF(`__lft`>:lft, `__lft` + (:width + 1), `__lft`),
-                    `__rgt` = IF(`__rgt`>=:lft, `__rgt` + (:width + 1), `__rgt`)
-                WHERE `__lft`>:lft OR `__rgt`>=:lft
-                ORDER BY `__lft` DESC
-            ";
-        $connection->execute($sql, [':lft' => $lft, ':width' => $width]);
+        $query = new QueryBuilder();
+        $query
+            ->update()
+            ->table($table)
+            ->values([
+                '__lft' => 'CASE WHEN __lft>:lft THEN __lft + (:width + 1) ELSE __lft END',
+                '__rgt' => 'CASE WHEN __rgt>=:lft THEN __rgt + (:width + 1) ELSE __rgt END',
+            ])
+            ->where('__lft>:lft OR __rgt>=:lft')
+            ->order('__lft DESC');
+        $query->params([':lft' => $lft, ':width' => $width]);
+        $connection->execute($query);
     }
 
     /**
@@ -128,15 +137,18 @@ trait TTreeService
      */
     protected function expandTreeAfterRgt(Connection $connection, $table, $rgt, $width)
     {
-        $sql = "
-                UPDATE `" . $table . "`
-                SET
-                    `__lft` = IF(`__lft`>:rgt, `__lft` + (:width + 1), `__lft`),
-                    `__rgt` = IF(`__rgt`>:rgt, `__rgt` + (:width + 1), `__rgt`)
-                WHERE `__lft`>:rgt OR `__rgt`>:rgt
-                ORDER BY `__lft` DESC
-            ";
-        $connection->execute($sql, [':rgt' => $rgt, ':width' => $width]);
+        $query = new QueryBuilder();
+        $query
+            ->update()
+            ->table($table)
+            ->values([
+                '__lft' => 'CASE WHEN __lft>:rgt THEN __lft + (:width + 1) ELSE __lft END',
+                '__rgt' => 'CASE WHEN __rgt>:rgt THEN __rgt + (:width + 1) ELSE __rgt END',
+            ])
+            ->where('__lft>:rgt OR __rgt>:rgt')
+            ->order('__lft DESC');
+        $query->params([':rgt' => $rgt, ':width' => $width]);
+        $connection->execute($query);
     }
 
     /**
@@ -149,15 +161,18 @@ trait TTreeService
      */
     protected function expandTreeBeforeRgt(Connection $connection, $table, $rgt, $width)
     {
-        $sql = "
-                UPDATE `" . $table . "`
-                SET
-                    `__lft` = IF(`__lft`>=:rgt, `__lft` + (:width + 1), `__lft`),
-                    `__rgt` = IF(`__rgt`>=:rgt, `__rgt` + (:width + 1), `__rgt`)
-                WHERE `__lft`>=:rgt OR `__rgt`>=:rgt
-                ORDER BY `__lft` DESC
-            ";
-        $connection->execute($sql, [':rgt' => $rgt, ':width' => $width]);
+        $query = new QueryBuilder();
+        $query
+            ->update()
+            ->table($table)
+            ->values([
+                '__lft' => 'CASE WHEN __lft>=:rgt THEN __lft + (:width + 1) ELSE __lft END',
+                '__rgt' => 'CASE WHEN __rgt>=:rgt THEN __rgt + (:width + 1) ELSE __rgt END',
+            ])
+            ->where('__lft>=:rgt OR __rgt>=:rgt')
+            ->order('__lft DESC');
+        $query->params([':rgt' => $rgt, ':width' => $width]);
+        $connection->execute($query);
     }
 
     /**
