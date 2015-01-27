@@ -144,13 +144,34 @@ class QueryBuilderTest extends PHPUnit_Framework_TestCase {
         $this->assertInstanceOf('\T4\Dbal\QueryBuilder', $b);
         $this->assertEquals($b, $builder);
         $this->assertEquals('insert', $builder->mode);
-        $this->assertEquals('test', $builder->insertTable);
+        $this->assertEquals(['test'], $builder->insertTables);
 
         $b = $builder->values(['foo' => ':foo', 'bar' => ':bar']);
         $this->assertInstanceOf('\T4\Dbal\QueryBuilder', $b);
         $this->assertEquals($b, $builder);
         $this->assertEquals(['foo' => ':foo', 'bar' => ':bar'], $builder->values);
+    }
 
+    public function testAssignUpdate()
+    {
+        $builder = new \T4\Dbal\QueryBuilder();
+
+        $b = $builder->update('test');
+        $this->assertInstanceOf('\T4\Dbal\QueryBuilder', $b);
+        $this->assertEquals($b, $builder);
+        $this->assertEquals('update', $builder->mode);
+        $this->assertEquals(['test'], $builder->updateTables);
+
+        $b = $builder->table('test1');
+        $this->assertInstanceOf('\T4\Dbal\QueryBuilder', $b);
+        $this->assertEquals($b, $builder);
+        $this->assertEquals('update', $builder->mode);
+        $this->assertEquals(['test', 'test1'], $builder->updateTables);
+
+        $b = $builder->values(['foo' => ':foo', 'bar' => ':bar']);
+        $this->assertInstanceOf('\T4\Dbal\QueryBuilder', $b);
+        $this->assertEquals($b, $builder);
+        $this->assertEquals(['foo' => ':foo', 'bar' => ':bar'], $builder->values);
     }
 
     public function testAssignDelete()

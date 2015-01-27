@@ -2,6 +2,7 @@
 
 namespace T4\Dbal\Drivers;
 
+use T4\Dbal\Exception;
 use T4\Dbal\QueryBuilder;
 
 trait TMysqlQueryBuilder
@@ -14,6 +15,8 @@ trait TMysqlQueryBuilder
                 return $this->makeQuerySelect($query);
             case 'insert':
                 return $this->makeQueryInsert($query);
+            case 'update':
+                return $this->makeQueryUpdate($query);
             case 'delete':
                 return $this->makeQueryDelete($query);
         }
@@ -102,12 +105,16 @@ trait TMysqlQueryBuilder
 
     protected function makeQueryInsert(QueryBuilder $query)
     {
-        if (empty($query->insertTable) || empty($query->values)) {
-            throw new Exception('INSERT statement must have both \'insert table\' and \'values\' parts');
+        if (empty($query->insertTables) || empty($query->values)) {
+            throw new Exception('INSERT statement must have both \'insert tables\' and \'values\' parts');
         }
 
         $sql  = 'INSERT INTO ';
-        $sql .= $this->quoteName( $query->insertTable );
+        $driver = $this;
+        $tables = array_map(function ($x) use ($driver) {
+            return $driver->quoteName($x);
+        }, $query->insertTables);
+        $sql .= implode(', ', $tables);
         $sql .= "\n";
 
         $sql .= '(';
@@ -124,6 +131,52 @@ trait TMysqlQueryBuilder
         return $sql;
     }
 
+    protected function makeQueryUpdate(QueryBuilder $query)
+    {
+        if (empty($query->updateTables) || empty($query->values)) {
+            throw new Exception('UPDATE statement must have both \'update tables\' and \'values\' parts');
+        }
+
+        $sql  = 'UPDATE ';
+        $driver = $this;
+        $tables = array_map(function ($x) use ($driver) {
+            return $driver->quoteName($x);
+        }, $query->updateTables);
+        $sql .= implode(', ', $tables);
+        $sql .= "\n";
+
+        $sets = [];
+        foreach ($query->values as $key => $value) {
+            $sets[] = static::quoteName($key) . '=' . $value;
+        }
+
+        $sql .= 'SET ' . implode(', ', $sets);
+        $sql .= "\n";
+
+        if (!empty($query->where)) {
+            $sql .= 'WHERE ' . $query->where;
+            $sql .= "\n";
+        }
+
+        if (!empty($query->order)) {
+            $sql .= 'ORDER BY ' . $query->order;
+            $sql .= "\n";
+        }
+
+        if (!empty($query->limit)) {
+            if (!empty($query->offset)) {
+                $sql .= 'LIMIT ' . $query->offset . ', ' . $query->limit;
+                $sql .= "\n";
+            } else {
+                $sql .= 'LIMIT ' . $query->limit;
+                $sql .= "\n";
+            }
+        }
+
+        $sql = preg_replace('~\n$~', '', $sql);
+        return $sql;
+    }
+
     protected function makeQueryDelete(QueryBuilder $query)
     {
         if (empty($query->deleteTables)) {
@@ -132,15 +185,11 @@ trait TMysqlQueryBuilder
 
         $sql  = 'DELETE FROM ';
         $driver = $this;
-        /*
-        $from = array_map(function ($x) use ($driver) {
+        $tables = array_map(function ($x) use ($driver) {
             static $c = 1;
             return $this->aliasTableName($x, 'main', $c++);
         }, $query->deleteTables);
-        */
-        $from = $query->deleteTables;
-
-        $sql .= implode(', ', $from);
+        $sql .= implode(', ', $tables);
         $sql .= "\n";
 
         if (!empty($query->where)) {

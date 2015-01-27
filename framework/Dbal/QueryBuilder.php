@@ -45,19 +45,58 @@ class QueryBuilder
         return $this;
     }
 
-    public function insert($table)
+    public function insert($table = null)
     {
-        $this->insertTable = $table;
         $this->mode = 'insert';
+        if (null !== $table) {
+            $this->table($table);
+        }
         return $this;
     }
 
-    public function delete($what)
+    public function update($table = null)
+    {
+        $this->mode = 'update';
+        if (null !== $table) {
+            $this->table($table);
+        }
+        return $this;
+    }
+
+    public function delete($table = null)
+    {
+        $this->mode = 'delete';
+        if (null !== $table) {
+            $this->table($table);
+        }
+        return $this;
+    }
+
+    public function table($table)
     {
         $what = $this->prepareWhat(func_get_args());
-        $this->deleteTables = array_merge(!empty($this->deleteTables) ? $this->deleteTables : [], $what);
-        $this->mode = 'delete';
+
+        switch ($this->mode) {
+            case 'insert':
+                $this->insertTables = array_merge(!empty($this->insertTables) ? $this->insertTables : [], $what);
+                break;
+            case 'update':
+                $this->updateTables = array_merge(!empty($this->updateTables) ? $this->updateTables : [], $what);
+                break;
+            case 'delete':
+                $this->deleteTables = array_merge(!empty($this->deleteTables) ? $this->deleteTables : [], $what);
+                break;
+            case 'select':
+            default:
+                $this->from($table);
+                break;
+        }
         return $this;
+    }
+
+    public function tables()
+    {
+        return call_user_func_array([$this, 'table'], func_get_args());
     }
 
     public function from($what)

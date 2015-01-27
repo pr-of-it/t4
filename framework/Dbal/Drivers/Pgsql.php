@@ -11,7 +11,10 @@ use T4\Orm\Model;
 class Pgsql
     implements IDriver
 {
+
     use TPgsqlQueryBuilder;
+
+    protected $selectNoQouteTemplate = '~count|avg|group_concat|min|max|sum~i';
 
     protected function quoteName($name)
     {
@@ -22,9 +25,12 @@ class Pgsql
                 continue;
             }
             if (
-                ($index == $lastIndex)
-                ||
-                (!preg_match('~^(t|j)[\d]+$~', $part))
+                (
+                    $index == $lastIndex
+                    ||
+                    !preg_match('~^(t|j)[\d]+$~', $part)
+                ) &&
+                !preg_match($this->selectNoQouteTemplate, $part)
             ) {
                 $part = '"' . $part . '"';
             }
@@ -410,9 +416,9 @@ class Pgsql
         if ($model->isNew()) {
             $sql = '
                 INSERT INTO ' . $this->quoteName($class::getTableName()) . '
-                (' . implode(', ', $cols) . ')
+                (' . implode(', ', array_unique($cols)) . ')
                 VALUES
-                (' . implode(', ', $prep) . ')
+                (' . implode(', ', array_unique($prep)) . ')
                 RETURNING ' . $class::PK . '
             ';
             $res = $connection->query($sql, $data);

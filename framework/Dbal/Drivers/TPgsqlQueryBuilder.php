@@ -2,6 +2,7 @@
 
 namespace T4\Dbal\Drivers;
 
+use T4\Dbal\Exception;
 use T4\Dbal\QueryBuilder;
 
 trait TPgsqlQueryBuilder
@@ -102,12 +103,12 @@ trait TPgsqlQueryBuilder
 
     protected function makeQueryInsert(QueryBuilder $query)
     {
-        if (empty($query->insertTable) || empty($query->values)) {
+        if (empty($query->insertTables) || empty($query->values)) {
             throw new Exception('INSERT statement must have both \'insert table\' and \'values\' parts');
         }
 
         $sql  = 'INSERT INTO ';
-        $sql .= $this->quoteName( $query->insertTable );
+        $sql .= $this->quoteName( $query->insertTables );
         $sql .= "\n";
 
         $sql .= '(';
