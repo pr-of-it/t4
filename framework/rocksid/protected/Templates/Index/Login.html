@@ -1,0 +1,7 @@
+{% extends "index.html" %}
+{% block content %}
+{% if app.flash.error is defined %}
+<div class="alert alert-danger">{{app.flash.error}}</div>
+{% endif %}
+<t4:block path="///Login">
+{% endblock %}
