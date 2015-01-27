@@ -1,11 +1,13 @@
 <?php
 
-require_once realpath(__DIR__ . '/../../../../framework/boot.php');
-require_once __DIR__ . '/testClasses.php';
-require_once __DIR__ . '/DbTestClass.php';
+require_once realpath(__DIR__ . '/../../../../../framework/boot.php');
+require_once __DIR__ . '/../testClasses.php';
+require_once __DIR__ . '/../TMysqlDbTest.php';
 
-class OrmExtTreeExpandTest extends DbTestClass
+class MysqlOrmExtTreeExpandTest extends PHPUnit_Extensions_Database_TestCase
 {
+
+    use TMysqlDbTest;
 
     public function testExpandTreeBeforeLft()
     {
