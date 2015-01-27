@@ -426,7 +426,7 @@ class Pgsql
         } else {
             $sql = '
                 UPDATE ' . $this->quoteName($class::getTableName()) . '
-                SET ' . implode(', ', $sets) . '
+                SET ' . implode(', ', array_unique($sets)) . '
                 WHERE "' . $class::PK . '"=\'' . $model->{$class::PK} . '\'
             ';
             $connection->execute($sql, $data);

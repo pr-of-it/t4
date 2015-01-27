@@ -186,8 +186,7 @@ trait TMysqlQueryBuilder
         $sql  = 'DELETE FROM ';
         $driver = $this;
         $tables = array_map(function ($x) use ($driver) {
-            static $c = 1;
-            return $this->aliasTableName($x, 'main', $c++);
+            return $driver->quoteName($x);
         }, $query->deleteTables);
         $sql .= implode(', ', $tables);
         $sql .= "\n";
