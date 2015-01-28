@@ -41,4 +41,19 @@ class Collection extends \ArrayObject
         }
     }
 
+    public function collect($attribute)
+    {
+        $ret = [];
+        foreach ($this as $element) {
+            if (is_callable($attribute)) {
+                $ret[] = $element->$attribute();
+            } elseif (is_array($element)) {
+                $ret[] = $element[$attribute];
+            } else {
+                $ret[] = $element->$attribute;
+            }
+        }
+        return $ret;
+    }
+
 }
