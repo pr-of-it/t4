@@ -66,10 +66,10 @@ class QueryBuilderMysqlTest extends PHPUnit_Framework_TestCase {
     {
         $builder = new \T4\Dbal\QueryBuilder();
         $query = $builder->delete('test1, test2')->where('foo=:foo')->getQuery('mysql');
-        $this->assertEquals("DELETE FROM `test1` AS t1, `test2` AS t2\nWHERE foo=:foo", $query);
+        $this->assertEquals("DELETE FROM `test1`, `test2`\nWHERE foo=:foo", $query);
         $builder = new \T4\Dbal\QueryBuilder();
         $query = $builder->delete()->tables('test1, test2')->where('foo=:foo')->getQuery('mysql');
-        $this->assertEquals("DELETE FROM `test1` AS t1, `test2` AS t2\nWHERE foo=:foo", $query);
+        $this->assertEquals("DELETE FROM `test1`, `test2`\nWHERE foo=:foo", $query);
     }
 
 }
