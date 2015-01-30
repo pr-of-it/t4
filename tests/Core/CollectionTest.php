@@ -68,4 +68,39 @@ class CollectionTest extends PHPUnit_Framework_TestCase
 
     }
 
+    public function testCollect()
+    {
+        $i1 = new \T4\Core\Std(['id' => 1, 'title' => 'foo']);
+        $i2 = new \T4\Core\Std(['id' => 2, 'title' => 'bar']);
+        $i3 = new \T4\Core\Std(['id' => 3, 'title' => 'baz']);
+
+        $collection = new Collection();
+        $collection->append($i1);
+        $collection->append($i2);
+        $collection->append($i3);
+
+        $this->assertEquals(
+            [new \T4\Core\Std(['id' => 1, 'title' => 'foo']), new \T4\Core\Std(['id' => 2, 'title' => 'bar']), new \T4\Core\Std(['id' => 3, 'title' => 'baz'])],
+            $collection->getArrayCopy()
+        );
+
+        $ids = $collection->collect('id');
+        $this->assertEquals([1, 2, 3], $ids);
+
+        $titles = $collection->collect(function ($x) {return $x->title;});
+        $this->assertEquals(['foo', 'bar', 'baz'], $titles);
+
+        $collection = new Collection([
+            ['id' => 1, 'title' => 'foo'],
+            ['id' => 2, 'title' => 'bar'],
+            ['id' => 3, 'title' => 'baz'],
+        ]);
+
+        $ids = $collection->collect('id');
+        $this->assertEquals([1, 2, 3], $ids);
+
+        $titles = $collection->collect(function ($x) {return $x['title'];});
+        $this->assertEquals(['foo', 'bar', 'baz'], $titles);
+    }
+
 }
