@@ -10,7 +10,7 @@ class HttpHelpersTest extends PHPUnit_Framework_TestCase {
         $reflector->setAccessible(true);
 
         $this->assertEquals(
-            '.localhost',
+            '',
             $reflector->invoke(null, 'localhost')
         );
         $this->assertEquals(

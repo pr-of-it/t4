@@ -3,7 +3,6 @@
 namespace T4\Http;
 
 use T4\Core\Exception;
-use T4\Fs\Helpers;
 use T4\Mvc\Application;
 
 class Uploader
@@ -60,7 +59,7 @@ class Uploader
         if (empty($this->uploadPath))
             throw new Exception('Invalid upload path');
 
-        $realUploadPath = Helpers::getRealPath($this->uploadPath);
+        $realUploadPath = \T4\Fs\Helpers::getRealPath($this->uploadPath);
         if (!is_dir($realUploadPath)) {
             try {
                 \T4\Fs\Helpers::mkDir($realUploadPath);
