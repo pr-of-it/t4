@@ -203,7 +203,7 @@ class Tree
                     '__prt' => 'CASE WHEN __id=:id THEN :parentid ELSE __prt END',
                 ])
                 ->where('__lft>=:lft AND __rgt<=:rgt');
-            $query->params([':lft'=>$model->__lft, ':rgt'=>$model->__rgt, ':diff'=>$diff, ':lvlDiff'=>$lvlDiff, ':id'=>$model->getPk(), ':parent'=>$parent->getPk()]);
+            $query->params([':lft'=>$model->__lft, ':rgt'=>$model->__rgt, ':diff'=>$diff, ':lvldiff'=>$lvlDiff, ':id'=>$model->getPk(), ':parentid'=>$parent->getPk()]);
             $connection->execute($query);
 
             $this->removeFromTreeByElement($model);
