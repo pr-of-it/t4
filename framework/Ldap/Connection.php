@@ -36,4 +36,10 @@ class Connection
         $this->bind = $bind;
     }
 
+    public function search($dn, $filter, $attrs = [])
+    {
+        $search = ldap_search($this->ldap, $dn, $filter, $attrs);
+        return ldap_get_entries($this->ldap, $search);
+    }
+
 }
