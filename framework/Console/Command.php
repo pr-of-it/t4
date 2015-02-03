@@ -18,12 +18,12 @@ class Command {
     }
 
 
-    public function beforeAction()
+    protected function beforeAction()
     {
         return true;
     }
 
-    public function afterAction()
+    protected function afterAction()
     {
 
     }
