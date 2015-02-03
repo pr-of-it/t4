@@ -17,9 +17,9 @@ class Extension
             $assets->publishCssFile($this->assetsPath.'/lib/css/bootstrap.min.css');
 
             if (!empty($this->options->theme)) {
-                $assets->publishCssFile($this->assetsPath . "/lib/css/' . $theme . '/bootstrap.min.css");
+                $assets->publishCssFile($this->assetsPath . '/lib/css/' . $theme . '/bootstrap.min.css');
             } else {
-                $assets->publishCssFile($this->assetsPath.'/lib/css/bootstrap-theme.min.css');
+                $assets->publishCssFile($this->assetsPath . '/lib/css/bootstrap-theme.min.css');
             }
 
             $assets->publishJsFile($this->assetsPath . '/lib/js/bootstrap.min.js');
