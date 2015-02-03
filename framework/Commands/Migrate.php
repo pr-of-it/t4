@@ -72,10 +72,14 @@ class Migrate
         }
     }
 
-    public function actionCreate($name)
+    public function actionCreate($name, $module = null)
     {
         $className = sprintf(self::CLASS_NAME_PATTERN, time(), $name);
-        $namespace = self::MIGRATIONS_NAMESPACE;
+        if (null !== $module) {
+            $namespace = 'App\\Modules\\' . ucfirst($module) . '\\Migrations';
+        } else {
+            $namespace = self::MIGRATIONS_NAMESPACE;
+        }
         $content = <<<FILE
 <?php
 
@@ -97,9 +101,14 @@ class {$className}
 
 }
 FILE;
-        $fileName = $this->getMigrationsPath() . DS . $className . '.php';
+        if (null !== $module) {
+            $fileName = ROOT_PATH_PROTECTED . DS . 'Modules' . DS . ucfirst($module) . DS . 'Migrations' . DS . $className . '.php';
+            echo 'Migration ' . $className . ' is created in ' . ROOT_PATH_PROTECTED . DS . ucfirst($module) . DS . 'Migrations';
+        } else {
+            $fileName = $this->getMigrationsPath() . DS . $className . '.php';
+            echo 'Migration ' . $className . ' is created in ' . $this->getMigrationsPath();
+        }
         file_put_contents($fileName, $content);
-        echo 'Migration ' . $className . ' is created in ' . $this->getMigrationsPath();
     }
 
     protected function isInstalled()
@@ -181,6 +190,10 @@ FILE;
         }
         $query->delete(self::TABLE_NAME)->where($column . '=:time')->params([':time' => $migration->getTimestamp()]);
         $this->app->db->default->execute($query);
+    }
+
+    public function actionImport($module) {
+
     }
 
 }
