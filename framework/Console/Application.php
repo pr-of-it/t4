@@ -23,7 +23,7 @@ class Application
     use TSingleton, TStdGetSet;
 
     const CMD_PATTERN = '~^(\/?)([^\/]*?)(\/([^\/]*?))?$~';
-    const OPTION_PATTERN = '~^--(.+)=(.*)$~';
+    const OPTION_PATTERN = '~^--([^=]+)={0,1}([^=]*)$~';
     const DEFAULT_ACTION = 'default';
 
     const ERROR_CODE = 1;
@@ -32,7 +32,8 @@ class Application
     {
         try {
 
-            $route = $this->parseCmd($_SERVER['argv']);
+            $arguments = array_slice($_SERVER['argv'], 1);
+            $route = $this->parseCmd($arguments);
 
             $commandClassName = $route['namespace'] . '\\Commands\\' . ucfirst($route['command']);
             if (!class_exists($commandClassName))
@@ -80,9 +81,9 @@ class Application
         return Helpers::run($callback, $args);
     }
 
+
     protected function parseCmd($argv)
     {
-        $argv = array_slice($argv, 1);
         if (empty($argv)) {
             $emptyCommand = true;
         } else {
@@ -90,24 +91,25 @@ class Application
         }
         $cmd = array_shift($argv);
         preg_match(self::CMD_PATTERN, $cmd, $m);
-        $commandName = $m[2];
+        $commandName = ucfirst($m[2]);
+
         $actionName = isset($m[4]) ? $m[4] : self::DEFAULT_ACTION;
+
         $rootCommand = !empty($m[1]) || $emptyCommand;
 
         $options = [];
         foreach ($argv as $arg) {
             if (preg_match(self::OPTION_PATTERN, $arg, $m)) {
-                $options[$m[1]] = $m[2];
+                $options[$m[1]] = $m[2] ?: true;
             }
         }
 
         return [
             'namespace' => $rootCommand ? 'T4' : 'App',
             'command' => $commandName ? $commandName : 'Application',
-            'action' => $actionName,
+            'action' => ucfirst($actionName),
             'params' => $options,
         ];
-
     }
 
     /**
