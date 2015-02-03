@@ -9,22 +9,27 @@ class Extension
     public function init()
     {
         $assets = $this->app->assets;
-	    $theme = $this->options->theme;
-        if ( isset($this->options->location) && 'local'==$this->options->location ) {
-            $assets->publish($this->assetsPath.'/lib');
-	        if ( !empty($this->options->theme) ) {
-		        $assets->publishCssFile($this->assetsPath."/lib/css/$theme/bootstrap.min.css");
-		        }
-            //$assets->publishCssFile($this->assetsPath.'/lib/css/bootstrap.min.css');
-            //$assets->publishCssFile($this->assetsPath.'/lib/css/bootstrap-theme.min.css');
+        $theme = $this->options->theme;
+        if (isset($this->options->location) && 'local' == $this->options->location) {
+            $assets->publish($this->assetsPath . '/lib');
 
-            $assets->publishJsFile($this->assetsPath.'/lib/js/bootstrap.min.js');
+            $assets->publishCssFile($this->assetsPath.'/lib/css/bootstrap.min.css');
+
+            if (!empty($this->options->theme)) {
+                $assets->publishCssFile($this->assetsPath . "/lib/css/$theme/bootstrap.min.css");
+            } else {
+                $assets->publishCssFile($this->assetsPath.'/lib/css/bootstrap-theme.min.css');
+            }
+
+            $assets->publishJsFile($this->assetsPath . '/lib/js/bootstrap.min.js');
         } else {
-           // $assets->registerCssUrl('//netdna.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css');
-            $assets->registerCssUrl("//maxcdn.bootstrapcdn.com/bootswatch/3.3.2/$theme/bootstrap.min.css");
-            //$assets->registerCssUrl('//maxcdn.bootstrapcdn.com/bootswatch/3.3.2/cosmo/bootstrap.min.css');
-           // $assets->registerCssUrl('//netdna.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap-theme.min.css');
-           // $assets->registerJsUrl('//netdna.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js');
+            $assets->registerCssUrl('//netdna.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css');
+            if (!empty($this->options->theme)) {
+                $assets->registerCssUrl("//maxcdn.bootstrapcdn.com/bootswatch/3.3.2/$theme/bootstrap.min.css");
+            } else {
+                $assets->registerCssUrl('//netdna.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap-theme.min.css');
+            }
+            $assets->registerJsUrl('//netdna.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js');
         }
     }
 
