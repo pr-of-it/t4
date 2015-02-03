@@ -28,18 +28,52 @@ class Command {
 
     }
 
-    final public function action($name, array $params = [])
+    final public function action($name, $params = [])
+    {
+        $name = ucfirst($name);
+        $actionMethodName = 'action' . $name;
+
+        if (!method_exists($this, $actionMethodName)) {
+            throw new Exception('Action ' . $name . ' is not found in command ' . get_class($this));
+        }
+
+        if ($this->beforeAction()) {
+
+            $p = [];
+            foreach ($this->getActionParameters($name) as $param) {
+
+                if (!empty($params[$param->name])) {
+                    $p[$param->name] = $params[$param->name];
+                    unset($params[$param->name]);
+                } elseif ( $param->isDefaultValueAvailable() ) {
+                    $p[$param->name] = $param->getDefaultValue();
+                } else {
+                    throw new Exception('Missing argument ' . $param->name . ' for action ' . $actionMethodName);
+                }
+
+            }
+            $p = array_merge($p, (array)$params);
+
+            call_user_func_array([$this, $actionMethodName], $p);
+            $this->afterAction();
+        }
+    }
+
+    /**
+     * @param string $name
+     * @return \ReflectionParameter[]
+     * @throws Exception
+     */
+    final protected function getActionParameters($name)
     {
         $actionMethodName = 'action' . ucfirst($name);
         if (method_exists($this, $actionMethodName)) {
-            // Продолжаем выполнение действия только если из beforeAction не передано false
-            if ($this->beforeAction()) {
-                call_user_func_array([$this, $actionMethodName], $params);
-                $this->afterAction();
-            }
+            $reflection = new \ReflectionMethod($this, $actionMethodName);
+            return $reflection->getParameters();
         } else {
             throw new Exception('Action ' . $name . ' is not found in command ' . get_class($this));
         }
+
     }
 
     protected function writeLn($msg)

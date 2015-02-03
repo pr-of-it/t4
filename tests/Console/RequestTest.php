@@ -26,21 +26,21 @@ class RequestTest extends PHPUnit_Framework_TestCase
 
         $this->assertEquals('test', $request->command);
         $this->assertEquals(['--foo=bar'], $request->arguments);
-        $this->assertEquals(new \T4\Core\Std(['foo' => 'bar']), $request->options);
+        $this->assertEquals(new \T4\Console\Request(['foo' => 'bar']), $request->options);
 
         $_SERVER['argv'] = ['t4', 'test', '--foo=bar', 'blabla'];
         $request = new \T4\Console\Request();
 
         $this->assertEquals('test', $request->command);
         $this->assertEquals(['--foo=bar', 'blabla'], $request->arguments);
-        $this->assertEquals(new \T4\Core\Std(['foo' => 'bar']), $request->options);
+        $this->assertEquals(new \T4\Console\Request(['foo' => 'bar']), $request->options);
 
         $_SERVER['argv'] = ['t4', 'test', '--foo=bar', 'blabla', '--baz'];
         $request = new \T4\Console\Request();
 
         $this->assertEquals('test', $request->command);
         $this->assertEquals(['--foo=bar', 'blabla', '--baz'], $request->arguments);
-        $this->assertEquals(new \T4\Core\Std(['foo' => 'bar', 'baz' => true]), $request->options);
+        $this->assertEquals(new \T4\Console\Request(['foo' => 'bar', 'baz' => true]), $request->options);
     }
 
 }

@@ -101,7 +101,7 @@ abstract class Controller
         $actionMethodName = 'action' . ucfirst($name);
         if (method_exists($this, $actionMethodName)) {
             $reflection = new \ReflectionMethod($this, $actionMethodName);
-            return $params = $reflection->getParameters();
+            return $reflection->getParameters();
         } else {
             throw new ControllerException('Action ' . $name . ' is not found in controller ' . get_class($this));
         }

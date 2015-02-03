@@ -18,13 +18,17 @@ class Request
 
     const OPTION_PATTERN = '~^--([^=]+)={0,1}([^=]*)$~';
 
-    public function __construct()
+    public function __construct($data = null)
     {
-        $arguments = array_slice($_SERVER['argv'], 1);
-        $this->command = array_shift($arguments);
-        $this->arguments = $arguments;
-        $options = $this->parseOptions($this->arguments);
-        $this->options = $options ? new Std($options) : [];
+        if (null !== $data) {
+            parent::__construct($data);
+        } else {
+            $arguments = array_slice($_SERVER['argv'], 1);
+            $this->command = array_shift($arguments);
+            $this->arguments = $arguments;
+            $options = $this->parseOptions($this->arguments);
+            $this->options = $options ? new self($options) : [];
+        }
     }
 
     protected function parseOptions($arguments)

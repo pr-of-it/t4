@@ -15,6 +15,7 @@ use T4\Threads\Helpers;
  * Class Application
  * @package T4\Console
  * @property \T4\Core\Config $config
+ * @property \T4\Console\Request $request
  * @property \T4\Dbal\Connection[] $db
  */
 class Application
@@ -23,7 +24,7 @@ class Application
     use TSingleton, TStdGetSet;
 
     const CMD_PATTERN = '~^(\/?)([^\/]*?)(\/([^\/]*?))?$~';
-    const OPTION_PATTERN = '~^--([^=]+)={0,1}([^=]*)$~';
+    const DEFAULT_COMMAND = 'Application';
     const DEFAULT_ACTION = 'Default';
 
     const ERROR_CODE = 1;
@@ -32,34 +33,43 @@ class Application
     {
         try {
 
-            $arguments = array_slice($_SERVER['argv'], 1);
-            $route = $this->parseCmd($arguments);
-
-            $commandClassName = $route['namespace'] . '\\Commands\\' . ucfirst($route['command']);
-            if (!class_exists($commandClassName))
-                throw new Exception('Command class ' . $commandClassName . ' is not found');
-            $command = new $commandClassName;
-            $actionMethodName = 'action' . ucfirst($route['action']);
-            if (!method_exists($command, $actionMethodName))
-                throw new Exception('Action ' . $route['action'] . ' is not found in command class ' . $commandClassName . '');
-
-            $reflection = new \ReflectionMethod($command, $actionMethodName);
-            if ($reflection->getNumberOfRequiredParameters() != count($route['params']))
-                throw new Exception('Invalid required parameters count for command');
-            $actionParams = $reflection->getParameters();
-            $params = [];
-            foreach ($actionParams as $actionParam) {
-                if (!$actionParam->isOptional() && !isset($route['params'][$actionParam->name])) {
-                    throw new Exception('Required parameter ' . $actionParam->name . ' is not set');
-                }
-                $params[$actionParam->name] = $route['params'][$actionParam->name];
-            }
-
-            $command->action($route['action'], $params);
+            $this->runRequest($this->request);
 
         } catch (Exception $e) {
             $this->shutdown('ERROR: ' . $e->getMessage());
         }
+    }
+
+    protected function runRequest(Request $request)
+    {
+        $route = $this->parseRequest($request);
+
+        $commandClassName = $route['namespace'] . '\\Commands\\' . ucfirst($route['command']);
+        if (!class_exists($commandClassName))
+            throw new Exception('Command class ' . $commandClassName . ' is not found');
+
+        $command = new $commandClassName;
+        $command->action($route['action'], $route['options']);
+    }
+
+    protected function parseRequest(Request $request)
+    {
+        if (empty($request->command)) {
+            $emptyCommand = true;
+        } else {
+            $emptyCommand = false;
+        }
+        preg_match(self::CMD_PATTERN, $request->command, $m);
+        $commandName = ucfirst($m[2]);
+        $actionName = isset($m[4]) ? $m[4] : self::DEFAULT_ACTION;
+        $rootCommand = !empty($m[1]) || $emptyCommand;
+
+        return [
+            'namespace' => $rootCommand ? 'T4' : 'App',
+            'command' => $commandName ? $commandName : self::DEFAULT_COMMAND,
+            'action' => ucfirst($actionName),
+            'options' => $request->options,
+        ];
     }
 
     public function shutdown($message = '')
@@ -79,37 +89,6 @@ class Application
     public function runLater(callable $callback, $args=[])
     {
         return Helpers::run($callback, $args);
-    }
-
-
-    protected function parseCmd($argv)
-    {
-        if (empty($argv)) {
-            $emptyCommand = true;
-        } else {
-            $emptyCommand = false;
-        }
-        $cmd = array_shift($argv);
-        preg_match(self::CMD_PATTERN, $cmd, $m);
-        $commandName = ucfirst($m[2]);
-
-        $actionName = isset($m[4]) ? $m[4] : self::DEFAULT_ACTION;
-
-        $rootCommand = !empty($m[1]) || $emptyCommand;
-
-        $options = [];
-        foreach ($argv as $arg) {
-            if (preg_match(self::OPTION_PATTERN, $arg, $m)) {
-                $options[$m[1]] = $m[2] ?: true;
-            }
-        }
-
-        return [
-            'namespace' => $rootCommand ? 'T4' : 'App',
-            'command' => $commandName ? $commandName : 'Application',
-            'action' => ucfirst($actionName),
-            'params' => $options,
-        ];
     }
 
     /**
@@ -136,6 +115,15 @@ class Application
         } catch (Exception $e) {
             $this->shutdown('BOOTSTRAP ERROR: ' . $e->getMessage());
         }
+    }
+
+    public function getRequest()
+    {
+        static $request = null;
+        if (null === $request) {
+            $request = new Request();
+        }
+        return $request;
     }
 
 }
