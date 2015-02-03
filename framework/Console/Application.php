@@ -24,7 +24,7 @@ class Application
 
     const CMD_PATTERN = '~^(\/?)([^\/]*?)(\/([^\/]*?))?$~';
     const OPTION_PATTERN = '~^--([^=]+)={0,1}([^=]*)$~';
-    const DEFAULT_ACTION = 'default';
+    const DEFAULT_ACTION = 'Default';
 
     const ERROR_CODE = 1;
 
