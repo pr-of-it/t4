@@ -16,14 +16,12 @@ namespace App\Commands {
 
 namespace {
 
-
     use T4\Console\Request;
-    use T4\Core\Std;
 
     class ApplicationTest extends PHPUnit_Framework_TestCase
     {
 
-        public function testParseCmd()
+        public function testParseRequest()
         {
             $appClass = new ReflectionClass(\T4\Console\Application::class);
             $app = $appClass->newInstanceWithoutConstructor();
