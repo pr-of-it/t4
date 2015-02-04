@@ -93,7 +93,7 @@ class Command {
             $val = $line;
 
         if ($echo) {
-            echo '---> '.$val."\n";
+            $this->writeLn('---> '.$val);
         }
 
         return $val;
