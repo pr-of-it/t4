@@ -192,8 +192,39 @@ FILE;
         $this->app->db->default->execute($query);
     }
 
-    public function actionImport($module) {
+    public function actionImport($name, $module)
+    {
+        $module = ucfirst($module);
+        $path = ROOT_PATH_PROTECTED . DS . 'Modules' . DS . $module . DS . 'Migrations';
+        $files = \T4\Fs\Helpers::listDir($path, \SCANDIR_SORT_DESCENDING);
+        $extendsClassName = basename($files[0], '.php');
+        $className = sprintf(self::CLASS_NAME_PATTERN, time(), $name);
+        $namespace = self::MIGRATIONS_NAMESPACE;
+        $content = <<<FILE
+<?php
 
+namespace {$namespace};
+use App\Modules\\{$module}\Migrations as ModuleMigration;
+
+class {$className}
+    extends ModuleMigration\\{$extendsClassName}
+{
+
+    public function up()
+    {
+        parent::up();
+    }
+
+    public function down()
+    {
+        parent::down();
+    }
+
+}
+FILE;
+        $fileName = $this->getMigrationsPath() . DS . $className . '.php';
+        file_put_contents($fileName, $content);
+        echo 'Migration ' . $className . ' is created in ' . $this->getMigrationsPath();
     }
 
 }
