@@ -6,6 +6,7 @@ use T4\Console\Application;
 use T4\Console\Command;
 use T4\Console\Exception;
 use T4\Dbal\QueryBuilder;
+use T4\Fs\Helpers;
 use T4\Orm\Migration;
 use T4\Orm\Model;
 
@@ -106,6 +107,9 @@ class {$className}
 FILE;
         if (null !== $module) {
             $fileName = ROOT_PATH_PROTECTED . DS . 'Modules' . DS . ucfirst($module) . DS . 'Migrations' . DS . $className . '.php';
+            if (!is_readable(dirname($fileName))) {
+                Helpers::mkDir(dirname($fileName));
+            }
             file_put_contents($fileName, $content);
             $this->writeLn('Migration ' . $className . ' is created in ' . ROOT_PATH_PROTECTED . DS . ucfirst($module) . DS . 'Migrations');
         } else {
