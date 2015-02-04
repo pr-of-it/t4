@@ -37,10 +37,10 @@ class Migrate
             }
             $migrations = $this->getMigrationsAfter($this->getLastMigrationTime());
             foreach ($migrations as $migration) {
-                echo $migration->getName() . ' up...' . "\n";
+                $this->writeLn($migration->getName() . ' up...');
                 $migration->up();
                 $this->save($migration);
-                echo $migration->getName() . ' is up successfully' . "\n";
+                $this->writeLn($migration->getName() . ' is up successfully');
             }
         } catch (\PDOException $e) {
             throw new Exception($e->getMessage());
@@ -55,17 +55,18 @@ class Migrate
 
         $migration = $this->getLastMigration();
         if (false === $migration) {
-            throw new Exception('No migrations to down');
+            $this->writeLn('No migrations to down');
+            $this->app->end();
         }
 
         try {
-            echo $migration->getName() . ' down...' . "\n";
+            $this->writeLn($migration->getName() . ' down...');
             $result = $migration->down();
             if (false !== $result) {
                 $this->delete($migration);
-                echo $migration->getName() . ' is down successfully' . "\n";
+                $this->writeLn($migration->getName() . ' is down successfully');
             } else {
-                echo $migration->getName() . ' is not downable' . "\n";
+                $this->writeLn($migration->getName() . ' is not downable');
             }
         } catch (\PDOException $e) {
             throw new Exception($e->getMessage());
@@ -75,11 +76,13 @@ class Migrate
     public function actionCreate($name, $module = null)
     {
         $className = sprintf(self::CLASS_NAME_PATTERN, time(), $name);
+
         if (null !== $module) {
             $namespace = 'App\\Modules\\' . ucfirst($module) . '\\Migrations';
         } else {
             $namespace = self::MIGRATIONS_NAMESPACE;
         }
+
         $content = <<<FILE
 <?php
 
@@ -103,12 +106,14 @@ class {$className}
 FILE;
         if (null !== $module) {
             $fileName = ROOT_PATH_PROTECTED . DS . 'Modules' . DS . ucfirst($module) . DS . 'Migrations' . DS . $className . '.php';
-            echo 'Migration ' . $className . ' is created in ' . ROOT_PATH_PROTECTED . DS . ucfirst($module) . DS . 'Migrations';
+            file_put_contents($fileName, $content);
+            $this->writeLn('Migration ' . $className . ' is created in ' . ROOT_PATH_PROTECTED . DS . ucfirst($module) . DS . 'Migrations');
         } else {
             $fileName = $this->getMigrationsPath() . DS . $className . '.php';
-            echo 'Migration ' . $className . ' is created in ' . $this->getMigrationsPath();
+            file_put_contents($fileName, $content);
+            $this->writeLn('Migration ' . $className . ' is created in ' . $this->getMigrationsPath());
         }
-        file_put_contents($fileName, $content);
+
     }
 
     protected function isInstalled()
@@ -131,7 +136,7 @@ FILE;
                 ['type' => 'unique', 'columns' => ['time']]
             ]
         );
-        echo 'Migration table `' . self::TABLE_NAME . '` is created' . "\n";
+        $this->writeLn('Migration table `' . self::TABLE_NAME . '` is created');
     }
 
     protected function getLastMigrationTime()

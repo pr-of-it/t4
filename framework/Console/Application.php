@@ -27,6 +27,7 @@ class Application
     const DEFAULT_COMMAND = 'Application';
     const DEFAULT_ACTION = 'Default';
 
+    const SUCCESS_CODE = 0;
     const ERROR_CODE = 1;
 
     public function run()
@@ -36,7 +37,7 @@ class Application
             $this->runRequest($this->request);
 
         } catch (Exception $e) {
-            $this->shutdown('ERROR: ' . $e->getMessage());
+            $this->halt('ERROR: ' . $e->getMessage());
         }
     }
 
@@ -72,7 +73,15 @@ class Application
         ];
     }
 
-    public function shutdown($message = '')
+    public function end($message = '')
+    {
+        if (!empty($message)) {
+            echo $message . "\n";
+        }
+        exit(self::SUCCESS_CODE);
+    }
+
+    public function halt($message = '')
     {
         if (!empty($message)) {
             echo $message . "\n";
@@ -100,7 +109,7 @@ class Application
         try {
             return new Config(ROOT_PATH_PROTECTED . DS . 'config.php');
         } catch (Exception $e) {
-            $this->shutdown('BOOTSTRAP ERROR: ' . $e->getMessage());
+            $this->halt('BOOTSTRAP ERROR: ' . $e->getMessage());
         }
     }
 
@@ -113,7 +122,7 @@ class Application
             }
             return $db;
         } catch (Exception $e) {
-            $this->shutdown('BOOTSTRAP ERROR: ' . $e->getMessage());
+            $this->halt('BOOTSTRAP ERROR: ' . $e->getMessage());
         }
     }
 
