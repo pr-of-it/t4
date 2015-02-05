@@ -132,7 +132,7 @@ class Application
      * @throws E403Exception
      * @throws Exception
      */
-    protected function runRoute($route, $format = 'html')
+    public function runRoute($route, $format = 'html')
     {
         if (!($route instanceof Route)) {
             $route = new Route((string)$route);
