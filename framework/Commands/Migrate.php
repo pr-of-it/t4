@@ -17,13 +17,8 @@ class Migrate
     const TABLE_NAME = '__migrations';
     const MIGRATIONS_NAMESPACE = 'App\\Migrations';
     const CLASS_NAME_PATTERN = 'm_%010d_%s';
-    const SEARCH_FILE_NAME_PATTERN = 'm_%s_%s';
     const CLASS_MODULE_NAME_PATTERN = 'm_%010d_%s_%s';
-
-    protected function getMigrationsPath()
-    {
-        return ROOT_PATH_PROTECTED . DS . 'Migrations';
-    }
+    const SEARCH_FILE_NAME_PATTERN = 'm_%s_%s';
 
 
     public function actionDefault()
@@ -78,12 +73,7 @@ class Migrate
     public function actionCreate($name, $module = null)
     {
         $className = sprintf(self::CLASS_NAME_PATTERN, time(), $name);
-
-        if (null !== $module) {
-            $namespace = 'App\\Modules\\' . ucfirst($module) . '\\Migrations';
-        } else {
-            $namespace = self::MIGRATIONS_NAMESPACE;
-        }
+        $namespace = $this->getMigrationsNamespace($module);
 
         $content = <<<FILE
 <?php
@@ -106,17 +96,32 @@ class {$className}
 
 }
 FILE;
-        if (null !== $module) {
-            $fileName = ROOT_PATH_PROTECTED . DS . 'Modules' . DS . ucfirst($module) . DS . 'Migrations' . DS . $className . '.php';
-            if (!is_readable(dirname($fileName))) {
-                Helpers::mkDir(dirname($fileName));
-            }
-            file_put_contents($fileName, $content);
-            $this->writeLn('Migration ' . $className . ' is created in ' . ROOT_PATH_PROTECTED . DS . ucfirst($module) . DS . 'Migrations');
+
+        $fileName = $this->getMigrationsPath($module) . DS . $className . '.php';
+
+        if (!is_readable(dirname($fileName))) {
+            Helpers::mkDir(dirname($fileName));
+        }
+        file_put_contents($fileName, $content);
+
+        $this->writeLn('Migration ' . $className . ' is created in ' . $fileName);
+    }
+
+    protected function getMigrationsNamespace($module = null)
+    {
+        if (null == $module) {
+            return self::MIGRATIONS_NAMESPACE;
         } else {
-            $fileName = $this->getMigrationsPath() . DS . $className . '.php';
-            file_put_contents($fileName, $content);
-            $this->writeLn('Migration ' . $className . ' is created in ' . $this->getMigrationsPath());
+            return 'App\\Modules\\' . ucfirst($module) . '\\Migrations';
+        }
+    }
+
+    protected function getMigrationsPath($module = null)
+    {
+        if (null == $module) {
+            return ROOT_PATH_PROTECTED . DS . 'Migrations';
+        } else {
+            return ROOT_PATH_PROTECTED . DS . 'Modules' . DS . ucfirst($module) . DS . 'Migrations';
         }
 
     }
