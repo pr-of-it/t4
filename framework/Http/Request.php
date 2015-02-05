@@ -15,6 +15,7 @@ use T4\Core\Session;
  * @property string $method
  * @property string $host
  * @property string $path
+ * @property string $extension
  * @property string $fullPath
  * @property \T4\Core\Url $url
  * @property \T4\Core\Std $get
@@ -96,6 +97,11 @@ class Request
     public function getFullPath()
     {
         return $this->host . '!' . $this->path;
+    }
+
+    public function getExtension()
+    {
+        return pathinfo($this->path, PATHINFO_EXTENSION);
     }
 
     public function existsGetData()

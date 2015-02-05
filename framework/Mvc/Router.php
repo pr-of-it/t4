@@ -72,6 +72,11 @@ class Router
         return $this->guessInternalPath($request);
     }
 
+    public function getFormatByExtension($extension)
+    {
+        return $extension ?: $this->allowedExtensions[0];
+    }
+
     /**
      * Splits canonical request path into domain, path and extension
      * @param string $path
