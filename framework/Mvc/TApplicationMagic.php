@@ -2,10 +2,12 @@
 
 namespace T4\Mvc;
 
+use T4\Core\Collection;
 use T4\Core\Config;
 use T4\Core\Flash;
 use T4\Core\Std;
 use T4\Dbal\Connection;
+use T4\Fs\Helpers;
 use T4\Http\Request;
 
 /**
@@ -15,6 +17,22 @@ use T4\Http\Request;
  */
 trait TApplicationMagic
 {
+
+    protected function getModules()
+    {
+        static $modules = null;
+        if (null === $modules) {
+            $dirs = Helpers::listDir(ROOT_PATH_PROTECTED . DS . 'Modules');
+            $modules = new Collection();
+            foreach ($dirs as $dir) {
+                $moduleClassName = '\\App\\Modules\\' . basename($dir) . '\\Module';
+                if (class_exists($moduleClassName)) {
+                    $modules[] = new $moduleClassName;
+                }
+            }
+        }
+        return $modules;
+    }
 
     protected function getDb()
     {

@@ -19,6 +19,7 @@ use T4\Threads\Helpers;
  * @property \T4\Dbal\Connection[] $db
  * @property \T4\Http\Request $request
  * @property \App\Models\User $user
+ * @property \T4\Mvc\Module[] $modules
  * @property \T4\Mvc\AssetsManager $assets
  * @property \T4\Core\Flash $flash
  */
