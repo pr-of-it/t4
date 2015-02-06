@@ -302,9 +302,7 @@ FILE;
     {
         $migrations = [];
         $migrationsDir = $this->getMigrationsPath($module);
-        if (!is_readable(basename($migrationsDir))) {
-            Helpers::mkDir(basename($migrationsDir));
-        }
+
         $pathToMigrations = Helpers::listDir($migrationsDir, \SCANDIR_SORT_DESCENDING);
 
         foreach ($pathToMigrations as $migration) {
