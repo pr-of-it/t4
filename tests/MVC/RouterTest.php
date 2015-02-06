@@ -242,27 +242,34 @@ class RouterTest extends PHPUnit_Framework_TestCase
     {
 
         $router = \T4\Mvc\Router::getInstance();
+        $reflector = new ReflectionMethod($router, 'parseRequestPath');
+        $reflector->setAccessible(true);
         $router->setConfig(getRouteConfig());
 
+        $url = '/';
         $this->assertEquals(
             new \T4\Mvc\Route(['module'=>'', 'controller'=>'Index', 'action'=>'Default', 'params'=>[], 'format'=>'html']),
-            $router->parseRequestPath('/')
+            $reflector->invoke($router, $url)
         );
+        $url = '/goods';
         $this->assertEquals(
             new \T4\Mvc\Route(['module'=>'Shop', 'controller'=>'Goods', 'action'=>'Default', 'params'=>[], 'format'=>'html']),
-            $router->parseRequestPath('/goods')
+            $reflector->invoke($router, $url)
         );
+        $url = '/goods/13.html';
         $this->assertEquals(
             new \T4\Mvc\Route(['module'=>'Shop', 'controller'=>'Goods', 'action'=>'View', 'params'=>['id'=>13], 'format'=>'html']),
-            $router->parseRequestPath('/goods/13.html')
+            $reflector->invoke($router, $url)
         );
+        $url = '/shop/volvo/42.html';
         $this->assertEquals(
             new \T4\Mvc\Route(['module'=>'Shop', 'controller'=>'Goods', 'action'=>'View', 'params'=>['id'=>'42', 'vendor'=>'volvo'], 'format'=>'html']),
-            $router->parseRequestPath('/shop/volvo/42.html')
+            $reflector->invoke($router, $url)
         );
+        $url = 'auto.fr!/shop/volvo/42.html';
         $this->assertEquals(
             new \T4\Mvc\Route(['module'=>'Shop', 'controller'=>'Goods', 'action'=>'View', 'params'=>['lang'=>'fr', 'id'=>'42', 'vendor'=>'volvo'], 'format'=>'html']),
-            $router->parseRequestPath('auto.fr!/shop/volvo/42.html')
+            $reflector->invoke($router, $url)
         );
     }
 

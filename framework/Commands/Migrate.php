@@ -300,9 +300,11 @@ FILE;
 
     protected function getMigrationsInModule($module)
     {
-        $module = ucfirst($module);
         $migrations = [];
-        $migrationsDir = ROOT_PATH_PROTECTED . DS . 'Modules' . DS . $module . DS . 'Migrations';
+        $migrationsDir = $this->getMigrationsPath($module);
+        if (!is_readable(basename($migrationsDir))) {
+            Helpers::mkDir(basename($migrationsDir));
+        }
         $pathToMigrations = Helpers::listDir($migrationsDir, \SCANDIR_SORT_DESCENDING);
 
         foreach ($pathToMigrations as $migration) {
@@ -314,7 +316,7 @@ FILE;
         }
 
         if (empty($migrations)) {
-            throw new Exception($module . ' has no migrations');
+            throw new Exception(ucfirst($module) . ' has no migrations');
         }
 
         return $migrations;
