@@ -20,7 +20,6 @@ class Migrate
     const CLASS_MODULE_NAME_PATTERN = 'm_%010d_%s_%s';
     const SEARCH_FILE_NAME_PATTERN = 'm_%s_%s';
 
-
     public function actionDefault()
     {
         $this->actionUp();
@@ -209,70 +208,68 @@ FILE;
 
     public function actionImport($module, $name = null)
     {
-        $module = ucfirst($module);
-        $migrations = [];
-        $migrationsInApp = $this->getMigrationsInApp();
-        $migrationsInModule = $this->getMigrationsInModule($module);
 
         if (null == $name) {
-            $match = false;
 
-            foreach ($migrationsInModule as $migrationInModule) {
-                $migrationInModule = substr(strrchr($migrationInModule, '_'), 1);
+            if ('all' == $module) {
+                $modules = Helpers::listDir(ROOT_PATH_PROTECTED . DS . 'Modules');
 
-                foreach ($migrationsInApp as $migrationInApp) {
-                    if (0 !== preg_match('~^m_\d+_' . $module . '_' . $migrationInModule .'~', $migrationInApp)) {
-                        $match = true;
-                        break;
+                    foreach ($modules as $module) {
+                        $module = basename($module);
+
+                        if ('.' != $module && '..' != $module && is_readable($this->getMigrationsPath($module))) {
+                            $this->importMigrations($module);
+                        }
                     }
-
-                    $match = false;
-                }
-
-                if (!$match) {
-                    $migrations[] = $migrationInModule;
-                }
+            } else {
+                $this->importMigrations($module);
             }
-
-            if (empty($migrations)) {
-                throw new Exception('All migrations is already imported');
-            }
-
-            foreach ($migrations as $migration) {
-                $this->importMigration($module, $migration);
-            }
-
         } else {
-            foreach ($migrationsInApp as $migrationInApp) {
-                if (0 !== preg_match('~^m_\d+_' . $module . '_' . $name .'~', $migrationInApp)) {
-                    throw new Exception('Migration ' . $name . ' is already imported');
-                }
+            if (!empty(glob($this->getMigrationsPath() . DS . sprintf(self::SEARCH_FILE_NAME_PATTERN, '*', ucfirst($module)) . '_' . $name . '.php'))) {
+                throw new Exception('Migration ' . $name . ' is already imported');
             }
 
             $this->importMigration($module, $name);
         }
     }
 
+    protected function importMigrations($module)
+    {
+        $migrations = [];
+
+        $migrationsInModule = $this->getMigrations($module);
+
+        foreach ($migrationsInModule as $migrationInModule) {
+
+            if (!empty(glob($this->getMigrationsPath() . DS . sprintf(self::SEARCH_FILE_NAME_PATTERN, '*', ucfirst($module)) .  '_' . $migrationInModule . '.php'))) {
+                continue;
+            }
+
+            $migrations[] = $migrationInModule;
+        }
+
+        if (empty($migrations)) {
+            $this->writeLn('All migrations is already imported');
+        }
+
+        foreach ($migrations as $migration) {
+            $this->importMigration($module, $migration);
+            sleep(1);
+        }
+    }
+
     protected function importMigration($module, $name)
     {
         $module = ucfirst($module);
-        $extendsClassName = '';
-        $migrations = $this->getMigrationsInModule($module);
+        $migration = glob($this->getMigrationsPath($module) . DS . sprintf(self::SEARCH_FILE_NAME_PATTERN, '*', $name) . '.php')[0];
 
-        foreach ($migrations as $migration){
-            if (0 !== preg_match('~^m_\d+_' . $name . '~', $migration, $m)) {
-                $extendsClassName = $m[0];
-                break;
-            }
-        }
-
-        if ($extendsClassName == '') {
-            throw new Exception('Migration ' . $name . ' in ' . $module . ' does not exist');
-        }
-
-        $className = sprintf(self::CLASS_MODULE_NAME_PATTERN, time(), $module, $name);
-        $namespace = self::MIGRATIONS_NAMESPACE;
-        $content = <<<FILE
+        if (empty($migration)) {
+            $this->writeLn('Migration ' . $name . ' in ' . $module . ' does not exist');
+        } else {
+            $extendsClassName = basename($migration, '.php');
+            $className = sprintf(self::CLASS_MODULE_NAME_PATTERN, time(), ucfirst($module), $name);
+            $namespace = self::MIGRATIONS_NAMESPACE;
+            $content = <<<FILE
 <?php
 
 namespace {$namespace};
@@ -281,53 +278,28 @@ class {$className}
     extends \App\Modules\\{$module}\Migrations\\{$extendsClassName}
 {
 
-    public function up()
-    {
-        parent::up();
-    }
-
-    public function down()
-    {
-        parent::down();
-    }
-
 }
 FILE;
-        $fileName = $this->getMigrationsPath() . DS . $className . '.php';
-        file_put_contents($fileName, $content);
-        $this->writeLn('Migration ' . $className . ' is created in ' . $this->getMigrationsPath() . "\n");
+            $fileName = $this->getMigrationsPath() . DS . $className . '.php';
+            file_put_contents($fileName, $content);
+            $this->writeLn('Migration ' . $className . ' is created in ' . $this->getMigrationsPath() . "\n");
+        }
     }
 
-    protected function getMigrationsInModule($module)
-    {
+    protected function getMigrations($module=null) {
         $migrations = [];
         $migrationsDir = $this->getMigrationsPath($module);
-
         $pathToMigrations = Helpers::listDir($migrationsDir, \SCANDIR_SORT_DESCENDING);
 
         foreach ($pathToMigrations as $migration) {
-            $migration = basename($migration, '.php');
 
-            if (0 !== preg_match('~^m_\d+_(.+)~', $migration, $m)) {
-                $migrations[] = $m[0];
+            if (is_file($migration)) {
+                $migrations[] = basename(substr(strrchr($migration, '_'), 1), '.php');
             }
         }
 
         if (empty($migrations)) {
-            throw new Exception(ucfirst($module) . ' has no migrations');
-        }
-
-        return $migrations;
-    }
-
-    protected function getMigrationsInApp()
-    {
-        $migrations = [];
-        $pathToMigrations = Helpers::listDir($this->getMigrationsPath(), \SCANDIR_SORT_DESCENDING);
-
-        foreach ($pathToMigrations as $migration) {
-            $migration = basename($migration, '.php');
-            $migrations[] = $migration;
+            $this->writeLn(ucfirst($module) . ' has no migrations');
         }
 
         return $migrations;
