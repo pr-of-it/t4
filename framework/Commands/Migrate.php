@@ -208,32 +208,24 @@ FILE;
 
     public function actionImport($module, $name = null)
     {
-        $module = ucfirst($module);
 
         if (null == $name) {
-            $migrations = [];
-            $migrationsInModule = $this->getMigrations($module);
 
-            foreach ($migrationsInModule as $migrationInModule) {
+            if ('all' == $module) {
+                $modules = Helpers::listDir(ROOT_PATH_PROTECTED . DS . 'Modules');
 
-                if (!empty(glob($this->getMigrationsPath() . DS . sprintf(self::SEARCH_FILE_NAME_PATTERN, '*', $module) .  '_' . $migrationInModule . '.php'))) {
-                    continue;
-                }
+                    foreach ($modules as $module) {
+                        $module = basename($module);
 
-                $migrations[] = $migrationInModule;
+                        if ('.' != $module && '..' != $module && is_readable($this->getMigrationsPath($module))) {
+                            $this->importMigrations($module);
+                        }
+                    }
+            } else {
+                $this->importMigrations($module);
             }
-
-            if (empty($migrations)) {
-                $this->writeLn('All migrations is already imported');
-            }
-
-            foreach ($migrations as $migration) {
-                $this->importMigration($module, $migration);
-                sleep(1);
-            }
-
         } else {
-            if (!empty(glob($this->getMigrationsPath() . DS . sprintf(self::SEARCH_FILE_NAME_PATTERN, '*', $module) . '_' . $name . '.php'))) {
+            if (!empty(glob($this->getMigrationsPath() . DS . sprintf(self::SEARCH_FILE_NAME_PATTERN, '*', ucfirst($module)) . '_' . $name . '.php'))) {
                 throw new Exception('Migration ' . $name . ' is already imported');
             }
 
@@ -241,8 +233,34 @@ FILE;
         }
     }
 
+    protected function importMigrations($module)
+    {
+        $migrations = [];
+
+        $migrationsInModule = $this->getMigrations($module);
+
+        foreach ($migrationsInModule as $migrationInModule) {
+
+            if (!empty(glob($this->getMigrationsPath() . DS . sprintf(self::SEARCH_FILE_NAME_PATTERN, '*', ucfirst($module)) .  '_' . $migrationInModule . '.php'))) {
+                continue;
+            }
+
+            $migrations[] = $migrationInModule;
+        }
+
+        if (empty($migrations)) {
+            $this->writeLn('All migrations is already imported');
+        }
+
+        foreach ($migrations as $migration) {
+            $this->importMigration($module, $migration);
+            sleep(1);
+        }
+    }
+
     protected function importMigration($module, $name)
     {
+        $module = ucfirst($module);
         $migration = glob($this->getMigrationsPath($module) . DS . sprintf(self::SEARCH_FILE_NAME_PATTERN, '*', $name) . '.php')[0];
 
         if (empty($migration)) {
