@@ -110,6 +110,9 @@ abstract class Controller
 
     final public function action($name, $params = [])
     {
+        if ($params instanceof Std) {
+            $params = $params->toArray();
+        }
         $name = ucfirst($name);
         $actionMethodName = 'action' . $name;
 
@@ -128,15 +131,16 @@ abstract class Controller
         if ($this->beforeAction()) {
 
             $p = [];
+            $request = Application::getInstance()->request;
             foreach ($this->getActionParameters($name) as $param) {
 
                 if (!empty($params[$param->name])) {
                     $p[$param->name] = $params[$param->name];
                     unset($params[$param->name]);
-                } elseif (!empty($_POST[$param->name])) {
-                    $p[$param->name] = $_POST[$param->name];
-                } elseif (!empty($_GET[$param->name])) {
-                    $p[$param->name] = $_GET[$param->name];
+                } elseif (!empty($request->post[$param->name])) {
+                    $p[$param->name] = $request->post[$param->name];
+                } elseif (!empty($request->get[$param->name])) {
+                    $p[$param->name] = $request->get[$param->name];
                 } elseif ( $param->isDefaultValueAvailable() ) {
                     $p[$param->name] = $param->getDefaultValue();
                 } else {
@@ -144,7 +148,7 @@ abstract class Controller
                 }
 
             }
-            $p = array_merge($p, (array)$params);
+            $p = array_merge($p, $params);
 
             call_user_func_array([$this, $actionMethodName], $p);
             $this->afterAction();

@@ -4,6 +4,7 @@ namespace T4\Mvc;
 
 use T4\Core\Std;
 use T4\Core\TSingleton;
+use T4\Http\Request;
 
 class Router
 {
@@ -34,11 +35,22 @@ class Router
     }
 
     /**
+     * @param \T4\Http\Request $request
+     * @return \T4\Mvc\Route
+     */
+    public function parseRequest(Request $request)
+    {
+        $fullPath = $request->getFullPath();
+        return $this->parseRequestPath($fullPath);
+    }
+
+    /**
+     * TODO: fix tests!
      * @param string $requestPath
      * @throws RouterException
      * @return \T4\Mvc\Route
      */
-    public function parseRequestPath($requestPath)
+    protected function parseRequestPath($requestPath)
     {
         $request = $this->splitRequestPath($requestPath);
         if (!empty($this->config)) {
@@ -58,6 +70,11 @@ class Router
             }
         }
         return $this->guessInternalPath($request);
+    }
+
+    public function getFormatByExtension($extension)
+    {
+        return $extension ?: $this->allowedExtensions[0];
     }
 
     /**
