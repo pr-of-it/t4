@@ -4,7 +4,7 @@ namespace T4\Core;
 
 class MultiException
     extends Exception
-    implements \IteratorAggregate, \Countable
+    implements \IteratorAggregate, \Countable, \ArrayAccess
 {
 
     protected $exceptions;
@@ -32,13 +32,13 @@ class MultiException
     {
         if ($error instanceof Exception) {
             if ($error instanceof $this->class) {
-                $this->exceptions[] = $error;
+                $this[] = $error;
             } else {
                 throw new Exception('Incompatible exception class' . get_class($error));
             }
         } else {
             $class = $this->class;
-            $this->exceptions[] = new $class($error, $code, $severity, $filename, $lineno, $previous);
+            $this[] = new $class($error, $code, $severity, $filename, $lineno, $previous);
         }
     }
 
@@ -57,8 +57,29 @@ class MultiException
         return 0 === $this->count();
     }
 
+    public function offsetExists($offset)
+    {
+        return $this->exceptions->offsetExists($offset);
+    }
+
+    public function offsetGet($offset)
+    {
+        return $this->exceptions->offsetGet($offset);
+    }
+
+    public function offsetSet($offset, $value)
+    {
+        $this->exceptions->offsetSet($offset, $value);
+    }
+
+    public function offsetUnset($offset)
+    {
+        $this->exceptions->offsetUnset($offset);
+    }
+
     public function getIterator()
     {
         return $this->exceptions->getIterator();
     }
+
 }

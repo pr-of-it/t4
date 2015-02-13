@@ -56,17 +56,26 @@ trait TMagic {
 
     public function __set($key, $value)
     {
-        // Обрабатываем установку свойства-связи
+        // Column validation
+        $validateMethod = 'validate' . ucfirst($key);
+        if (method_exists($this, $validateMethod)) {
+            if (!$this->$validateMethod($value)) {
+                return;
+            }
+        }
+
+        // Relations
         $class = get_class($this);
         $relations = $class::getRelations();
         $keys = explode('.', $key);
         $key = array_shift($keys);
+
         if (isset($relations[$key])) {
             $this->setRelation($key, $value);
             return;
         }
 
-        // Все другие случаи
+        // Non-relation columns
         parent::__set($key, $value);
     }
 

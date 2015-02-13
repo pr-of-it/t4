@@ -38,7 +38,7 @@ class Pgsql
         return implode('.', $parts);
     }
 
-    protected function createColumnDDL($name, $options)
+    protected function createColumnDDL($table, $name, $options)
     {
         $name = $this->quoteName($name);
         switch ($options['type']) {
@@ -53,6 +53,7 @@ class Pgsql
                 $ddl = 'SERIAL';
                 break;
             case 'boolean':
+            case 'bool':
                 $ddl = 'BOOLEAN';
                 break;
             case 'int':
@@ -87,6 +88,12 @@ class Pgsql
                 }
                 break;
         }
+
+        if(isset($options['default'])) {
+            $default = 'ALTER TABLE ' . $this->quoteName($table) . ' ALTER COLUMN ' . $name . ' SET DEFAULT \'' . $options['default'] .'\'';
+            return [$name . ' ' . $ddl, $default];
+        }
+
         return $name . ' ' . $ddl;
     }
 
@@ -126,10 +133,19 @@ class Pgsql
         }
 
         $columnsDDL = [];
+        $extraDDL = [];
 
         $hasPK = false;
         foreach ($columns as $name => $options) {
-            $columnsDDL[] = $this->createColumnDDL($name, $options);
+
+            $columnDDLs = $this->createColumnDDL($tableName, $name, $options);
+            if (is_array($columnDDLs)) {
+                $columnsDDL[] = array_shift($columnDDLs);
+                $extraDDL = array_merge($extraDDL, $columnDDLs);
+            } else {
+                $columnsDDL[] = $columnDDLs;
+            }
+
             if ('pk' == $options['type']) {
                 $hasPK = true;
             }
@@ -137,10 +153,11 @@ class Pgsql
             if ('link' == $options['type']) {
                 $indexes[] = ['type'=>'index', 'columns'=>[$name]];
             }
+
         }
 
         if (!$hasPK) {
-            array_unshift($columnsDDL, $this->createColumnDDL(Model::PK, ['type' => 'pk']));
+            array_unshift($columnsDDL, $this->createColumnDDL($tableName, Model::PK, ['type' => 'pk']));
         }
 
         $indexesDDL = [];
@@ -152,20 +169,13 @@ class Pgsql
             }
             if (is_numeric($name)) {
                 $name = '';
-                /*
-                if ($options['type'] == 'primary') {
-                    $name = $tableName . '__' . implode('_', $options['columns']) . '_pkey';
-                } else {
-                    $name = $tableName . '__' . implode('_', $options['columns']) . '_key';
-                }
-                */
             }
             $indexesDDL[] = 'CREATE '. $this->createIndexDDL($tableName, $name, $options);
             $columnsUsed[] = $options['columns'];
         }
 
         $createTableDDL = 'CREATE TABLE ' . $this->quoteName($tableName) . "\n" . '(' . implode(', ', array_unique($columnsDDL)) . ')';
-        return array_merge([$createTableDDL], $indexesDDL);
+        return array_merge([$createTableDDL], $indexesDDL, $extraDDL);
     }
 
     public function createTable(Connection $connection, $tableName, $columns = [], $indexes = [], $extensions = [])
@@ -202,13 +212,24 @@ class Pgsql
     {
         $sql = 'ALTER TABLE ' . $this->quoteName($tableName) . '';
         $columnsDDL = [];
+        $extraDDL = [];
+
         foreach ($columns as $name => $options) {
-            $columnsDDL[] = 'ADD COLUMN ' . $this->createColumnDDL($name, $options);
+            $columnDDLs = $this->createColumnDDL($tableName, $name, $options);
+            if (is_array($columnDDLs)) {
+                $columnsDDL[] = 'ADD COLUMN ' . array_shift($columnDDLs);
+                $extraDDL = array_merge($extraDDL, $columnDDLs);
+            } else {
+                $columnsDDL[] = 'ADD COLUMN ' . $columnDDLs;
+            }
         }
         $sql .= ' ' .
             implode(', ', $columnsDDL) .
             '';
         $connection->execute($sql);
+        foreach ($extraDDL as $ddl) {
+            $connection->execute($ddl);
+        }
     }
 
     public function dropColumn(Connection $connection, $tableName, array $columns)

@@ -54,6 +54,7 @@ class Mysql
                 $ddl = 'SERIAL';
                 break;
             case 'boolean':
+            case 'bool':
                 $ddl = 'BOOLEAN';
                 break;
             case 'int':

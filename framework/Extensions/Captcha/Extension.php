@@ -1,22 +1,12 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: User
- * Date: 09.02.15
- * Time: 23:09
- */
 
 namespace T4\Extensions\Captcha;
 
 use T4\Core\Session;
+
 class Extension
     extends \T4\Core\Extension
 {
-
-    /**
-     * @var \SxGeo
-     */
-    protected $captcha;
 
     public function init()
     {
@@ -25,8 +15,9 @@ class Extension
 
     public function generateImage()
     {
-        $this->captcha = new \ KCAPTCHA();
-        Session::set('keystring', $this->captcha->getKeyString());
+        $captcha = new \KCAPTCHA();
+        Session::set('keystring', $captcha->getKeyString());
+        die;
     }
 
     public function checkKeyString($string)
