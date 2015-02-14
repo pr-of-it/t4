@@ -21,7 +21,7 @@ $width = 160;
 $height = 80;
 
 # symbol's vertical fluctuation amplitude
-$fluctuation_amplitude = 8;
+$fluctuation_amplitude = 5;
 
 #noise
 //$white_noise_density=0; // no white noise

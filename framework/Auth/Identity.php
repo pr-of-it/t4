@@ -14,5 +14,4 @@ abstract class Identity {
     abstract public function login($user);
 
     abstract public function logout();
-
 }
