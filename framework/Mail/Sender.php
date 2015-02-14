@@ -38,4 +38,21 @@ class Sender
         }
     }
 
+    public function sendMail($usermail,$theme, $message ){
+        $this->usermail = $usermail;
+        $this->theme = $theme;
+        $this->message = $message;
+        $this->setFrom('admin@t4.org', 'Sender');
+        $this->addReplyTo('admin@t4.org', 'recipient');
+        $this->addAddress($usermail, 'Sender');
+        $this->Subject = $theme;
+        $this->msgHTML($message);
+        try {
+            $this->send();
+        }
+        catch(Exception $e) {
+            echo "Mailer Error: " . $this->ErrorInfo;
+        }
+    }
+
 }

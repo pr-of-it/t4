@@ -130,6 +130,11 @@ trait TCrud
      * Save model methods
      */
 
+    public function validate()
+    {
+        return true;
+    }
+
     public function beforeSave()
     {
         /** @var \T4\Orm\Model $class */
@@ -147,7 +152,7 @@ trait TCrud
 
     public function save()
     {
-        if ($this->beforeSave()) {
+        if ($this->validate() && $this->beforeSave()) {
             $class = get_class($this);
             $driver = $class::getDbDriver();
             $driver->save($this);
