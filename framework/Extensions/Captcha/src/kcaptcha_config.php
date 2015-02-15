@@ -21,7 +21,7 @@ $width = 160;
 $height = 80;
 
 # symbol's vertical fluctuation amplitude
-$fluctuation_amplitude = 5;
+$fluctuation_amplitude = 3;
 
 #noise
 //$white_noise_density=0; // no white noise
@@ -44,4 +44,6 @@ $background_color = array(mt_rand(220,255), mt_rand(220,255), mt_rand(220,255));
 
 # JPEG quality of CAPTCHA image (bigger is better quality, but larger file size)
 $jpeg_quality = 90;
+
+$show_credits = false;
 ?>
