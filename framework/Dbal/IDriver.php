@@ -8,6 +8,8 @@ interface IDriver
     extends IDriverQueryBuilder
 {
 
+    public function quoteName($name);
+
     public function createTable(Connection $connection, $tableName, $columns = [], $indexes = [], $extensions = []);
 
     public function existsTable(Connection $connection, $tableName);

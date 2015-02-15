@@ -16,7 +16,7 @@ class Pgsql
 
     protected $selectNoQouteTemplate = '~count|avg|group_concat|min|max|sum~i';
 
-    protected function quoteName($name)
+    public function quoteName($name)
     {
         $parts = explode('.', $name);
         $lastIndex = count($parts)-1;
