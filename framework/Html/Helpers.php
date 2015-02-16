@@ -6,6 +6,7 @@ use T4\Core\Collection;
 use T4\Core\Std;
 use T4\Html\Elements\Int;
 use T4\Html\Elements\Select;
+use T4\Html\Elements\Text;
 use T4\Html\Elements\Textarea;
 use T4\Orm\Model;
 
@@ -26,18 +27,19 @@ class Helpers
         $htmlOptions['name'] = $name;
         switch ($options['type']) {
             case 'int':
-                $input = new Int($options, $htmlOptions);
-                $input->setName($name);
+                $input = new Int($name, $options, $htmlOptions);
+                $input->setValue(is_null($value) ? $options['default'] : $value);
+                return $input->render();
+            case 'string':
+                $input = new Text($name, $options, $htmlOptions);
                 $input->setValue(is_null($value) ? $options['default'] : $value);
                 return $input->render();
             case 'text':
-                $input = new Textarea($options, $htmlOptions);
-                $input->setName($name);
+                $input = new Textarea($name, $options, $htmlOptions);
                 $input->setValue(is_null($value) ? $options['default'] : $value);
                 return $input->render();
             case 'select':
-                $select = new Select($options, $htmlOptions);
-                $select->setName($name);
+                $select = new Select($name, $options, $htmlOptions);
                 $select->setOption('values', $options['values']->toArray());
                 $select->setSelected(is_null($value) ? $options['default'] : $value);
                 return $select->render();
