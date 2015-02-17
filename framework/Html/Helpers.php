@@ -43,6 +43,11 @@ class Helpers
                 $select->setOption('values', $options['values']->toArray());
                 $select->setSelected(is_null($value) ? $options['default'] : $value);
                 return $select->render();
+            case 'select:model':
+                $select = new Select($name, $options, $htmlOptions);
+                $select->setOption('values', $options['model']::findAll());
+                $select->setSelected(is_null($value) ? $options['default'] : $value);
+                return $select->render();
             case 'select:tree':
                 return self::selectTreeByModel($options['model'], is_null($value) ? $options['default'] : $value, $options, $htmlOptions);
         }
