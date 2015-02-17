@@ -182,11 +182,12 @@ class Application
         $route->params->merge($params);
 
         $canonicalPath = $route->toString();
-        if (!isset($this->config->blocks) || !isset($this->config->blocks[$canonicalPath])) {
-            throw new Exception('No config for block ' . $canonicalPath);
-        }
 
-        $blockOptions = $this->config->blocks[$canonicalPath];
+        if (isset($this->config->blocks) && isset($this->config->blocks[$canonicalPath])) {
+            $blockOptions = $this->config->blocks[$canonicalPath];
+        } else {
+            $blockOptions = [];
+        }
 
         $getBlock = function() use ($template, $route) {
             $controller = $this->createController($route->module, $route->controller);
