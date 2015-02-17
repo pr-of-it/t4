@@ -34,19 +34,20 @@ class Sender
                 $this->Username = $config->auth->username;
                 $this->Password = $config->auth->password;
             }
+            $this->Port = $config->port;
             $this->SMTPSecure = !empty($config->secure) ? $config->secure : '';
         }
     }
 
-    public function sendMail($usermail,$theme, $message ){
+    public function sendMail($usermail, $theme, $answer ){
         $this->usermail = $usermail;
         $this->theme = $theme;
-        $this->message = $message;
+        $this->answer = $answer;
         $this->setFrom('admin@t4.org', 'Sender');
         $this->addReplyTo('admin@t4.org', 'recipient');
         $this->addAddress($usermail, 'Sender');
         $this->Subject = $theme;
-        $this->msgHTML($message);
+        $this->msgHTML($answer);
         try {
             $this->send();
         }
