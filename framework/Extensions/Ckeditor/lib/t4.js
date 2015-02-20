@@ -16,8 +16,10 @@ $(function(){
             { name: 'basicstyles', groups: [ 'basicstyles', 'cleanup' ] },
             { name: 'paragraph',   groups: [ 'list', 'indent', 'blocks', 'align' ] },
             { name: 'styles' },
-            { name: 'colors' }
+            { name: 'colors' },
+            { name: 't4block'}
             //{ name: 'about' }
-        ]
+        ],
+        extraPlugins: 't4block'
     });
 });
