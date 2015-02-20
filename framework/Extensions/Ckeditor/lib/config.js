@@ -9,4 +9,5 @@ CKEDITOR.editorConfig = function( config ) {
 	// config.uiColor = '#AADC6E';
     config.protectedSource.push( /<t4:block[\s\S]*?\/>/g );
     config.allowedContent = true;
+    config.enterMode = CKEDITOR.ENTER_BR;
 };
