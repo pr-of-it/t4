@@ -23,7 +23,10 @@ class Twig
         $this->links->app = Application::getInstance();
 
         $loader = new \Twig_Loader_Filesystem($paths);
-        $this->twig = new \Twig_Environment($loader);
+        $this->twig = new \Twig_Environment($loader, [
+            'cache' => ROOT_PATH_PROTECTED . '/Cache/Twig',
+            'auto_reload' => true,
+        ]);
         $this->twig->addGlobal('app', $this->links->app);
         $this->twig->addExtension(new TwigExtensions());
     }
