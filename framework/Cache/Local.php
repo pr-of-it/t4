@@ -13,7 +13,7 @@ class Local
 
     public function __construct(Config $config = null)
     {
-        $this->path = ROOT_PATH_PUBLIC . DS . 'Cache';
+        $this->path = ROOT_PATH_PROTECTED . DS . 'Cache';
         if (null !== $config) {
             if (!empty($config->path)) {
                 $this->path = $config->path;
@@ -24,8 +24,9 @@ class Local
     public function __invoke($key, $callback, $time = self::DEFAULT_CACHE_TIME)
     {
         $cachePath = $this->path;
-        if (!is_readable($cachePath))
+        if (!is_readable($cachePath)) {
             Helpers::mkDir($cachePath);
+        }
         $fileName = $cachePath . DS . md5($key) . '.cache';
         clearstatcache(true, $fileName);
         if (!file_exists($fileName) || (time() - filemtime($fileName) > (int)$time)) {
