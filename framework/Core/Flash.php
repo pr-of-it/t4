@@ -10,8 +10,9 @@ class Flash
 
     public function __construct($data=null)
     {
-        if (null != $data)
-            $this->fromArray($data);
+        if (null != $data) {
+            parent::__construct($data);
+        }
         $this->merge(Session::get(self::FLASH_KEY));
     }
 
