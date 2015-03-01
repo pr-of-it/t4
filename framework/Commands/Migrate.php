@@ -43,6 +43,66 @@ class Migrate
         }
     }
 
+    protected function isInstalled()
+    {
+        $connection = Application::getInstance(true)->db->default;
+        $driver = $connection->getDriver();
+        return $driver->existsTable($connection, self::TABLE_NAME);
+    }
+
+    protected function install()
+    {
+        $connection = Application::getInstance()->db->default;
+        $driver = $connection->getDriver();
+        $driver->createTable($connection, self::TABLE_NAME,
+            [
+                Model::PK => ['type' => 'pk'],
+                'time' => ['type' => 'int'],
+            ],
+            [
+                ['type' => 'unique', 'columns' => ['time']]
+            ]
+        );
+        $this->writeLn('Migration table `' . self::TABLE_NAME . '` is created');
+    }
+
+    protected function getMigrationsAfter($time)
+    {
+        $migrations = [];
+        foreach (glob($this->getMigrationsPath() . DS . sprintf(self::SEARCH_FILE_NAME_PATTERN, '*', '*') . '.php') as $fileName) {
+            $className = self::MIGRATIONS_NAMESPACE . '\\' . pathinfo($fileName, PATHINFO_FILENAME);
+            $migration = new $className;
+            if ($migration->getTimestamp() > $time) {
+                $migrations[] = $migration;
+            }
+        }
+        return $migrations;
+    }
+
+    protected function getMigrationsPath($module = null)
+    {
+        if (null == $module) {
+            return ROOT_PATH_PROTECTED . DS . 'Migrations';
+        } else {
+            return ROOT_PATH_PROTECTED . DS . 'Modules' . DS . ucfirst($module) . DS . 'Migrations';
+        }
+
+    }
+
+    protected function getLastMigrationTime()
+    {
+        $query = new QueryBuilder();
+        $query->select('time')->from(self::TABLE_NAME)->order(Model::PK . ' DESC')->limit(1);
+        return $this->app->db->default->query($query)->fetchScalar() ?: 0;
+    }
+
+    protected function save(Migration $migration)
+    {
+        $query = new QueryBuilder();
+        $query->insert(self::TABLE_NAME)->values(['time' => ':time'])->params([':time' => $migration->getTimestamp()]);
+        $this->app->db->default->execute($query);
+    }
+
     public function actionDown()
     {
         if (!$this->isInstalled()) {
@@ -67,6 +127,37 @@ class Migrate
         } catch (\PDOException $e) {
             throw new Exception($e->getMessage());
         }
+    }
+
+    /**
+     * Возвращает последнюю примененную миграцию
+     * @return bool
+     */
+    protected function getLastMigration()
+    {
+        $lastMigrationTime = $this->getLastMigrationTime();
+        if (empty($lastMigrationTime))
+            return false;
+
+        foreach (glob($this->getMigrationsPath() . DS . sprintf(self::CLASS_NAME_PATTERN, $lastMigrationTime, '*') . '.php') as $fileName) {
+            $className = self::MIGRATIONS_NAMESPACE . '\\' . pathinfo($fileName, PATHINFO_FILENAME);
+            $migration = new $className;
+            break;
+        }
+
+        return $migration;
+    }
+
+    protected function delete(Migration $migration)
+    {
+        $query = new QueryBuilder();
+        if ($this->app->db->default->getDriverName() == 'mysql') {
+            $column = '`time`';
+        } else {
+            $column = '"time"';
+        }
+        $query->delete(self::TABLE_NAME)->where($column . '=:time')->params([':time' => $migration->getTimestamp()]);
+        $this->app->db->default->execute($query);
     }
 
     public function actionCreate($name, $module = null)
@@ -115,112 +206,19 @@ FILE;
         }
     }
 
-    protected function getMigrationsPath($module = null)
-    {
-        if (null == $module) {
-            return ROOT_PATH_PROTECTED . DS . 'Migrations';
-        } else {
-            return ROOT_PATH_PROTECTED . DS . 'Modules' . DS . ucfirst($module) . DS . 'Migrations';
-        }
-
-    }
-
-    protected function isInstalled()
-    {
-        $connection = Application::getInstance(true)->db->default;
-        $driver = $connection->getDriver();
-        return $driver->existsTable($connection, self::TABLE_NAME);
-    }
-
-    protected function install()
-    {
-        $connection = Application::getInstance()->db->default;
-        $driver = $connection->getDriver();
-        $driver->createTable($connection, self::TABLE_NAME,
-            [
-                Model::PK => ['type' => 'pk'],
-                'time' => ['type' => 'int'],
-            ],
-            [
-                ['type' => 'unique', 'columns' => ['time']]
-            ]
-        );
-        $this->writeLn('Migration table `' . self::TABLE_NAME . '` is created');
-    }
-
-    protected function getLastMigrationTime()
-    {
-        $query = new QueryBuilder();
-        $query->select('time')->from(self::TABLE_NAME)->order(Model::PK . ' DESC')->limit(1);
-        return $this->app->db->default->query($query)->fetchScalar() ?: 0;
-    }
-
-    protected function getMigrationsAfter($time)
-    {
-        $migrations = [];
-        foreach (glob($this->getMigrationsPath() . DS . sprintf(self::SEARCH_FILE_NAME_PATTERN, '*', '*') . '.php') as $fileName) {
-            $className = self::MIGRATIONS_NAMESPACE . '\\' . pathinfo($fileName, PATHINFO_FILENAME);
-            $migration = new $className;
-            if ($migration->getTimestamp() > $time) {
-                $migrations[] = $migration;
-            }
-        }
-        return $migrations;
-    }
-
-    /**
-     * Возвращает последнюю примененную миграцию
-     * @return bool
-     */
-    protected function getLastMigration()
-    {
-        $lastMigrationTime = $this->getLastMigrationTime();
-        if (empty($lastMigrationTime))
-            return false;
-
-        foreach (glob($this->getMigrationsPath() . DS . sprintf(self::CLASS_NAME_PATTERN, $lastMigrationTime, '*') . '.php') as $fileName) {
-            $className = self::MIGRATIONS_NAMESPACE . '\\' . pathinfo($fileName, PATHINFO_FILENAME);
-            $migration = new $className;
-            break;
-        }
-
-        return $migration;
-    }
-
-    protected function save(Migration $migration)
-    {
-        $query = new QueryBuilder();
-        $query->insert(self::TABLE_NAME)->values(['time' => ':time'])->params([':time' => $migration->getTimestamp()]);
-        $this->app->db->default->execute($query);
-    }
-
-    protected function delete(Migration $migration)
-    {
-        $query = new QueryBuilder();
-        if ($this->app->db->default->getDriverName() == 'mysql') {
-            $column = '`time`';
-        } else {
-            $column = '"time"';
-        }
-        $query->delete(self::TABLE_NAME)->where($column . '=:time')->params([':time' => $migration->getTimestamp()]);
-        $this->app->db->default->execute($query);
-    }
-
-    public function actionImport($module, $name = null)
+    public function actionImport($module = 'all', $name = null)
     {
 
         if (null == $name) {
-
             if ('all' == $module) {
                 $modules = Helpers::listDir(ROOT_PATH_PROTECTED . DS . 'Modules');
 
-                    foreach ($modules as $module) {
-                        $module = basename($module);
-
-                        if ('.' != $module && '..' != $module && is_readable($this->getMigrationsPath($module))) {
-                            $this->importMigrations($module);
-                        }
+                foreach ($modules as $module) {
+                    $module = basename($module);
+                    if ('.' != $module && '..' != $module && is_readable($this->getMigrationsPath($module))) {
+                        $this->importMigrations($module);
                     }
+                }
             } else {
                 $this->importMigrations($module);
             }
@@ -241,7 +239,7 @@ FILE;
 
         foreach ($migrationsInModule as $migrationInModule) {
 
-            if (!empty(glob($this->getMigrationsPath() . DS . sprintf(self::SEARCH_FILE_NAME_PATTERN, '*', ucfirst($module)) .  '_' . $migrationInModule . '.php'))) {
+            if (!empty(glob($this->getMigrationsPath() . DS . sprintf(self::SEARCH_FILE_NAME_PATTERN, '*', ucfirst($module)) . '_' . $migrationInModule . '.php'))) {
                 continue;
             }
 
@@ -256,6 +254,26 @@ FILE;
             $this->importMigration($module, $migration);
             sleep(1);
         }
+    }
+
+    protected function getMigrations($module = null)
+    {
+        $migrations = [];
+        $migrationsDir = $this->getMigrationsPath($module);
+        $pathToMigrations = Helpers::listDir($migrationsDir, \SCANDIR_SORT_DESCENDING);
+
+        foreach ($pathToMigrations as $migration) {
+
+            if (is_file($migration)) {
+                $migrations[] = basename(substr(strrchr($migration, '_'), 1), '.php');
+            }
+        }
+
+        if (empty($migrations)) {
+            $this->writeLn(ucfirst($module) . ' has no migrations');
+        }
+
+        return $migrations;
     }
 
     protected function importMigration($module, $name)
@@ -284,25 +302,6 @@ FILE;
             file_put_contents($fileName, $content);
             $this->writeLn('Migration ' . $className . ' is created in ' . $this->getMigrationsPath() . "\n");
         }
-    }
-
-    protected function getMigrations($module=null) {
-        $migrations = [];
-        $migrationsDir = $this->getMigrationsPath($module);
-        $pathToMigrations = Helpers::listDir($migrationsDir, \SCANDIR_SORT_DESCENDING);
-
-        foreach ($pathToMigrations as $migration) {
-
-            if (is_file($migration)) {
-                $migrations[] = basename(substr(strrchr($migration, '_'), 1), '.php');
-            }
-        }
-
-        if (empty($migrations)) {
-            $this->writeLn(ucfirst($module) . ' has no migrations');
-        }
-
-        return $migrations;
     }
 
 }
