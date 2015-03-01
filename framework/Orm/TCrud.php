@@ -225,8 +225,7 @@ trait TCrud
             $extensionClassName = '\\T4\\Orm\\Extensions\\' . ucfirst($extension);
             /** @var \T4\Orm\Extension $extension */
             $extension = new $extensionClassName;
-            if (!$extension->afterDelete($this))
-                return false;
+            $extension->afterDelete($this);
         }
         return true;
     }

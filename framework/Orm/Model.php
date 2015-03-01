@@ -149,8 +149,8 @@ abstract class Model
     static public function getExtensions()
     {
         return !empty(static::$extensions) ?
-            array_merge(['standard'], static::$extensions) :
-            ['standard'];
+            array_merge(['standard', 'relations'], static::$extensions) :
+            ['standard', 'relations'];
     }
 
 }
