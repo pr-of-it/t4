@@ -10,7 +10,7 @@ class Relations
     extends Extension
 {
 
-    public function afterDelete($model)
+    public function afterDelete(&$model)
     {
         $class = get_class($model);
         $relations = $class::getRelations();
@@ -22,7 +22,8 @@ class Relations
                     $query
                         ->delete()
                         ->table($linkTable)
-                        ->where('t1.'.$class::getManyToManyThatLinkColumnName($relation).'=:id');
+                        ->where($class::getManyToManyThatLinkColumnName($relation).'=:id');
+                    echo $query->getQuery('mysql');die;
                     $query->params([':id'=>$model->getPk()]);
                     $class::getDbConnection()->execute($query);
             }
