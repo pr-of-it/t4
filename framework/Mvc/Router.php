@@ -74,7 +74,7 @@ class Router
 
     public function getFormatByExtension($extension)
     {
-        return $extension ?: $this->allowedExtensions[0];
+        return in_array($extension, $this->allowedExtensions) ? $extension : $this->allowedExtensions[0];
     }
 
     /**
