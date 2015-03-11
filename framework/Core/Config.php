@@ -33,12 +33,14 @@ class Config extends Std
         return $this->fromArray(include($path));
     }
 
-    public function save($path)
+
+
+    public function save($path=null)
     {
         $file = fopen($path, 'w');
-        fwrite($file,'<?php'."\r\n"."\r\n".'return ');
-        fwrite($file,var_export( $this->toArray()),true);
-        fwrite($file,';');
+        fwrite($file, '<?php' . "\r\n" . "\r\n" . 'return ');
+        fwrite($file, var_export($this->toArray(), true));
+        fwrite($file, ';');
         fclose($file);
 
     }
