@@ -1,10 +1,14 @@
 <?php
-return [
-    'db' => [
-        'default' => [
-            'driver' => 'mysql',
-            'host' => 'localhost'
-        ]
+
+return   [
+  'db' => 
+    [
+    'default' => 
+      [
+      'driver' => 'mysql',
+      'host' => 'localhost',
     ],
-    'name' => 'test',
+  ],
+  'name' => 'test',
+  'app_title' => 'Сайт',
 ];

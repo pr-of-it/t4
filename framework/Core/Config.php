@@ -8,7 +8,9 @@ class Config extends Std
     /**
      * @param array|string|null $data
      * @throws \T4\Core\Exception
+     * @property $path string
      */
+    public $path;
     public function __construct($data = null)
     {
         if (null !== $data) {
@@ -27,6 +29,7 @@ class Config extends Std
      */
     public function load($path)
     {
+        $this->path=$path;
         if (!is_readable($path)) {
             throw new Exception('Config file ' . $path . ' is not found or is not readable');
         }
@@ -34,24 +37,11 @@ class Config extends Std
     }
 
 
-    public function save($path = null)
+    public function save()
     {
-        /**
-         * не знаю нужно ли это но если вызывать из адмики, то зачем там path
-         */
-
-        if ($path == null) {
-            $path = ROOT_PATH_PROTECTED . DS . 'config.php';
-        }
-
         $str = var_export($this->toArray(), true);
         $str = str_replace(['array', '(', ')'], [' ', '[', ']'], $str);
-        $file = fopen($path, 'w');
-        fwrite($file, '<?php' . "\r\n" . "\r\n" . 'return ');
-        fwrite($file, $str);
-        fwrite($file, ';');
-        fclose($file);
-
+        file_put_contents($this->path,'<?php' . "\r\n" . "\r\n" . 'return '.$str.';');
     }
 
 }
