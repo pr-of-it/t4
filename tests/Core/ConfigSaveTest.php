@@ -12,7 +12,7 @@ class ConfigSaveTest  extends PHPUnit_Framework_TestCase{
         $config = new Config;
         $config->load(__DIR__ . DS . 'configsave.test.php');
         $config->app_title = 'Сайт';
-        $config->save(__DIR__ . DS . 'configsave.test.php');
+        $config->save();
         unset($config);
 
         $config = new Config;
