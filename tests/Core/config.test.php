@@ -1,11 +1,11 @@
-<?php
-
-return [
-    'db' => [
-        'default' => [
-            'driver' => 'mysql',
-            'host' => 'localhost'
-        ]
-    ],
-    'name' => 'test',
-];
+array (
+  'db' => 
+  array (
+    'default' => 
+    array (
+      'driver' => 'mysql',
+      'host' => 'localhost',
+    ),
+  ),
+  'name' => 'test1',
+)

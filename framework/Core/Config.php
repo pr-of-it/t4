@@ -33,4 +33,13 @@ class Config extends Std
         return $this->fromArray(include($path));
     }
 
+    public function save($path)
+    {
+     //   $path=ROOT_PATH_PROTECTED . DS . 'config.php';
+        $file = fopen($path, 'w');
+        fwrite($file,var_export($this->toArray(),true));
+        fclose($file);
+
+    }
+
 }
