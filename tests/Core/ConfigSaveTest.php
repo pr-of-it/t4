@@ -8,12 +8,21 @@ class ConfigSaveTest  extends PHPUnit_Framework_TestCase{
     /**
      * @expectedException T4\Core\Exception
      */
-    public function testSave(){
+    public function testSave()
+    {
 
         $config = new Config;
         $config->load(__DIR__ . DS . 'config.test.php');
-            $config->name='test1';
+        $config->name = 'test1';
         $config->save(__DIR__ . DS . 'config.test.php');
+        unset($config);
+        $config = new Config;
+        $config->load(__DIR__ . DS . 'config.test.php');
+
+        $this->assertEquals(
+            'test1',
+            $config->name
+        );
     }
 
 } 

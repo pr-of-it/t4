@@ -35,12 +35,10 @@ class Config extends Std
 
     public function save($path)
     {
-        $file=fopen($path,'wb');
-        $config=$this->toArray($this->getData());
-        fwrite($file,'<php '."\r\n");
-        foreach($config as $key=>$value){
-            fwrite($file,$key.'=>'."\r\n");
-        }
+        $file = fopen($path, 'w');
+        fwrite($file,'<?php'."\r\n"."\r\n".'return ');
+        fwrite($file,var_export( $this->toArray()),true);
+        fwrite($file,';');
         fclose($file);
 
     }
