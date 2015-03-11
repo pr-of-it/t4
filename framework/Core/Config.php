@@ -38,6 +38,7 @@ class Config extends Std
      //   $path=ROOT_PATH_PROTECTED . DS . 'config.php';
         $file = fopen($path, 'w');
         fwrite($file,var_export($this->toArray(),true));
+
         fclose($file);
 
     }
