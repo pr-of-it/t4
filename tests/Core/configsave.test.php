@@ -1,13 +1,14 @@
 <?php
 
-return array (
+return   [
   'db' => 
-  array (
+    [
     'default' => 
-    array (
+      [
       'driver' => 'mysql',
       'host' => 'localhost',
-    ),
-  ),
-  'name' => 'test1',
-);
+    ],
+  ],
+  'name' => 'test',
+  'app_title' => 'Сайт',
+];

@@ -33,15 +33,23 @@ class Config extends Std
         return $this->fromArray(include($path));
     }
 
-    public function save($path)
-    {
-     //   $path=ROOT_PATH_PROTECTED . DS . 'config.php';
-        $str=var_export($this->toArray());
-        $str=str_replace( [ '(', ')' ], [ '[', ']' ], $str );
-        $file = fopen($path, 'w');
-        //fwrite($file,var_export($this->toArray(),true));
-        fwrite($file,str,true);
 
+    public function save($path = null)
+    {
+        /**
+         * не знаю нужно ли это но если вызывать из адмики, то зачем там path
+         */
+
+        if ($path == null) {
+            $path = ROOT_PATH_PROTECTED . DS . 'config.php';
+        }
+
+        $str = var_export($this->toArray(), true);
+        $str = str_replace(['array', '(', ')'], [' ', '[', ']'], $str);
+        $file = fopen($path, 'w');
+        fwrite($file, '<?php' . "\r\n" . "\r\n" . 'return ');
+        fwrite($file, $str);
+        fwrite($file, ';');
         fclose($file);
 
     }
