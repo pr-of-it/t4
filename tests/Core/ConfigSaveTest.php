@@ -12,6 +12,7 @@ class ConfigSaveTest  extends PHPUnit_Framework_TestCase{
         $config = new Config;
         $config->load(__DIR__ . DS . 'configsave.test.php');
         $config->app_title = 'Сайт';
+        $config->bar = 'foo(bar)';
         $config->save();
         unset($config);
 
@@ -21,6 +22,11 @@ class ConfigSaveTest  extends PHPUnit_Framework_TestCase{
         $this->assertEquals(
             'Сайт',
             $config->app_title
+        );
+
+        $this->assertEquals(
+            'foo(bar)',
+            $config->bar
         );
     }
 
