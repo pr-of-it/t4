@@ -36,12 +36,29 @@ class Config extends Std
         return $this->fromArray(include($path));
     }
 
+    protected function arr_format($var, $indent = "")
+    {
+        switch (gettype($var)) {
+            case "string":
+                return '"' . addcslashes($var, "\\\$\"\r\n\t\v\f") . '"';
+            case "array":
+                $indexed = array_keys($var) === range(0, count($var) - 1);
+                $r = [];
+                foreach ($var as $key => $value) {
+                    $r[] = "$indent    " . ($indexed ? "" : $this->arr_format($key) . " => ") . $this->arr_format($value, "$indent    ");
+                }
+                return "[\n" . implode(",\n", $r) . "\n" . $indent . "]";
+            case "boolean":
+                return $var ? "TRUE" : "FALSE";
+            default:
+                return var_export($var, TRUE);
+        }
+    }
 
     public function save()
     {
-        $str = var_export($this->toArray(), true);
-        $str = str_replace(['array', '(', ')'], [' ', '[', ']'], $str);
-        file_put_contents($this->path,'<?php' . "\r\n" . "\r\n" . 'return '.$str.';');
+        $str = $this->arr_format($this->toArray());
+        file_put_contents($this->path, '<?php' . "\r\n" . "\r\n" . 'return ' . $str . ';');
     }
 
 }
