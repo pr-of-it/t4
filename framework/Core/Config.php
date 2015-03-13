@@ -10,7 +10,7 @@ class Config extends Std
      * @throws \T4\Core\Exception
      * @property $path string
      */
-    public $path;
+    private  $path;
     public function __construct($data = null)
     {
         if (null !== $data) {
@@ -36,7 +36,7 @@ class Config extends Std
         return $this->fromArray(include($path));
     }
 
-    protected function arr_format($var, $indent = "")
+    private function arr_format($var, $indent = "")
     {
         switch (gettype($var)) {
             case "string":
