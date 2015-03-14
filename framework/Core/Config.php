@@ -5,12 +5,13 @@ namespace T4\Core;
 class Config extends Std
 {
 
+    protected $path;
+
     /**
      * @param array|string|null $data
      * @throws \T4\Core\Exception
      * @property $path string
      */
-    private  $path;
     public function __construct($data = null)
     {
         if (null !== $data) {
@@ -29,36 +30,30 @@ class Config extends Std
      */
     public function load($path)
     {
-        $this->path=$path;
         if (!is_readable($path)) {
             throw new Exception('Config file ' . $path . ' is not found or is not readable');
         }
-        return $this->fromArray(include($path));
-    }
-
-    private function arr_format($var, $indent = "")
-    {
-        switch (gettype($var)) {
-            case "string":
-                return '"' . addcslashes($var, "\\\$\"\r\n\t\v\f") . '"';
-            case "array":
-                $indexed = array_keys($var) === range(0, count($var) - 1);
-                $r = [];
-                foreach ($var as $key => $value) {
-                    $r[] = "$indent    " . ($indexed ? "" : $this->arr_format($key) . " => ") . $this->arr_format($value, "$indent    ");
-                }
-                return "[\n" . implode(",\n", $r) . "\n" . $indent . "]";
-            case "boolean":
-                return $var ? "TRUE" : "FALSE";
-            default:
-                return var_export($var, TRUE);
-        }
+        $this->path = $path;
+        return $this->fromArray(include($this->path));
     }
 
     public function save()
     {
-        $str = $this->arr_format($this->toArray());
-        file_put_contents($this->path, '<?php' . "\r\n" . "\r\n" . 'return ' . $str . ';');
+        $str = $this->prepareForSave($this->toArray());
+        file_put_contents($this->path, '<?php' . "\n\n" . 'return ' . $str . ';');
+    }
+
+
+    /**
+     * Prepares array representation for save in PHP file
+     * @param array $data
+     * @return string
+     */
+    protected function prepareForSave(array $data)
+    {
+        $str = var_export($data, true);
+        $str = preg_replace(['~^(\s*)array\s*\($~im', '~^(\s*)\)(\,?)$~im', '~\s+$~im'], ['$1[', '$1]$2', ''], $str);
+        return $str;
     }
 
 }

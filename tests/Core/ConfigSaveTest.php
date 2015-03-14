@@ -1,33 +1,71 @@
 <?php
+
 use T4\Core\Config;
 
 require_once realpath(__DIR__ . '/../../framework/boot.php');
 
-class ConfigSaveTest  extends PHPUnit_Framework_TestCase{
+class ConfigSaveTest extends PHPUnit_Framework_TestCase
+{
 
+    protected function setUp()
+    {
+        file_put_contents(__DIR__ . '/savetest.config.php', <<<'CONFIG'
+<?php
+
+return [
+    'application' => [
+        'name' => 'Test Application'
+    ],
+];
+CONFIG
+        );
+    }
 
     public function testSave()
     {
+        $config = new Config(__DIR__ . '/savetest.config.php');
+        $this->assertEquals('Test Application', $config->application->name);
 
-        $config = new Config;
-        $config->load(__DIR__ . DS . 'configsave.test.php');
-        $config->app_title = 'Сайт';
-        $config->bar = 'foo(bar)';
+        $config->foo = 'bar';
+        $config->baz = [1, 2, 3];
+        $config->songs = ['Hey' => 'Jude', 'I just' => ['call' => ['to' => 'say']]];
+
         $config->save();
-        unset($config);
 
-        $config = new Config;
-        $config->load(__DIR__ . DS . 'configsave.test.php');
+        $this->assertStringEqualsFile(__DIR__ . '/savetest.config.php', <<<'CONFIG'
+<?php
 
-        $this->assertEquals(
-            'Сайт',
-            $config->app_title
-        );
+return [
+  'application' =>
+  [
+    'name' => 'Test Application',
+  ],
+  'foo' => 'bar',
+  'baz' =>
+  [
+    0 => 1,
+    1 => 2,
+    2 => 3,
+  ],
+  'songs' =>
+  [
+    'Hey' => 'Jude',
+    'I just' =>
+    [
+      'call' =>
+      [
+        'to' => 'say',
+      ],
+    ],
+  ],
+];
+CONFIG
+            , '', true);
+    }
 
-        $this->assertEquals(
-            'foo(bar)',
-            $config->bar
-        );
+    protected function tearDown()
+    {
+        unlink(__DIR__ . '/savetest.config.php');
     }
 
 } 
