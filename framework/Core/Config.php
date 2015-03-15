@@ -33,8 +33,13 @@ class Config extends Std
         if (!is_readable($path)) {
             throw new Exception('Config file ' . $path . ' is not found or is not readable');
         }
+        $this->setPath($path);
+        return $this->fromArray(include($path));
+    }
+
+    public function setPath($path)
+    {
         $this->path = $path;
-        return $this->fromArray(include($this->path));
     }
 
     public function save()
