@@ -8,6 +8,4 @@ return [
         ]
     ],
     'name' => 'test',
-    'app_title' => 'Сайт',
-    'bar' => 'foo(bar)'
 ];
