@@ -1,4 +1,5 @@
 <?php
+
 return [
     'db' => [
         'default' => [
@@ -7,4 +8,6 @@ return [
         ]
     ],
     'name' => 'test',
+    'app_title' => 'Сайт',
+    'bar' => 'foo(bar)'
 ];
