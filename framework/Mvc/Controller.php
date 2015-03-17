@@ -4,6 +4,7 @@ namespace T4\Mvc;
 
 use T4\Core\Std;
 use T4\Http\E403Exception;
+use T4\Http\E404Exception;
 use T4\Http\Helpers;
 
 abstract class Controller
@@ -94,7 +95,7 @@ abstract class Controller
      * Возвращает список аргументов действия данного контроллера
      * @param $name Имя действия
      * @return array Список аргументов
-     * @throws ControllerException
+     * @throws E404Exception
      */
     final protected function getActionParameters($name)
     {
@@ -103,7 +104,7 @@ abstract class Controller
             $reflection = new \ReflectionMethod($this, $actionMethodName);
             return $reflection->getParameters();
         } else {
-            throw new ControllerException('Action ' . $name . ' is not found in controller ' . get_class($this));
+            throw new E404Exception('Action ' . $name . ' is not found in controller ' . get_class($this));
         }
 
     }
@@ -117,7 +118,7 @@ abstract class Controller
         $actionMethodName = 'action' . $name;
 
         if (!method_exists($this, $actionMethodName)) {
-            throw new ControllerException('Action ' . $name . ' is not found in controller ' . get_class($this));
+            throw new E404Exception('Action ' . $name . ' is not found in controller ' . get_class($this));
         }
 
         if (method_exists($this, 'access')) {
