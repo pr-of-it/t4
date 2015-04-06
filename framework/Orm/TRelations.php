@@ -5,13 +5,15 @@ namespace T4\Orm;
 use T4\Core\Collection;
 use T4\Dbal\QueryBuilder;
 
-trait TRelations {
+trait TRelations
+{
 
     /**
      * Список связей модели
      * @return array
      */
-    public static function getRelations() {
+    public static function getRelations()
+    {
         $schema = static::getSchema();
         return !empty($schema['relations']) ? $schema['relations'] : [];
     }
@@ -41,7 +43,7 @@ trait TRelations {
                 $thisTableName = $class::getTableName();
                 $relationClass = (false !== strpos($relation['model'], 'App\\')) ? $relation['model'] : '\\App\\Models\\' . $relation['model'];
                 $thatTableName = $relationClass::getTableName();
-                return $thisTableName < $thatTableName ? $thisTableName .'_to_'. $thatTableName : $thatTableName .'_to_'. $thisTableName;
+                return $thisTableName < $thatTableName ? $thisTableName . '_to_' . $thatTableName : $thatTableName . '_to_' . $thisTableName;
         }
 
     }
@@ -102,8 +104,8 @@ trait TRelations {
                     ->select('t1.*')
                     ->from($relationClass::getTableName())
                     ->join($linkTable, 't1.' . $relationClass::PK . '=j1.' . static::getManyToManyThatLinkColumnName($relation), 'right')
-                    ->where('j1.'.static::getManyToManyThisLinkColumnName().'=:id');
-                $query->params([':id'=>$this->getPk()]);
+                    ->where('j1.' . static::getManyToManyThisLinkColumnName() . '=:id');
+                $query->params([':id' => $this->getPk()]);
                 $result = $relationClass::getDbConnection()->query($query)->fetchAll(\PDO::FETCH_CLASS, $relationClass);
                 if (!empty($result)) {
                     $ret = new Collection($result);

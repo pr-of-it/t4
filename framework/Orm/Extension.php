@@ -1,6 +1,7 @@
 <?php
 
 namespace T4\Orm;
+
 use T4\Orm\Extensions\Exception;
 
 /**
@@ -17,7 +18,7 @@ abstract class Extension
      * @param string $class
      * @return array
      */
-    public function prepareColumns($columns, $class='')
+    public function prepareColumns($columns, $class = '')
     {
         return $columns;
     }
@@ -28,7 +29,7 @@ abstract class Extension
      * @param string $class
      * @return array
      */
-    public function prepareIndexes($indexes, $class='')
+    public function prepareIndexes($indexes, $class = '')
     {
         return $indexes;
     }
@@ -39,7 +40,7 @@ abstract class Extension
      * @param $class
      * @return array
      */
-    public function prepareRelations($relations, $class='')
+    public function prepareRelations($relations, $class = '')
     {
         return $relations;
     }

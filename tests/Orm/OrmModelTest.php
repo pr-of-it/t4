@@ -6,8 +6,8 @@ class Book extends \T4\Orm\Model
 {
     protected static $schema = [
         'columns' => [
-            'title' => ['type'=>'string'],
-            'author' => ['type'=>'string'],
+            'title' => ['type' => 'string'],
+            'author' => ['type' => 'string'],
         ],
     ];
 }
@@ -50,7 +50,7 @@ class OrmModelTest extends PHPUnit_Extensions_Database_TestCase
      */
     protected function getDataSet()
     {
-        return $this->createXMLDataSet(__DIR__.'/OrmModelTest.data.xml');
+        return $this->createXMLDataSet(__DIR__ . '/OrmModelTest.data.xml');
     }
 
     public function testConnection()
@@ -85,14 +85,14 @@ class OrmModelTest extends PHPUnit_Extensions_Database_TestCase
             $res[0]['author']
         );
 
-        $connection->query("UPDATE `books` SET `title`='Baz' WHERE `__id`=:id", [':id'=>1]);
-        $res = $connection->query("SELECT * FROM `books` WHERE `__id`=:id", [':id'=>1])->fetchObject();
+        $connection->query("UPDATE `books` SET `title`='Baz' WHERE `__id`=:id", [':id' => 1]);
+        $res = $connection->query("SELECT * FROM `books` WHERE `__id`=:id", [':id' => 1])->fetchObject();
         $this->assertEquals(
             'Baz',
             $res->title
         );
 
-        $connection->execute("DELETE FROM `books` WHERE `__id`=:id", [':id'=>1]);
+        $connection->execute("DELETE FROM `books` WHERE `__id`=:id", [':id' => 1]);
         $res = $connection->query("SELECT COUNT(*) FROM `books`")->fetchScalar();
         $this->assertEquals(
             0,
@@ -109,8 +109,8 @@ class OrmModelTest extends PHPUnit_Extensions_Database_TestCase
         $query->execute([':title' => 'Foo', ':author' => 'Bar']);
         $query->execute([':title' => 'Baz', ':author' => 'Bla']);
 
-        $book1attributes = ['__id'=>1, 'title'=>'Foo', 'author'=>'Bar'];
-        $book2attributes = ['__id'=>2, 'title'=>'Baz', 'author'=>'Bla'];
+        $book1attributes = ['__id' => 1, 'title' => 'Foo', 'author' => 'Bar'];
+        $book2attributes = ['__id' => 2, 'title' => 'Baz', 'author' => 'Bla'];
 
         $books = Book::findAllByQuery("SELECT * FROM `books`");
         $this->assertInstanceOf('\T4\Core\Collection', $books);
@@ -120,7 +120,7 @@ class OrmModelTest extends PHPUnit_Extensions_Database_TestCase
         $this->assertEquals($book1attributes, $books[0]->toArray());
         $this->assertEquals($book2attributes, $books[1]->toArray());
 
-        $book = Book::findByQuery("SELECT * FROM `books` WHERE `__id`=:id", [':id'=>1]);
+        $book = Book::findByQuery("SELECT * FROM `books` WHERE `__id`=:id", [':id' => 1]);
         $this->assertInstanceOf('Book', $book);
         $this->assertEquals($book1attributes, $book->toArray());
 
@@ -169,7 +169,7 @@ class OrmModelTest extends PHPUnit_Extensions_Database_TestCase
         $this->assertFalse($book->isDeleted());
 
         $this->assertEquals(
-           1,
+            1,
             $book->getPk()
         );
 

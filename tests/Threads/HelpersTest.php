@@ -2,7 +2,8 @@
 
 require_once realpath(__DIR__ . '/../../framework/boot.php');
 
-class HelpersTest extends PHPUnit_Framework_TestCase {
+class HelpersTest extends PHPUnit_Framework_TestCase
+{
 
     public $testFileName;
 
@@ -19,7 +20,7 @@ class HelpersTest extends PHPUnit_Framework_TestCase {
         \T4\Threads\Helpers::run(function ($text) use ($testFileName) {
             sleep(10);
             file_put_contents($testFileName, $text);
-        }, ['text'=>'Hello, world!']);
+        }, ['text' => 'Hello, world!']);
 
         sleep(5);
         $this->assertFalse(file_exists($testFileName));

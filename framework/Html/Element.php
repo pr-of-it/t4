@@ -4,7 +4,8 @@ namespace T4\Html;
 
 use T4\Core\Std;
 
-abstract class Element {
+abstract class Element
+{
 
     /**
      * @var \T4\Core\Std
@@ -21,7 +22,7 @@ abstract class Element {
      * @param array $options
      * @param array $attributes
      */
-    public function __construct($name='', $options=[], $attributes=[])
+    public function __construct($name = '', $options = [], $attributes = [])
     {
         $this->options = new Std();
         foreach ($options as $name => $value)

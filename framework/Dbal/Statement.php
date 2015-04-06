@@ -7,7 +7,8 @@ class Statement
     extends \PDOStatement
 {
 
-    public function fetchScalar() {
+    public function fetchScalar()
+    {
         return $this->fetchColumn(0);
     }
 

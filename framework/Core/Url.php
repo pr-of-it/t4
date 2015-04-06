@@ -33,10 +33,10 @@ class Url
         if (false === $url) {
             return $this;
         }
-        $this->protocol     = isset($url['scheme']) ? $url['scheme'] : null;
-        $this->host         = isset($url['host']) ? $url['host'] : null;
-        $this->port         = isset($url['port']) ? $url['port'] : null;
-        $this->path         = isset($url['path']) ? $url['path'] : null;
+        $this->protocol = isset($url['scheme']) ? $url['scheme'] : null;
+        $this->host = isset($url['host']) ? $url['host'] : null;
+        $this->port = isset($url['port']) ? $url['port'] : null;
+        $this->path = isset($url['path']) ? $url['path'] : null;
 
         if (null == $this->host && null !== $this->path) {
             $pathParts = explode('/', $this->path);
@@ -47,14 +47,14 @@ class Url
             }
         }
 
-        $this->query        = isset($url['query']) ? $url['query'] : null;
-        $this->fragment     = isset($url['fragment']) ? $url['fragment'] : null;
+        $this->query = isset($url['query']) ? $url['query'] : null;
+        $this->fragment = isset($url['fragment']) ? $url['fragment'] : null;
         return $this;
     }
 
     public function toString()
     {
-        $ret  = $this->protocol ? $this->protocol . '://' : '';
+        $ret = $this->protocol ? $this->protocol . '://' : '';
         $ret .= $this->host ? $this->host : '';
         $ret .= $this->port ? ':' . $this->port : '';
         $ret .= $this->path ? $this->path : '';

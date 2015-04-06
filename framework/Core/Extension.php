@@ -34,7 +34,7 @@ abstract class Extension
         $this->options = $options;
         $reflect = new \ReflectionClass($this);
         $this->path = dirname($reflect->getFileName());
-        $this->assetsPath = '/'.str_replace(DS, '/', str_replace(\T4\ROOT_PATH, '', dirname($reflect->getFileName())));
+        $this->assetsPath = '/' . str_replace(DS, '/', str_replace(\T4\ROOT_PATH, '', dirname($reflect->getFileName())));
 
     }
 

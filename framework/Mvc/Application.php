@@ -141,7 +141,7 @@ class Application
 
         $controller = $this->createController($route->module, $route->controller);
         $controller->action($route->action, $route->params);
-        $data =  $controller->getData();
+        $data = $controller->getData();
 
         switch ($format) {
             case 'json':
@@ -162,7 +162,7 @@ class Application
      * @throws \T4\Threads\Exception
      * @return int Child process PID
      */
-    public function runLater(callable $callback, $args=[])
+    public function runLater(callable $callback, $args = [])
     {
         return Helpers::run($callback, $args);
     }
@@ -189,7 +189,7 @@ class Application
             $blockOptions = [];
         }
 
-        $getBlock = function() use ($template, $route) {
+        $getBlock = function () use ($template, $route) {
             $controller = $this->createController($route->module, $route->controller);
             $controller->action($route->action, $route->params);
             return $controller->view->render(

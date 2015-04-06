@@ -8,7 +8,7 @@ class Flash
 
     const FLASH_KEY = '__flash';
 
-    public function __construct($data=null)
+    public function __construct($data = null)
     {
         if (null != $data) {
             parent::__construct($data);

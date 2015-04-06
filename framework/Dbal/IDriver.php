@@ -38,13 +38,13 @@ interface IDriver
 
     public function findAll($class, $options = []);
 
-    public function findAllByColumn($class, $column, $value, $options=[]);
+    public function findAllByColumn($class, $column, $value, $options = []);
 
-    public function findByColumn($class, $column, $value, $options=[]);
+    public function findByColumn($class, $column, $value, $options = []);
 
     public function countAll($class, $options = []);
 
-    public function countAllByColumn($class, $column, $value, $options=[]);
+    public function countAllByColumn($class, $column, $value, $options = []);
 
     public function save(Model $model);
 

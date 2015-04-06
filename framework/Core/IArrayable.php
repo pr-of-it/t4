@@ -2,7 +2,9 @@
 
 namespace T4\Core;
 
-interface IArrayable {
+interface IArrayable
+{
     public function toArray();
+
     public function fromArray($data);
 }

@@ -32,7 +32,7 @@ class Connection
             }
             $this->pdo = new \PDO($dsn, $config->user, $config->password, $options);
             $this->pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
-            $this->pdo->setAttribute(\PDO::ATTR_STATEMENT_CLASS, [__NAMESPACE__.'\\Statement']);
+            $this->pdo->setAttribute(\PDO::ATTR_STATEMENT_CLASS, [__NAMESPACE__ . '\\Statement']);
         } catch (\PDOException $e) {
             throw new Exception($e->getMessage());
         }
@@ -109,7 +109,8 @@ class Connection
     /**
      * @return array
      */
-    public function getErrorInfo() {
+    public function getErrorInfo()
+    {
         return $this->pdo->errorInfo();
     }
 

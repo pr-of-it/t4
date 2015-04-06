@@ -13,9 +13,9 @@ namespace T4\Orm\Extensions {
             return $columns + ['year' => ['type' => 'integer']];
         }
 
-        public function prepareRelations($relations, $class='')
+        public function prepareRelations($relations, $class = '')
         {
-            return $relations + ['publisher' => ['type'=>\T4\Orm\Model::HAS_ONE, 'model'=>'Publisher']];
+            return $relations + ['publisher' => ['type' => \T4\Orm\Model::HAS_ONE, 'model' => 'Publisher']];
         }
     }
 }
@@ -52,7 +52,7 @@ namespace {
         {
             $this->assertEquals(
                 [
-                    'publisher' => ['type'=>\T4\Orm\Model::HAS_ONE, 'model'=>'Publisher']
+                    'publisher' => ['type' => \T4\Orm\Model::HAS_ONE, 'model' => 'Publisher']
                 ],
                 \BookExtTestModel1::getRelations()
             );

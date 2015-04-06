@@ -18,7 +18,7 @@ class View
      */
     public $meta;
 
-    public function __construct($renderer = '', $paths=[])
+    public function __construct($renderer = '', $paths = [])
     {
         $this->meta = new Meta();
         if (empty($renderer) || 'vanilla' == $renderer) {
@@ -54,7 +54,7 @@ class View
         }
     }
 
-    public function render($template, $data=[])
+    public function render($template, $data = [])
     {
         return $this->postProcess(
             $this->renderer->render($template, $data)
@@ -78,7 +78,7 @@ class View
     {
         preg_match_all(self::TAG_PATTERN, $content, $m);
         foreach ($m['tag'] as $n => $tag) {
-            $tagClassName = '\T4\Mvc\Tags\\'.ucfirst($tag);
+            $tagClassName = '\T4\Mvc\Tags\\' . ucfirst($tag);
             $tag = new $tagClassName($m['params'][$n], $m['html'][$n]);
             try {
                 $content = str_replace($m[0][$n], $tag->render(), $content);

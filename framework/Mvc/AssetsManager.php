@@ -89,21 +89,21 @@ class AssetsManager
                 // Файл не найден, копируем его
                 // Файл найден, но протух - перезаписываем
                 if (
-                    !is_readable($assetBasePath . DS. $baseRealName)
-                    || $lastModifiedTime >= filemtime($assetBasePath . DS. $baseRealName)
+                    !is_readable($assetBasePath . DS . $baseRealName)
+                    || $lastModifiedTime >= filemtime($assetBasePath . DS . $baseRealName)
                 ) {
                     Helpers::copyFile($realPath, $assetBasePath);
                 }
             } else {
                 // Это папка. Она уже скопирована. Но протухла
-                if ($lastModifiedTime >= filemtime($assetBasePath . DS. '.')) {
+                if ($lastModifiedTime >= filemtime($assetBasePath . DS . '.')) {
                     Helpers::copyDir($realPath, $assetBasePath);
                 }
             }
 
         }
 
-        $asset = & $this->assets[];
+        $asset = &$this->assets[];
         $asset['path'] = $realPath;
         $asset['url'] = str_replace(DS, '/', str_replace($baseRealPath, $assetBaseUrl, $realPath));
 

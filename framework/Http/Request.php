@@ -30,21 +30,21 @@ class Request
     public function __construct()
     {
         $port = $_SERVER['SERVER_PORT'];
-        if ( !empty($_SERVER['HTTPS']) ) {
-            if($_SERVER['HTTPS'] !== 'off')
-                $protocol =  'https';
+        if (!empty($_SERVER['HTTPS'])) {
+            if ($_SERVER['HTTPS'] !== 'off')
+                $protocol = 'https';
             else
-                $protocol =  'http';
+                $protocol = 'http';
         } else {
-            if($port == 443)
-                $protocol =  'https';
+            if ($port == 443)
+                $protocol = 'https';
             else
-                $protocol =  'http';
+                $protocol = 'http';
         }
         $host = !empty($_SERVER['SERVER_NAME']) ? $_SERVER['SERVER_NAME'] : $_SERVER['HTTP_X_REWRITE_URL'];
         $path = $_SERVER['REQUEST_URI'];
 
-        $this->url = new Url($protocol . '://' . $host . ($port!=80 && $port!=443 ? ':' . $port : '') . $path);
+        $this->url = new Url($protocol . '://' . $host . ($port != 80 && $port != 443 ? ':' . $port : '') . $path);
 
         $this->get = new Std($_GET);
 
@@ -121,7 +121,7 @@ class Request
 
     public function isUploaded($file)
     {
-        return isset($this->files->{$file}) && ( is_array($this->files->{$file}) || \UPLOAD_ERR_OK == $this->files->{$file}->error );
+        return isset($this->files->{$file}) && (is_array($this->files->{$file}) || \UPLOAD_ERR_OK == $this->files->{$file}->error);
     }
 
     public function isUploadedArray($file)
@@ -146,7 +146,7 @@ class Request
 
     public function getIp()
     {
-        if(isset($_SERVER['REMOTE_ADDR'])) {
+        if (isset($_SERVER['REMOTE_ADDR'])) {
             return ip2long($_SERVER['REMOTE_ADDR']);
         } else {
             return false;

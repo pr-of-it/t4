@@ -25,7 +25,7 @@ class Route
 
     const INTERNAL_PATH_PATTERN = '~^\/([^\/]*?)\/([^\/]*?)\/([^\/]*?)\/?(\((.*)\))?$~i';
 
-    public function __construct($data=null, $simple=false)
+    public function __construct($data = null, $simple = false)
     {
         if (null !== $data) {
             if (is_array($data)) {
@@ -36,7 +36,7 @@ class Route
         }
     }
 
-    public function fromString($str, $simple=false)
+    public function fromString($str, $simple = false)
     {
         if (!preg_match(self::INTERNAL_PATH_PATTERN, $str, $m)) {
             throw new RouteException('Invalid route \'' . $str . '\'');
@@ -54,16 +54,16 @@ class Route
         } else $params = [];
 
         $this->module = ucfirst($m[1]);
-        $this->controller = ( !$simple && empty($m[2]) ) ? Router::DEFAULT_CONTROLLER : ucfirst($m[2]);
-        $this->action = ( !$simple && empty($m[3]) ) ? Router::DEFAULT_ACTION: ucfirst($m[3]);
+        $this->controller = (!$simple && empty($m[2])) ? Router::DEFAULT_CONTROLLER : ucfirst($m[2]);
+        $this->action = (!$simple && empty($m[3])) ? Router::DEFAULT_ACTION : ucfirst($m[3]);
         $this->params = new self($params);
     }
 
-    public function toString($simple=true)
+    public function toString($simple = true)
     {
         $base = '/' . $this->module . '/' .
-        ($simple && ($this->controller == Router::DEFAULT_CONTROLLER || empty($this->controller)) ? '' : ($this->controller ?: Router::DEFAULT_CONTROLLER)) . '/' .
-        ($simple && ($this->action == Router::DEFAULT_ACTION || empty($this->action)) ? '' : ($this->action ?: Router::DEFAULT_ACTION));
+            ($simple && ($this->controller == Router::DEFAULT_CONTROLLER || empty($this->controller)) ? '' : ($this->controller ?: Router::DEFAULT_CONTROLLER)) . '/' .
+            ($simple && ($this->action == Router::DEFAULT_ACTION || empty($this->action)) ? '' : ($this->action ?: Router::DEFAULT_ACTION));
         return $base;
     }
 

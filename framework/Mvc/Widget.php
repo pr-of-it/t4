@@ -4,12 +4,13 @@ namespace T4\Mvc;
 
 use T4\Core\Std;
 
-abstract class Widget {
+abstract class Widget
+{
 
     protected $options;
     protected $app;
 
-    public function __construct($options=[])
+    public function __construct($options = [])
     {
         $this->app = Application::getInstance();
         $this->options = new Std();

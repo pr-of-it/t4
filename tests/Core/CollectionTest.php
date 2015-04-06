@@ -4,12 +4,15 @@ use T4\Core\Collection;
 
 require_once realpath(__DIR__ . '/../../framework/boot.php');
 
-class Int {
+class Int
+{
     protected $data;
+
     public function __construct($x)
     {
         $this->data = $x;
     }
+
     public function increment()
     {
         $this->data++;
@@ -43,7 +46,7 @@ class CollectionTest extends PHPUnit_Framework_TestCase
 
         $collection->prepend(2);
         $this->assertEquals(
-            [2,1],
+            [2, 1],
             $collection->getArrayCopy()
         );
         $this->assertEquals(
@@ -87,7 +90,9 @@ class CollectionTest extends PHPUnit_Framework_TestCase
         $ids = $collection->collect('id');
         $this->assertEquals([1, 2, 3], $ids);
 
-        $titles = $collection->collect(function ($x) {return $x->title;});
+        $titles = $collection->collect(function ($x) {
+            return $x->title;
+        });
         $this->assertEquals(['foo', 'bar', 'baz'], $titles);
 
         $collection = new Collection([
@@ -99,7 +104,9 @@ class CollectionTest extends PHPUnit_Framework_TestCase
         $ids = $collection->collect('id');
         $this->assertEquals([1, 2, 3], $ids);
 
-        $titles = $collection->collect(function ($x) {return $x['title'];});
+        $titles = $collection->collect(function ($x) {
+            return $x['title'];
+        });
         $this->assertEquals(['foo', 'bar', 'baz'], $titles);
     }
 

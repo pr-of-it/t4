@@ -24,7 +24,7 @@ class Helpers
             throw new Exception('No such dir: ' . $path);
         return array_map(
             function ($f) use ($path) {
-                return $path.DS.$f;
+                return $path . DS . $f;
             },
             scandir($path, $order)
         );
@@ -58,7 +58,7 @@ class Helpers
     {
         $result = mkdir($dirName, $mode, true);
         if (!$result)
-            throw new Exception('Can not create dir '.$dirName);
+            throw new Exception('Can not create dir ' . $dirName);
     }
 
 
@@ -124,14 +124,14 @@ class Helpers
 
         foreach (self::listDir($src) as $file) {
             $fileName = basename($file);
-            if ( '.'==$fileName || '..'==$fileName ) {
+            if ('.' == $fileName || '..' == $fileName) {
                 continue;
             }
-            if ( !is_readable($file) ) {
+            if (!is_readable($file)) {
                 throw new Exception($file . ' is not readable');
             }
             if (is_dir($file)) {
-                self::copyDir($file, $dst.DS.$fileName);
+                self::copyDir($file, $dst . DS . $fileName);
             } else {
                 self::copyFile($file, $dst);
             }
@@ -164,7 +164,9 @@ class Helpers
     static public function dirMTime($path)
     {
         clearstatcache();
-        return max( array_map(function ($f) {return filemtime($f);}, self::listDirRecursive($path)) );
+        return max(array_map(function ($f) {
+            return filemtime($f);
+        }, self::listDirRecursive($path)));
     }
 
 }

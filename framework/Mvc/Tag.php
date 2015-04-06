@@ -5,7 +5,8 @@ namespace T4\Mvc;
 use T4\Core\Exception;
 use T4\Core\Std;
 
-abstract class Tag {
+abstract class Tag
+{
 
     const PARAM_PAIR_STR_TEMPLATE = '~([a-z][a-z0-9_-]*)=\"(.*)\"~i';
 
@@ -13,7 +14,7 @@ abstract class Tag {
     protected $params;
     protected $html;
 
-    final public function __construct($params='', $html='')
+    final public function __construct($params = '', $html = '')
     {
         $classNameParts = explode('\\', get_class($this));
         $this->name = strtolower(array_pop($classNameParts));
@@ -26,7 +27,7 @@ abstract class Tag {
         $ret = new Std();
 
         $paramPairs = preg_split('~[\s]+~', $str, -1, PREG_SPLIT_NO_EMPTY);
-        if ( empty($paramPairs) )
+        if (empty($paramPairs))
             return $ret;
 
         foreach ($paramPairs as $pair) {

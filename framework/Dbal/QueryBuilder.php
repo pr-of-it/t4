@@ -33,13 +33,13 @@ class QueryBuilder
         return $what;
     }
 
-    public function select($what='*')
+    public function select($what = '*')
     {
         if ('*' == $what) {
             $this->select = ['*'];
         } else {
             $what = $this->prepareWhat(func_get_args());
-            $this->select = array_values(array_diff( array_merge(!empty($this->select) ? $this->select : [], $what), ['*']));
+            $this->select = array_values(array_diff(array_merge(!empty($this->select) ? $this->select : [], $what), ['*']));
         }
         $this->mode = 'select';
         return $this;
@@ -106,7 +106,7 @@ class QueryBuilder
         return $this;
     }
 
-    public function join($table, $on, $type='full')
+    public function join($table, $on, $type = 'full')
     {
         if (!isset($this->joins)) {
             $this->joins = [];

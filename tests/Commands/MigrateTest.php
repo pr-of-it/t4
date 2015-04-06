@@ -1,6 +1,7 @@
 <?php
 
 
-class MigrateTest {
+class MigrateTest
+{
 
 } 

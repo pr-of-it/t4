@@ -191,7 +191,7 @@ class Router
                 'controller' => self::DEFAULT_CONTROLLER,
                 'action' => self::DEFAULT_ACTION,
                 'params' => [],
-                'format' => $url->extension ? : 'html',
+                'format' => $url->extension ?: 'html',
             ]);
         }
 
@@ -202,7 +202,7 @@ class Router
                     'controller' => self::DEFAULT_CONTROLLER,
                     'action' => self::DEFAULT_ACTION,
                     'params' => [],
-                    'format' => $url->extension ? : 'html',
+                    'format' => $url->extension ?: 'html',
                 ]);
             elseif ($app->existsController('', $urlParts[0]))
                 return new Route([
@@ -210,7 +210,7 @@ class Router
                     'controller' => ucfirst($urlParts[0]),
                     'action' => self::DEFAULT_ACTION,
                     'params' => [],
-                    'format' => $url->extension ? : 'html',
+                    'format' => $url->extension ?: 'html',
                 ]);
             else
                 return new Route([
@@ -218,7 +218,7 @@ class Router
                     'controller' => self::DEFAULT_CONTROLLER,
                     'action' => ucfirst($urlParts[0]),
                     'params' => [],
-                    'format' => $url->extension ? : 'html',
+                    'format' => $url->extension ?: 'html',
                 ]);
         }
 
@@ -230,7 +230,7 @@ class Router
                         'controller' => ucfirst($urlParts[1]),
                         'action' => self::DEFAULT_ACTION,
                         'params' => [],
-                        'format' => $url->extension ? : 'html',
+                        'format' => $url->extension ?: 'html',
                     ]);
                 } else {
                     return new Route([
@@ -238,7 +238,7 @@ class Router
                         'controller' => self::DEFAULT_CONTROLLER,
                         'action' => ucfirst($urlParts[1]),
                         'params' => [],
-                        'format' => $url->extension ? : 'html',
+                        'format' => $url->extension ?: 'html',
                     ]);
                 }
             } elseif ($app->existsController('', $urlParts[0])) {
@@ -247,7 +247,7 @@ class Router
                     'controller' => ucfirst($urlParts[0]),
                     'action' => ucfirst($urlParts[1]),
                     'params' => [],
-                    'format' => $url->extension ? : 'html',
+                    'format' => $url->extension ?: 'html',
                 ]);
             }
         }
@@ -259,7 +259,7 @@ class Router
                     'controller' => ucfirst($urlParts[1]),
                     'action' => ucfirst($urlParts[2]),
                     'params' => [],
-                    'format' => $url->extension ? : 'html',
+                    'format' => $url->extension ?: 'html',
                 ]);
             }
         }

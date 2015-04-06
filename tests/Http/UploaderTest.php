@@ -23,13 +23,13 @@ class UploaderTest extends PHPUnit_Framework_TestCase
             $reflector->invokeArgs($uploader, [$tmpDir, 'test.html'])
         );
 
-        file_put_contents($tmpDir.DS.'test.html', 'TEST');
+        file_put_contents($tmpDir . DS . 'test.html', 'TEST');
         $this->assertEquals(
             'test_1.html',
             $reflector->invokeArgs($uploader, [$tmpDir, 'test.html'])
         );
 
-        file_put_contents($tmpDir.DS.'test_1.html', 'TEST');
+        file_put_contents($tmpDir . DS . 'test_1.html', 'TEST');
         $this->assertEquals(
             'test_2.html',
             $reflector->invokeArgs($uploader, [$tmpDir, 'test.html'])
@@ -39,8 +39,8 @@ class UploaderTest extends PHPUnit_Framework_TestCase
             $reflector->invokeArgs($uploader, [$tmpDir, 'test_1.html'])
         );
 
-        unlink($tmpDir.DS.'test.html');
-        unlink($tmpDir.DS.'test_1.html');
+        unlink($tmpDir . DS . 'test.html');
+        unlink($tmpDir . DS . 'test_1.html');
         rmdir($tmpDir);
 
     }

@@ -2,9 +2,14 @@
 
 require_once realpath(__DIR__ . '/../../framework/boot.php');
 
-class TestTag extends \T4\Mvc\Tag {
-    public function render() {}
-};
+class TestTag extends \T4\Mvc\Tag
+{
+    public function render()
+    {
+    }
+}
+
+;
 
 class TagTest extends PHPUnit_Framework_TestCase
 {
@@ -29,19 +34,19 @@ class TagTest extends PHPUnit_Framework_TestCase
 
         $str = 'a=""';
         $this->assertEquals(
-            new \T4\Core\Std(['a'=>'']),
+            new \T4\Core\Std(['a' => '']),
             $reflector->invoke($tag, $str)
         );
 
         $str = 'a="1"';
         $this->assertEquals(
-            new \T4\Core\Std(['a'=>1]),
+            new \T4\Core\Std(['a' => 1]),
             $reflector->invoke($tag, $str)
         );
 
         $str = 'a="1"  b="2"';
         $this->assertEquals(
-            new \T4\Core\Std(['a'=>1, 'b'=>2]),
+            new \T4\Core\Std(['a' => 1, 'b' => 2]),
             $reflector->invoke($tag, $str)
         );
 

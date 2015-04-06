@@ -142,7 +142,7 @@ abstract class Controller
                     $p[$param->name] = $request->post[$param->name];
                 } elseif (!empty($request->get[$param->name])) {
                     $p[$param->name] = $request->get[$param->name];
-                } elseif ( $param->isDefaultValueAvailable() ) {
+                } elseif ($param->isDefaultValueAvailable()) {
                     $p[$param->name] = $param->getDefaultValue();
                 } else {
                     throw new ControllerException('Missing argument ' . $param->name . ' for action ' . $actionMethodName);

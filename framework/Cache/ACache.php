@@ -18,6 +18,6 @@ abstract class ACache
      * @param int $time
      * @return mixed
      */
-    abstract public function __invoke($key, $callback, $time=self::DEFAULT_CACHE_TIME);
+    abstract public function __invoke($key, $callback, $time = self::DEFAULT_CACHE_TIME);
 
 }

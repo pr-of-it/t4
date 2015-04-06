@@ -5,7 +5,9 @@ use T4\Core\MultiException;
 
 require_once realpath(__DIR__ . '/../../framework/boot.php');
 
-class SomeException extends Exception {}
+class SomeException extends Exception
+{
+}
 
 class MultiExceptionTest extends PHPUnit_Framework_TestCase
 {

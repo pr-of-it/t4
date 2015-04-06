@@ -10,13 +10,14 @@ class Create
     extends Command
 {
 
-    public function actionExtension($name) {
+    public function actionExtension($name)
+    {
         $name = ucfirst($name);
-        $dirname = ROOT_PATH_PROTECTED.DS.'Extensions'.DS.$name;
-        $nameSpace = 'APP\\Extensions\\'.$name;
+        $dirname = ROOT_PATH_PROTECTED . DS . 'Extensions' . DS . $name;
+        $nameSpace = 'APP\\Extensions\\' . $name;
 
         \T4\Fs\Helpers::mkDir($dirname);
-        $fileName = $dirname.DS.'Extension.php';
+        $fileName = $dirname . DS . 'Extension.php';
         $content = <<<FILE
 <?php
 

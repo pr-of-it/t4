@@ -15,7 +15,7 @@ class Helpers
 
     const TREE_LEVEL_SYMBOL = '-';
 
-    static public function element($el, $name='', $options=[], $attrs=[])
+    static public function element($el, $name = '', $options = [], $attrs = [])
     {
         $elClass = '\T4\Html\Elements\\' . ucfirst($el);
         $el = new $elClass($name, $options, $attrs);
@@ -85,7 +85,7 @@ class Helpers
             (in_array('disabled', $htmlOptions) ? ' disabled="disabled"' : '') .
             '>' . "\n";
         if (isset($options['null']) && $options['null']) {
-            $data->prepend([$options['valueColumn']=>0, $options['titleColumn']=>'---']);
+            $data->prepend([$options['valueColumn'] => 0, $options['titleColumn'] => '---']);
         }
         foreach ($data as $item) {
             $html .=
@@ -144,7 +144,7 @@ class Helpers
                 continue;
             $ret .= '<li data-id="' . $element->getPk() . '">' . $element->{$options['titleColumn']};
             if (self::hasTreeElementChildren($tree, $index)) {
-                $ret .= self::ulTree(self::getAllChildrenByIndex($tree, $index), array_merge($options, ['parent'=>$element->getPk()]), $htmlOptions);
+                $ret .= self::ulTree(self::getAllChildrenByIndex($tree, $index), array_merge($options, ['parent' => $element->getPk()]), $htmlOptions);
             } else {
                 $ret .= '<ul' .
                     (isset($htmlOptions['class']) ? ' class="' . $htmlOptions['class'] . '"' : '') .
@@ -158,7 +158,7 @@ class Helpers
 
     static protected function hasTreeElementChildren(Collection $tree, $index)
     {
-        if (isset($tree[$index+1]) && $tree[$index+1]->__lvl > $tree[$index]->__lvl)
+        if (isset($tree[$index + 1]) && $tree[$index + 1]->__lvl > $tree[$index]->__lvl)
             return true;
         else
             return false;
@@ -167,7 +167,7 @@ class Helpers
     static protected function getAllChildrenByIndex(Collection $tree, $index)
     {
         $lvl = $tree[$index]->__lvl;
-        $tail = array_slice($tree->getArrayCopy(), $index+1);
+        $tail = array_slice($tree->getArrayCopy(), $index + 1);
         $ret = [];
         foreach ($tail as $el) {
             if ($el->__lvl <= $lvl)

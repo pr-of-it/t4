@@ -95,7 +95,7 @@ class Application
      * @throws \T4\Threads\Exception
      * @return int Child process PID
      */
-    public function runLater(callable $callback, $args=[])
+    public function runLater(callable $callback, $args = [])
     {
         return Helpers::run($callback, $args);
     }

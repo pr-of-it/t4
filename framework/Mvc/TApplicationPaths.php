@@ -27,7 +27,7 @@ trait TApplicationPaths
      * @param string $module
      * @return string
      */
-    public function getModulePath($module='')
+    public function getModulePath($module = '')
     {
         return $this->getPath() . (empty($module) ? '' : DS . 'Modules' . DS . ucfirst($module));
     }
@@ -37,7 +37,7 @@ trait TApplicationPaths
      * @param string $controller
      * @return string
      */
-    public function getControllerTemplatesPath($module='', $controller = Router::DEFAULT_CONTROLLER)
+    public function getControllerTemplatesPath($module = '', $controller = Router::DEFAULT_CONTROLLER)
     {
         return $this->getModulePath($module) . DS . 'Templates' . DS . ucfirst($controller);
     }
@@ -71,7 +71,7 @@ trait TApplicationPaths
      * @param string $action
      * @return bool
      */
-    public function existsActionView($module='', $controller = Router::DEFAULT_CONTROLLER, $action = Router::DEFAULT_ACTION)
+    public function existsActionView($module = '', $controller = Router::DEFAULT_CONTROLLER, $action = Router::DEFAULT_ACTION)
     {
         $controllerTemplatesPath = $this->getControllerTemplatesPath($module, $controller);
         if (!is_dir($controllerTemplatesPath) || !is_readable($controllerTemplatesPath))

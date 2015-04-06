@@ -2,7 +2,8 @@
 
 require_once realpath(__DIR__ . '/../../framework/boot.php');
 
-class StdTest extends PHPUnit_Framework_TestCase {
+class StdTest extends PHPUnit_Framework_TestCase
+{
 
     public function testArrayAccess()
     {
@@ -46,7 +47,7 @@ class StdTest extends PHPUnit_Framework_TestCase {
 
         $this->assertEquals($array1, $obj2->toArray());
 
-        $array2 = ['foo' => 1, 'bar' => ['baz'=>11, 'bla'=>12]];
+        $array2 = ['foo' => 1, 'bar' => ['baz' => 11, 'bla' => 12]];
         $obj3 = new \T4\Core\Std($array2);
         $this->assertEquals(1, $obj3->foo);
         $this->assertTrue($obj3->bar instanceof T4\Core\Std);
@@ -108,7 +109,7 @@ class StdTest extends PHPUnit_Framework_TestCase {
         $this->assertFalse(empty($obj->foo->bar));
 
         $this->assertTrue($obj->foo instanceof T4\Core\Std);
-        $this->assertEquals(new \T4\Core\Std(['bar'=>'baz']), $obj->foo);
+        $this->assertEquals(new \T4\Core\Std(['bar' => 'baz']), $obj->foo);
         $this->assertEquals('baz', $obj->foo->bar);
     }
 

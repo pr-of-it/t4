@@ -9,9 +9,9 @@ class Extension
     public function init()
     {
         $assets = $this->app->assets;
-        $assets->publish($this->assetsPath.'/lib/js/');
-        $assets->publishJsFile($this->assetsPath.'/lib/js/jquery.iframe-transport.js');
-        $assets->publishJsFile($this->assetsPath.'/lib/js/jquery.fileupload.js');
+        $assets->publish($this->assetsPath . '/lib/js/');
+        $assets->publishJsFile($this->assetsPath . '/lib/js/jquery.iframe-transport.js');
+        $assets->publishJsFile($this->assetsPath . '/lib/js/jquery.fileupload.js');
     }
 
 }

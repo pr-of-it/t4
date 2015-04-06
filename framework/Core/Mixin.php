@@ -2,7 +2,8 @@
 
 namespace T4\Core;
 
-abstract class Mixin {
+abstract class Mixin
+{
 
     protected $_caller;
 

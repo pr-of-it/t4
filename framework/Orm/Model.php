@@ -58,8 +58,8 @@ abstract class Model
             $class = get_called_class();
             $schema = $class::$schema;
             $extensions = $class::getExtensions();
-            foreach ( $extensions as $extension ) {
-                $extensionClassName = '\\T4\\Orm\\Extensions\\'.ucfirst($extension);
+            foreach ($extensions as $extension) {
+                $extensionClassName = '\\T4\\Orm\\Extensions\\' . ucfirst($extension);
                 if (class_exists($extensionClassName)) {
                     $extension = new $extensionClassName;
                     $schema['columns'] = $extension->prepareColumns($schema['columns'], $class);
@@ -73,14 +73,16 @@ abstract class Model
     /**
      * @return array
      */
-    static public function getColumns() {
+    static public function getColumns()
+    {
         return static::getSchema()['columns'];
     }
 
     /**
      * @return array
      */
-    static public function getRelations() {
+    static public function getRelations()
+    {
         return static::getSchema()['relations'];
     }
 

@@ -47,16 +47,17 @@ class Pager
             return $d >= 1 && $d <= $pagesCount;
         }));
 
-        if ( ($this->options->active - 1)-3 == 2 ) {
+        if (($this->options->active - 1) - 3 == 2) {
             $displayed[] = 4;
         }
-        if ( ($pagesCount - 2) - ($this->options->active + 1) == 2) {
+        if (($pagesCount - 2) - ($this->options->active + 1) == 2) {
             $displayed[] = $pagesCount - 3;
         }
         sort($displayed);
         ?>
         <ul class="pagination">
-            <li<?php echo($this->options->active == 1 ? ' class="disabled"' : ''); ?>><a href="<?php printf($this->options->url, 1); ?>">&laquo;</a></li>
+            <li<?php echo($this->options->active == 1 ? ' class="disabled"' : ''); ?>><a
+                    href="<?php printf($this->options->url, 1); ?>">&laquo;</a></li>
             <?php
             $prev = 1;
             foreach ($displayed as $page) {
@@ -72,7 +73,8 @@ class Pager
                 $prev = $page;
             }
             ?>
-            <li<?php echo($this->options->active == $pagesCount ? ' class="disabled"' : ''); ?>><a href="<?php printf($this->options->url, $page); ?>">&raquo;</a>
+            <li<?php echo($this->options->active == $pagesCount ? ' class="disabled"' : ''); ?>><a
+                    href="<?php printf($this->options->url, $page); ?>">&raquo;</a>
             </li>
         </ul>
     <?php

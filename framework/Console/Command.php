@@ -2,7 +2,8 @@
 
 namespace T4\Console;
 
-class Command {
+class Command
+{
 
     const DEFAULT_ACTION = 'default';
 
@@ -45,7 +46,7 @@ class Command {
                 if (!empty($params[$param->name])) {
                     $p[$param->name] = $params[$param->name];
                     unset($params[$param->name]);
-                } elseif ( $param->isDefaultValueAvailable() ) {
+                } elseif ($param->isDefaultValueAvailable()) {
                     $p[$param->name] = $param->getDefaultValue();
                 } else {
                     throw new Exception('Missing argument ' . $param->name . ' for action ' . $actionMethodName);
@@ -81,9 +82,9 @@ class Command {
         echo $msg . "\n";
     }
 
-    protected function read($message, $default='', $echo=true)
+    protected function read($message, $default = '', $echo = true)
     {
-        echo $message . ( !empty($default) ? ' ['.$default.']' : '' ) . ': ';
+        echo $message . (!empty($default) ? ' [' . $default . ']' : '') . ': ';
         $line = fgets(STDIN);
         $line = str_replace(["\n", "\r"], '', $line);
 
@@ -93,7 +94,7 @@ class Command {
             $val = $line;
 
         if ($echo) {
-            $this->writeLn('---> '.$val);
+            $this->writeLn('---> ' . $val);
         }
 
         return $val;

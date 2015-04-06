@@ -20,7 +20,7 @@ class LocalTest extends PHPUnit_Framework_TestCase
         $key = 'Test';
         $time = 1;
 
-        $src1 = function() {
+        $src1 = function () {
             return 'Hello, world!';
         };
 
@@ -33,7 +33,7 @@ class LocalTest extends PHPUnit_Framework_TestCase
         $this->assertTrue(file_exists($cacheFile));
         $this->assertEquals(serialize($src1()), file_get_contents($cacheFile));
 
-        $src2 = function() {
+        $src2 = function () {
             return 'Мир, труд, май!';
         };
 

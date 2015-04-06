@@ -6,8 +6,8 @@ class BookTestModel1 extends \T4\Orm\Model
 {
     protected static $schema = [
         'columns' => [
-            'title' => ['type'=>'string'],
-            'author' => ['type'=>'string', 'length'=>100],
+            'title' => ['type' => 'string'],
+            'author' => ['type' => 'string', 'length' => 100],
         ],
     ];
 }
@@ -17,8 +17,8 @@ class BookTestModel2 extends \T4\Orm\Model
     protected static $schema = [
         'table' => 'books',
         'columns' => [
-            'title' => ['type'=>'string'],
-            'author' => ['type'=>'string', 'length'=>200],
+            'title' => ['type' => 'string'],
+            'author' => ['type' => 'string', 'length' => 200],
         ],
     ];
 }
@@ -29,11 +29,11 @@ class BookTestModel3 extends \T4\Orm\Model
         'db' => 'test',
         'table' => 'books',
         'columns' => [
-            'title' => ['type'=>'string'],
-            'author' => ['type'=>'string', 'length'=>200],
+            'title' => ['type' => 'string'],
+            'author' => ['type' => 'string', 'length' => 200],
         ],
         'relations' => [
-            'publisher' => ['type'=>self::HAS_ONE, 'model'=>'Publisher']
+            'publisher' => ['type' => self::HAS_ONE, 'model' => 'Publisher']
         ],
     ];
 }
@@ -43,26 +43,27 @@ class BookTestModel4 extends \T4\Orm\Model
     protected static $schema = [
         'table' => 'books',
         'columns' => [
-            'title' => ['type'=>'string'],
-            'author' => ['type'=>'string', 'length'=>200],
+            'title' => ['type' => 'string'],
+            'author' => ['type' => 'string', 'length' => 200],
         ],
         'relations' => [
-            'publisher' => ['type'=>self::HAS_ONE, 'model'=>'Publisher']
+            'publisher' => ['type' => self::HAS_ONE, 'model' => 'Publisher']
         ],
     ];
 
     protected static $extensions = ['test'];
 }
 
-class OrmModelSchemaTest extends PHPUnit_Framework_TestCase {
+class OrmModelSchemaTest extends PHPUnit_Framework_TestCase
+{
 
     public function testSchema()
     {
         $schema = BookTestModel1::getSchema();
         $this->assertEquals([
             'columns' => [
-                'title' => ['type'=>'string'],
-                'author' => ['type'=>'string', 'length'=>100],
+                'title' => ['type' => 'string'],
+                'author' => ['type' => 'string', 'length' => 100],
             ],
             'relations' => []
         ], $schema);
@@ -71,8 +72,8 @@ class OrmModelSchemaTest extends PHPUnit_Framework_TestCase {
         $this->assertEquals([
             'table' => 'books',
             'columns' => [
-                'title' => ['type'=>'string'],
-                'author' => ['type'=>'string', 'length'=>200],
+                'title' => ['type' => 'string'],
+                'author' => ['type' => 'string', 'length' => 200],
             ],
             'relations' => []
         ], $schema);
@@ -82,11 +83,11 @@ class OrmModelSchemaTest extends PHPUnit_Framework_TestCase {
             'db' => 'test',
             'table' => 'books',
             'columns' => [
-                'title' => ['type'=>'string'],
-                'author' => ['type'=>'string', 'length'=>200],
+                'title' => ['type' => 'string'],
+                'author' => ['type' => 'string', 'length' => 200],
             ],
             'relations' => [
-                'publisher' => ['type'=>\T4\Orm\Model::HAS_ONE, 'model'=>'Publisher']
+                'publisher' => ['type' => \T4\Orm\Model::HAS_ONE, 'model' => 'Publisher']
             ]
         ], $schema);
 
@@ -94,11 +95,11 @@ class OrmModelSchemaTest extends PHPUnit_Framework_TestCase {
         $this->assertEquals([
             'table' => 'books',
             'columns' => [
-                'title' => ['type'=>'string'],
-                'author' => ['type'=>'string', 'length'=>200],
+                'title' => ['type' => 'string'],
+                'author' => ['type' => 'string', 'length' => 200],
             ],
             'relations' => [
-                'publisher' => ['type'=>\T4\Orm\Model::HAS_ONE, 'model'=>'Publisher']
+                'publisher' => ['type' => \T4\Orm\Model::HAS_ONE, 'model' => 'Publisher']
             ]
         ], $schema);
     }
@@ -115,14 +116,14 @@ class OrmModelSchemaTest extends PHPUnit_Framework_TestCase {
     {
         $columns = BookTestModel1::getColumns();
         $this->assertEquals([
-            'title' => ['type'=>'string'],
-            'author' => ['type'=>'string', 'length'=>100],
+            'title' => ['type' => 'string'],
+            'author' => ['type' => 'string', 'length' => 100],
         ], $columns);
 
         $columns = BookTestModel2::getColumns();
         $this->assertEquals([
-            'title' => ['type'=>'string'],
-            'author' => ['type'=>'string', 'length'=>200],
+            'title' => ['type' => 'string'],
+            'author' => ['type' => 'string', 'length' => 200],
         ], $columns);
 
     }

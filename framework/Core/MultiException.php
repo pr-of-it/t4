@@ -28,7 +28,7 @@ class MultiException
      * @param null $previous
      * @throws \T4\Core\Exception
      */
-    public function add($error = "", $code = 0, $severity = 1, $filename = __FILE__, $lineno = __LINE__, $previous=null)
+    public function add($error = "", $code = 0, $severity = 1, $filename = __FILE__, $lineno = __LINE__, $previous = null)
     {
         if ($error instanceof Exception) {
             if ($error instanceof $this->class) {

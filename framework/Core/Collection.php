@@ -15,7 +15,7 @@ class Collection extends \ArrayObject
         return $this->exchangeArray(array_merge($this->getArrayCopy(), [$value]));
     }
 
-    public function existsElement(array $properties=[])
+    public function existsElement(array $properties = [])
     {
         if (empty($properties))
             return false;

@@ -4,7 +4,8 @@ namespace T4\Orm;
 
 use T4\Core\Std;
 
-trait TMagic {
+trait TMagic
+{
 
     public function __isset($key)
     {
@@ -45,7 +46,7 @@ trait TMagic {
             if (empty($keys)) {
                 return $this->{$key};
             } else {
-                if ( $this->{$key} instanceof Std)
+                if ($this->{$key} instanceof Std)
                     return $this->{$key}->{implode('.', $keys)};
                 else
                     return null;
@@ -90,9 +91,9 @@ trait TMagic {
         /** @var \T4\Orm\Model $class */
         $class = get_called_class();
         $extensions = $class::getExtensions();
-        foreach ( $extensions as $extension ) {
+        foreach ($extensions as $extension) {
             /** @var \T4\Orm\Extension $extensionClassName */
-            $extensionClassName = '\\T4\\Orm\\Extensions\\'.ucfirst($extension);
+            $extensionClassName = '\\T4\\Orm\\Extensions\\' . ucfirst($extension);
             if ($extensionClassName::hasMagicStaticMethod($method)) {
                 return call_user_func_array([$extensionClassName, $method], array_merge([$class], $argv));
             }
@@ -111,8 +112,8 @@ trait TMagic {
         /** @var \T4\Orm\Model $class */
         $class = get_class($this);
         $extensions = $class::getExtensions();
-        foreach ( $extensions as $extension ) {
-            $extensionClassName = '\\T4\\Orm\\Extensions\\'.ucfirst($extension);
+        foreach ($extensions as $extension) {
+            $extensionClassName = '\\T4\\Orm\\Extensions\\' . ucfirst($extension);
             /** @var \T4\Orm\Extension $extension */
             $extension = new $extensionClassName;
             if ($extension->hasMagicDynamicMethod($method)) {

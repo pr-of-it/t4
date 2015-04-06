@@ -2,7 +2,8 @@
 
 require_once realpath(__DIR__ . '/../../framework/boot.php');
 
-class HttpHelpersTest extends PHPUnit_Framework_TestCase {
+class HttpHelpersTest extends PHPUnit_Framework_TestCase
+{
 
     public function testGetUniversalDomainName()
     {
