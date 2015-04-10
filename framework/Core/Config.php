@@ -2,7 +2,9 @@
 
 namespace T4\Core;
 
-class Config extends Std
+class Config
+    extends Std
+    implements IActiveRecord
 {
 
     protected $path;
@@ -42,13 +44,6 @@ class Config extends Std
         $this->path = $path;
     }
 
-    public function save()
-    {
-        $str = $this->prepareForSave($this->toArray());
-        file_put_contents($this->path, '<?php' . "\n\n" . 'return ' . $str . ';');
-    }
-
-
     /**
      * Prepares array representation for save in PHP file
      * @param array $data
@@ -61,4 +56,23 @@ class Config extends Std
         return $str;
     }
 
+    public function save()
+    {
+        $str = $this->prepareForSave($this->toArray());
+        if (empty($this->path)) {
+            throw new Exception('Empty path for save config');
+        }
+        file_put_contents($this->path, '<?php' . "\n\n" . 'return ' . $str . ';');
+    }
+
+    public function delete()
+    {
+        if (empty($this->path)) {
+            throw new Exception('Empty path for delete config');
+        }
+        if (!file_exists($this->path) || !is_file($this->path)) {
+            throw new Exception('Config path is not file or does not exist');
+        }
+        unlink($this->path);
+    }
 }

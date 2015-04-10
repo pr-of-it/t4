@@ -2,15 +2,16 @@
 
 namespace T4\Orm;
 
+use T4\Core\IActiveRecord;
 use T4\Core\Std;
 use T4\Dbal\Connection;
-use T4\Dbal\DriverFactory;
 
 abstract class Model
     extends Std
+    implements IActiveRecord
 {
 
-    use TMagic, TCrud, TRelations;
+    use TMagic, TActiveRecord, TCrud, TRelations;
 
     const PK = '__id';
 
