@@ -28,7 +28,7 @@ class Errors
         return $this;
     }
 
-    public function getErrorsForField($field)
+    public function getForField($field)
     {
         return $this->fields[$field];
     }
