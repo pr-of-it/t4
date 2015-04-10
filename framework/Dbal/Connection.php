@@ -25,17 +25,23 @@ class Connection
     {
         $this->config = $config;
         try {
-            $dsn = $config->driver . ':host=' . $config->host . ';dbname=' . $config->dbname;
-            $options = [];
-            if (!empty($config->options)) {
-                $options = $config->options->toArray();
-            }
-            $this->pdo = new \PDO($dsn, $config->user, $config->password, $options);
-            $this->pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
-            $this->pdo->setAttribute(\PDO::ATTR_STATEMENT_CLASS, [__NAMESPACE__ . '\\Statement']);
+            $this->pdo = $this->getPdoObject($this->config);
         } catch (\PDOException $e) {
             throw new Exception($e->getMessage());
         }
+    }
+
+    protected function getPdoObject($config)
+    {
+        $dsn = $config->driver . ':host=' . $config->host . ';dbname=' . $config->dbname;
+        $options = [];
+        if (!empty($config->options)) {
+            $options = $config->options->toArray();
+        }
+        $pdo = new \PDO($dsn, $config->user, $config->password, $options);
+        $pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
+        $pdo->setAttribute(\PDO::ATTR_STATEMENT_CLASS, [__NAMESPACE__ . '\\Statement']);
+        return $pdo;
     }
 
     /**
@@ -112,6 +118,16 @@ class Connection
     public function getErrorInfo()
     {
         return $this->pdo->errorInfo();
+    }
+
+    public function __sleep()
+    {
+        return ['config'];
+    }
+
+    public function __wakeup()
+    {
+        $this->pdo = $this->getPdoObject($this->config);
     }
 
 }
