@@ -26,6 +26,7 @@ class MultiException
      * @param string $filename
      * @param int $lineno
      * @param null $previous
+     * @return \T4\Core\MultiException
      * @throws \T4\Core\Exception
      */
     public function add($error = "", $code = 0, $severity = 1, $filename = __FILE__, $lineno = __LINE__, $previous = null)
@@ -40,6 +41,7 @@ class MultiException
             $class = $this->class;
             $this[] = new $class($error, $code, $severity, $filename, $lineno, $previous);
         }
+        return $this;
     }
 
     public function getExceptions()
