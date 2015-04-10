@@ -13,13 +13,13 @@ class Flash
         if (null != $data) {
             parent::__construct($data);
         }
-        $this->merge(Session::get(self::FLASH_KEY));
+        $this->merge(unserialize(Session::get(self::FLASH_KEY)));
     }
 
     public function __set($key, $val)
     {
         parent::__set($key, $val);
-        Session::set(self::FLASH_KEY, $this->getData());
+        Session::set(self::FLASH_KEY, serialize($this->getData()));
     }
 
     public function __get($key)
@@ -28,7 +28,7 @@ class Flash
             return null;
         $val = parent::__get($key);
         unset($this->{$key});
-        Session::set(self::FLASH_KEY, $this->getData());
+        Session::set(self::FLASH_KEY, serialize($this->getData()));
         return $val;
     }
 
