@@ -8,7 +8,7 @@ class Errors
     extends MultiException
 {
 
-    protected $errors = [];
+    protected $fields = [];
 
     public function add($field, $error = "", $code = 0, $severity = 1, $filename = __FILE__, $lineno = __LINE__, $previous = null)
     {
@@ -24,13 +24,13 @@ class Errors
             $this[] = $error;
         }
 
-        $this->errors[$field][] = $error;
+        $this->fields[$field][] = $error;
         return $this;
     }
 
     public function getErrorsForField($field)
     {
-        return $this->errors[$field];
+        return $this->fields[$field];
     }
 
 }
