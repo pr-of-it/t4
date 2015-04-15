@@ -57,14 +57,6 @@ trait TMagic
 
     public function __set($key, $value)
     {
-        // Column validation
-        $validateMethod = 'validate' . ucfirst($key);
-        if (method_exists($this, $validateMethod)) {
-            if (!$this->$validateMethod($value)) {
-                return;
-            }
-        }
-
         // Relations
         $class = get_class($this);
         $relations = $class::getRelations();

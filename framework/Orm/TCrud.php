@@ -126,13 +126,4 @@ trait TCrud
         return $driver->countAllByColumn(get_called_class(), $column, $value, $options);
     }
 
-    /*
-     * Save model methods
-     */
-
-    public function validate()
-    {
-        return true;
-    }
-
 }

@@ -2,6 +2,24 @@
 
 require_once realpath(__DIR__ . '/../../framework/boot.php');
 
+class TestStdClass1 extends \T4\Core\Std {
+
+    protected function validateFoo($val)
+    {
+        return $val > 0;
+    }
+
+}
+
+class TestStdClass2 extends \T4\Core\Std {
+
+    protected function sanitizeFoo($val)
+    {
+        return $val * 10;
+    }
+
+}
+
 class StdTest extends PHPUnit_Framework_TestCase
 {
 
@@ -111,6 +129,25 @@ class StdTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($obj->foo instanceof T4\Core\Std);
         $this->assertEquals(new \T4\Core\Std(['bar' => 'baz']), $obj->foo);
         $this->assertEquals('baz', $obj->foo->bar);
+    }
+
+    public function testValidate()
+    {
+        $obj = new TestStdClass1();
+        $obj->foo = -1;
+        $this->assertFalse(isset($obj->foo));
+        $obj->foo = 1;
+        $this->assertTrue(isset($obj->foo));
+        $this->assertEquals(1, $obj->foo);
+    }
+
+    public function testSanitize()
+    {
+        $obj = new TestStdClass2();
+        $obj->foo = -1;
+        $this->assertEquals(-10, $obj->foo);
+        $obj->foo = 1;
+        $this->assertEquals(10, $obj->foo);
     }
 
 }

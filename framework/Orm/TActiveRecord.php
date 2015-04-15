@@ -5,7 +5,12 @@ namespace T4\Orm;
 trait TActiveRecord
 {
 
-    public function beforeSave()
+    protected function validate()
+    {
+        return true;
+    }
+
+    protected function beforeSave()
     {
         /** @var \T4\Orm\Model $class */
         $class = get_class($this);
@@ -36,7 +41,7 @@ trait TActiveRecord
         return $this;
     }
 
-    public function afterSave()
+    protected function afterSave()
     {
         /** @var \T4\Orm\Model $class */
         $class = get_class($this);
@@ -55,7 +60,7 @@ trait TActiveRecord
      * Delete model methods
      */
 
-    public function beforeDelete()
+    protected function beforeDelete()
     {
         /** @var \T4\Orm\Model $class */
         $class = get_class($this);
@@ -86,7 +91,7 @@ trait TActiveRecord
         return $this;
     }
 
-    public function afterDelete()
+    protected function afterDelete()
     {
         /** @var \T4\Orm\Model $class */
         $class = get_class($this);

@@ -14,7 +14,7 @@ trait TStdGetSet
 
     protected function innerIsSet($key)
     {
-        return isset($this->__data[$key]) || method_exists($this, 'get' . ucfirst($key));
+        return isset($this->__data[$key]) || is_callable([$this, 'get' . ucfirst($key)]);
     }
 
     protected function innerUnSet($key)
@@ -25,18 +25,36 @@ trait TStdGetSet
     protected function innerGet($key)
     {
         $method = 'get' . ucfirst($key);
-        if (method_exists($this, $method))
+        if (is_callable([$this, $method]))
             return $this->$method();
         return isset($this->__data[$key]) ? $this->__data[$key] : null;
     }
 
     protected function innerSet($key, $val)
     {
-        $method = 'set' . ucfirst($key);
-        if (method_exists($this, $method))
-            $this->$method($val);
-        else
+        $setMethod = 'set' . ucfirst($key);
+        if (is_callable([$this, $setMethod])) {
+
+            $this->$setMethod($val);
+
+        } else {
+
+            $validateMethod = 'validate' . ucfirst($key);
+            if (is_callable([$this, $validateMethod])) {
+                $validateResult = $this->$validateMethod($val);
+                if (false === $validateResult) {
+                    return;
+                }
+            }
+
+            $sanitizeMethod = 'sanitize' . ucfirst($key);
+            if (is_callable([$this, $sanitizeMethod])) {
+                $val = $this->$sanitizeMethod($val);
+            }
+
             $this->__data[$key] = $val;
+
+        }
     }
 
     /**
