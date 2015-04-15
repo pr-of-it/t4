@@ -35,6 +35,7 @@ trait TTreeMagic
             case 'getTreeWidth':
             case 'findAllParents':
             case 'findAllChildren':
+            case 'hasChildren':
             case 'findSubTree':
             case 'hasPrevSibling':
             case 'getPrevSibling':
@@ -97,6 +98,16 @@ trait TTreeMagic
                     ->order('__lft')
                     ->params([':lft'=>$model->__lft, ':rgt'=>$model->__rgt]);
                 return $class::findAllByQuery($query);
+
+            case 'hasChildren':
+                $query = new QueryBuilder();
+                $query
+                    ->select('COUNT(*)')
+                    ->from($class::getTableName())
+                    ->where('__lft>:lft AND __rgt<:rgt')
+                    ->order('__lft')
+                    ->params([':lft'=>$model->__lft, ':rgt'=>$model->__rgt]);
+                return 0 != $connection->query($query)->fetchScalar();
 
             case 'findSubTree':
                 $query = new QueryBuilder();
