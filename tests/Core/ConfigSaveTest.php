@@ -32,7 +32,7 @@ CONFIG
 
         $config->save();
 
-        $this->assertStringEqualsFile(__DIR__ . '/savetest.config.php', <<<'CONFIG'
+        $expectedText = <<<'CONFIG'
 <?php
 
 return [
@@ -59,8 +59,11 @@ return [
     ],
   ],
 ];
-CONFIG
-            , '', true);
+CONFIG;
+        $this->assertEquals(
+            str_replace("\r\n", "\n", $expectedText),
+            str_replace("\r\n", "\n", file_get_contents(__DIR__ . '/savetest.config.php'))
+        );
     }
 
     protected function tearDown()
