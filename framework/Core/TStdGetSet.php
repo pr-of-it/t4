@@ -40,7 +40,7 @@ trait TStdGetSet
         } else {
 
             $validateMethod = 'validate' . ucfirst($key);
-            if (method_exists($this, $validateMethod]) {
+            if (method_exists($this, $validateMethod)) {
                 $validateResult = $this->$validateMethod($val);
                 if (false === $validateResult) {
                     return;
