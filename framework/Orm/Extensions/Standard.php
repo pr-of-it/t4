@@ -15,6 +15,8 @@ class Standard
                 return true;
             case preg_match('~^findBy(.+)$~', $method):
                 return true;
+            case preg_match('~^countAllBy(.+)$~', $method):
+                return true;
         }
         return false;
     }
@@ -30,6 +32,9 @@ class Standard
                 break;
             case preg_match('~^findBy(.+)$~', $method, $m):
                 return $class::findByColumn(lcfirst($m[1]), $argv[0], isset($argv[1]) ? $argv[1] : []);
+                break;
+            case preg_match('~^countAllBy(.+)$~', $method, $m):
+                return $class::countAllByColumn(lcfirst($m[1]), $argv[0], isset($argv[1]) ? $argv[1] : []);
                 break;
         }
     }
