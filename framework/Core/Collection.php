@@ -2,7 +2,9 @@
 
 namespace T4\Core;
 
-class Collection extends \ArrayObject
+class Collection
+    extends \ArrayObject
+    implements IArrayable
 {
 
     public function prepend($value)
@@ -56,4 +58,18 @@ class Collection extends \ArrayObject
         return $ret;
     }
 
+    /**
+     * IArrayable implement
+     */
+
+    public function toArray()
+    {
+        return $this->getArrayCopy();
+    }
+
+    public function fromArray($data)
+    {
+        $this->exchangeArray($data);
+        return $this;
+    }
 }

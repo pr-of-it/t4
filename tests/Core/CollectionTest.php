@@ -22,7 +22,26 @@ class Int
 class CollectionTest extends PHPUnit_Framework_TestCase
 {
 
-    public function testCollection()
+    public function testArrayable()
+    {
+        $collection = new Collection();
+        $collection[] = 1;
+        $collection[] = 2;
+        $collection[] = 3;
+        $this->assertEquals([1,2,3], $collection->toArray());
+
+        $collection1 = new Collection();
+        $collection1->fromArray([3,4,5]);
+
+        $collection2 = new Collection();
+        $collection2[] = 3;
+        $collection2[] = 4;
+        $collection2[] = 5;
+
+        $this->assertEquals($collection1, $collection2);
+    }
+
+    public function testAppendPrependCall()
     {
         $collection = new Collection();
         $this->assertEquals(
@@ -67,8 +86,21 @@ class CollectionTest extends PHPUnit_Framework_TestCase
         $collection->increment();
 
         $this->assertEquals($collectionExpected, $collection);
+    }
 
+    public function testExistElement()
+    {
+        $collection = new Collection();
+        $el1 = new \T4\Core\Std(['id' => 1, 'title' => 'foo', 'text' => 'FooFooFoo']);
+        $collection->append($el1);
+        $el2 = new \T4\Core\Std(['id' => 2, 'title' => 'bar', 'text' => 'BarBarBar']);
+        $collection->append($el2);
 
+        $this->assertTrue($collection->existsElement(['id' =>  1]));
+        $this->assertFalse($collection->existsElement(['id' =>  3]));
+        $this->assertTrue($collection->existsElement(['title' =>  'foo']));
+        $this->assertTrue($collection->existsElement(['title' =>  'foo', 'text' => 'FooFooFoo']));
+        $this->assertFalse($collection->existsElement(['title' =>  'foo', 'text' => 'BarBarBar']));
     }
 
     public function testCollect()
