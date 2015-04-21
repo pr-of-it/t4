@@ -23,6 +23,19 @@ class TestStdClass2 extends \T4\Core\Std {
 class StdTest extends PHPUnit_Framework_TestCase
 {
 
+    public function testAdd()
+    {
+        $obj = new \T4\Core\Std();
+
+        $obj[] = 'foo';
+        $obj[] = 'bar';
+        $this->assertEquals($obj[0], 'foo');
+        $this->assertEquals($obj[1], 'bar');
+
+        $obj->append('baz');
+        $this->assertEquals($obj[2], 'baz');
+    }
+
     public function testArrayAccess()
     {
         $obj = new T4\Core\Std();

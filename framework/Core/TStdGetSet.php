@@ -52,7 +52,11 @@ trait TStdGetSet
                 $val = $this->$sanitizeMethod($val);
             }
 
-            $this->__data[$key] = $val;
+            if ('' == $key) {
+                $this->__data[] = $val;
+            } else {
+                $this->__data[$key] = $val;
+            }
 
         }
     }

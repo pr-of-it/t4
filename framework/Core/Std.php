@@ -68,6 +68,16 @@ class Std
     }
 
     /**
+     * @param $data
+     * @return \T4\Core\Std $this
+     */
+    public function append($data)
+    {
+        $this[] = $data;
+        return $this;
+    }
+
+    /**
      * @param \T4\Core\Std | array $obj
      * @return \T4\Core\Std $this
      */
