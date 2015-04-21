@@ -340,7 +340,7 @@ class Pgsql
             ->where('' . $this->quoteName($column) . '=:value' . (!empty($options['where']) ? ' AND (' . $options['where'] . ')' : ''))
             ->order(!empty($options['order']) ? $options['order'] : '')
             ->limit(!empty($options['limit']) ? $options['limit'] : '')
-            ->params([':value' => $value]);
+            ->params([':value' => $value] + (!empty($options['params']) ? $options['params'] : []));
         return $this->findAllByQuery($class, $query);
     }
 

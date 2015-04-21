@@ -337,7 +337,7 @@ class Mysql
             ->order(!empty($options['order']) ? $options['order'] : '')
             ->offset(!empty($options['offset']) ? $options['offset'] : '')
             ->limit(!empty($options['limit']) ? $options['limit'] : '')
-            ->params([':value' => $value]);
+            ->params([':value' => $value] + (!empty($options['params']) ? $options['params'] : []));
         return $this->findAllByQuery($class, $query);
     }
 
