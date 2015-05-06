@@ -42,9 +42,9 @@ abstract class Controller
     {
         $templatesPaths = [];
         if ('' == $this->getModuleName()) {
-            $templatesPaths[] = $this->app->getPath() . DS . 'Templates' . DS . $this->getShortName();
+            $templatesPaths[] = $this->app->getPath() . DS . 'Templates' . DS . str_replace('\\', DS, $this->getShortName());
         } else {
-            $templatesPaths[] = $this->app->getPath() . DS . 'Modules' . DS . $this->getModuleName() . DS . 'Templates' . DS . $this->getShortName();
+            $templatesPaths[] = $this->app->getPath() . DS . 'Modules' . DS . $this->getModuleName() . DS . 'Templates' . DS . str_replace('\\', DS, $this->getShortName());
         }
         if ('' != $this->getModuleName() && is_readable($moduleLayoutPath = $this->app->getPath() . DS . 'Layouts' . DS . $this->getModuleName())) {
             $templatesPaths[] = $moduleLayoutPath;
@@ -68,7 +68,17 @@ abstract class Controller
     public function getShortName()
     {
         $classNameParts = explode('\\', get_class($this));
-        return array_pop($classNameParts);
+        $ret = [];
+        $skip = true;
+        foreach ($classNameParts as $part) {
+            if (!$skip) {
+                $ret[] = $part;
+            }
+            if ('Controllers' == $part) {
+                $skip = false;
+            }
+        }
+        return implode('\\', $ret);
     }
 
     protected function access($action)

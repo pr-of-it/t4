@@ -140,7 +140,21 @@ class Application
         }
 
         $controller = $this->createController($route->module, $route->controller);
-        $controller->action($route->action, $route->params);
+        $this->runController($controller, $route->action, $route->params, $format);
+    }
+
+    /**
+     * @param Controller $controller
+     * @param string $action
+     * @param array $params
+     * @param string $format
+     * @throws ControllerException
+     * @throws E403Exception
+     * @throws E404Exception
+     */
+    public function runController(Controller $controller, $action, $params = [], $format = 'html')
+    {
+        $controller->action($action, $params);
         $data = $controller->getData();
 
         switch ($format) {
@@ -151,7 +165,7 @@ class Application
             default:
             case 'html':
                 header('Content-Type: text/html; charset=utf-8');
-                $controller->view->display($route->action . '.' . $format, $data);
+                $controller->view->display($action . '.' . $format, $data);
                 break;
         }
     }
