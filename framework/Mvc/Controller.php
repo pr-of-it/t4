@@ -116,7 +116,6 @@ abstract class Controller
         } else {
             throw new E404Exception('Action ' . $name . ' is not found in controller ' . get_class($this));
         }
-
     }
 
     final public function action($name, $params = [])
@@ -145,12 +144,12 @@ abstract class Controller
             $request = Application::getInstance()->request;
             foreach ($this->getActionParameters($name) as $param) {
 
-                if (!empty($params[$param->name])) {
+                if (isset($params[$param->name])) {
                     $p[$param->name] = $params[$param->name];
                     unset($params[$param->name]);
-                } elseif (!empty($request->post[$param->name])) {
+                } elseif (isset($request->post[$param->name])) {
                     $p[$param->name] = $request->post[$param->name];
-                } elseif (!empty($request->get[$param->name])) {
+                } elseif (isset($request->get[$param->name])) {
                     $p[$param->name] = $request->get[$param->name];
                 } elseif ($param->isDefaultValueAvailable()) {
                     $p[$param->name] = $param->getDefaultValue();
