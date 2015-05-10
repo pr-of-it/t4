@@ -94,7 +94,11 @@ class Helpers
                 ($item[$options['valueColumn']] == $selected ? ' selected="selected"' : '') .
                 (in_array($item[$options['valueColumn']], $options['disabled']) ? ' disabled="disabled"' : '') .
                 '>' .
-                (in_array('tree', $options) && isset($item[$options['treeLevelColumn']]) ? str_repeat(self::TREE_LEVEL_SYMBOL, (int)$item[$options['treeLevelColumn']]) : '') . ' ' .
+                (
+                    in_array('tree', $options) && isset($options['treeLevelColumn']) && isset($item[$options['treeLevelColumn']])
+                        ? str_repeat(self::TREE_LEVEL_SYMBOL, (int)$item[$options['treeLevelColumn']])
+                        : ''
+                ) . ' ' .
                 $item[$options['titleColumn']] .
                 '</option>' . "\n";
         }
