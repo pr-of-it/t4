@@ -86,12 +86,12 @@ abstract class Controller
         return true;
     }
 
-    protected function beforeAction()
+    protected function beforeAction($action)
     {
         return true;
     }
 
-    protected function afterAction()
+    protected function afterAction($action)
     {
 
     }
@@ -138,7 +138,7 @@ abstract class Controller
         }
 
         // Продолжаем выполнение действия только если из beforeAction не передано false
-        if ($this->beforeAction()) {
+        if ($this->beforeAction($name)) {
 
             $p = [];
             $request = Application::getInstance()->request;
@@ -161,7 +161,7 @@ abstract class Controller
             $p = array_merge($p, $params);
 
             call_user_func_array([$this, $actionMethodName], $p);
-            $this->afterAction();
+            $this->afterAction($name);
         }
 
         return $this->data;
