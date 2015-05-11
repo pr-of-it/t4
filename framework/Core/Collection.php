@@ -33,6 +33,11 @@ class Collection
         return false;
     }
 
+    public function isEmpty()
+    {
+        return empty($this->getArrayCopy());
+    }
+
     /**
      * Проброс метода ко всем объектам коллекции
      */
