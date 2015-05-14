@@ -58,7 +58,21 @@ class Pgsql
                 break;
             case 'int':
             case 'integer':
-                $ddl = 'INTEGER';
+                $options['length'] = isset($options['length']) ? $options['length'] : '';
+                switch (strtolower($options['length'])) {
+                    case 'tiny':
+                    case 'small':
+                        $ddl = 'SMALLINT';
+                        break;
+                    case 'long':
+                    case 'big':
+                        $ddl = 'BIGINT';
+                        break;
+                    case 'medium':
+                    default:
+                        $ddl = 'INTEGER';
+                        break;
+                }
                 break;
             case 'float':
             case 'real':

@@ -59,7 +59,26 @@ class Mysql
                 break;
             case 'int':
             case 'integer':
-                $ddl = 'INT(11)';
+                $options['length'] = isset($options['length']) ? $options['length'] : '';
+                switch (strtolower($options['length'])) {
+                    case 'tiny':
+                        $ddl = 'TINYINT';
+                        break;
+                    case 'small':
+                        $ddl = 'SMALLINT';
+                        break;
+                    case 'medium':
+                        $ddl = 'MEDIUMINT';
+                        break;
+                    case 'long':
+                    case 'big':
+                        $ddl = 'BIGINT';
+                        break;
+                    default:
+                        $ddl = 'INT';
+                        break;
+                }
+                $ddl .= isset($options['dimension']) ? '(' . $options['dimension'] . ')' : '';
                 break;
             case 'float':
             case 'real':
