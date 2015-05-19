@@ -82,6 +82,16 @@ trait TCrud
     }
 
     /**
+     * @param array $options
+     * @return \T4\Orm\Model
+     */
+    public static function find($options = [])
+    {
+        $driver = static::getDbDriver();
+        return $driver->find(get_called_class(), $options);
+    }
+
+    /**
      * @param string $column
      * @param mixed $value
      * @param array $options
