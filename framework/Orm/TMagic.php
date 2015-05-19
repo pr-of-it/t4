@@ -76,6 +76,7 @@ trait TMagic
      * Вызов статических методов модели, определенных в расширениях
      * @param string $method
      * @param array $argv
+     * @return mixed
      * @throws \T4\Orm\Exception
      */
     public static function __callStatic($method, $argv)
@@ -97,6 +98,7 @@ trait TMagic
      * Вызов динамических методов модели, определенных в расширениях
      * @param string $method
      * @param array $argv
+     * @return mixed
      * @throws \T4\Orm\Exception
      */
     public function __call($method, $argv)

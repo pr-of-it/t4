@@ -340,9 +340,24 @@ class Pgsql
             ->from($class::getTableName())
             ->where(!empty($options['where']) ? $options['where'] : '')
             ->order(!empty($options['order']) ? $options['order'] : '')
+            ->offset(!empty($options['offset']) ? $options['offset'] : '')
             ->limit(!empty($options['limit']) ? $options['limit'] : '')
             ->params(!empty($options['params']) ? $options['params'] : []);
         return $this->findAllByQuery($class, $query);
+    }
+
+    public function find($class, $options = [])
+    {
+        $query = new QueryBuilder();
+        $query
+            ->select('*')
+            ->from($class::getTableName())
+            ->where(!empty($options['where']) ? $options['where'] : '')
+            ->order(!empty($options['order']) ? $options['order'] : '')
+            ->offset(!empty($options['offset']) ? $options['offset'] : '')
+            ->limit(1)
+            ->params(!empty($options['params']) ? $options['params'] : []);
+        return $this->findByQuery($class, $query);
     }
 
     public function findAllByColumn($class, $column, $value, $options = [])
@@ -353,6 +368,7 @@ class Pgsql
             ->from($class::getTableName())
             ->where('' . $this->quoteName($column) . '=:value' . (!empty($options['where']) ? ' AND (' . $options['where'] . ')' : ''))
             ->order(!empty($options['order']) ? $options['order'] : '')
+            ->offset(!empty($options['offset']) ? $options['offset'] : '')
             ->limit(!empty($options['limit']) ? $options['limit'] : '')
             ->params([':value' => $value] + (!empty($options['params']) ? $options['params'] : []));
         return $this->findAllByQuery($class, $query);
@@ -366,6 +382,7 @@ class Pgsql
             ->from($class::getTableName())
             ->where('' . $this->quoteName($column) . '=:value')
             ->order(!empty($options['order']) ? $options['order'] : '')
+            ->offset(!empty($options['offset']) ? $options['offset'] : '')
             ->limit(1)
             ->params([':value' => $value]);
         return $this->findByQuery($class, $query);
