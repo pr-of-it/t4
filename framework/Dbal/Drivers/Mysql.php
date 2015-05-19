@@ -79,12 +79,12 @@ class Mysql
                         break;
                 }
                 $ddl .= isset($options['dimension']) ? '(' . $options['dimension'] . ')' : '';
-                $ddl .= (isset($options['hasSign']) && $options['hasSign'] === false) ?'UNSIGNED' : '';
+                $ddl .= (isset($options['hasSign']) && $options['hasSign'] === false) ? 'UNSIGNED' : '';
                 break;
             case 'float':
             case 'real':
                 isset($options['dimension']) ? $ddl = 'FLOAT(' . $options['dimension'] . ')' : $ddl = 'FLOAT';
-                $ddl .= (isset($options['hasSign']) && $options['hasSign'] === false) ?'UNSIGNED' : '';
+                $ddl .= (isset($options['hasSign']) && $options['hasSign'] === false) ? 'UNSIGNED' : '';
                 break;
             case 'text':
                 $options['length'] = isset($options['length']) ? $options['length'] : '';
