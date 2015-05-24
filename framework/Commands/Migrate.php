@@ -260,7 +260,7 @@ FILE;
     {
         $migrations = [];
         $migrationsDir = $this->getMigrationsPath($module);
-        $pathToMigrations = Helpers::listDir($migrationsDir, \SCANDIR_SORT_DESCENDING);
+        $pathToMigrations = Helpers::listDir($migrationsDir);
 
         foreach ($pathToMigrations as $migration) {
 
