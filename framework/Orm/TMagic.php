@@ -42,7 +42,7 @@ trait TMagic
         $key = array_shift($keys);
 
         if (isset($relations[$key])) {
-            $this->{$key} = $this->getRelationLazy($key);
+            $this->{$key} = $this->getRelationLazy($key, $relations[$key]);
             if (empty($keys)) {
                 return $this->{$key};
             } else {
