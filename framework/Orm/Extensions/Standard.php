@@ -70,7 +70,12 @@ class Standard
         $columns = $class::getColumns();
         foreach ($columns as $name => $column) {
             if ($column['type'] == 'json') {
-                $model->$name = new Std(json_decode($model->$name, true));
+                if (!empty($column['class']) && class_exists($column['class']) && is_subclass_of($column['class'], Std::class)) {
+                    $class = $column['class'];
+                    $model->$name = new $class(json_decode($model->$name, true));
+                } else {
+                    $model->$name = new Std(json_decode($model->$name, true));
+                }
             }
         }
         return true;
@@ -82,7 +87,11 @@ class Standard
         $columns = $class::getColumns();
         foreach ($columns as $name => $column) {
             if ($column['type'] == 'json') {
-                $model->$name = json_encode($model->$name, JSON_NUMERIC_CHECK | JSON_UNESCAPED_UNICODE);
+                if (is_subclass_of($model->$name, Std::class)) {
+                    $model->$name = json_encode($model->$name->toArray(), JSON_NUMERIC_CHECK | JSON_UNESCAPED_UNICODE);
+                } else {
+                    $model->$name = json_encode($model->$name, JSON_NUMERIC_CHECK | JSON_UNESCAPED_UNICODE);
+                }
             }
         }
         return true;
