@@ -10,6 +10,21 @@ trait TActiveRecord
         return true;
     }
 
+    protected function afterFind()
+    {
+        /** @var \T4\Orm\Model $class */
+        $class = get_class($this);
+        $extensions = $class::getExtensions();
+        foreach ($extensions as $extension) {
+            $extensionClassName = '\\T4\\Orm\\Extensions\\' . ucfirst($extension);
+            /** @var \T4\Orm\Extension $extension */
+            $extension = new $extensionClassName;
+            if (!$extension->afterFind($this))
+                return false;
+        }
+        return true;
+    }
+
     protected function beforeSave()
     {
         /** @var \T4\Orm\Model $class */

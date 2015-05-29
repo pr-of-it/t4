@@ -57,7 +57,9 @@ trait TCrud
     public static function findAllByQuery($query, $params = [])
     {
         $driver = static::getDbDriver();
-        return $driver->findAllByQuery(get_called_class(), $query, $params);
+        $models = $driver->findAllByQuery(get_called_class(), $query, $params);
+        $models->afterFind();
+        return $models;
     }
 
     /**
@@ -68,7 +70,11 @@ trait TCrud
     public static function findByQuery($query, $params = [])
     {
         $driver = static::getDbDriver();
-        return $driver->findByQuery(get_called_class(), $query, $params);
+        $model = $driver->findByQuery(get_called_class(), $query, $params);
+        if (!empty($model)) {
+            $model->afterFind();
+        }
+        return $model;
     }
 
     /**
@@ -78,7 +84,9 @@ trait TCrud
     public static function findAll($options = [])
     {
         $driver = static::getDbDriver();
-        return $driver->findAll(get_called_class(), $options);
+        $models = $driver->findAll(get_called_class(), $options);
+        $models->afterFind();
+        return $models;
     }
 
     /**
@@ -88,7 +96,11 @@ trait TCrud
     public static function find($options = [])
     {
         $driver = static::getDbDriver();
-        return $driver->find(get_called_class(), $options);
+        $model = $driver->find(get_called_class(), $options);
+        if (!empty($model)) {
+            $model->afterFind();
+        }
+        return $model;
     }
 
     /**
@@ -100,7 +112,9 @@ trait TCrud
     public static function findAllByColumn($column, $value, $options = [])
     {
         $driver = static::getDbDriver();
-        return $driver->findAllByColumn(get_called_class(), $column, $value, $options);
+        $models = $driver->findAllByColumn(get_called_class(), $column, $value, $options);
+        $models->afterFind();
+        return $models;
     }
 
     /**
@@ -112,7 +126,11 @@ trait TCrud
     public static function findByColumn($column, $value, $options = [])
     {
         $driver = static::getDbDriver();
-        return $driver->findByColumn(get_called_class(), $column, $value, $options);
+        $model = $driver->findByColumn(get_called_class(), $column, $value, $options);
+        if (!empty($model)) {
+            $model->afterFind();
+        }
+        return $model;
     }
 
     /**

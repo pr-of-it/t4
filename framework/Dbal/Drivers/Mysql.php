@@ -103,6 +103,9 @@ class Mysql
                         break;
                 }
                 break;
+            case 'json':
+                $ddl = 'TEXT';
+                break;
             case 'datetime':
                 $ddl = 'DATETIME';
                 break;

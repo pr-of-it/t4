@@ -2,7 +2,9 @@
 
 namespace T4\Orm\Extensions;
 
+use T4\Core\Std;
 use T4\Orm\Extension;
+use T4\Orm\Model;
 
 class Standard
     extends Extension
@@ -60,6 +62,30 @@ class Standard
                 return $model;
                 break;
         }
+    }
+
+    public function afterFind(Model &$model)
+    {
+        $class = get_class($model);
+        $columns = $class::getColumns();
+        foreach ($columns as $name => $column) {
+            if ($column['type'] == 'json') {
+                $model->$name = new Std(json_decode($model->$name, true));
+            }
+        }
+        return true;
+    }
+
+    public function beforeSave(Model &$model)
+    {
+        $class = get_class($model);
+        $columns = $class::getColumns();
+        foreach ($columns as $name => $column) {
+            if ($column['type'] == 'json') {
+                $model->$name = json_encode($model->$name, JSON_NUMERIC_CHECK | JSON_UNESCAPED_UNICODE);
+            }
+        }
+        return true;
     }
 
 }

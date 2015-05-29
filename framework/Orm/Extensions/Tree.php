@@ -354,7 +354,7 @@ class Tree
      * Методы модели
      */
 
-    public function beforeSave(&$model)
+    public function beforeSave(Model &$model)
     {
 
         if ($model->isNew()) {
@@ -387,7 +387,7 @@ class Tree
      * @param Model $model
      * @return bool
      */
-    public function beforeDelete(&$model)
+    public function beforeDelete(Model &$model)
     {
         $model->refreshTreeColumns();
         return true;
@@ -399,7 +399,7 @@ class Tree
      * @param \T4\Orm\Model $model
      * @return bool
      */
-    public function afterDelete(&$model)
+    public function afterDelete(Model &$model)
     {
         /** @var \T4\Orm\Model $class */
         $class = get_class($model);

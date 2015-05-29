@@ -46,12 +46,21 @@ abstract class Extension
     }
 
     /**
+     * @param $model \T4\Orm\Model
+     * @return bool
+     */
+    public function afterFind(Model &$model)
+    {
+        return true;
+    }
+
+    /**
      * Метод, срабатывающий перед сохранением модели в БД
      * Возврат false предотвращает сохранение
      * @param $model \T4\Orm\Model
      * @return bool
      */
-    public function beforeSave(&$model)
+    public function beforeSave(Model &$model)
     {
         return true;
     }
@@ -61,7 +70,7 @@ abstract class Extension
      * @param $model \T4\Orm\Model
      * @return bool
      */
-    public function afterSave(&$model)
+    public function afterSave(Model &$model)
     {
         return true;
     }
@@ -72,7 +81,7 @@ abstract class Extension
      * @param $model \T4\Orm\Model
      * @return bool
      */
-    public function beforeDelete(&$model)
+    public function beforeDelete(Model &$model)
     {
         return true;
     }
@@ -82,7 +91,7 @@ abstract class Extension
      * @param $model \T4\Orm\Model
      * @return bool
      */
-    public function afterDelete(&$model)
+    public function afterDelete(Model &$model)
     {
         return true;
     }

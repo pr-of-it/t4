@@ -10,7 +10,7 @@ class Relations
     extends Extension
 {
 
-    public function afterDelete(&$model)
+    public function afterDelete(Model &$model)
     {
         $class = get_class($model);
         $relations = $class::getRelations();
