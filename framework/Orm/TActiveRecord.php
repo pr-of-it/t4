@@ -10,7 +10,7 @@ trait TActiveRecord
         return true;
     }
 
-    protected function afterFind()
+    public function afterFind()
     {
         /** @var \T4\Orm\Model $class */
         $class = get_class($this);
