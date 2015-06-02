@@ -28,6 +28,9 @@ trait TRelations
         if (!empty($relation['on']))
             return $relation['on'];
 
+        if (!empty($relation['by']))
+            return $relation['by'];
+
         $class = get_called_class();
         switch ($relation['type']) {
             case $class::HAS_ONE:
