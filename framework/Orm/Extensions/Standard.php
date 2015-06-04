@@ -2,6 +2,7 @@
 
 namespace T4\Orm\Extensions;
 
+use T4\Core\Collection;
 use T4\Core\Std;
 use T4\Orm\Extension;
 use T4\Orm\Model;
@@ -70,7 +71,13 @@ class Standard
         $columns = $class::getColumns();
         foreach ($columns as $name => $column) {
             if ($column['type'] == 'json') {
-                if (!empty($column['class']) && class_exists($column['class']) && is_subclass_of($column['class'], Std::class)) {
+                if (
+                    !empty($column['class'])
+                    &&
+                    class_exists($column['class'])
+                    &&
+                    (is_subclass_of($column['class'], Std::class) || is_subclass_of($column['class'], Collection::class))
+                ) {
                     $class = $column['class'];
                     $model->$name = new $class(json_decode($model->$name, true));
                 } else {
