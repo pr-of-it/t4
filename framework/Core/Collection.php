@@ -63,6 +63,11 @@ class Collection
         return $ret;
     }
 
+    public function filter(callable $callback)
+    {
+        return new static(array_filter($this->toArray(), $callback));
+    }
+
     /**
      * IArrayable implement
      */
