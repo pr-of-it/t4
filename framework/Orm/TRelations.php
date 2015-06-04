@@ -103,9 +103,16 @@ trait TRelations
             case $class::MANY_TO_MANY:
                 $relationClass = $relation['model'];
                 $linkTable = $class::getRelationLinkName($relation);
+                $pivotColumns = $relationClass::getPivotColumns($class);
+                if (!empty($pivotColumns)) {
+                    $pivotColumnsSql = ', ' . implode(', ', array_map(function ($x) {return 'j1.'.$x;}, array_keys($pivotColumns)));
+                } else {
+                    $pivotColumnsSql = '';
+                }
+
                 $query = new QueryBuilder();
                 $query
-                    ->select('t1.*')
+                    ->select('t1.*' . $pivotColumnsSql)
                     ->from($relationClass::getTableName())
                     ->join($linkTable, 't1.' . $relationClass::PK . '=j1.' . static::getManyToManyThatLinkColumnName($relation), 'right')
                     ->where(
@@ -116,6 +123,7 @@ trait TRelations
                     $query->order($options['order']);
                 }
                 $query->params([':id' => $this->getPk()]);
+
                 $result = $relationClass::getDbConnection()->query($query)->fetchAll(\PDO::FETCH_CLASS, $relationClass);
                 if (!empty($result)) {
                     $ret = new Collection($result);
