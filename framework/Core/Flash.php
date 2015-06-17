@@ -13,7 +13,10 @@ class Flash
         if (null != $data) {
             parent::__construct($data);
         }
-        $this->merge(unserialize(Session::get(self::FLASH_KEY)));
+        $savedData = unserialize(Session::get(self::FLASH_KEY));
+        if (!empty($savedData)) {
+            $this->merge($savedData);
+        }
     }
 
     public function __set($key, $val)

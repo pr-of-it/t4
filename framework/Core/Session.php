@@ -22,8 +22,9 @@ class Session
 
     public static function get($key)
     {
-        if (!isset($_SESSION[self::SESSION_KEY]) || !isset($_SESSION[self::SESSION_KEY]->{$key}))
+        if (!isset($_SESSION[self::SESSION_KEY]) || !isset($_SESSION[self::SESSION_KEY]->{$key})) {
             return null;
+        }
         return $_SESSION[self::SESSION_KEY]->{$key};
     }
 
