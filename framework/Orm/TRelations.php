@@ -33,11 +33,11 @@ trait TRelations
 
         $class = get_called_class();
         switch ($relation['type']) {
-            case $class::HAS_ONE:
             case $class::BELONGS_TO:
                 $class = explode('\\', $relation['model']);
                 $class = array_pop($class);
                 return '__' . strtolower($class) . '_id';
+            case $class::HAS_ONE:
             case $class::HAS_MANY:
                 $class = explode('\\', $class);
                 $class = array_pop($class);
@@ -83,7 +83,6 @@ trait TRelations
         $relation = $relations[$key];
         switch ($relation['type']) {
 
-            case $class::HAS_ONE:
             case $class::BELONGS_TO:
                 $relationClass = $relation['model'];
                 $link = $class::getRelationLinkName($relation);
@@ -92,6 +91,12 @@ trait TRelations
                     return null;
                 else
                     return $relationClass::findByPK($this->{$link});
+                break;
+
+            case $class::HAS_ONE:
+                $relationClass = $relation['model'];
+                $link = $class::getRelationLinkName($relation);
+                return $relationClass::findByColumn($link, $this->getPk(), $options);
                 break;
 
             case $class::HAS_MANY:
