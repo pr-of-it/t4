@@ -80,16 +80,16 @@ abstract class Model
     }
 
     /**
-     * @param string $class
+     * @param string $relationName
      * @return array mixed
      */
-    static public function getPivotColumns($class)
+    static public function getPivotColumns($class, $relationName)
     {
         $schema = static::getSchema();
-        if (empty($schema['pivotColumns']) || empty($schema['pivotColumns'][$class])) {
+        if (empty($schema['pivotColumns']) || empty($schema['pivotColumns'][$class]) || empty($schema['pivotColumns'][$class][$relationName])) {
             return [];
         } else {
-            return $schema['pivotColumns'][$class];
+            return $schema['pivotColumns'][$class][$relationName];
         }
     }
 
