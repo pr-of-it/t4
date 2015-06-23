@@ -102,6 +102,15 @@ abstract class Model
     }
 
     /**
+     * @param mixed $name
+     * @return array
+     */
+    static public function getRelation($name)
+    {
+        return static::getRelations()[$name];
+    }
+
+    /**
      * @return string
      */
     static public function getTableName()
