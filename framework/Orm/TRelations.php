@@ -108,9 +108,9 @@ trait TRelations
             case $class::MANY_TO_MANY:
                 $relationClass = $relation['model'];
                 $linkTable = $class::getRelationLinkName($relation);
-                $pivotColumns = $relationClass::getPivotColumns($class, $key);
-                if (!empty($pivotColumns)) {
-                    $pivotColumnsSql = ', ' . implode(', ', array_map(function ($x) {return 'j1.'.$x;}, array_keys($pivotColumns)));
+                $pivots = $relationClass::getPivots($class, $key);
+                if (!empty($pivots)) {
+                    $pivotColumnsSql = ', ' . implode(', ', array_map(function ($x) {return 'j1.'.$x;}, array_keys($pivots)));
                 } else {
                     $pivotColumnsSql = '';
                 }
