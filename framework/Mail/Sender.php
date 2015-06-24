@@ -51,7 +51,7 @@ class Sender
         $this->msgHTML($answer);
         try {
             $this->send();
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             echo "Mailer Error: " . $this->ErrorInfo;
         }
     }
