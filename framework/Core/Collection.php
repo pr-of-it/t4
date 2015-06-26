@@ -38,16 +38,6 @@ class Collection
         return empty($this->getArrayCopy());
     }
 
-    /**
-     * Проброс метода ко всем объектам коллекции
-     */
-    public function __call($method, array $params = [])
-    {
-        foreach ($this as $element) {
-            call_user_func_array([$element, $method], $params);
-        }
-    }
-
     public function collect($what)
     {
         $ret = [];
@@ -56,7 +46,7 @@ class Collection
                 $ret[] = $what($element);
             } elseif (is_array($element)) {
                 $ret[] = $element[$what];
-            } else {
+            } elseif (is_object($element)) {
                 $ret[] = $element->$what;
             }
         }
@@ -66,6 +56,31 @@ class Collection
     public function filter(callable $callback)
     {
         return new static(array_filter($this->toArray(), $callback));
+    }
+
+    public function group($by) {
+        $ret = new static;
+        foreach ($this as $element) {
+            if (is_callable($by)) {
+                $key = $by($element);
+            } elseif (is_array($element)) {
+                $key = $element[$by];
+            } elseif (is_object($element)) {
+                $key = $element->$by;
+            }
+            if (!isset($ret[$key])) {
+                $ret[$key] = new static;
+            }
+            $ret[$key]->append($element);
+        }
+        return $ret;
+    }
+
+    public function __call($method, array $params = [])
+    {
+        foreach ($this as $element) {
+            call_user_func_array([$element, $method], $params);
+        }
     }
 
     /**
