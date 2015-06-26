@@ -145,24 +145,24 @@ class CollectionTest extends PHPUnit_Framework_TestCase
     public function testGroup()
     {
         $collection = new Collection([
-            ['datetime' => '2000-01-01', 'title' => 'First'],
-            ['datetime' => '2000-01-01', 'title' => 'Second'],
-            ['datetime' => '2000-01-02', 'title' => 'Third'],
-            ['datetime' => '2000-01-04', 'title' => 'Fourth'],
+            ['date' => '2000-01-01', 'title' => 'First'],
+            ['date' => '2000-01-01', 'title' => 'Second'],
+            ['date' => '2000-01-02', 'title' => 'Third'],
+            ['date' => '2000-01-04', 'title' => 'Fourth'],
         ]);
 
-        $grouped = $collection->group('datetime');
+        $grouped = $collection->group('date');
         $this->assertEquals(new Collection([
-            '2000-01-01' => new Collection([['datetime' => '2000-01-01', 'title' => 'First'], ['datetime' => '2000-01-01', 'title' => 'Second']]),
-            '2000-01-02' => new Collection([['datetime' => '2000-01-02', 'title' => 'Third']]),
-            '2000-01-04' => new Collection([['datetime' => '2000-01-04', 'title' => 'Fourth']]),
+            '2000-01-01' => new Collection([['date' => '2000-01-01', 'title' => 'First'], ['date' => '2000-01-01', 'title' => 'Second']]),
+            '2000-01-02' => new Collection([['date' => '2000-01-02', 'title' => 'Third']]),
+            '2000-01-04' => new Collection([['date' => '2000-01-04', 'title' => 'Fourth']]),
         ]), $grouped);
 
-        $grouped = $collection->group(function ($x) {return date('m-d', strtotime($x['datetime']));});
+        $grouped = $collection->group(function ($x) {return date('m-d', strtotime($x['date']));});
         $this->assertEquals(new Collection([
-            '01-01' => new Collection([['datetime' => '2000-01-01', 'title' => 'First'], ['datetime' => '2000-01-01', 'title' => 'Second']]),
-            '01-02' => new Collection([['datetime' => '2000-01-02', 'title' => 'Third']]),
-            '01-04' => new Collection([['datetime' => '2000-01-04', 'title' => 'Fourth']]),
+            '01-01' => new Collection([['date' => '2000-01-01', 'title' => 'First'], ['date' => '2000-01-01', 'title' => 'Second']]),
+            '01-02' => new Collection([['date' => '2000-01-02', 'title' => 'Third']]),
+            '01-04' => new Collection([['date' => '2000-01-04', 'title' => 'Fourth']]),
         ]), $grouped);
     }
 

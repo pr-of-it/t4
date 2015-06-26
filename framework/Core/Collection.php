@@ -42,7 +42,7 @@ class Collection
     {
         $ret = [];
         foreach ($this as $element) {
-            if (is_callable($what)) {
+            if ($what instanceof \Closure) {
                 $ret[] = $what($element);
             } elseif (is_array($element)) {
                 $ret[] = $element[$what];
@@ -61,7 +61,7 @@ class Collection
     public function group($by) {
         $ret = new static;
         foreach ($this as $element) {
-            if (is_callable($by)) {
+            if ($by instanceof \Closure) {
                 $key = $by($element);
             } elseif (is_array($element)) {
                 $key = $element[$by];
