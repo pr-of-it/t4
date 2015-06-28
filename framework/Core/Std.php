@@ -42,9 +42,9 @@ class Std
         $data = (array)$data;
         foreach ($data as $key => $value) {
             if (is_null($value) || is_scalar($value)) {
-                $this->{$key} = $value;
+                $this->innerSet($key, $value);
             } else {
-                $this->{$key} = new static;
+                $this->innerSet($key, new static);
                 $this->{$key}->fromArray($value);
             }
         }
@@ -108,7 +108,7 @@ class Std
      * (PHP 5 &gt;= 5.0.0)<br/>
      * Retrieve an external iterator
      * @link http://php.net/manual/en/iteratoraggregate.getiterator.php
-     * @return Traversable An instance of an object implementing <b>Iterator</b> or
+     * @return \Traversable An instance of an object implementing <b>Iterator</b> or
      * <b>Traversable</b>
      */
     public function getIterator()
