@@ -7,7 +7,7 @@ class Config
     implements IActiveRecord
 {
 
-    protected $path;
+    protected $__path;
 
     /**
      * @param array|string|null $data
@@ -41,7 +41,12 @@ class Config
 
     public function setPath($path)
     {
-        $this->path = $path;
+        $this->__path = $path;
+    }
+
+    public function getPath()
+    {
+        return $this->__path;
     }
 
     /**
@@ -59,20 +64,20 @@ class Config
     public function save()
     {
         $str = $this->prepareForSave($this->toArray());
-        if (empty($this->path)) {
+        if (empty($this->__path)) {
             throw new Exception('Empty path for save config');
         }
-        file_put_contents($this->path, '<?php' . "\n\n" . 'return ' . $str . ';');
+        file_put_contents($this->__path, '<?php' . "\n\n" . 'return ' . $str . ';');
     }
 
     public function delete()
     {
-        if (empty($this->path)) {
+        if (empty($this->__path)) {
             throw new Exception('Empty path for delete config');
         }
-        if (!file_exists($this->path) || !is_file($this->path)) {
+        if (!file_exists($this->__path) || !is_file($this->__path)) {
             throw new Exception('Config path is not file or does not exist');
         }
-        unlink($this->path);
+        unlink($this->__path);
     }
 }

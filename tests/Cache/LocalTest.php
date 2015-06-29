@@ -19,7 +19,6 @@ class LocalTest extends PHPUnit_Framework_TestCase
 
         $key = 'Test';
         $time = 1;
-
         $src1 = function () {
             return 'Hello, world!';
         };
