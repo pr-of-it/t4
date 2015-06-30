@@ -159,8 +159,8 @@ class Application
 
         switch ($format) {
             case 'json':
-                header('Content-Type: application/json');
-                echo json_encode($data->toArray());
+                header('Content-Type: application/json; charset=utf-8');
+                echo json_encode($data->toArray(), JSON_UNESCAPED_UNICODE);
                 die;
             default:
             case 'html':
