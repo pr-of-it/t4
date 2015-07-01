@@ -4,7 +4,7 @@ use T4\Mvc\Route;
 
 require_once realpath(__DIR__ . '/../../framework/boot.php');
 
-function getRouteConfig()
+function getSimpleRouteConfig()
 {
     return new \T4\Core\Std([
         '/' => '///',
@@ -16,7 +16,7 @@ function getRouteConfig()
     ]);
 }
 
-class RouterTest extends PHPUnit_Framework_TestCase
+class RouterSimpleTest extends PHPUnit_Framework_TestCase
 {
 
     public function testSplitRequestPath()
@@ -244,7 +244,7 @@ class RouterTest extends PHPUnit_Framework_TestCase
         $router = \T4\Mvc\Router::getInstance();
         $reflector = new ReflectionMethod($router, 'parseRequestPath');
         $reflector->setAccessible(true);
-        $router->setConfig(getRouteConfig());
+        $router->setConfig(getSimpleRouteConfig());
 
         $url = '/';
         $this->assertEquals(

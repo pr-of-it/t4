@@ -56,6 +56,19 @@ class Router
         if (!empty($this->config)) {
             foreach ($this->config as $template => $internalPath) {
                 if (false !== $params = $this->matchPathTemplate($template, $request)) {
+
+                    if ($internalPath instanceof \Closure) {
+                        $route = $internalPath($request, $params);
+                        if (false === $route) {
+                            continue;
+                        }
+                        if (!($route instanceof Route)) {
+                            $route = new Route($route);
+                        }
+                        $route->format = $request->extension ?: $this->allowedExtensions[0];
+                        return $route;
+                    }
+
                     $internalPath = preg_replace_callback(
                         '~\<(\d+)\>~',
                         function ($m) use ($params) {

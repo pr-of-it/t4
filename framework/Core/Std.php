@@ -41,7 +41,7 @@ class Std
     {
         $data = (array)$data;
         foreach ($data as $key => $value) {
-            if (is_null($value) || is_scalar($value)) {
+            if (is_null($value) || is_scalar($value) || $value instanceof \Closure) {
                 $this->innerSet($key, $value);
             } else {
                 $this->innerSet($key, new static);
