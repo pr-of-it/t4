@@ -58,6 +58,12 @@ class Collection
         return new static(array_filter($this->toArray(), $callback));
     }
 
+    public function sort(\Closure $callback)
+    {
+        $this->uasort($callback);
+        return $this;
+    }
+
     public function group($by) {
         $ret = new static;
         foreach ($this as $element) {
