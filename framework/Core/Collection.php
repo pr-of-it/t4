@@ -60,8 +60,9 @@ class Collection
 
     public function sort(\Closure $callback)
     {
-        $this->uasort($callback);
-        return $this;
+        $copy = clone $this;
+        $copy->uasort($callback);
+        return new static(array_values($copy->getArrayCopy()));
     }
 
     public function group($by) {
