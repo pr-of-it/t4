@@ -55,7 +55,7 @@ class Collection
 
     public function filter(callable $callback)
     {
-        return new static(array_filter($this->toArray(), $callback));
+        return new static(array_values(array_filter($this->toArray(), $callback)));
     }
 
     public function sort(\Closure $callback)
