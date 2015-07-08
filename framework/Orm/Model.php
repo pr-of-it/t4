@@ -2,7 +2,9 @@
 
 namespace T4\Orm;
 
+use T4\Core\Exception;
 use T4\Core\IActiveRecord;
+use T4\Core\MultiException;
 use T4\Core\Std;
 use T4\Dbal\Connection;
 
@@ -177,6 +179,37 @@ abstract class Model
         return !empty(static::$extensions) ?
             array_merge(['standard', 'relations'], static::$extensions) :
             ['standard', 'relations'];
+    }
+
+    /**
+     * @param array|\T4\Core\Std $data
+     * @return $this
+     * @throws \T4\Core\MultiException
+     */
+    public function fill($data)
+    {
+
+        if ($data instanceof self) {
+            $data = $data->toArray();
+        } else {
+            $data = (array)$data;
+        }
+
+        $errors = new MultiException();
+
+        foreach ($data as $key => $value) {
+            try {
+                $this->$key = $value;
+            } catch (Exception $e) {
+                $errors->add($e);
+            }
+        }
+
+        if (!$errors->isEmpty()) {
+            throw $errors;
+        }
+
+        return $this;
     }
 
 }

@@ -94,17 +94,6 @@ class Std
     }
 
     /**
-     * Применяется в моделях
-     * Заполняет модель внешними данными
-     * @param $data
-     * @return $this
-     */
-    public function fill($data)
-    {
-        return $this->merge($data);
-    }
-
-    /**
      * (PHP 5 &gt;= 5.0.0)<br/>
      * Retrieve an external iterator
      * @link http://php.net/manual/en/iteratoraggregate.getiterator.php
