@@ -431,10 +431,10 @@ class Mysql
         foreach ($columns as $column => $def) {
             if (isset($model->{$column}) && !is_null($model->{$column})) {
                 $cols[] = $column;
-                $sets[] = '`' . $column . '`=:' . $column;
+                $sets[$column] = ':' . $column;
                 $data[':'.$column] = $model->{$column};
             } elseif (isset($def['default'])) {
-                $sets[] = '`' . $column . '`=:' . $column;
+                $sets[$column] = ':' . $column;
                 $data[':'.$column] = $def['default'];
             }
         }
@@ -446,10 +446,10 @@ class Mysql
                     $column = $class::getRelationLinkName($def);
                     if (!in_array($column, $cols)) {
                         if (isset($model->{$column}) && !is_null($model->{$column})) {
-                            $sets[] = '`' . $column . '`=:' . $column;
+                            $sets[$column] = ':' . $column;
                             $data[':'.$column] = $model->{$column};
                         } elseif (isset($model->{$rel}) && $model->{$rel} instanceof Model) {
-                            $sets[] = '`' . $column . '`=:' . $column;
+                            $sets[$column] = ':' . $column;
                             $data[':'.$column] = $model->{$rel}->getPk();
                         }
                     }
@@ -459,18 +459,16 @@ class Mysql
 
         $connection = $class::getDbConnection();
         if ($model->isNew()) {
-            $sql = '
-                INSERT INTO `' . $class::getTableName() . '`
-                SET ' . implode(', ', $sets) . '
-            ';
+            $sql = new QueryBuilder();
+            $sql->insert($class::getTableName())
+                ->values($sets);
             $connection->execute($sql, $data);
             $model->{$class::PK} = $connection->lastInsertId();
         } else {
-            $sql = '
-                UPDATE `' . $class::getTableName() . '`
-                SET ' . implode(', ', $sets) . '
-                WHERE `' . $class::PK . '`=\'' . $model->{$class::PK} . '\'
-            ';
+            $sql = new QueryBuilder();
+            $sql->update($class::getTableName())
+                ->values($sets)
+                ->where($class::PK . '=' . $model->getPk());
             $connection->execute($sql, $data);
         }
 
