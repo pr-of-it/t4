@@ -4,6 +4,7 @@ namespace T4\Orm;
 
 use T4\Core\Exception;
 use T4\Core\IActiveRecord;
+use T4\Core\IArrayable;
 use T4\Core\MultiException;
 use T4\Core\Std;
 use T4\Dbal\Connection;
@@ -189,7 +190,7 @@ abstract class Model
     public function fill($data)
     {
 
-        if ($data instanceof self) {
+        if ($data instanceof IArrayable) {
             $data = $data->toArray();
         } else {
             $data = (array)$data;
