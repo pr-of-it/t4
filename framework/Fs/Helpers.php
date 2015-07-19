@@ -49,16 +49,22 @@ class Helpers
     }
 
     /**
-     * Создает папку по указанному пути
-     * @param string $dirName Имя папки
-     * @param int $mode Права доступа к создаваемой папке
+     * Creates directory by absolute path
+     * @param string $dirName Directory path
+     * @param int $mode Access mode
+     * @return bool
      * @throws \T4\Fs\Exception
      */
     public static function mkDir($dirName, $mode = 0777)
     {
-        $result = mkdir($dirName, $mode, true);
-        if (!$result)
+        if (file_exists($dirName) && is_dir($dirName)) {
+            return @chmod($dirName, $mode);
+        }
+        $result = @mkdir($dirName, $mode, true);
+        if (false === $result) {
             throw new Exception('Can not create dir ' . $dirName);
+        }
+        return true;
     }
 
 
