@@ -33,6 +33,30 @@ class Collection
         return false;
     }
 
+    public function filter(callable $callback)
+    {
+        return new static(array_values(array_filter($this->toArray(), $callback)));
+    }
+
+    public function findAllByAttributes(array $attributes)
+    {
+        return $this->filter(function ($x) use ($attributes) {
+            $elementAttributes = [];
+            foreach ($x as $key => $value) {
+                if (array_key_exists($key, $attributes)) {
+                    $elementAttributes[$key] = $value;
+                }
+            }
+            return $elementAttributes == $attributes;
+        });
+    }
+
+    public function findByAttributes(array $attributes)
+    {
+        $allCollection = $this->findAllByAttributes($attributes);
+        return $allCollection->isEmpty() ? null : $allCollection;
+    }
+
     public function isEmpty()
     {
         return empty($this->getArrayCopy());
@@ -51,11 +75,6 @@ class Collection
             }
         }
         return $ret;
-    }
-
-    public function filter(callable $callback)
-    {
-        return new static(array_values(array_filter($this->toArray(), $callback)));
     }
 
     public function sort(\Closure $callback)
