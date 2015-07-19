@@ -54,7 +54,7 @@ class Collection
     public function findByAttributes(array $attributes)
     {
         $allCollection = $this->findAllByAttributes($attributes);
-        return $allCollection->isEmpty() ? null : $allCollection;
+        return $allCollection->isEmpty() ? null : $allCollection[0];
     }
 
     public function isEmpty()
