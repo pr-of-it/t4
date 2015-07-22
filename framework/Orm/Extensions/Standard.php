@@ -3,6 +3,7 @@
 namespace T4\Orm\Extensions;
 
 use T4\Core\Collection;
+use T4\Core\IArrayable;
 use T4\Core\Std;
 use T4\Orm\Extension;
 use T4\Orm\Model;
@@ -94,9 +95,18 @@ class Standard
         $columns = $class::getColumns();
         foreach ($columns as $name => $column) {
             if ($column['type'] == 'json') {
-                if (is_subclass_of($model->$name, Std::class)) {
+                if ($model->$name instanceof IArrayable) {
                     $model->$name = json_encode($model->$name->toArray(), JSON_NUMERIC_CHECK | JSON_UNESCAPED_UNICODE);
                 } else {
+                    if (is_array($model->$name)) {
+                        $model->$name = array_map(function ($el) {
+                            if (is_object($el) && $el instanceof IArrayable) {
+                                return $el->toArray();
+                            } else {
+                                return $el;
+                            }
+                        }, $model->$name);
+                    }
                     $model->$name = json_encode($model->$name, JSON_NUMERIC_CHECK | JSON_UNESCAPED_UNICODE);
                 }
             }
