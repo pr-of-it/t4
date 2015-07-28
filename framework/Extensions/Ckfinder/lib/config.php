@@ -64,7 +64,7 @@ Examples:
 
 ATTENTION: The trailing slash is required.
 */
-$baseUrl = '/public/';
+$baseUrl = '/public/editor/';
 
 /*
 $baseDir : the path to the local directory (in the server) which points to the
@@ -84,7 +84,7 @@ Examples:
 ATTENTION: The trailing slash is required.
 */
 //$baseDir = resolveUrl($baseUrl);
-$baseDir = ROOT_PATH_PUBLIC . DS . 'public' . DS;
+$baseDir = ROOT_PATH_PUBLIC . DS . 'public' . DS . 'editor' . DS;
 
 /*
  * ### Advanced Settings
