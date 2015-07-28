@@ -43,7 +43,11 @@ class Pgsql
         $name = $this->quoteName($name);
         switch ($options['type']) {
             case 'pk':
-                $ddl = 'BIGSERIAL PRIMARY KEY';
+                if (isset($options['autoincrement']) && false == $options['autoincrement']) {
+                    $ddl = 'BIGINT NOT NULL DEFAULT \'0\' PRIMARY KEY';
+                } else {
+                    $ddl = 'BIGSERIAL PRIMARY KEY';
+                }
                 break;
             case 'relation':
             case 'link':

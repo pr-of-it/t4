@@ -44,7 +44,11 @@ class Mysql
 
         switch ($options['type']) {
             case 'pk':
-                $ddl = 'BIGINT UNSIGNED NOT NULL AUTO_INCREMENT';
+                if (isset($options['autoincrement']) && false == $options['autoincrement']) {
+                    $ddl = 'BIGINT UNSIGNED NOT NULL';
+                } else {
+                    $ddl = 'SERIAL';
+                }
                 break;
             case 'relation':
             case 'link':
