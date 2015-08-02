@@ -85,7 +85,7 @@ class Collection
     }
 
     public function group($by) {
-        $ret = new static;
+        $ret = [];
         foreach ($this as $element) {
             if ($by instanceof \Closure) {
                 $key = $by($element);
