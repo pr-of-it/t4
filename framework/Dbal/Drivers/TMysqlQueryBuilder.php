@@ -84,6 +84,11 @@ trait TMysqlQueryBuilder
             $sql .= "\n";
         }
 
+        if (!empty($query->group)) {
+            $sql .= 'GROUP BY ' . $query->group;
+            $sql .= "\n";
+        }
+
         if (!empty($query->order)) {
             $sql .= 'ORDER BY ' . $query->order;
             $sql .= "\n";

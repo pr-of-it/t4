@@ -24,6 +24,9 @@ class Mysql
             if ('*' == $part) {
                 continue;
             }
+            if (false !== strpos($part, ')') || false !== strpos($part, '(')) {
+                continue;
+            }
             if (
                 (
                 $index == $lastIndex

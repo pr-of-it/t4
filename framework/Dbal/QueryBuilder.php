@@ -129,6 +129,12 @@ class QueryBuilder
         return $this;
     }
 
+    public function group($group)
+    {
+        $this->group = $group;
+        return $this;
+    }
+
     public function order($order)
     {
         $this->order = $order;
