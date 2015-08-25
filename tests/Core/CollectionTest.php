@@ -152,18 +152,18 @@ class CollectionTest extends PHPUnit_Framework_TestCase
         ]);
 
         $grouped = $collection->group('date');
-        $this->assertEquals(new Collection([
+        $this->assertEquals([
             '2000-01-01' => new Collection([['date' => '2000-01-01', 'title' => 'First'], ['date' => '2000-01-01', 'title' => 'Second']]),
             '2000-01-02' => new Collection([['date' => '2000-01-02', 'title' => 'Third']]),
             '2000-01-04' => new Collection([['date' => '2000-01-04', 'title' => 'Fourth']]),
-        ]), $grouped);
+        ], $grouped);
 
         $grouped = $collection->group(function ($x) {return date('m-d', strtotime($x['date']));});
-        $this->assertEquals(new Collection([
+        $this->assertEquals([
             '01-01' => new Collection([['date' => '2000-01-01', 'title' => 'First'], ['date' => '2000-01-01', 'title' => 'Second']]),
             '01-02' => new Collection([['date' => '2000-01-02', 'title' => 'Third']]),
             '01-04' => new Collection([['date' => '2000-01-04', 'title' => 'Fourth']]),
-        ]), $grouped);
+        ], $grouped);
     }
 
 }
