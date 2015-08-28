@@ -65,7 +65,9 @@ class Router
                         if (!($route instanceof Route)) {
                             $route = new Route($route);
                         }
-                        $route->format = $request->extension ?: $this->allowedExtensions[0];
+                        if (empty($route->format)) {
+                            $route->format = $request->extension ?: $this->allowedExtensions[0];
+                        }
                         return $route;
                     }
 

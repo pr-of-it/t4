@@ -20,7 +20,15 @@ function getLambdaRouteConfig()
                     'lang' => str_replace('auto.', '', $request['domain']),
                     'id' => $matches[2],
                     'vendor' => $matches[3],
-                ]
+                ],
+            ]);
+        },
+        '/items/<1>' => function ($request, $matches) {
+            return new \T4\Mvc\Route([
+                'module' => 'Shop',
+                'controller' => 'Items',
+                'action' => 'View',
+                'format' => 'json',
             ]);
         },
         '/shop/<2>/<1>' => '/Shop/Goods/view(id=<1>,vendor=<2>)',
@@ -61,6 +69,11 @@ class RouterLambdaTest extends PHPUnit_Framework_TestCase
         $url = 'auto.fr!/shop/volvo/42.html';
         $this->assertEquals(
             new \T4\Mvc\Route(['module' => 'Shop', 'controller' => 'Goods', 'action' => 'View', 'params' => ['lang' => 'fr', 'id' => '42', 'vendor' => 'volvo'], 'format' => 'html']),
+            $reflector->invoke($router, $url)
+        );
+        $url = '/items/45.html';
+        $this->assertEquals(
+            new \T4\Mvc\Route(['module' => 'Shop', 'controller' => 'Items', 'action' => 'View', 'format' => 'json']),
             $reflector->invoke($router, $url)
         );
     }
