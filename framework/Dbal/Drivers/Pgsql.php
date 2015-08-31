@@ -437,7 +437,7 @@ class Pgsql
         $data = [];
 
         foreach ($columns as $column => $def) {
-            if (isset($model->{$column}) && !is_null($model->{$column})) {
+            if (isset($model->{$column})) {
                 $cols[] = $this->quoteName($column);
                 $prep[] = ':' . $column;
                 $sets[] = '' . $this->quoteName($column) . '=:' . $column;

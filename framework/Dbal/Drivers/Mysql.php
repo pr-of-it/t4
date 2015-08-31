@@ -436,7 +436,7 @@ class Mysql
         $data = [];
 
         foreach ($columns as $column => $def) {
-            if (isset($model->{$column}) && !is_null($model->{$column})) {
+            if (isset($model->{$column})) {
                 $cols[] = $column;
                 $sets[$column] = ':' . $column;
                 $data[':'.$column] = $model->{$column};

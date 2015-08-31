@@ -14,7 +14,7 @@ trait TStdGetSet
 
     protected function innerIsSet($key)
     {
-        return isset($this->__data[$key]) || method_exists($this, 'get' . ucfirst($key));
+        return array_key_exists($key, $this->__data) || method_exists($this, 'get' . ucfirst($key));
     }
 
     protected function innerUnSet($key)
