@@ -9,12 +9,14 @@ class Collection
 
     public function prepend($value)
     {
-        return $this->exchangeArray(array_merge([$value], $this->getArrayCopy()));
+        $this->exchangeArray(array_merge([$value], $this->getArrayCopy()));
+        return $this;
     }
 
     public function append($value)
     {
-        return $this->exchangeArray(array_merge($this->getArrayCopy(), [$value]));
+        $this->exchangeArray(array_merge($this->getArrayCopy(), [$value]));
+        return $this;
     }
 
     public function existsElement(array $properties = [])
