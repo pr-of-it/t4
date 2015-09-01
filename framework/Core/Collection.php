@@ -33,6 +33,73 @@ class Collection
         return false;
     }
 
+    /**
+     * @return static
+     */
+    public function asort()
+    {
+        $copy = $this->getArrayCopy();
+        asort($copy);
+        return new static($copy);
+    }
+
+    /**
+     * @return static
+     */
+    public function ksort()
+    {
+        $copy = $this->getArrayCopy();
+        ksort($copy);
+        return new static($copy);
+    }
+
+    /**
+     * @param callable $cmp_function
+     * @return static
+     */
+    public function uasort($cmp_function) {
+        $copy = $this->getArrayCopy();
+        uasort($copy, $cmp_function);
+        return new static($copy);
+    }
+
+    /**
+     * @param callable $cmp_function
+     * @return static
+     */
+    public function uksort($cmp_function) {
+        $copy = $this->getArrayCopy();
+        uksort($copy, $cmp_function);
+        return new static($copy);
+    }
+
+    /**
+     * @param \Closure $callback
+     * @return static
+     */
+    public function sort(\Closure $callback)
+    {
+        return $this->uasort($callback);
+    }
+
+    /**
+     * @return static
+     */
+    public function natsort() {
+        $copy = $this->getArrayCopy();
+        natsort($copy);
+        return new static($copy);
+    }
+
+    /**
+     * @return static
+     */
+    public function natcasesort() {
+        $copy = $this->getArrayCopy();
+        natcasesort($copy);
+        return new static($copy);
+    }
+
     public function filter(callable $callback)
     {
         return new static(array_values(array_filter($this->toArray(), $callback)));
@@ -75,13 +142,6 @@ class Collection
             }
         }
         return $ret;
-    }
-
-    public function sort(\Closure $callback)
-    {
-        $copy = clone $this;
-        $copy->uasort($callback);
-        return new static(array_values($copy->getArrayCopy()));
     }
 
     public function group($by) {
