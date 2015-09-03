@@ -41,19 +41,21 @@ class Sender
         }
     }
 
-    public function sendMail($email, $theme, $answer)
+    public function sendMail($email, $theme, $message)
     {
-        $this->email = $email;
-        $this->theme = $theme;
-        $this->answer = $answer;
-        $this->addAddress($email, 'recipient');
-        $this->Subject = $theme;
-        $this->msgHTML($answer);
-        try {
-            $this->send();
-        } catch (\Exception $e) {
-            echo "Mailer Error: " . $this->ErrorInfo;
+        if (is_array($email)) {
+            $this->email = $email[0];
+            $this->addAddress($email[0], $email[1]);
+        } else {
+            $this->email = $email;
+            $this->addAddress($email, 'recipient');
         }
+
+        $this->theme = $theme;
+        $this->Subject = $theme;
+        $this->answer = $message;
+        $this->msgHTML($message);
+        $this->send();
     }
 
 }
