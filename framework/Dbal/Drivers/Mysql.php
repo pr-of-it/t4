@@ -542,15 +542,26 @@ class Mysql
                             if ($subModel->isNew()) {
                                 $this->saveColumns($subModel);
                             }
-                            $sets[] = '(' . $model->getPk() . ',' . $subModel->getPk() . ')';
+                            $pivots = $subModel::getPivots($class, $key);
+                            if (!empty($pivots)) {
+                                $pivotSets = ', ' . implode(',', array_map(function ($x) use ($subModel) {return $subModel->$x;}, array_keys($pivots)));
+                            } else {
+                                $pivotSets = '';
+                            }
+                            $sets[] = '(' . $model->getPk() . ',' . $subModel->getPk() . $pivotSets . ')';
                         }
 
                         $table = $class::getRelationLinkName($relation);
                         $sql = 'DELETE FROM `' . $table . '` WHERE `' . $class::getManyToManyThisLinkColumnName() . '`=:id';
                         $connection->execute($sql, [':id'=>$model->getPk()]);
+                        if (!empty($pivots)) {
+                            $pivotColumnName = '`, `' . implode('`, `', array_map(function ($x) {return $x;}, array_keys($pivots)));
+                        } else {
+                            $pivotColumnName = '';
+                        }
                         if (!empty($sets)) {
                             $sql = 'INSERT INTO `' . $table . '`
-                                    (`' . $class::getManyToManyThisLinkColumnName() . '`, `' . $class::getManyToManyThatLinkColumnName($relation) . '`)
+                                    (`' . $class::getManyToManyThisLinkColumnName() . '`, `' . $class::getManyToManyThatLinkColumnName($relation) . $pivotColumnName .'`)
                                     VALUES
                                     ' . (implode(', ', $sets)) . '
                                     ';

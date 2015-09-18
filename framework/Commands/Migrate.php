@@ -265,7 +265,7 @@ FILE;
         foreach ($pathToMigrations as $migration) {
 
             if (is_file($migration)) {
-                $migrations[] = basename(substr(strrchr($migration, '_'), 1), '.php');
+                $migrations[] = basename(preg_replace('~m_(\d+)_~', '', $migration), '.php');
             }
         }
 
