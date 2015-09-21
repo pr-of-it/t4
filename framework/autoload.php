@@ -1,11 +1,5 @@
 <?php
 
-if (!is_readable(\T4\ROOT_PATH . DS . '..' . DS . 'vendor')) {
-    die('Install composer depedencies first!');
-}
-
-require realpath(\T4\ROOT_PATH . DS . '..' . DS . 'vendor' . DS . 'autoload.php');
-
 spl_autoload_register(function ($className) {
 
     if ('T4' == substr($className, 0, 2)) {

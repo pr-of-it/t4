@@ -16,5 +16,7 @@ namespace {
 }
 
 namespace {
-    require T4\ROOT_PATH . DS . 'autoload.php';
+    if (!class_exists('\\T4\\Core\\Std')) {
+        require T4\ROOT_PATH . DS . 'autoload.php';
+    }
 }
