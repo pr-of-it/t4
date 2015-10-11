@@ -22,7 +22,7 @@ class Router
      * Allowed URL extensions
      * @var array
      */
-    protected $allowedExtensions = ['html', 'json'];
+    protected $allowedExtensions = ['html', 'json', 'xml'];
 
     /**
      * @param \T4\Core\Std $config

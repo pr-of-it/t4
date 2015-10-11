@@ -162,6 +162,10 @@ class Application
                 header('Content-Type: application/json; charset=utf-8');
                 echo json_encode($data->toArray(), JSON_UNESCAPED_UNICODE);
                 die;
+            case 'xml':
+                header('Content-Type: text/xml; charset=utf-8');
+                $controller->view->display($action . '.' . $format, $data);
+                break;
             default:
             case 'html':
                 header('Content-Type: text/html; charset=utf-8');
