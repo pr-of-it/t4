@@ -9,16 +9,24 @@ class Uploader
 {
 
     protected $formFieldName = '';
+    protected $allowedExtensions = [];
     protected $uploadPath;
 
-    public function __construct($name = '')
+    public function __construct($name = '', $exts = [])
     {
         $this->formFieldName = $name;
+        $this->setAllowedExtensions($exts);
     }
 
     public function setPath($path)
     {
         $this->uploadPath = $path;
+        return $this;
+    }
+
+    public function setAllowedExtensions($exts)
+    {
+        $this->allowedExtensions = $exts;
     }
 
     public function isUploaded($name = '')
@@ -79,6 +87,9 @@ class Uploader
 
             $ret = [];
             foreach ($request->files->{$this->formFieldName} as $n => $file) {
+                if (!$this->checkExtension($file->name)) {
+                    throw new Exception('Invalid file extension');
+                }
                 $uploadedFileName = $this->suggestUploadedFileName($realUploadPath, $file->name);
                 if (move_uploaded_file($file->tmp_name, $realUploadPath . DS . $uploadedFileName)) {
                     $ret[$n] = $this->uploadPath . '/' . $uploadedFileName;
@@ -91,6 +102,9 @@ class Uploader
         } else {
 
             $file = $request->files->{$this->formFieldName};
+            if (!$this->checkExtension($file->name)) {
+                throw new Exception('Invalid file extension');
+            }
             $uploadedFileName = $this->suggestUploadedFileName($realUploadPath, $file->name);
             if (move_uploaded_file($file->tmp_name, $realUploadPath . DS . $uploadedFileName)) {
                 return $this->uploadPath . '/' . $uploadedFileName;
@@ -99,6 +113,18 @@ class Uploader
             }
 
         }
+    }
+
+    protected function checkExtension($filename)
+    {
+        if (empty($this->allowedExtensions)) {
+            return true;
+        }
+        $ext = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
+        if (in_array($ext, $this->allowedExtensions)) {
+            return true;
+        }
+        return false;
     }
 
     protected function suggestUploadedFileName($path, $name)
