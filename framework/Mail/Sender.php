@@ -55,7 +55,7 @@ class Sender
         $this->Subject = $theme;
         $this->answer = $message;
         $this->msgHTML($message);
-        $this->send();
+        return $this->send();
     }
 
 }
