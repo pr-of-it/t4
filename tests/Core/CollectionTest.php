@@ -124,6 +124,14 @@ class CollectionTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(array_keys($expected->getArrayCopy()), array_keys($result->getArrayCopy()));
     }
 
+    public function testMap()
+    {
+        $collection = new Collection([1, 2, 3]);
+        $result = $collection->map(function ($x) {return $x*2;});
+        $expected = new Collection([2, 4, 6]);
+        $this->assertEquals(array_values($expected->getArrayCopy()), array_values($result->getArrayCopy()));
+    }
+
     public function testCollect()
     {
         $i1 = new \T4\Core\Std(['id' => 1, 'title' => 'foo']);

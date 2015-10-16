@@ -102,6 +102,11 @@ class Collection
         return new static($copy);
     }
 
+    public function map(callable $callback)
+    {
+        return new static(array_values(array_map($callback, $this->toArray())));
+    }
+
     public function filter(callable $callback)
     {
         return new static(array_values(array_filter($this->toArray(), $callback)));
