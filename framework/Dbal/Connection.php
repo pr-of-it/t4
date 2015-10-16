@@ -34,6 +34,9 @@ class Connection
     protected function getPdoObject($config)
     {
         $dsn = $config->driver . ':host=' . $config->host . ';dbname=' . $config->dbname;
+        if (!empty($config->port)) {
+            $dsn .= ';port=' . $config->port;
+        }
         $options = [];
         if (!empty($config->options)) {
             $options = $config->options->toArray();
