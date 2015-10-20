@@ -5,6 +5,11 @@ namespace T4\Orm;
 use T4\Core\Collection;
 use T4\Dbal\QueryBuilder;
 
+/**
+ * Trait TRelations
+ * @package T4\Orm
+ * @mixin \T4\Orm\Model
+ */
 trait TRelations
 {
 
@@ -16,6 +21,15 @@ trait TRelations
     {
         $schema = static::getSchema();
         return !empty($schema['relations']) ? $schema['relations'] : [];
+    }
+
+    /**
+     * @param mixed $name
+     * @return array
+     */
+    public static function getRelation($name)
+    {
+        return static::getRelations() ? static::getRelations()[$name] : [];
     }
 
     /**
@@ -73,7 +87,7 @@ trait TRelations
      * @return mixed
      * @throws Exception
      */
-    protected function getRelationLazy($key, $options = [])
+    public function getRelationLazy($key, $options = [])
     {
         $class = get_class($this);
         $relations = $class::getRelations();
@@ -137,7 +151,6 @@ trait TRelations
                 } else {
                     return new Collection();
                 }
-
         }
     }
 

@@ -83,6 +83,7 @@ abstract class Model
     }
 
     /**
+     * @param string $class
      * @param string $relationName
      * @return array mixed
      */
@@ -94,23 +95,6 @@ abstract class Model
         } else {
             return $schema['pivots'][$class][$relationName];
         }
-    }
-
-    /**
-     * @return array
-     */
-    static public function getRelations()
-    {
-        return static::getSchema()['relations'];
-    }
-
-    /**
-     * @param mixed $name
-     * @return array
-     */
-    static public function getRelation($name)
-    {
-        return static::getRelations()[$name];
     }
 
     /**

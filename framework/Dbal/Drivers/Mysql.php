@@ -537,25 +537,51 @@ class Mysql
 
                 case $class::MANY_TO_MANY:
                     if (!empty($model->{$key}) && $model->{$key} instanceof Collection ) {
-                        $sets = [];
-                        foreach ( $model->{$key} as $subModel ) {
-                            if ($subModel->isNew()) {
-                                $this->saveColumns($subModel);
-                            }
-                            $sets[] = '(' . $model->getPk() . ',' . $subModel->getPk() . ')';
-                        }
+
+                        /** @var Collection $newSubModelsSet */
+                        $newSubModelsSet = $model->{$key};
+
+                        /** @var Collection $oldSubModelsSet */
+                        $oldSubModelsSet = $model->getRelationLazy($key);
 
                         $table = $class::getRelationLinkName($relation);
-                        $sql = 'DELETE FROM `' . $table . '` WHERE `' . $class::getManyToManyThisLinkColumnName() . '`=:id';
-                        $connection->execute($sql, [':id'=>$model->getPk()]);
-                        if (!empty($sets)) {
-                            $sql = 'INSERT INTO `' . $table . '`
-                                    (`' . $class::getManyToManyThisLinkColumnName() . '`, `' . $class::getManyToManyThatLinkColumnName($relation) . '`)
-                                    VALUES
-                                    ' . (implode(', ', $sets)) . '
-                                    ';
-                            $connection->execute($sql);
+
+                        $subModelsToDelete = $oldSubModelsSet->filter(function (Model $m) use ($class, $newSubModelsSet) {
+                            return !$newSubModelsSet->existsElement($m->toArray());
+                        });
+
+                        if (!$subModelsToDelete->isEmpty()) {
+                            $sql = (new QueryBuilder())
+                                ->delete($table)
+                                ->where($class::getManyToManyThisLinkColumnName() . '=:thisId AND ' . $class::getManyToManyThatLinkColumnName($relation) . '=:thatId');
+                            foreach ($subModelsToDelete as $subModel) {
+                                $connection->execute($sql, [
+                                    ':thisId' => $model->getPk(),
+                                    ':thatId' => $subModel->getPk()
+                                ]);
+                            }
                         }
+
+                        $subModelsToInsert = $newSubModelsSet->filter(function(Model $m) use ($class, $oldSubModelsSet) {
+                            return $m->isNew() || !$oldSubModelsSet->existsElement($m->toArray());
+                        });
+
+                        if (!$subModelsToInsert->isEmpty()) {
+                            $coreValues = [$class::getManyToManyThisLinkColumnName() => ':thisId', $class::getManyToManyThatLinkColumnName($relation) => ':thatId'];
+                            $sql = (new QueryBuilder())
+                                ->insert($table)
+                                ->values($coreValues);
+                            foreach ($subModelsToInsert as $subModel) {
+                                if ($subModel->isNew()) {
+                                    $subModel->save();
+                                }
+                                $connection->execute($sql, [
+                                    ':thisId' => $model->getPk(),
+                                    ':thatId' => $subModel->getPk()
+                                ]);
+                            }
+                        }
+
                     }
                     break;
 
