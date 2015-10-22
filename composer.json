@@ -22,6 +22,9 @@
   "autoload": {
     "psr-4": {
       "T4\\": "framework/"
-    }
+    },
+    "files": [
+      "framework/boot.php"
+    ]
   }
 }

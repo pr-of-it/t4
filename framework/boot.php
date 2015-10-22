@@ -1,15 +1,12 @@
 <?php
 
-namespace {
-    const DS = DIRECTORY_SEPARATOR;
-}
-
 namespace T4 {
     const ROOT_PATH = __DIR__;
     const VERSION = 0.1;
 }
 
 namespace {
+    const DS = DIRECTORY_SEPARATOR;
     define('ROOT_PATH', realpath(__DIR__ . '/../../'));
     define('ROOT_PATH_PROTECTED', ROOT_PATH . DS . 'protected');
     define('ROOT_PATH_PUBLIC', ROOT_PATH . DS . 'public');
