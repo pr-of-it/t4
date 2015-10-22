@@ -7,9 +7,6 @@ namespace T4 {
 
 namespace {
     const DS = DIRECTORY_SEPARATOR;
-    define('ROOT_PATH', realpath(__DIR__ . '/../../'));
-    define('ROOT_PATH_PROTECTED', ROOT_PATH . DS . 'protected');
-    define('ROOT_PATH_PUBLIC', ROOT_PATH . DS . 'public');
 }
 
 namespace {
