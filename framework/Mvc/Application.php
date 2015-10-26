@@ -49,36 +49,32 @@ class Application
     protected function __construct(Config $config = null)
     {
         try {
-
-            Session::init();
-
             if (null !== $config) {
                 $this->setConfig($config);
             }
-
-            /*
-             * Extensions setup and initialize
-             */
-            $this->extensions = new Std;
-            if (isset($this->config->extensions)) {
-                foreach ($this->config->extensions as $extension => $options) {
-                    $extensionClassName = 'Extensions\\' . ucfirst($extension) . '\\Extension';
-                    if (class_exists('\\App\\' . $extensionClassName)) {
-                        $extensionClassName = '\\App\\' . $extensionClassName;
-                    } else {
-                        $extensionClassName = '\\T4\\' . $extensionClassName;
-                    }
-                    $this->extensions->{$extension} = new $extensionClassName($options);
-                    $this->extensions->{$extension}->setApp($this);
-                    if (!isset($options->autoload) || true == $options->autoload) {
-                        $this->extensions->{$extension}->init();
-                    }
-                }
-            }
-
         } catch (Exception $e) {
             echo $e->getMessage();
             die;
+        }
+    }
+
+    protected function initExtensions()
+    {
+        $this->extensions = new Std;
+        if (isset($this->config->extensions)) {
+            foreach ($this->config->extensions as $extension => $options) {
+                $extensionClassName = 'Extensions\\' . ucfirst($extension) . '\\Extension';
+                if (class_exists('\\App\\' . $extensionClassName)) {
+                    $extensionClassName = '\\App\\' . $extensionClassName;
+                } else {
+                    $extensionClassName = '\\T4\\' . $extensionClassName;
+                }
+                $this->extensions->{$extension} = new $extensionClassName($options);
+                $this->extensions->{$extension}->setApp($this);
+                if (!isset($options->autoload) || true == $options->autoload) {
+                    $this->extensions->{$extension}->init();
+                }
+            }
         }
     }
 
@@ -90,6 +86,8 @@ class Application
     {
         try {
 
+            Session::init();
+            $this->initExtensions();
             $this->runRequest($this->request);
 
         } catch (Exception $e) {
