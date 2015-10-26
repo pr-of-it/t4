@@ -12,11 +12,61 @@ use T4\Http\Request;
 
 /**
  * Application properties lazy loading
- * Class TApplicationMagic
+ * Trait TApplicationMagic
  * @package T4\Mvc
+ * @mixins T4\Mvc\Application
  */
 trait TApplicationMagic
 {
+
+    public function setConfig(Config $config = null)
+    {
+        $this->config = $config ?: new Config([]);
+
+        if (null !== $this->config->getPath() && file_exists(dirname($this->config->getPath()) . DS . 'routes.php')) {
+            $this->setRoutes(new Config(dirname($this->config->getPath()) . DS . 'routes.php'));
+        } else {
+            $this->setRoutes(new Config([]));
+        }
+
+        if (null !== $this->config->getPath() && file_exists(dirname($this->config->getPath()) . DS . 'sections.php')) {
+            $this->setSections(new Config(dirname($this->config->getPath()) . DS . 'sections.php'));
+        } else {
+            $this->setSections(new Config([]));
+        }
+
+        if (null !== $this->config->getPath() && file_exists(dirname($this->config->getPath()) . DS . 'blocks.php')) {
+            $this->setBlocks(new Config(dirname($this->config->getPath()) . DS . 'blocks.php'));
+        } else {
+            $this->setBlocks(new Config([]));
+        }
+
+        return $this;
+    }
+
+    public function setRoutes(Config $config = null)
+    {
+        if (empty($this->config)) {
+            $this->setConfig(new Config([]));
+        }
+        $this->config->routes = $config ?: new Config([]);
+    }
+
+    public function setSections(Config $config = null)
+    {
+        if (empty($this->config)) {
+            $this->setConfig(new Config([]));
+        }
+        $this->config->sections = $config ?: new Config([]);
+    }
+
+    public function setBlocks(Config $config = null)
+    {
+        if (empty($this->config)) {
+            $this->setConfig(new Config([]));
+        }
+        $this->config->blocks = $config ?: new Config([]);
+    }
 
     protected function getModules()
     {
@@ -45,18 +95,6 @@ trait TApplicationMagic
             $this->db = $db;
         }
         return $db;
-    }
-
-    protected function getConfig()
-    {
-        static $config = null;
-        if (null == $config) {
-            $config = new Config($this->getPath() . DS . 'config.php');
-            $config->routes = new Config($this->getPath() . DS . 'routes.php');
-            $config->sections = new Config($this->getPath() . DS . 'sections.php');
-            $config->blocks = new Config($this->getPath() . DS . 'blocks.php');
-        }
-        return $config;
     }
 
     protected function getRequest()

@@ -2,6 +2,7 @@
 
 namespace T4\Mvc;
 
+use T4\Core\Config;
 use T4\Core\Exception;
 use T4\Core\Session;
 use T4\Core\Std;
@@ -45,11 +46,15 @@ class Application
      * - создание подключений к БД
      * - расширений
      */
-    protected function __construct()
+    protected function __construct(Config $config = null)
     {
         try {
 
             Session::init();
+
+            if (null !== $config) {
+                $this->setConfig($config);
+            }
 
             /*
              * Extensions setup and initialize
