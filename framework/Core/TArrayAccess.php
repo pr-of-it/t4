@@ -9,8 +9,9 @@ namespace T4\Core;
  * @implements \ArrayAccess
  * @implements \Countable
  * @implements \IteratorAggregate
+ * @implements \T4\Core\IArrayable
  */
-trait TSimpleArrayAccess
+trait TArrayAccess
 {
 
     protected $storage = [];
@@ -111,6 +112,21 @@ trait TSimpleArrayAccess
     public function getIterator()
     {
         return new \ArrayIterator($this->storage);
+    }
+
+    /*
+     * --------------------------------------------------------------------------------
+     */
+
+    public function fromArray($data)
+    {
+        $this->storage = $data;
+        return $this;
+    }
+
+    public function toArray()
+    {
+        return $this->storage;
     }
 
 }

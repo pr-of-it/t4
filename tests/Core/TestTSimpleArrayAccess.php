@@ -3,12 +3,12 @@
 require_once realpath(__DIR__ . '/../../framework/boot.php');
 
 class TestAA
-    implements ArrayAccess, Countable
+    implements ArrayAccess, Countable, \T4\Core\IArrayable
 {
-    use \T4\Core\TSimpleArrayAccess;
+    use \T4\Core\TArrayAccess;
 }
 
-class TestTSimpleArrayAccess extends PHPUnit_Framework_TestCase
+class TestTArrayAccess extends PHPUnit_Framework_TestCase
 {
 
     public function testSetGet()
@@ -74,6 +74,25 @@ class TestTSimpleArrayAccess extends PHPUnit_Framework_TestCase
 
         unset($arr[10]);
         $this->assertTrue($arr->isEmpty());
+    }
+
+    public function testIArrayable()
+    {
+        $arr1 = new TestAA();
+        $arr1->fromArray([1 => 'foo', 'bar', 'baz']);
+
+        $this->assertEquals('foo', $arr1[1]);
+        $this->assertEquals('bar', $arr1[2]);
+        $this->assertEquals('baz', $arr1[3]);
+
+        $arr2 = new TestAA();
+        $arr2['foo'] = 100;
+        $arr2['bar'] = 200;
+        $arr2['baz'] = 300;
+        $this->assertEquals(
+            ['foo' => 100, 'bar' => 200, 'baz' => 300],
+            $arr2->toArray()
+        );
     }
 
 }
