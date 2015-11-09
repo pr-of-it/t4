@@ -3,7 +3,7 @@
 require_once realpath(__DIR__ . '/../../framework/boot.php');
 
 class TestAA
-    implements ArrayAccess, Countable, \T4\Core\IArrayable
+    implements ArrayAccess, Countable, \IteratorAggregate, \T4\Core\IArrayable
 {
     use \T4\Core\TArrayAccess;
 }
@@ -93,6 +93,15 @@ class TestTArrayAccess extends PHPUnit_Framework_TestCase
             ['foo' => 100, 'bar' => 200, 'baz' => 300],
             $arr2->toArray()
         );
+    }
+
+    public function testIterator()
+    {
+        $arr = (new TestAA())->fromArray([1, 2, 3]);
+        $test = [1, 2, 3];
+        foreach ($arr as $k => $v) {
+            $this->assertEquals($test[$k], $v);
+        }
     }
 
 }
