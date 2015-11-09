@@ -3,21 +3,29 @@
 namespace T4\Core;
 
 class Collection
-    extends \ArrayObject
-    implements IArrayable
+    implements \ArrayAccess, \Countable, \IteratorAggregate, IArrayable
 {
+    use TArrayAccess;
+
+    public function __construct($data = null)
+    {
+        if (null !== $data) {
+            $this->fromArray($data);
+        }
+    }
 
     public function prepend($value)
     {
-        $this->exchangeArray(array_merge([$value], $this->getArrayCopy()));
+        $this->storage = array_merge([$value], $this->storage);
         return $this;
     }
 
     public function append($value)
     {
-        $this->exchangeArray(array_merge($this->getArrayCopy(), [$value]));
+        $this->storage = array_merge($this->storage, [$value]);
         return $this;
     }
+
 
     public function existsElement(array $properties = [])
     {
@@ -40,7 +48,7 @@ class Collection
      */
     public function asort()
     {
-        $copy = $this->getArrayCopy();
+        $copy = $this->toArray();
         asort($copy);
         return new static($copy);
     }
@@ -50,7 +58,7 @@ class Collection
      */
     public function ksort()
     {
-        $copy = $this->getArrayCopy();
+        $copy = $this->toArray();
         ksort($copy);
         return new static($copy);
     }
@@ -60,7 +68,7 @@ class Collection
      * @return static
      */
     public function uasort($cmp_function) {
-        $copy = $this->getArrayCopy();
+        $copy = $this->toArray();
         uasort($copy, $cmp_function);
         return new static($copy);
     }
@@ -70,7 +78,7 @@ class Collection
      * @return static
      */
     public function uksort($cmp_function) {
-        $copy = $this->getArrayCopy();
+        $copy = $this->toArray();
         uksort($copy, $cmp_function);
         return new static($copy);
     }
@@ -88,7 +96,7 @@ class Collection
      * @return static
      */
     public function natsort() {
-        $copy = $this->getArrayCopy();
+        $copy = $this->toArray();
         natsort($copy);
         return new static($copy);
     }
@@ -97,7 +105,7 @@ class Collection
      * @return static
      */
     public function natcasesort() {
-        $copy = $this->getArrayCopy();
+        $copy = $this->toArray();
         natcasesort($copy);
         return new static($copy);
     }
@@ -129,11 +137,6 @@ class Collection
     {
         $allCollection = $this->findAllByAttributes($attributes);
         return $allCollection->isEmpty() ? null : $allCollection[0];
-    }
-
-    public function isEmpty()
-    {
-        return empty($this->getArrayCopy());
     }
 
     public function collect($what)
@@ -176,18 +179,4 @@ class Collection
         }
     }
 
-    /**
-     * IArrayable implement
-     */
-
-    public function toArray()
-    {
-        return $this->getArrayCopy();
-    }
-
-    public function fromArray($data)
-    {
-        $this->exchangeArray($data);
-        return $this;
-    }
 }

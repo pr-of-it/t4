@@ -46,7 +46,7 @@ class CollectionTest extends PHPUnit_Framework_TestCase
         $collection = new Collection();
         $this->assertEquals(
             [],
-            $collection->getArrayCopy()
+            $collection->toArray()
         );
         $this->assertEquals(
             0,
@@ -56,7 +56,7 @@ class CollectionTest extends PHPUnit_Framework_TestCase
         $collection->append(1);
         $this->assertEquals(
             [1],
-            $collection->getArrayCopy()
+            $collection->toArray()
         );
         $this->assertEquals(
             1,
@@ -66,7 +66,7 @@ class CollectionTest extends PHPUnit_Framework_TestCase
         $collection->prepend(2);
         $this->assertEquals(
             [2, 1],
-            $collection->getArrayCopy()
+            $collection->toArray()
         );
         $this->assertEquals(
             2,
@@ -109,19 +109,19 @@ class CollectionTest extends PHPUnit_Framework_TestCase
 
         $result = $collection->asort();
         $expected = new Collection(['a' => -1, 'b' => 0, 1 => '1', 10 => 1, 20 => 2, 30 => 3, 32 => '11', 'c' => 42, 31 => '111']);
-        $this->assertEquals(array_values($expected->getArrayCopy()), array_values($result->getArrayCopy()));
+        $this->assertEquals(array_values($expected->toArray()), array_values($result->toArray()));
 
         $result = $collection->ksort();
         $expected = new Collection(['a' => -1, 'b' => 0, 'c' => 42, 1 => '1', 10 => 1, 20 => 2, 30 => 3, 31 => '111', 32 => '11']);
-        $this->assertEquals(array_keys($expected->getArrayCopy()), array_keys($result->getArrayCopy()));
+        $this->assertEquals(array_keys($expected->toArray()), array_keys($result->toArray()));
 
         $result = $collection->uasort(function ($a, $b) { return $a < $b ? 1 : ($a > $b ? -1 : 0);});
         $expected = new Collection([31 => '111', 'c' => 42, 32 => '11', 30 => 3, 20 => 2, 10 => 1, 1 => '1', 'b' => 0, 'a' => -1]);
-        $this->assertEquals(array_values($expected->getArrayCopy()), array_values($result->getArrayCopy()));
+        $this->assertEquals(array_values($expected->toArray()), array_values($result->toArray()));
 
         $result = $collection->uksort(function ($a, $b) { return $a < $b ? 1 : ($a > $b ? -1 : 0);});
         $expected = new Collection([32 => '11', 31 => '111', 30 => 3, 20 => 2, 10 => 1, 1 => '1', 'c' => 42, 'b' => 0, 'a' => -1]);
-        $this->assertEquals(array_keys($expected->getArrayCopy()), array_keys($result->getArrayCopy()));
+        $this->assertEquals(array_keys($expected->toArray()), array_keys($result->toArray()));
     }
 
     public function testMap()
@@ -129,7 +129,7 @@ class CollectionTest extends PHPUnit_Framework_TestCase
         $collection = new Collection([1, 2, 3]);
         $result = $collection->map(function ($x) {return $x*2;});
         $expected = new Collection([2, 4, 6]);
-        $this->assertEquals(array_values($expected->getArrayCopy()), array_values($result->getArrayCopy()));
+        $this->assertEquals(array_values($expected->toArray()), array_values($result->toArray()));
     }
 
     public function testCollect()
@@ -145,7 +145,7 @@ class CollectionTest extends PHPUnit_Framework_TestCase
 
         $this->assertEquals(
             [new \T4\Core\Std(['id' => 1, 'title' => 'foo']), new \T4\Core\Std(['id' => 2, 'title' => 'bar']), new \T4\Core\Std(['id' => 3, 'title' => 'baz'])],
-            $collection->getArrayCopy()
+            $collection->toArray()
         );
 
         $ids = $collection->collect('id');

@@ -171,7 +171,7 @@ class Helpers
     static protected function getAllChildrenByIndex(Collection $tree, $index)
     {
         $lvl = $tree[$index]->__lvl;
-        $tail = array_slice($tree->getArrayCopy(), $index + 1);
+        $tail = array_slice($tree->toArray(), $index + 1);
         $ret = [];
         foreach ($tail as $el) {
             if ($el->__lvl <= $lvl)
