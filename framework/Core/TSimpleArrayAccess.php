@@ -26,7 +26,7 @@ trait TSimpleArrayAccess
 
     protected function innerGet($offset)
     {
-        return $this->storage[$offset];
+        return isset($this->storage[$offset]) ? $this->storage[$offset] : null;
     }
 
     protected function innerSet($offset, $value)
@@ -50,21 +50,36 @@ trait TSimpleArrayAccess
      * --------------------------------------------------------------------------------
      */
 
+    /**
+     * @param $offset
+     * @return bool
+     */
     public function offsetExists($offset)
     {
         return $this->innerIsset($offset);
     }
 
+    /**
+     * @param $offset
+     * @return mixed
+     */
     public function offsetGet($offset)
     {
         return $this->innerGet($offset);
     }
 
+    /**
+     * @param $offset
+     * @param $value
+     */
     public function offsetSet($offset, $value)
     {
         $this->innerSet($offset, $value);
     }
 
+    /**
+     * @param $offset
+     */
     public function offsetUnset($offset)
     {
         $this->innerUnset($offset);
@@ -74,11 +89,25 @@ trait TSimpleArrayAccess
      * --------------------------------------------------------------------------------
      */
 
+    /**
+     * @return int
+     */
     public function count()
     {
         return count($this->storage);
     }
 
+    /**
+     * @return bool
+     */
+    public function isEmpty()
+    {
+        return empty($this->storage);
+    }
+
+    /**
+     * @return \ArrayIterator
+     */
     public function getIterator()
     {
         return new \ArrayIterator($this->storage);
