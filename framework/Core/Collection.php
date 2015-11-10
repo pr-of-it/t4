@@ -3,7 +3,7 @@
 namespace T4\Core;
 
 class Collection
-    implements \ArrayAccess, \Countable, \IteratorAggregate, IArrayable
+    implements IArrayAccess
 {
     use TArrayAccess;
 

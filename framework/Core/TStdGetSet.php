@@ -119,4 +119,4 @@ trait TStdGetSet
         $this->innerSet($key, $val);
     }
 
-} 
+}
