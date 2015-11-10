@@ -103,9 +103,12 @@ class TestTArrayAccess extends PHPUnit_Framework_TestCase
     {
         $arr = (new TestAA())->fromArray([1, 2, 3]);
         $test = [1, 2, 3];
+        $i = 0;
         foreach ($arr as $k => $v) {
             $this->assertEquals($test[$k], $v);
+            $i++;
         }
+        $this->assertEquals(3, $i);
     }
 
 }
