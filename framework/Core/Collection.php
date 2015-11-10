@@ -3,7 +3,7 @@
 namespace T4\Core;
 
 class Collection
-    implements IArrayAccess, ICollection
+    implements IArrayAccess, ICollection, \Serializable
 {
     use TCollection;
 
@@ -12,6 +12,16 @@ class Collection
         if (null !== $data) {
             $this->fromArray($data);
         }
+    }
+
+    public function serialize()
+    {
+        return serialize($this->storage);
+    }
+
+    public function unserialize($serialized)
+    {
+        $this->storage = unserialize($serialized);
     }
 
 }
