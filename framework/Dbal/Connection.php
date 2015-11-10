@@ -108,11 +108,12 @@ class Connection
     }
 
     /**
+     * @param string $name [optional] Name of the sequence object from which the ID should be returned.
      * @return string
      */
-    public function lastInsertId()
+    public function lastInsertId($name = null)
     {
-        return $this->pdo->lastInsertId();
+        return $this->pdo->lastInsertId($name);
     }
 
     /**
@@ -133,4 +134,18 @@ class Connection
         $this->pdo = $this->getPdoObject($this->config);
     }
 
+    public function beginTransaction()
+    {
+        return $this->pdo->beginTransaction();
+    }
+
+    public function rollback()
+    {
+        return $this->rollback();
+    }
+
+    public function commit()
+    {
+        return $this->commit();
+    }
 }

@@ -19,7 +19,7 @@ class Pgsql
     public function quoteName($name)
     {
         $parts = explode('.', $name);
-        $lastIndex = count($parts)-1;
+        $lastIndex = count($parts) - 1;
         foreach ($parts as $index => &$part) {
             if ('*' == $part) {
                 continue;
@@ -111,21 +111,21 @@ class Pgsql
                 break;
         }
 
-        if(isset($options['default'])) {
-            $default = 'ALTER TABLE ' . $this->quoteName($table) . ' ALTER COLUMN ' . $name . ' SET DEFAULT \'' . $options['default'] .'\'';
+        if (isset($options['default'])) {
+            $default = 'ALTER TABLE ' . $this->quoteName($table) . ' ALTER COLUMN ' . $name . ' SET DEFAULT \'' . $options['default'] . '\'';
             return [$name . ' ' . $ddl, $default];
         }
 
         return $name . ' ' . $ddl;
     }
 
-    protected function createIndexDDL($tableName, $name='', $options='')
+    protected function createIndexDDL($tableName, $name = '', $options = '')
     {
 
         if (!isset($options['type']))
             $options['type'] = '';
 
-        $ddl  = 'INDEX ' . (!empty($name) ? $this->quoteName($name) . ' ' : '') . 'ON ' . $this->quoteName($tableName);
+        $ddl = 'INDEX ' . (!empty($name) ? $this->quoteName($name) . ' ' : '') . 'ON ' . $this->quoteName($tableName);
         if ('unique' == $options['type']) {
             $ddl = 'UNIQUE ' . $ddl;
         }
@@ -173,7 +173,7 @@ class Pgsql
             }
 
             if ('link' == $options['type']) {
-                $indexes[] = ['type'=>'index', 'columns'=>[$name]];
+                $indexes[] = ['type' => 'index', 'columns' => [$name]];
             }
 
         }
@@ -192,7 +192,7 @@ class Pgsql
             if (is_numeric($name)) {
                 $name = '';
             }
-            $indexesDDL[] = 'CREATE '. $this->createIndexDDL($tableName, $name, $options);
+            $indexesDDL[] = 'CREATE ' . $this->createIndexDDL($tableName, $name, $options);
             $columnsUsed[] = $options['columns'];
         }
 
@@ -271,7 +271,7 @@ class Pgsql
     {
         $sql = 'SHOW CREATE TABLE `' . $tableName . '`';
         $result = $connection->query($sql)->fetch()['Create Table'];
-        preg_match('~^[\s]+\`'.$oldName.'\`[\s]+(.*?)[\,]?$~m', $result, $m);
+        preg_match('~^[\s]+\`' . $oldName . '\`[\s]+(.*?)[\,]?$~m', $result, $m);
         $sql = '
             ALTER TABLE `' . $tableName . '`
             CHANGE `' . $oldName . '` `' . $newName . '` ' . $m[1];
@@ -301,18 +301,19 @@ class Pgsql
 
     public function insert(Connection $connection, $tableName, array $data)
     {
-        $sql  = 'INSERT INTO ' . $this->quoteName($tableName) . '';
+        $sql = 'INSERT INTO ' . $this->quoteName($tableName) . '';
         $sql .= ' ("' . implode('", "', array_keys($data)) . '")';
         $sql .= ' VALUES';
         $values = [];
         foreach ($data as $key => $val)
-            $values[':'.$key] = $val;
+            $values[':' . $key] = $val;
         $sql .= ' (' . implode(', ', array_keys($values)) . ')';
         $connection->execute($sql, $values);
-        return $connection->lastInsertId();
+        $sequenceName = $this->getSequenceName($connection, $tableName);
+        return empty($sequenceName) ? null : $connection->lastInsertId($sequenceName);
     }
 
-    public function findAllByQuery($class, $query, $params=[])
+    public function findAllByQuery($class, $query, $params = [])
     {
         if ($query instanceof QueryBuilder) {
             $params = $query->getParams();
@@ -421,6 +422,29 @@ class Pgsql
     }
 
     /**
+     * get name of the sequence that a serial or bigserial column uses
+     * @param Connection $connection
+     * @param string $tableName
+     *
+     * @return string
+     */
+    protected function getSequenceName(Connection $connection, $tableName)
+    {
+        $PkColumns = $connection->query("SELECT a.attname, format_type(a.atttypid, a.atttypmod) AS data_type
+            FROM   pg_index i
+            JOIN   pg_attribute a ON a.attrelid = i.indrelid
+                                 AND a.attnum = ANY(i.indkey)
+            WHERE  i.indrelid = :table_name::regclass
+            AND    i.indisprimary;", [':table_name' => $tableName])->fetchAll(\PDO::FETCH_ASSOC);
+        $PkColumnsCount = count($PkColumns);
+        if ($PkColumnsCount != 1) {
+            return null;
+        }
+
+        return $connection->query('select pg_get_serial_sequence(:table_name, :column_name)', [':table_name' => $tableName, ':column_name' => $PkColumnsCount[0]['attname']])->fetchScalar();
+    }
+
+    /**
      * TODO: много лишних isset, которые всегда true по определению
      * Сохранение полей модели без учета связей, требующих ID модели
      * @param Model $model
@@ -441,12 +465,12 @@ class Pgsql
                 $cols[] = $this->quoteName($column);
                 $prep[] = ':' . $column;
                 $sets[] = '' . $this->quoteName($column) . '=:' . $column;
-                $data[':'.$column] = $model->{$column};
+                $data[':' . $column] = $model->{$column};
             } elseif (isset($def['default'])) {
                 $cols[] = $this->quoteName($column);
                 $prep[] = ':' . $column;
                 $sets[] = '' . $this->quoteName($column) . '=:' . $column;
-                $data[':'.$column] = $def['default'];
+                $data[':' . $column] = $def['default'];
             }
         }
 
@@ -459,12 +483,12 @@ class Pgsql
                             $cols[] = $this->quoteName($column);
                             $prep[] = ':' . $column;
                             $sets[] = '' . $this->quoteName($column) . '=:' . $column;
-                            $data[':'.$column] = $model->{$column};
+                            $data[':' . $column] = $model->{$column};
                         } elseif (isset($model->{$rel}) && $model->{$rel} instanceof Model) {
                             $cols[] = $this->quoteName($column);
                             $prep[] = ':' . $column;
                             $sets[] = '' . $this->quoteName($column) . '=:' . $column;
-                            $data[':'.$column] = $model->{$rel}->getPk();
+                            $data[':' . $column] = $model->{$rel}->getPk();
                         }
                     }
                     break;
@@ -509,8 +533,8 @@ class Pgsql
             switch ($relation['type']) {
                 case $class::BELONGS_TO:
                     $column = $class::getRelationLinkName($relation);
-                    if (!empty($model->{$key}) && $model->{$key} instanceof Model ) {
-                        if ( $model->{$key}->isNew() ) {
+                    if (!empty($model->{$key}) && $model->{$key} instanceof Model) {
+                        if ($model->{$key}->isNew()) {
                             $model->{$key}->save();
                         }
                         $model->{$column} = $model->{$key}->getPk();
@@ -531,7 +555,7 @@ class Pgsql
             switch ($relation['type']) {
 
                 case $class::HAS_ONE:
-                    if (!empty($model->{$key}) && $model->{$key} instanceof Model ) {
+                    if (!empty($model->{$key}) && $model->{$key} instanceof Model) {
                         $column = $class::getRelationLinkName($relation);
                         $subModel = $model->{$key};
                         $subModel->{$column} = $model->getPk();
@@ -540,9 +564,9 @@ class Pgsql
                     break;
 
                 case $class::HAS_MANY:
-                    if (!empty($model->{$key}) && $model->{$key} instanceof Collection ) {
+                    if (!empty($model->{$key}) && $model->{$key} instanceof Collection) {
                         $column = $class::getRelationLinkName($relation);
-                        foreach ( $model->{$key} as $subModel) {
+                        foreach ($model->{$key} as $subModel) {
                             $subModel->{$column} = $model->getPk();
                             $subModel->save();
                         }
@@ -550,9 +574,9 @@ class Pgsql
                     break;
 
                 case $class::MANY_TO_MANY:
-                    if (!empty($model->{$key}) && $model->{$key} instanceof Collection ) {
+                    if (!empty($model->{$key}) && $model->{$key} instanceof Collection) {
                         $sets = [];
-                        foreach ( $model->{$key} as $subModel ) {
+                        foreach ($model->{$key} as $subModel) {
                             if ($subModel->isNew()) {
                                 $this->saveColumns($subModel);
                             }
@@ -561,7 +585,7 @@ class Pgsql
 
                         $table = $class::getRelationLinkName($relation);
                         $sql = 'DELETE FROM ' . $this->quoteName($table) . ' WHERE "' . $class::getManyToManyThisLinkColumnName() . '"=:id';
-                        $connection->execute($sql, [':id'=>$model->getPk()]);
+                        $connection->execute($sql, [':id' => $model->getPk()]);
                         if (!empty($sets)) {
                             $sql = 'INSERT INTO ' . $this->quoteName($table) . '
                                     ("' . $class::getManyToManyThisLinkColumnName() . '", "' . $class::getManyToManyThatLinkColumnName($relation) . '")
