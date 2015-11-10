@@ -195,4 +195,13 @@ class CollectionTest extends PHPUnit_Framework_TestCase
         ], $grouped);
     }
 
+    public function testReduce()
+    {
+        $collection = new Collection([1, 2, 3, 4]);
+        $reduced = $collection->reduce(0, function($carry, $item) {
+            return $carry + $item;
+        });
+        $this->assertEquals(10, $reduced);
+    }
+
 }

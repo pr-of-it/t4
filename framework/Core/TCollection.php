@@ -165,7 +165,7 @@ trait TCollection
      */
     public function reduce($start, callable $callback)
     {
-        return new static(array_values(array_reduce($this->toArray(), $callback, $start)));
+        return array_reduce($this->toArray(), $callback, $start);
     }
 
     /**
