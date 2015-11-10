@@ -33,6 +33,9 @@ class Collection
             return false;
         foreach ($this as $element) {
             $elementProperties = [];
+            if (!is_array($element) && !$element instanceof \Traversable) {
+                continue;
+            }
             foreach ($element as $key => $val) {
                 if (array_key_exists($key, $properties))
                     $elementProperties[$key] = $val;
