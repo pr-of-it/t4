@@ -15,6 +15,9 @@ class MultiException
 
     public function __construct($class = Exception::class)
     {
+        if ( !is_a($class, Exception::class, true) ) {
+            throw new Exception('Invalid MultiException base class');
+        }
         $this->class = $class;
     }
 
@@ -36,10 +39,10 @@ class MultiException
         return $this;
     }
 
-    public function addException($message = '', $code = 0)
+    public function addException($message = "", $code = 0, Exception $previous = null)
     {
         $class = $this->class;
-        $this->add(new $class($message, $code));
+        $this->add(new $class($message, $code, $previous));
     }
 
 }
