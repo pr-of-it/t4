@@ -161,7 +161,7 @@ trait TCollection
     /**
      * @param mixed $start
      * @param callable $callback
-     * @return static
+     * @return mixed
      */
     public function reduce($start, callable $callback)
     {
