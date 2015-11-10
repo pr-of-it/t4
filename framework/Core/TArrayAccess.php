@@ -10,6 +10,7 @@ namespace T4\Core;
  * @implements \Countable
  * @implements \IteratorAggregate
  * @implements \T4\Core\IArrayable
+ * @implements \Setializeable
  */
 trait TArrayAccess
 {
@@ -127,6 +128,20 @@ trait TArrayAccess
     public function toArray()
     {
         return $this->storage;
+    }
+
+    /*
+     * --------------------------------------------------------------------------------
+     */
+
+    public function serialize()
+    {
+        return serialize($this->storage);
+    }
+
+    public function unserialize($serialized)
+    {
+        $this->storage = unserialize($serialized);
     }
 
 }
