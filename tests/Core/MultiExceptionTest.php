@@ -14,72 +14,75 @@ class MultiExceptionTest extends PHPUnit_Framework_TestCase
 
     public function testCreate()
     {
-        $exception = new MultiException;
+        $errors = new MultiException;
         $this->assertInstanceOf(
-            'T4\Core\MultiException',
-            $exception
+            MultiException::class,
+            $errors
         );
         $this->assertInstanceOf(
-            'T4\Core\Collection',
-            $exception->getExceptions()
+            T4\Core\ICollection::class,
+            $errors
         );
-        $this->assertTrue($exception->isEmpty());
+        $this->assertInstanceOf(
+            T4\Core\IArrayAccess::class,
+            $errors
+        );
+        $this->assertTrue($errors->isEmpty());
+    }
+
+    public function testAdd()
+    {
+        $errors = new MultiException;
+
+        $errors->add(new Exception('First'));
+        $this->assertFalse($errors->isEmpty());
+        $this->assertEquals(1, $errors->count());
+
+        $errors->add(new Exception('Second'));
+        $this->assertFalse($errors->isEmpty());
+        $this->assertEquals(2, $errors->count());
+
+        $errors->addException('Third', 123);
+        $this->assertFalse($errors->isEmpty());
+        $this->assertEquals(3, $errors->count());
+
+        $this->assertInstanceOf(
+            \T4\Core\Exception::class,
+            $errors[0]
+        );
+        $this->assertInstanceOf(
+            \T4\Core\Exception::class,
+            $errors[1]
+        );
+        $this->assertInstanceOf(
+            \T4\Core\Exception::class,
+            $errors[2]
+        );
+        $this->assertEquals(new Exception('First'), $errors[0]);
+        $this->assertEquals(new Exception('Second'), $errors[1]);
+        $this->assertEquals(new Exception('Third', 123), $errors[2]);
     }
 
     public function testCount()
     {
         $exception = new MultiException;
         $this->assertEquals(0, $exception->count());
-        $exception->add('foo');
+        $exception->add(new Exception('foo'));
         $this->assertEquals(1, $exception->count());
 
         $exception = new MultiException;
         $this->assertEquals(0, count($exception));
-        $exception->add('foo');
+        $exception->add(new Exception('foo'));
         $this->assertEquals(1, count($exception));
-    }
-
-    public function testAdd()
-    {
-        $exception = new MultiException;
-
-        $exception->add(new Exception('First'));
-        $this->assertFalse($exception->isEmpty());
-        $this->assertEquals(1, $exception->count());
-
-        $exception->add(new Exception('Second'));
-        $this->assertFalse($exception->isEmpty());
-        $this->assertEquals(2, $exception->count());
-
-        $exception->add('Second', 123);
-        $this->assertFalse($exception->isEmpty());
-        $this->assertEquals(3, $exception->count());
-
-        $this->assertInstanceOf(
-            'T4\Core\Collection',
-            $exception->getExceptions()
-        );
-        $this->assertInstanceOf(
-            'T4\Core\Exception',
-            $exception->getExceptions()[0]
-        );
-        $this->assertInstanceOf(
-            'T4\Core\Exception',
-            $exception->getExceptions()[1]
-        );
-        $this->assertInstanceOf(
-            'T4\Core\Exception',
-            $exception->getExceptions()[2]
-        );
     }
 
     public function testClass()
     {
-        $exception = new MultiException('SomeException');
-        $exception->add('Foo');
+        $errors = new MultiException(SomeException::class);
+        $errors->addException('Foo');
         $this->assertInstanceOf(
-            'SomeException',
-            $exception->getExceptions()[0]
+            SomeException::class,
+            $errors[0]
         );
     }
 
@@ -88,56 +91,58 @@ class MultiExceptionTest extends PHPUnit_Framework_TestCase
      */
     public function testInvalidClass()
     {
-        $exception = new MultiException('SomeException');
-        $exception->add(new Exception);
+        $errors = new MultiException('SomeException');
+        $errors->add(new Exception);
     }
+
 
     public function testIterate()
     {
-        $exception = new MultiException();
-        $exception->add('Foo');
-        $exception->add('Bar');
-        $exception->add('Baz');
+        $errors = new MultiException();
+        $errors->add(new Exception('Foo'));
+        $errors->add(new Exception('Bar'));
+        $errors->add(new Exception('Baz'));
 
-        foreach ($exception as $ex) {
+        $i = 0;
+        foreach ($errors as $ex) {
             $this->assertInstanceOf('T4\Core\Exception', $ex);
+            $i++;
         }
+        $this->assertEquals(3, $i);
     }
 
     public function testThrow()
     {
         try {
 
-            $exception = new MultiException();
-            $exception->add('Foo');
-            $exception->add('Bar');
-            $exception->add('Baz');
+            $errors = new MultiException();
+            $errors->add(new Exception('Foo'));
+            $errors->add(new Exception('Bar'));
+            $errors->add(new Exception('Baz'));
 
-            if (!$exception->isEmpty())
-                throw $exception;
+            if (!$errors->isEmpty())
+                throw $errors;
 
         } catch (MultiException $ex) {
 
             $this->assertEquals(3, $ex->count());
 
-            $exceptions = $ex->getExceptions();
-
             $this->assertInstanceOf(
-                'T4\Core\Exception',
-                $exceptions[0]
+                \T4\Core\Exception::class,
+                $ex[0]
             );
             $this->assertInstanceOf(
-                'T4\Core\Exception',
-                $exceptions[1]
+                \T4\Core\Exception::class,
+                $ex[1]
             );
             $this->assertInstanceOf(
-                'T4\Core\Exception',
-                $exceptions[2]
+                \T4\Core\Exception::class,
+                $ex[2]
             );
 
-            $this->assertEquals('Foo', $exceptions[0]->getMessage());
-            $this->assertEquals('Bar', $exceptions[1]->getMessage());
-            $this->assertEquals('Baz', $exceptions[2]->getMessage());
+            $this->assertEquals('Foo', $ex[0]->getMessage());
+            $this->assertEquals('Bar', $ex[1]->getMessage());
+            $this->assertEquals('Baz', $ex[2]->getMessage());
 
         }
     }
