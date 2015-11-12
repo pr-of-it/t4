@@ -42,44 +42,21 @@ abstract class Migration
         return (int)$m[1];
     }
 
-    public function up()
-    {
-        $this->db->beginTransaction();
-        try
-        {
-            $this->transactionalUp();
-            $this->db->commit();
-        }
-        catch(\Exception $e)
-        {
-            $this->db->rollback();
-            throw $e;
-        }
+    final public function beginTransaction() {
+        return $this->db->beginTransaction();
     }
 
-    public function down()
-    {
-        $this->db->beginTransaction();
-        try
-        {
-            $this->transactionalDown();
-            $this->db->commit();
-        }
-        catch(\Exception $e)
-        {
-            $this->db->rollback();
-            throw $e;
-        }
+    final public function rollback() {
+        return $this->db->rollback();
     }
 
-    public function transactionalUp()
-    {
-
+    final public function commit() {
+        return $this->db->commit();
     }
-    public function transactionalDown()
-    {
 
-    }
+    abstract public function up();
+
+    abstract public function down();
 
     final protected function createTable($tableName, $columns = [], $indexes = [], $extensions = [])
     {

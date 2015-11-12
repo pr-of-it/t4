@@ -183,17 +183,6 @@ class {$className}
     public function down()
     {
     }
-    /*
-	// Use transactionalUp/transactionalDown to do migration with transaction
-	// Attention! Some Mysql commands (aka ALTER, DROP etc) cause implict commit! See more at https://dev.mysql.com/doc/refman/5.7/en/implicit-commit.html
-	public function transactionalUp()
-	{
-	}
-
-	public function transactionalDown()
-	{
-	}
-	*/
 }
 FILE;
 
