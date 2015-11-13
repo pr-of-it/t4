@@ -441,7 +441,7 @@ class Pgsql
             return null;
         }
 
-        return $connection->query('select pg_get_serial_sequence(:table_name, :column_name)', [':table_name' => $tableName, ':column_name' => $PkColumnsCount[0]['attname']])->fetchScalar();
+        return $connection->query('select pg_get_serial_sequence(:table_name, :column_name)', [':table_name' => $tableName, ':column_name' => $PkColumns[0]['attname']])->fetchScalar();
     }
 
     /**
