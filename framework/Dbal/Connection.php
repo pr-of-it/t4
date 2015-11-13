@@ -139,13 +139,13 @@ class Connection
         return $this->pdo->beginTransaction();
     }
 
-    public function rollback()
+    public function rollbackTransaction()
     {
-        return $this->rollback();
+        return $this->pdo->rollback();
     }
 
-    public function commit()
+    public function commitTransaction()
     {
-        return $this->commit();
+        return $this->pdo->commit();
     }
 }
