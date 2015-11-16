@@ -42,6 +42,18 @@ abstract class Migration
         return (int)$m[1];
     }
 
+    final public function beginTransaction() {
+        return $this->db->beginTransaction();
+    }
+
+    final public function rollbackTransaction() {
+        return $this->db->rollbackTransaction();
+    }
+
+    final public function commitTransaction() {
+        return $this->db->commitTransaction();
+    }
+
     abstract public function up();
 
     abstract public function down();
