@@ -183,6 +183,7 @@ class {$className}
     public function down()
     {
     }
+    
 }
 FILE;
 
