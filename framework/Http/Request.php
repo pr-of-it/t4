@@ -20,6 +20,7 @@ use T4\Core\Session;
  * @property \T4\Core\Url $url
  * @property \T4\Core\Std $get
  * @property \T4\Core\Std $post
+ * @property \T4\Core\Std $body
  * @property \T4\Core\Std $files
  * @property \T4\Core\Std $headers
  */
@@ -49,6 +50,16 @@ class Request
         $this->get = new Std($_GET);
 
         $this->post = new Std($_POST);
+
+        $input = file_get_contents('php://input');
+        if ($input) {
+            $decoded = @json_decode($input, true);
+            if (JSON_ERROR_NONE == json_last_error()) {
+                $this->body = new Std($decoded);
+            } else {
+                $this->body = $input;
+            }
+        }
 
         $this->files = new Std();
         if (!empty($_FILES)) {
