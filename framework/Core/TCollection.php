@@ -35,6 +35,11 @@ trait TCollection
         return $this;
     }
 
+    public function slice($offset, $length=null)
+    {
+        return new static(array_slice($this->storage, $offset, $length));
+    }
+
     public function existsElement(array $attributes)
     {
         if (empty($attributes))

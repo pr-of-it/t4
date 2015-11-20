@@ -88,6 +88,27 @@ class CollectionTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($collectionExpected, $collection);
     }
 
+    public function testSlice()
+    {
+        $collection = new Collection([10, 20, 30, 40, 50]);
+        $this->assertEquals(
+            new Collection([30, 40, 50]),
+            $collection->slice(2)
+        );
+        $this->assertEquals(
+            new Collection([40, 50]),
+            $collection->slice(-2)
+        );
+        $this->assertEquals(
+            new Collection([30, 40]),
+            $collection->slice(2, 2)
+        );
+        $this->assertEquals(
+            new Collection([40]),
+            $collection->slice(-2, 1)
+        );
+    }
+
     public function testExistElement()
     {
         $collection = new Collection();

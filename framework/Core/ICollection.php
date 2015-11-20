@@ -8,6 +8,7 @@ interface ICollection
     public function add($value);
     public function prepend($value);
     public function append($value);
+    public function slice($offset, $length=null);
 
     public function existsElement(array $attributes);
     public function findAllByAttributes(array $attributes);
