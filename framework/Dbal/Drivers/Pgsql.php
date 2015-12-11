@@ -397,6 +397,16 @@ class Pgsql
         return $this->findByQuery($class, $query);
     }
 
+    public function countAllByQuery($class, $query, $params = [])
+    {
+        if ($query instanceof QueryBuilder) {
+            $params = $query->getParams();
+            $query = clone $query;
+            $query = $query->select('COUNT(*)')->getQuery($this);
+        }
+        return $class::getDbConnection()->query($query, $params)->fetchScalar();
+    }
+
     public function countAll($class, $options = [])
     {
         $query = new QueryBuilder();
