@@ -42,6 +42,8 @@ interface IDriver
 
     public function findByColumn($class, $column, $value, $options = []);
 
+    public function countAllByQuery($class, $query, $params = []);
+
     public function countAll($class, $options = []);
 
     public function countAllByColumn($class, $column, $value, $options = []);

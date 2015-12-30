@@ -163,6 +163,17 @@ trait TCrud
     }
 
     /**
+     * @param string|\T4\Dbal\QueryBuilder $query
+     * @param array $params
+     * @return int
+     */
+    public static function countAllByQuery($query, $params = [])
+    {
+        $driver = static::getDbDriver();
+        return $driver->countAllByQuery(get_called_class(), $query, $params);
+    }
+
+    /**
      * @param array $options
      * @return int
      */

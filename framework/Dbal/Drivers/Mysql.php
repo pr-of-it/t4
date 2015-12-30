@@ -29,9 +29,9 @@ class Mysql
             }
             if (
                 (
-                $index == $lastIndex
-                ||
-                !preg_match('~^(t|j)[\d]+$~', $part)
+                    $index == $lastIndex
+                    ||
+                    !preg_match('~^(t|j)[\d]+$~', $part)
                 ) &&
                 !preg_match($this->selectNoQouteTemplate, $part)
             ) {
@@ -396,6 +396,16 @@ class Mysql
             ->limit(1)
             ->params([':value' => $value]);
         return $this->findByQuery($class, $query);
+    }
+
+    public function countAllByQuery($class, $query, $params = [])
+    {
+        if ($query instanceof QueryBuilder) {
+            $params = $query->getParams();
+            $query = clone $query;
+            $query = $query->select('COUNT(*)')->getQuery($this);
+        }
+        return $class::getDbConnection()->query($query, $params)->fetchScalar();
     }
 
     public function countAll($class, $options = [])
