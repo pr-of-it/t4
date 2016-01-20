@@ -5,7 +5,7 @@ namespace T4\Console;
 trait TRunCommand
 {
 
-    protected function runCommand($cmd)
+    public function runCommand($cmd)
     {
         if (substr(php_uname(), 0, 7) == "Windows"){
             $res = popen('start "" /B '.$cmd, "r");
