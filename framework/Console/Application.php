@@ -22,6 +22,7 @@ class Application
 {
 
     use TSingleton, TStdGetSet;
+    use TRunCommand;
 
     const CMD_PATTERN = '~^(\/?)([^\/]*?)(\/([^\/]*?))?$~';
     const DEFAULT_COMMAND = 'Application';
