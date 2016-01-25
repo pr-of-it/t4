@@ -2,6 +2,7 @@
 
 namespace T4\Mvc;
 
+use T4\Console\TRunCommand;
 use T4\Core\Config;
 use T4\Core\Exception;
 use T4\Core\Session;
@@ -31,6 +32,8 @@ class Application
         TSingleton,
         TApplicationPaths,
         TApplicationMagic;
+
+    use TRunCommand;
 
     /**
      * @var \T4\Core\Std
