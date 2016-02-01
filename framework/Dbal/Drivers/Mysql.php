@@ -446,13 +446,13 @@ class Mysql
         $data = [];
 
         foreach ($columns as $column => $def) {
-            if (isset($model->{$column})) {
+            if (isset($model->{$column}) && null === $model->{$column} && isset($def['default'])) {
+                $sets[$column] = ':' . $column;
+                $data[':'.$column] = $def['default'];
+            } else {
                 $cols[] = $column;
                 $sets[$column] = ':' . $column;
                 $data[':'.$column] = $model->{$column};
-            } elseif (isset($def['default'])) {
-                $sets[$column] = ':' . $column;
-                $data[':'.$column] = $def['default'];
             }
         }
 

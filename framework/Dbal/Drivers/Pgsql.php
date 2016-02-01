@@ -471,16 +471,16 @@ class Pgsql
         $data = [];
 
         foreach ($columns as $column => $def) {
-            if (isset($model->{$column})) {
-                $cols[] = $this->quoteName($column);
-                $prep[] = ':' . $column;
-                $sets[] = '' . $this->quoteName($column) . '=:' . $column;
-                $data[':' . $column] = $model->{$column};
-            } elseif (isset($def['default'])) {
+            if (isset($model->{$column}) && null === $model->{$column} && isset($def['default'])) {
                 $cols[] = $this->quoteName($column);
                 $prep[] = ':' . $column;
                 $sets[] = '' . $this->quoteName($column) . '=:' . $column;
                 $data[':' . $column] = $def['default'];
+            } else {
+                $cols[] = $this->quoteName($column);
+                $prep[] = ':' . $column;
+                $sets[] = '' . $this->quoteName($column) . '=:' . $column;
+                $data[':' . $column] = $model->{$column};
             }
         }
 
