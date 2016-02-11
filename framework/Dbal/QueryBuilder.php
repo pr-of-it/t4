@@ -29,7 +29,7 @@ class QueryBuilder
                 $what = preg_split('~[\s]*\,[\s]*~', $what[0]);
             }
         }
-        $what = array_map([get_called_class(), 'trim'], $what);
+        $what = array_map([$this, 'trim'], $what);
         return $what;
     }
 
