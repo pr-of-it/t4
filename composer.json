@@ -12,7 +12,8 @@
   "require": {
     "php": ">=5.6.0",
     "twig/twig": "1.*",
-    "phpmailer/phpmailer": "5.*"
+    "phpmailer/phpmailer": "5.*",
+    "psr/log": "1.*"
   },
   "require-dev": {
     "phing/phing": "2.*",
