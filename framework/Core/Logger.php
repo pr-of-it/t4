@@ -1,6 +1,6 @@
 <?php
-namespace T4\Core;
 
+namespace T4\Core;
 
 use Psr\Log\AbstractLogger;
 
