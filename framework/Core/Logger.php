@@ -7,13 +7,14 @@ use Psr\Log\AbstractLogger;
 class Logger
     extends AbstractLogger
 {
-    protected $path =  \ROOT_PATH . DIRECTORY_SEPARATOR . 'logs' . DIRECTORY_SEPARATOR;
+    protected $path;
 
     public function __construct(Std $config = null)
     {
-        if (!empty($config->path)) {
-            $this->path = $config->path;
+        if (empty($config->path)) {
+            throw new Exception('Empty path for logs');
         }
+        $this->path = $config->path;
     }
 
     /**
