@@ -25,7 +25,6 @@ use T4\Threads\Helpers;
  * @property \T4\Mvc\Module[] $modules
  * @property \T4\Mvc\AssetsManager $assets
  * @property \T4\Core\Flash $flash
- * @property \Psr\Log\LoggerInterface $logger
  */
 class Application
 {
@@ -41,11 +40,6 @@ class Application
      * @var \T4\Core\Std
      */
     public $extensions;
-
-    /**
-     * @var \Psr\Log\LoggerInterface
-     */
-    public $logger;
 
     /**
      * Конструктор
@@ -95,7 +89,6 @@ class Application
     public function run()
     {
         try {
-            $this->initLogger();
             Session::init();
             $this->initExtensions();
             $this->runRequest($this->request);
@@ -108,7 +101,6 @@ class Application
                         $this->runRoute($this->config->errors['404']);
                     } else {
                         echo $e->getMessage();
-                        $this->logger->error($e->getMessage());
                     }
                 } elseif ($e instanceof E403Exception) {
                     header('HTTP/1.0 403 Forbidden', true, 403);
@@ -116,27 +108,15 @@ class Application
                         $this->runRoute($this->config->errors['403']);
                     } else {
                         echo $e->getMessage();
-                        $this->logger->error($e->getMessage());
                     }
                 } else {
                     echo $e->getMessage();
-                    $this->logger->error($e->getMessage());
                     die;
                 }
             } catch (Exception $e2) {
                 echo $e2->getMessage();
-                $this->logger->error($e2->getMessage());
                 die;
             }
-        }
-    }
-    protected function initLogger()
-    {
-        if (isset($this->config->log->class)) {
-            $loggerClass = $this->config->log->class;
-            $this->logger = new $loggerClass($this->config->log);
-        } else {
-            $this->logger = new Logger($this->config->log);
         }
     }
     /**
