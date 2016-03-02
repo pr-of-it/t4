@@ -5,6 +5,7 @@ namespace T4\Mvc;
 use T4\Console\TRunCommand;
 use T4\Core\Config;
 use T4\Core\Exception;
+use T4\Core\Logger;
 use T4\Core\Session;
 use T4\Core\Std;
 use T4\Core\TSingleton;
@@ -88,7 +89,6 @@ class Application
     public function run()
     {
         try {
-
             Session::init();
             $this->initExtensions();
             $this->runRequest($this->request);
@@ -119,7 +119,6 @@ class Application
             }
         }
     }
-
     /**
      * @param \T4\Http\Request $request
      */
