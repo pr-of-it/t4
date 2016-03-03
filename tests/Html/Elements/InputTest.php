@@ -34,10 +34,10 @@ class InputTest extends PHPUnit_Framework_TestCase
 
     }
 
-    public function testInt()
+    public function testNumber()
     {
 
-        $input = new \T4\Html\Elements\Int;
+        $input = new \T4\Html\Elements\Number;
         $this->assertEquals(
             '<input type="number" />',
             $input->render()
