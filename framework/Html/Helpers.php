@@ -4,7 +4,7 @@ namespace T4\Html;
 
 use T4\Core\Collection;
 use T4\Core\Std;
-use T4\Html\Elements\Int;
+use T4\Html\Elements\Number;
 use T4\Html\Elements\Select;
 use T4\Html\Elements\Text;
 use T4\Html\Elements\Textarea;
@@ -27,7 +27,7 @@ class Helpers
         $htmlOptions['name'] = $name;
         switch ($options['type']) {
             case 'int':
-                $input = new Int($name, $options, $htmlOptions);
+                $input = new Number($name, $options, $htmlOptions);
                 $input->setValue(is_null($value) ? $options['default'] : $value);
                 return $input->render();
             case 'string':

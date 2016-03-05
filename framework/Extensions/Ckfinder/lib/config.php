@@ -1,6 +1,9 @@
 <?php
 
-require_once realpath(__DIR__ . '/../../../t4/framework/boot.php');
+require_once '{{ROOT_PATH_T4}}' . '/boot.php';
+require_once '{{ROOT_PATH_PROTECTED}}' . '/boot.php';
+require_once '{{ROOT_PATH_T4}}' . '/autoload.php';
+require_once '{{ROOT_PATH_PROTECTED}}' . '/autoload.php';
 
 /*
  * ### CKFinder : Configuration File - Basic Instructions
@@ -33,8 +36,8 @@ function CheckAuthentication()
 	// user logs in your system. To be able to use session variables don't
 	// forget to add session_start() at the top of this file.
 
-    $app = \T4\Mvc\Application::getInstance();
-	return null !== $app->user;
+	$app = \T4\Mvc\Application::getInstance()->setConfig(new \T4\Core\Config(ROOT_PATH_PROTECTED . '/config.php'));
+	return !empty($app->user);
 }
 
 // LicenseKey : Paste your license key here. If left blank, CKFinder will be
@@ -84,7 +87,7 @@ Examples:
 ATTENTION: The trailing slash is required.
 */
 //$baseDir = resolveUrl($baseUrl);
-$baseDir = ROOT_PATH_PUBLIC . DS . 'public' . DS . 'editor' . DS;
+$baseDir = ROOT_PATH_PUBLIC . '/public/editor/';
 
 /*
  * ### Advanced Settings
@@ -208,9 +211,7 @@ $config['ResourceType'][] = Array(
 */
 $config['ResourceType'][] = Array(
 		'name' => 'Images',
-		//'url' => $baseUrl . 'images',
 		'url' => $baseUrl,
-		//'directory' => $baseDir . 'images',
 		'directory' => $baseDir,
 		'maxSize' => 0,
 		'allowedExtensions' => 'bmp,gif,jpeg,jpg,png',

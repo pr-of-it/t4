@@ -2,7 +2,7 @@
 
 namespace T4\Html\Elements;
 
-class Int
+class Number
     extends Input
 {
 
