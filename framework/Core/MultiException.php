@@ -2,20 +2,21 @@
 
 namespace T4\Core;
 
-use T4\Core\Exception;
-
 class MultiException
     extends Exception
     implements IArrayAccess, ICollection
 {
 
-    use TCollection;
+    use TCollection {
+        append as protected collectionAppend;
+        prepend as protected collectionPrepend;
+    }
 
     protected $class = Exception::class;
 
     public function __construct($class = Exception::class)
     {
-        if ( !is_a($class, Exception::class, true) ) {
+        if ( !is_a($class, \Exception::class, true) ) {
             throw new Exception('Invalid MultiException base class');
         }
         $this->class = $class;
@@ -26,8 +27,7 @@ class MultiException
         if (!($value instanceof $this->class)) {
             throw new Exception('MultiException class mismatch');
         }
-        $this->storage = array_merge($this->storage, [$value]);
-        return $this;
+        return $this->collectionAppend($value);
     }
 
     public function prepend($value)
@@ -35,11 +35,10 @@ class MultiException
         if (!($value instanceof $this->class)) {
             throw new Exception('MultiException class mismatch');
         }
-        $this->storage = array_merge([$value], $this->storage);
-        return $this;
+        return $this->collectionPrepend($value);
     }
 
-    public function addException($message = "", $code = 0, Exception $previous = null)
+    public function addException($message = "", $code = 0, \Exception $previous = null)
     {
         $class = $this->class;
         $this->add(new $class($message, $code, $previous));
