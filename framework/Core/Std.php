@@ -78,18 +78,52 @@ class Std
     }
 
     /**
-     * @param \T4\Core\Std | array $obj
+     * @param \T4\Core\IArrayable|array $obj
      * @return \T4\Core\Std $this
      */
     public function merge($obj)
     {
-        if ($obj instanceof self) {
+        if ($obj instanceof IArrayable) {
             $obj = $obj->toArray();
         } else {
             $obj = (array)$obj;
         }
         foreach ($obj as $key => $value)
             $this->$key = $value;
+        return $this;
+    }
+
+    /**
+     * @param \T4\Core\IArrayable|array $data
+     * @return \T4\Core\Std $this
+     * @throws \T4\Core\MultiException
+     */
+    public function fill($data)
+    {
+        if ($data instanceof IArrayable) {
+            $data = $data->toArray();
+        } else {
+            $data = (array)$data;
+        }
+
+        $errors = new MultiException();
+
+        foreach ($data as $key => $value) {
+            try {
+                $this->$key = $value;
+            } catch (\Exception $e) {
+                if ($e instanceof MultiException) {
+                    $errors->merge($e);
+                } else {
+                    $errors->add($e);
+                }
+            }
+        }
+
+        if (!$errors->isEmpty()) {
+            throw $errors;
+        }
+
         return $this;
     }
 
