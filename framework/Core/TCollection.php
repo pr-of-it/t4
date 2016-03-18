@@ -35,6 +35,21 @@ trait TCollection
         return $this;
     }
 
+    /**
+     * @param \T4\Core\IArrayable|array $values
+     * @return $this
+     */
+    public function merge($values)
+    {
+        if ($values instanceof IArrayable) {
+            $values = $values->toArray();
+        } else {
+            $values = (array)$values;
+        }
+        $this->storage = array_merge($this->storage, $values);
+        return $this;
+    }
+
     public function slice($offset, $length=null)
     {
         return new static(array_slice($this->storage, $offset, $length));

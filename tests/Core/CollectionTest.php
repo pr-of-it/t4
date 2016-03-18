@@ -4,7 +4,7 @@ use T4\Core\Collection;
 
 require_once realpath(__DIR__ . '/../../framework/boot.php');
 
-class Int
+class Number
 {
     protected $data;
 
@@ -74,18 +74,33 @@ class CollectionTest extends PHPUnit_Framework_TestCase
         );
 
         $collection = new Collection();
-        $collection->append(new Int(1));
-        $collection->append(new Int(2));
-        $collection->append(new Int(3));
+        $collection->append(new Number(1));
+        $collection->append(new Number(2));
+        $collection->append(new Number(3));
 
         $collectionExpected = new Collection();
-        $collectionExpected->append(new Int(2));
-        $collectionExpected->append(new Int(3));
-        $collectionExpected->append(new Int(4));
+        $collectionExpected->append(new Number(2));
+        $collectionExpected->append(new Number(3));
+        $collectionExpected->append(new Number(4));
 
         $collection->increment();
 
         $this->assertEquals($collectionExpected, $collection);
+    }
+
+    public function testMerge()
+    {
+        $collection = new Collection([1, 2]);
+
+        $collection->merge([3, 4]);
+        $this->assertCount(4, $collection);
+        $expected = new Collection([1, 2, 3, 4]);
+        $this->assertEquals(array_values($expected->toArray()), array_values($collection->toArray()));
+
+        $collection->merge(new Collection([5, 6]));
+        $this->assertCount(6, $collection);
+        $expected = new Collection([1, 2, 3, 4, 5, 6]);
+        $this->assertEquals(array_values($expected->toArray()), array_values($collection->toArray()));
     }
 
     public function testSlice()
