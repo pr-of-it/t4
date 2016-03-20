@@ -41,10 +41,24 @@ trait TStdGetSet
 
             $validateMethod = 'validate' . ucfirst($key);
             if (method_exists($this, $validateMethod)) {
+
                 $validateResult = $this->$validateMethod($val);
                 if (false === $validateResult) {
                     return;
                 }
+
+                if ($validateResult instanceof \Generator) {
+                    $errors = new MultiException();
+                    foreach ($validateResult as $error) {
+                        if ($error instanceof \Exception) {
+                            $errors[] = $error;
+                        }
+                    }
+                    if (!$errors->isEmpty()) {
+                        throw $errors;
+                    }
+                }
+
             }
 
             $sanitizeMethod = 'sanitize' . ucfirst($key);

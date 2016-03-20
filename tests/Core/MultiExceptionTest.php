@@ -30,9 +30,48 @@ class MultiExceptionTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($errors->isEmpty());
     }
 
+    public function testAppend()
+    {
+        $errors = new MultiException;
+        $this->assertTrue($errors->isEmpty());
+
+        $errors->append(new Exception('First'));
+        $this->assertFalse($errors->isEmpty());
+        $this->assertEquals(1, $errors->count());
+
+        $errors->append(new Exception('Second'));
+        $this->assertFalse($errors->isEmpty());
+        $this->assertEquals(2, $errors->count());
+
+        $this->assertEquals(
+            [new Exception('First'), new Exception('Second')],
+            $errors->toArray()
+        );
+    }
+
+    public function testPrepend()
+    {
+        $errors = new MultiException;
+        $this->assertTrue($errors->isEmpty());
+
+        $errors->prepend(new Exception('First'));
+        $this->assertFalse($errors->isEmpty());
+        $this->assertEquals(1, $errors->count());
+
+        $errors->prepend(new Exception('Second'));
+        $this->assertFalse($errors->isEmpty());
+        $this->assertEquals(2, $errors->count());
+
+        $this->assertEquals(
+            [new Exception('Second'), new Exception('First')],
+            $errors->toArray()
+        );
+    }
+
     public function testAdd()
     {
         $errors = new MultiException;
+        $this->assertTrue($errors->isEmpty());
 
         $errors->add(new Exception('First'));
         $this->assertFalse($errors->isEmpty());

@@ -3,9 +3,10 @@
 namespace T4\Core;
 
 /**
- * Trait TSimpleArrayAccess
+ * Trait TArrayAccess
  * @package T4\Core
  *
+ * @implements \T4\Core\IArrayAccess
  * @implements \ArrayAccess
  * @implements \Countable
  * @implements \IteratorAggregate

@@ -4,7 +4,7 @@ use T4\Core\Collection;
 
 require_once realpath(__DIR__ . '/../../framework/boot.php');
 
-class Int
+class Number
 {
     protected $data;
 
@@ -22,26 +22,19 @@ class Int
 class CollectionTest extends PHPUnit_Framework_TestCase
 {
 
-    public function testArrayable()
+    public function testConstruct()
     {
-        $collection = new Collection();
-        $collection[] = 1;
-        $collection[] = 2;
-        $collection[] = 3;
-        $this->assertEquals([1,2,3], $collection->toArray());
-
-        $collection1 = new Collection();
-        $collection1->fromArray([3,4,5]);
-
-        $collection2 = new Collection();
-        $collection2[] = 3;
-        $collection2[] = 4;
-        $collection2[] = 5;
-
-        $this->assertEquals($collection1, $collection2);
+        $collection1 = new Collection([1, 2, 3]);
+        $this->assertEquals(
+            [1, 2, 3],
+            $collection1->toArray()
+        );
+        $this->assertEquals(1, $collection1[0]);
+        $this->assertEquals(2, $collection1[1]);
+        $this->assertEquals(3, $collection1[2]);
     }
 
-    public function testAppendPrependCall()
+    public function testAppendPrependAdd()
     {
         $collection = new Collection();
         $this->assertEquals(
@@ -73,19 +66,30 @@ class CollectionTest extends PHPUnit_Framework_TestCase
             count($collection)
         );
 
-        $collection = new Collection();
-        $collection->append(new Int(1));
-        $collection->append(new Int(2));
-        $collection->append(new Int(3));
+        $collection->add(3);
+        $this->assertEquals(
+            [2, 1, 3],
+            $collection->toArray()
+        );
+        $this->assertEquals(
+            3,
+            count($collection)
+        );
+    }
 
-        $collectionExpected = new Collection();
-        $collectionExpected->append(new Int(2));
-        $collectionExpected->append(new Int(3));
-        $collectionExpected->append(new Int(4));
+    public function testMerge()
+    {
+        $collection = new Collection([1, 2]);
 
-        $collection->increment();
+        $collection->merge([3, 4]);
+        $this->assertCount(4, $collection);
+        $expected = new Collection([1, 2, 3, 4]);
+        $this->assertEquals(array_values($expected->toArray()), array_values($collection->toArray()));
 
-        $this->assertEquals($collectionExpected, $collection);
+        $collection->merge(new Collection([5, 6]));
+        $this->assertCount(6, $collection);
+        $expected = new Collection([1, 2, 3, 4, 5, 6]);
+        $this->assertEquals(array_values($expected->toArray()), array_values($collection->toArray()));
     }
 
     public function testSlice()
@@ -223,6 +227,41 @@ class CollectionTest extends PHPUnit_Framework_TestCase
             return $carry + $item;
         });
         $this->assertEquals(10, $reduced);
+    }
+
+    public function testCall()
+    {
+        $collection = new Collection();
+        $collection->append(new Number(1));
+        $collection->append(new Number(2));
+        $collection->append(new Number(3));
+
+        $collectionExpected = new Collection();
+        $collectionExpected->append(new Number(2));
+        $collectionExpected->append(new Number(3));
+        $collectionExpected->append(new Number(4));
+
+        $collection->increment();
+        $this->assertEquals($collectionExpected, $collection);
+    }
+
+    public function testArrayable()
+    {
+        $collection = new Collection();
+        $collection[] = 1;
+        $collection[] = 2;
+        $collection[] = 3;
+        $this->assertEquals([1,2,3], $collection->toArray());
+
+        $collection1 = new Collection();
+        $collection1->fromArray([3,4,5]);
+
+        $collection2 = new Collection();
+        $collection2[] = 3;
+        $collection2[] = 4;
+        $collection2[] = 5;
+
+        $this->assertEquals($collection1, $collection2);
     }
 
 }
