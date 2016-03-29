@@ -149,6 +149,15 @@ class CollectionTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(array_keys($expected->toArray()), array_keys($result->toArray()));
     }
 
+    public function testReverse()
+    {
+        $collection = new Collection([10 => 1, 30 => 3, 20 => 2, 'a' => -1, 'b' => 0, 'c' => 42, '111', '11']);
+
+        $result = $collection->reverse();
+        $expected = new Collection([32 => '11', 31 => '111', 'c' => 42, 'b' => 0, 'a' => -1, 20 => 2, 30 => 3, 10 => 1]);
+        $this->assertEquals($expected->toArray(), $result->toArray());
+    }
+
     public function testMap()
     {
         $collection = new Collection([1, 2, 3]);
