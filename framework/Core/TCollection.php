@@ -161,6 +161,15 @@ trait TCollection
     }
 
     /**
+     * @return static
+     */
+    public function reverse() {
+        $reversed = array_reverse($this->toArray(), true);
+        return new static($reversed);
+    }
+
+
+    /**
      * @param callable $callback
      * @return static
      */
