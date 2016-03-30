@@ -38,6 +38,14 @@ class Twig
         $this->twig->addGlobal('view', $this->links->view);
     }
 
+    public function addTemplatePath($path)
+    {
+        parent::addTemplatePath($path);
+        $loader = $this->twig->getLoader();
+        $loader->setPaths($this->paths);
+        $this->twig->setLoader($loader);
+    }
+
     // TODO: непонятно что с этим делать. Вообще-то надо во View этот метод использовать, а не здесь
     public function setController(Controller $controller)
     {
