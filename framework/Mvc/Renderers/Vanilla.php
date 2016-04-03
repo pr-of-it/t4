@@ -4,7 +4,7 @@ namespace T4\Mvc\Renderers;
 
 use T4\Core\Std;
 use T4\Mvc\ARenderer;
-use T4\Mvc\View;
+use T4\Mvc\Controller;
 
 class Vanilla
     extends ARenderer

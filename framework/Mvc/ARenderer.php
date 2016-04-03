@@ -22,7 +22,7 @@ abstract class ARenderer
         $this->view = $view;
     }
 
-    final public function addTemplatePath($path)
+    public function addTemplatePath($path)
     {
         $this->paths[] = Helpers::getRealPath($path);
     }
