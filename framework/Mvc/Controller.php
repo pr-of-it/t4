@@ -141,6 +141,7 @@ abstract class Controller
 
             $p = [];
             $request = Application::instance()->request;
+
             foreach ($this->getActionParameters($name) as $param) {
 
                 if (isset($params[$param->name])) {
@@ -172,9 +173,10 @@ abstract class Controller
                 }
 
             }
+
             $p = array_merge($p, $params);
 
-            call_user_func_array([$this, $actionMethodName], $p);
+            $this->$actionMethodName(...array_values($p));
             $this->afterAction($name);
         }
 
