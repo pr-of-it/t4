@@ -17,6 +17,10 @@ use T4\Threads\Helpers;
 /**
  * Class Application
  * @package T4\Mvc
+ *
+ * @property string $path
+ * @property string $routeConfigPath
+ *
  * @property \T4\Core\Config $config
  * @property \T4\Dbal\Connection[] $db
  * @property \T4\Http\Request $request
@@ -26,7 +30,9 @@ use T4\Threads\Helpers;
  * @property \T4\Core\Flash $flash
  */
 class Application
-    implements ISingleton
+    implements
+        ISingleton,
+        IApplication
 {
     use
         TStdGetSet,

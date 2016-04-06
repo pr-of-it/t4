@@ -221,7 +221,7 @@ class Router
                     'params' => [],
                     'format' => $url->extension ?: 'html',
                 ]);
-            elseif ($app->existsController('', $urlParts[0]))
+            elseif ($app->existsController(null, $urlParts[0]))
                 return new Route([
                     'module' => '',
                     'controller' => ucfirst($urlParts[0]),
@@ -258,7 +258,7 @@ class Router
                         'format' => $url->extension ?: 'html',
                     ]);
                 }
-            } elseif ($app->existsController('', $urlParts[0])) {
+            } elseif ($app->existsController(null, $urlParts[0])) {
                 return new Route([
                     'module' => '',
                     'controller' => ucfirst($urlParts[0]),

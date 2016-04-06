@@ -2,7 +2,6 @@
 
 namespace T4\Core;
 
-
 trait TSingleton
 //implements ISingleton
 {
@@ -15,6 +14,10 @@ trait TSingleton
     {
     }
 
+    /**
+     * @param bool $new
+     * @return static
+     */
     public static function instance($new = false)
     {
         static $instance = null;

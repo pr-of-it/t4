@@ -2,17 +2,20 @@
 
 namespace T4\Mvc;
 
+/**
+ * Class TApplicationPaths
+ * @package \T4\Mvc
+ * @mixin \T4\Mvc\Application
+ */
 trait TApplicationPaths
 {
-
-    public $path = \ROOT_PATH_PROTECTED;
 
     /**
      * @return string
      */
     public function getPath()
     {
-        return $this->path;
+        return \ROOT_PATH_PROTECTED;
     }
 
     /**
@@ -27,9 +30,9 @@ trait TApplicationPaths
      * @param string $module
      * @return string
      */
-    public function getModulePath($module = '')
+    public function getModulePath($module = null)
     {
-        return $this->getPath() . (empty($module) ? '' : DS . 'Modules' . DS . ucfirst($module));
+        return $this->getPath() . (null === $module ? '' : DS . 'Modules' . DS . ucfirst($module));
     }
 
     /**
@@ -37,7 +40,7 @@ trait TApplicationPaths
      * @param string $controller
      * @return string
      */
-    public function getControllerTemplatesPath($module = '', $controller = Router::DEFAULT_CONTROLLER)
+    public function getControllerTemplatesPath($module = null, $controller)
     {
         return $this->getModulePath($module) . DS . 'Templates' . DS . ucfirst($controller);
     }
@@ -46,10 +49,11 @@ trait TApplicationPaths
      * @param string $module
      * @return bool
      */
-    public function existsModule($module = '')
+    public function existsModule($module = null)
     {
-        if (empty($module))
+        if (null === $module) {
             return true;
+        }
         $modulePath = $this->getModulePath($module);
         return is_dir($modulePath) && is_readable($modulePath);
     }
@@ -59,24 +63,10 @@ trait TApplicationPaths
      * @param string $controller
      * @return bool
      */
-    public function existsController($module = '', $controller = Router::DEFAULT_CONTROLLER)
+    public function existsController($module = null, $controller)
     {
-        $controllerClassName = (empty($module) ? '\\App\\Controllers\\' : '\\App\\Modules\\' . ucfirst($module) . '\\Controllers\\') . ucfirst($controller);
+        $controllerClassName = (null === $module ? '\\App\\Controllers\\' : '\\App\\Modules\\' . ucfirst($module) . '\\Controllers\\') . ucfirst($controller);
         return $this->existsModule($module) && class_exists($controllerClassName) && is_subclass_of($controllerClassName, '\T4\Mvc\Controller');
-    }
-
-    /**
-     * @param string $module
-     * @param string $controller
-     * @param string $action
-     * @return bool
-     */
-    public function existsActionView($module = '', $controller = Router::DEFAULT_CONTROLLER, $action = Router::DEFAULT_ACTION)
-    {
-        $controllerTemplatesPath = $this->getControllerTemplatesPath($module, $controller);
-        if (!is_dir($controllerTemplatesPath) || !is_readable($controllerTemplatesPath))
-            return false;
-        return count(glob($controllerTemplatesPath . DS . ucfirst($action) . '.*')) > 0;
     }
 
 }
