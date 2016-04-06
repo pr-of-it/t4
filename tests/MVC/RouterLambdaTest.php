@@ -4,7 +4,7 @@ require_once realpath(__DIR__ . '/../../framework/boot.php');
 
 function getLambdaRouteConfig()
 {
-    return new \T4\Core\Std([
+    return new \T4\Core\Config([
         '/' => '///',
         '/index' => '///',
         '/goods' => '/Shop/Goods/default',

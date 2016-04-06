@@ -22,6 +22,7 @@ use T4\Threads\Helpers;
  * @property string $routeConfigPath
  *
  * @property \T4\Core\Config $config
+ * @property \T4\Mvc\IRouter $router
  * @property \T4\Dbal\Connection[] $db
  * @property \T4\Http\Request $request
  * @property \App\Models\User $user

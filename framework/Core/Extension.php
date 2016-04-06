@@ -2,7 +2,7 @@
 
 namespace T4\Core;
 
-use T4\Mvc\Application;
+use T4\Mvc\IApplication;
 
 abstract class Extension
 {
@@ -25,7 +25,7 @@ abstract class Extension
 
     /**
      * Ссылка на объект приложения
-     * @var \T4\Mvc\Application
+     * @var \T4\Mvc\IApplication
      */
     protected $app;
 
@@ -38,7 +38,7 @@ abstract class Extension
 
     }
 
-    public function setApp(Application $app)
+    public function setApp(IApplication $app)
     {
         $this->app = $app;
     }

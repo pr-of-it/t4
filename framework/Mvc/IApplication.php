@@ -17,5 +17,6 @@ interface IApplication
 
     public function setConfig(Config $config = null);
     public function setRoutes(Config $config = null);
+    public function getRouter() : IRouter;
 
 }

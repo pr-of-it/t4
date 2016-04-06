@@ -52,6 +52,13 @@ trait TApplicationMagic
         $this->config->routes = $config ?: new Config([]);
     }
 
+    public function getRouter() : IRouter
+    {
+        /** @var \T4\Mvc\IRouter $class */
+        $class = Router::class;
+        return $class::instance()->setConfig($this->config->routes);
+    }
+
     public function setSections(Config $config = null)
     {
         if (empty($this->config)) {
