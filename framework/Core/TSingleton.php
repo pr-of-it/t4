@@ -9,12 +9,10 @@ trait TSingleton
 
     protected function __construct()
     {
-
     }
 
     protected function __clone()
     {
-
     }
 
     public static function instance($new = false)

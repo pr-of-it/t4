@@ -3,10 +3,8 @@
 namespace T4\Mvc;
 
 use T4\Console\TRunCommand;
-use T4\Core\Config;
 use T4\Core\Exception;
 use T4\Core\ISingleton;
-use T4\Core\Logger;
 use T4\Core\Session;
 use T4\Core\Std;
 use T4\Core\TSingleton;
@@ -42,27 +40,6 @@ class Application
      * @var \T4\Core\Std
      */
     public $extensions;
-
-    /**
-     * Конструктор
-     * Инициализация:
-     * - сессий
-     * - конфигурации приложения
-     * - секций и блоков
-     * - создание подключений к БД
-     * - расширений
-     */
-    protected function __construct(Config $config = null)
-    {
-        try {
-            if (null !== $config) {
-                $this->setConfig($config);
-            }
-        } catch (Exception $e) {
-            echo $e->getMessage();
-            die;
-        }
-    }
 
     protected function initExtensions()
     {
