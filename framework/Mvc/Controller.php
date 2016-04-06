@@ -2,6 +2,7 @@
 
 namespace T4\Mvc;
 
+use T4\Core\IArrayable;
 use T4\Core\Std;
 use T4\Http\E403Exception;
 use T4\Http\E404Exception;
@@ -153,6 +154,21 @@ abstract class Controller
                     $p[$param->name] = $param->getDefaultValue();
                 } else {
                     throw new ControllerException('Missing argument ' . $param->name . ' for action ' . $actionMethodName);
+                }
+
+                // Arguments class hinting!
+                if (isset($p[$param->name])) {
+                    $class = $param->getClass();
+                    if (null !== $class && $class instanceof \ReflectionClass) {
+                        if ( is_a($class->name, Std::class, true) ) {
+                            $val = $p[$param->name];
+                            if (is_array($val)) {
+                                $p[$param->name] = new $class->name($val);
+                            } elseif ($val instanceof IArrayable) {
+                                $p[$param->name] = new $class->name($val->toArray());
+                            }
+                        }
+                    }
                 }
 
             }
