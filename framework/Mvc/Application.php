@@ -229,7 +229,7 @@ class Application
      */
     public function createController($module, $controller)
     {
-        if (!$this->existsController($module, $controller))
+        if (!$this->existsController($module ?:  null, $controller))
             throw new Exception('Controller ' . $controller . ' does not exist');
 
         if (empty($module))
