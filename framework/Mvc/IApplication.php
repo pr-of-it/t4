@@ -2,6 +2,8 @@
 
 namespace T4\Mvc;
 
+use T4\Core\Config;
+
 interface IApplication
 {
 
@@ -12,5 +14,8 @@ interface IApplication
 
     public function existsModule($module = null);
     public function existsController($module = null, $controller);
+
+    public function setConfig(Config $config = null);
+    public function setRoutes(Config $config = null);
 
 }

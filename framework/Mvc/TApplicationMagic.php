@@ -14,7 +14,7 @@ use T4\Http\Request;
  * Application properties lazy loading
  * Trait TApplicationMagic
  * @package T4\Mvc
- * @mixins T4\Mvc\Application
+ * @mixin \T4\Mvc\Application
  */
 trait TApplicationMagic
 {
