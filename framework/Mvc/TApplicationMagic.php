@@ -50,6 +50,7 @@ trait TApplicationMagic
             $this->setConfig(new Config([]));
         }
         $this->config->routes = $config ?: new Config([]);
+        return $this;
     }
 
     public function getRouter() : IRouter
