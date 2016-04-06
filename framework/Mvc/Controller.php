@@ -31,7 +31,7 @@ abstract class Controller
     final public function __construct()
     {
         $this->data = new Std();
-        $this->app = Application::getInstance();
+        $this->app = Application::instance();
         $this->view = new View('twig', $this->getTemplatePaths());
         $this->view->setController($this);
     }
@@ -139,7 +139,7 @@ abstract class Controller
         if ($this->beforeAction($name)) {
 
             $p = [];
-            $request = Application::getInstance()->request;
+            $request = Application::instance()->request;
             foreach ($this->getActionParameters($name) as $param) {
 
                 if (isset($params[$param->name])) {

@@ -4,6 +4,7 @@ namespace T4\Core;
 
 
 trait TSingleton
+//implements ISingleton
 {
 
     protected function __construct()
@@ -16,7 +17,7 @@ trait TSingleton
 
     }
 
-    public static function getInstance($new = false)
+    public static function instance($new = false)
     {
         static $instance = null;
         if (null === $instance || $new)

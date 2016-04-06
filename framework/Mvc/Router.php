@@ -2,11 +2,13 @@
 
 namespace T4\Mvc;
 
+use T4\Core\ISingleton;
 use T4\Core\Std;
 use T4\Core\TSingleton;
 use T4\Http\Request;
 
 class Router
+    implements ISingleton
 {
     use TSingleton;
 
@@ -198,7 +200,7 @@ class Router
     protected function guessInternalPath($url)
     {
         $urlParts = preg_split('~/~', $url->basepath, -1, PREG_SPLIT_NO_EMPTY);
-        $app = \T4\Mvc\Application::getInstance();
+        $app = \T4\Mvc\Application::instance();
 
         if (0 == count($urlParts)) {
             return new Route([

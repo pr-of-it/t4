@@ -14,7 +14,7 @@ class Section
     public function render()
     {
         $id = $this->params->id;
-        $app = Application::getInstance();
+        $app = Application::instance();
         $blocks = \App\Models\Block::findAllBySection($id, ['order'=>'`order`']);
 
         $ret = '<section role="section" data-section-id="' . $id . '">' . "\n";

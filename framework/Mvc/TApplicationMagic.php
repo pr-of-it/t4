@@ -121,7 +121,7 @@ trait TApplicationMagic
 
     protected function getAssets()
     {
-        return AssetsManager::getInstance();
+        return AssetsManager::instance();
     }
 
     protected function getFlash()

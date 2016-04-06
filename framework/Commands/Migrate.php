@@ -45,14 +45,14 @@ class Migrate
 
     protected function isInstalled()
     {
-        $connection = Application::getInstance(true)->db->default;
+        $connection = Application::instance(true)->db->default;
         $driver = $connection->getDriver();
         return $driver->existsTable($connection, self::TABLE_NAME);
     }
 
     protected function install()
     {
-        $connection = Application::getInstance()->db->default;
+        $connection = Application::instance()->db->default;
         $driver = $connection->getDriver();
         $driver->createTable($connection, self::TABLE_NAME,
             [

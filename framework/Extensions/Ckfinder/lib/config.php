@@ -36,7 +36,7 @@ function CheckAuthentication()
 	// user logs in your system. To be able to use session variables don't
 	// forget to add session_start() at the top of this file.
 
-	$app = \T4\Mvc\Application::getInstance()->setConfig(new \T4\Core\Config(ROOT_PATH_PROTECTED . '/config.php'));
+	$app = \T4\Mvc\Application::instance()->setConfig(new \T4\Core\Config(ROOT_PATH_PROTECTED . '/config.php'));
 	return !empty($app->user);
 }
 

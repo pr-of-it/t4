@@ -20,7 +20,7 @@ abstract class Migration
 
     final public function setDb($db)
     {
-        $app = Application::getInstance();
+        $app = Application::instance();
         if (is_string($db)) {
             $this->db = $app->db->{$db};
         } elseif ($db instanceof Connection) {

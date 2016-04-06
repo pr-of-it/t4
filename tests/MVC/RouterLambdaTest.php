@@ -41,7 +41,7 @@ class RouterLambdaTest extends PHPUnit_Framework_TestCase
     public function testParseUrl()
     {
 
-        $router = \T4\Mvc\Router::getInstance();
+        $router = \T4\Mvc\Router::instance();
         $reflector = new ReflectionMethod($router, 'parseRequestPath');
         $reflector->setAccessible(true);
         $router->setConfig(getLambdaRouteConfig());

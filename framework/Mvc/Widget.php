@@ -12,7 +12,7 @@ abstract class Widget
 
     public function __construct($options = [])
     {
-        $this->app = Application::getInstance();
+        $this->app = Application::instance();
         $this->options = new Std();
         $this->options->fromArray($options);
     }
