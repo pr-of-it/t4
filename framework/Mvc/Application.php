@@ -75,6 +75,7 @@ class Application
     public function run()
     {
         try {
+
             Session::init();
             $this->initExtensions();
             $this->runRequest($this->request);
@@ -110,10 +111,7 @@ class Application
      */
     protected function runRequest(Request $request)
     {
-        $route =
-            Router::instance()
-                ->setConfig($this->config->routes)
-                ->parseRequest($request);
+        $route = $this->router->parseRequest($request);
         $this->runRoute($route, $route->format);
     }
 
