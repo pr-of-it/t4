@@ -5,8 +5,7 @@ namespace T4\Mvc;
 use T4\Core\Collection;
 use T4\Core\Config;
 use T4\Core\Flash;
-use T4\Core\Std;
-use T4\Dbal\Connection;
+use T4\Dbal\Connections;
 use T4\Fs\Helpers;
 use T4\Http\Request;
 
@@ -96,11 +95,7 @@ trait TApplicationMagic
     {
         static $db = null;
         if (null === $db) {
-            $db = new Std();
-            foreach ($this->config->db as $connection => $connectionConfig) {
-                $db->{$connection} = new Connection($connectionConfig);
-            }
-            $this->db = $db;
+            $db = new Connections($this->config->db);
         }
         return $db;
     }
