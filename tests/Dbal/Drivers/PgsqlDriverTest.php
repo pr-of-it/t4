@@ -44,59 +44,59 @@ class PgsqlDriverTest extends PHPUnit_Framework_TestCase {
 
         $this->assertEquals(
             '"foo" BIGSERIAL PRIMARY KEY',
-            $reflector->invokeArgs($driver, ['foo', ['type' => 'pk']])
+            $reflector->invokeArgs($driver, ['table', 'foo', ['type' => 'pk']])
         );
         $this->assertEquals(
             '"foo" BIGINT NOT NULL DEFAULT \'0\'',
-            $reflector->invokeArgs($driver, ['foo', ['type' => 'relation']])
+            $reflector->invokeArgs($driver, ['table', 'foo', ['type' => 'relation']])
         );
         $this->assertEquals(
             '"foo" SERIAL',
-            $reflector->invokeArgs($driver, ['foo', ['type' => 'serial']])
+            $reflector->invokeArgs($driver, ['table', 'foo', ['type' => 'serial']])
         );
         $this->assertEquals(
             '"foo" BOOLEAN',
-            $reflector->invokeArgs($driver, ['foo', ['type' => 'boolean']])
+            $reflector->invokeArgs($driver, ['table', 'foo', ['type' => 'boolean']])
         );
         $this->assertEquals(
             '"foo" INTEGER',
-            $reflector->invokeArgs($driver, ['foo', ['type' => 'int']])
+            $reflector->invokeArgs($driver, ['table', 'foo', ['type' => 'int']])
         );
         $this->assertEquals(
             '"foo" REAL',
-            $reflector->invokeArgs($driver, ['foo', ['type' => 'float']])
+            $reflector->invokeArgs($driver, ['table', 'foo', ['type' => 'float']])
         );
         $this->assertEquals(
             '"foo" TEXT',
-            $reflector->invokeArgs($driver, ['foo', ['type' => 'text']])
+            $reflector->invokeArgs($driver, ['table', 'foo', ['type' => 'text']])
         );
         $this->assertEquals(
             '"foo" TIMESTAMP',
-            $reflector->invokeArgs($driver, ['foo', ['type' => 'datetime']])
+            $reflector->invokeArgs($driver, ['table', 'foo', ['type' => 'datetime']])
         );
         $this->assertEquals(
             '"foo" DATE',
-            $reflector->invokeArgs($driver, ['foo', ['type' => 'date']])
+            $reflector->invokeArgs($driver, ['table', 'foo', ['type' => 'date']])
         );
         $this->assertEquals(
             '"foo" TIME',
-            $reflector->invokeArgs($driver, ['foo', ['type' => 'time']])
+            $reflector->invokeArgs($driver, ['table', 'foo', ['type' => 'time']])
         );
         $this->assertEquals(
             '"foo" CHARACTER(255)',
-            $reflector->invokeArgs($driver, ['foo', ['type' => 'char']])
+            $reflector->invokeArgs($driver, ['table', 'foo', ['type' => 'char']])
         );
         $this->assertEquals(
             '"foo" CHARACTER(123)',
-            $reflector->invokeArgs($driver, ['foo', ['type' => 'char', 'length' => 123]])
+            $reflector->invokeArgs($driver, ['table', 'foo', ['type' => 'char', 'length' => 123]])
         );
         $this->assertEquals(
             '"foo" VARCHAR',
-            $reflector->invokeArgs($driver, ['foo', ['type' => 'string']])
+            $reflector->invokeArgs($driver, ['table', 'foo', ['type' => 'string']])
         );
         $this->assertEquals(
             '"foo" VARCHAR(123)',
-            $reflector->invokeArgs($driver, ['foo', ['type' => 'string', 'length' => 123]])
+            $reflector->invokeArgs($driver, ['table', 'foo', ['type' => 'string', 'length' => 123]])
         );
     }
 
