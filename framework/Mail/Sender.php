@@ -11,7 +11,7 @@ class Sender
 
     protected function getConfig()
     {
-        $config = Application::getInstance()->config;
+        $config = Application::instance()->config;
         if (empty($config->mail)) {
             $config->mail = new Std();
         }

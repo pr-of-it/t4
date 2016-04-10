@@ -20,7 +20,7 @@ class Twig
         $this->paths = (array)$paths;
         $this->links = new Std;
 
-        $this->links->app = Application::getInstance();
+        $this->links->app = Application::instance();
 
         $loader = new \Twig_Loader_Filesystem($paths);
         $this->twig = new \Twig_Environment($loader, [

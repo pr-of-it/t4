@@ -2,11 +2,13 @@
 
 namespace T4\Mvc;
 
-use T4\Core\Std;
+use T4\Core\Config;
+use T4\Core\ISingleton;
 use T4\Core\TSingleton;
 use T4\Http\Request;
 
 class Router
+    implements ISingleton, IRouter
 {
     use TSingleton;
 
@@ -25,10 +27,10 @@ class Router
     protected $allowedExtensions = ['html', 'json', 'xml'];
 
     /**
-     * @param \T4\Core\Std $config
-     * @return \T4\Mvc\Router $this
+     * @param \T4\Core\Config $config
+     * @return self $this
      */
-    public function setConfig(Std $config)
+    public function setConfig(Config $config)
     {
         $this->config = $config;
         return $this;
@@ -38,7 +40,7 @@ class Router
      * @param \T4\Http\Request $request
      * @return \T4\Mvc\Route
      */
-    public function parseRequest(Request $request)
+    public function parseRequest(Request $request) : Route
     {
         $fullPath = $request->getFullPath();
         return $this->parseRequestPath($fullPath);
@@ -85,11 +87,6 @@ class Router
             }
         }
         return $this->guessInternalPath($request);
-    }
-
-    public function getFormatByExtension($extension)
-    {
-        return in_array($extension, $this->allowedExtensions) ? $extension : $this->allowedExtensions[0];
     }
 
     /**
@@ -198,7 +195,7 @@ class Router
     protected function guessInternalPath($url)
     {
         $urlParts = preg_split('~/~', $url->basepath, -1, PREG_SPLIT_NO_EMPTY);
-        $app = \T4\Mvc\Application::getInstance();
+        $app = \T4\Mvc\Application::instance();
 
         if (0 == count($urlParts)) {
             return new Route([
@@ -219,7 +216,7 @@ class Router
                     'params' => [],
                     'format' => $url->extension ?: 'html',
                 ]);
-            elseif ($app->existsController('', $urlParts[0]))
+            elseif ($app->existsController(null, $urlParts[0]))
                 return new Route([
                     'module' => '',
                     'controller' => ucfirst($urlParts[0]),
@@ -256,7 +253,7 @@ class Router
                         'format' => $url->extension ?: 'html',
                     ]);
                 }
-            } elseif ($app->existsController('', $urlParts[0])) {
+            } elseif ($app->existsController(null, $urlParts[0])) {
                 return new Route([
                     'module' => '',
                     'controller' => ucfirst($urlParts[0]),

@@ -2,6 +2,7 @@
 
 namespace T4\Mvc;
 
+use T4\Core\ISingleton;
 use T4\Core\Std;
 use T4\Mvc\AssetException as Exception;
 use T4\Core\TSingleton;
@@ -14,6 +15,7 @@ use T4\Fs\Helpers;
  * @package T4\Mvc
  */
 class AssetsManager
+    implements ISingleton
 {
 
     use TSingleton;

@@ -3,9 +3,8 @@
 namespace T4\Mvc;
 
 use T4\Console\TRunCommand;
-use T4\Core\Config;
 use T4\Core\Exception;
-use T4\Core\Logger;
+use T4\Core\ISingleton;
 use T4\Core\Session;
 use T4\Core\Std;
 use T4\Core\TSingleton;
@@ -18,8 +17,13 @@ use T4\Threads\Helpers;
 /**
  * Class Application
  * @package T4\Mvc
+ *
+ * @property string $path
+ * @property string $routeConfigPath
+ *
  * @property \T4\Core\Config $config
- * @property \T4\Dbal\Connection[] $db
+ * @property \T4\Mvc\IRouter $router
+ * @property \T4\Dbal\Connections|\T4\Dbal\Connection[] $db
  * @property \T4\Http\Request $request
  * @property \App\Models\User $user
  * @property \T4\Mvc\Module[] $modules
@@ -27,6 +31,9 @@ use T4\Threads\Helpers;
  * @property \T4\Core\Flash $flash
  */
 class Application
+    implements
+        ISingleton,
+        IApplication
 {
     use
         TStdGetSet,
@@ -40,27 +47,6 @@ class Application
      * @var \T4\Core\Std
      */
     public $extensions;
-
-    /**
-     * Конструктор
-     * Инициализация:
-     * - сессий
-     * - конфигурации приложения
-     * - секций и блоков
-     * - создание подключений к БД
-     * - расширений
-     */
-    protected function __construct(Config $config = null)
-    {
-        try {
-            if (null !== $config) {
-                $this->setConfig($config);
-            }
-        } catch (Exception $e) {
-            echo $e->getMessage();
-            die;
-        }
-    }
 
     protected function initExtensions()
     {
@@ -89,6 +75,7 @@ class Application
     public function run()
     {
         try {
+
             Session::init();
             $this->initExtensions();
             $this->runRequest($this->request);
@@ -124,10 +111,7 @@ class Application
      */
     protected function runRequest(Request $request)
     {
-        $route =
-            Router::getInstance()
-                ->setConfig($this->config->routes)
-                ->parseRequest($request);
+        $route = $this->router->parseRequest($request);
         $this->runRoute($route, $route->format);
     }
 
@@ -244,7 +228,7 @@ class Application
      */
     public function createController($module, $controller)
     {
-        if (!$this->existsController($module, $controller))
+        if (!$this->existsController($module ?:  null, $controller))
             throw new Exception('Controller ' . $controller . ' does not exist');
 
         if (empty($module))

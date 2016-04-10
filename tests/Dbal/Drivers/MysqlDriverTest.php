@@ -35,7 +35,7 @@ class MysqlDriverTest extends PHPUnit_Framework_TestCase {
         $reflector->setAccessible(true);
 
         $this->assertEquals(
-            '`foo` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT',
+            '`foo` SERIAL',
             $reflector->invokeArgs($driver, ['foo', ['type' => 'pk']])
         );
         $this->assertEquals(
@@ -51,11 +51,11 @@ class MysqlDriverTest extends PHPUnit_Framework_TestCase {
             $reflector->invokeArgs($driver, ['foo', ['type' => 'boolean']])
         );
         $this->assertEquals(
-            '`foo` INT(11) NOT NULL DEFAULT \'123\'',
+            '`foo` INT NOT NULL DEFAULT \'123\'',
             $reflector->invokeArgs($driver, ['foo', ['type' => 'int', 'default' => '123']])
         );
         $this->assertEquals(
-            '`foo` INT(11)',
+            '`foo` INT',
             $reflector->invokeArgs($driver, ['foo', ['type' => 'int']])
         );
         $this->assertEquals(
@@ -161,13 +161,13 @@ class MysqlDriverTest extends PHPUnit_Framework_TestCase {
         $reflector->setAccessible(true);
 
         $this->assertEquals(
-            'CREATE TABLE `foo`' . "\n" . '(' . "\n" . '`__id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,' . "\n" . 'PRIMARY KEY (`__id`)' . "\n" . ')',
+            'CREATE TABLE `foo`' . "\n" . '(' . "\n" . '`__id` SERIAL,' . "\n" . 'PRIMARY KEY (`__id`)' . "\n" . ')',
             $reflector->invokeArgs($driver, ['foo', []])
         );
         $this->assertEquals(
             'CREATE TABLE `foo`' . "\n" . '(' . "\n" .
-            '`__id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,' . "\n" .
-            '`foo` INT(11),' . "\n" .
+            '`__id` SERIAL,' . "\n" .
+            '`foo` INT,' . "\n" .
             '`bar` VARCHAR(255),' . "\n" .
             'PRIMARY KEY (`__id`)' . "\n" .
             ')',
@@ -175,9 +175,9 @@ class MysqlDriverTest extends PHPUnit_Framework_TestCase {
         );
         $this->assertEquals(
             'CREATE TABLE `foo`' . "\n" . '(' . "\n" .
-            '`__id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,' . "\n" .
+            '`__id` SERIAL,' . "\n" .
             '`lnk` BIGINT UNSIGNED NOT NULL DEFAULT \'0\',' . "\n" .
-            '`foo` INT(11),' . "\n" .
+            '`foo` INT,' . "\n" .
             '`bar` VARCHAR(255),' . "\n" .
             'PRIMARY KEY (`__id`),' . "\n" .
             'INDEX `lnk_idx` (`lnk`)' . "\n" .

@@ -2,7 +2,7 @@
 
 namespace T4\Dbal;
 
-use T4\Core\Std;
+use T4\Core\Config;
 
 class Connection
 {
@@ -18,10 +18,10 @@ class Connection
     protected $pdo;
 
     /**
-     * @param \T4\Core\Std $config
+     * @param \T4\Core\Config $config
      * @throws \T4\Dbal\Exception
      */
-    public function __construct(Std $config)
+    public function __construct(Config $config)
     {
         $this->config = $config;
         try {

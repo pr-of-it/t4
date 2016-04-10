@@ -13,7 +13,7 @@ class Block
     public function render()
     {
         try {
-            $app = Application::getInstance();
+            $app = Application::instance();
 
             $path = $this->params->path;
             unset($this->params->path);

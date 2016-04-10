@@ -2,6 +2,7 @@
 
 namespace T4\Mvc;
 
+use T4\Core\IArrayable;
 use T4\Core\Std;
 use T4\Http\E403Exception;
 use T4\Http\E404Exception;
@@ -31,7 +32,7 @@ abstract class Controller
     final public function __construct()
     {
         $this->data = new Std();
-        $this->app = Application::getInstance();
+        $this->app = Application::instance();
         $this->view = new View('twig', $this->getTemplatePaths());
         $this->view->setController($this);
     }
@@ -139,7 +140,8 @@ abstract class Controller
         if ($this->beforeAction($name)) {
 
             $p = [];
-            $request = Application::getInstance()->request;
+            $request = Application::instance()->request;
+
             foreach ($this->getActionParameters($name) as $param) {
 
                 if (isset($params[$param->name])) {
@@ -155,10 +157,26 @@ abstract class Controller
                     throw new ControllerException('Missing argument ' . $param->name . ' for action ' . $actionMethodName);
                 }
 
+                // Arguments class hinting!
+                if (isset($p[$param->name])) {
+                    $class = $param->getClass();
+                    if (null !== $class && $class instanceof \ReflectionClass) {
+                        if ( is_a($class->name, Std::class, true) ) {
+                            $val = $p[$param->name];
+                            if (is_array($val)) {
+                                $p[$param->name] = new $class->name($val);
+                            } elseif ($val instanceof IArrayable) {
+                                $p[$param->name] = new $class->name($val->toArray());
+                            }
+                        }
+                    }
+                }
+
             }
+
             $p = array_merge($p, $params);
 
-            call_user_func_array([$this, $actionMethodName], $p);
+            $this->$actionMethodName(...array_values($p));
             $this->afterAction($name);
         }
 

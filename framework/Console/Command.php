@@ -15,7 +15,7 @@ class Command
 
     final public function __construct()
     {
-        $this->app = \T4\Console\Application::getInstance();
+        $this->app = \T4\Console\Application::instance();
     }
 
 

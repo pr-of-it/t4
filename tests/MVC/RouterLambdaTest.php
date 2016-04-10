@@ -4,7 +4,7 @@ require_once realpath(__DIR__ . '/../../framework/boot.php');
 
 function getLambdaRouteConfig()
 {
-    return new \T4\Core\Std([
+    return new \T4\Core\Config([
         '/' => '///',
         '/index' => '///',
         '/goods' => '/Shop/Goods/default',
@@ -41,7 +41,7 @@ class RouterLambdaTest extends PHPUnit_Framework_TestCase
     public function testParseUrl()
     {
 
-        $router = \T4\Mvc\Router::getInstance();
+        $router = \T4\Mvc\Router::instance();
         $reflector = new ReflectionMethod($router, 'parseRequestPath');
         $reflector->setAccessible(true);
         $router->setConfig(getLambdaRouteConfig());

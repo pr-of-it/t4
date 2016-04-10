@@ -4,6 +4,7 @@ namespace T4\Console;
 
 use T4\Core\Config;
 use T4\Core\Exception;
+use T4\Core\ISingleton;
 use T4\Core\Std;
 use T4\Core\TSingleton;
 use T4\Core\TStdGetSet;
@@ -19,6 +20,7 @@ use T4\Threads\Helpers;
  * @property \T4\Dbal\Connection[] $db
  */
 class Application
+    implements ISingleton
 {
 
     use TSingleton, TStdGetSet;

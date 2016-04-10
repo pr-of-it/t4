@@ -37,7 +37,7 @@ class Uploader
         if (empty($name))
             throw new Exception('Empty form field name for file upload');
 
-        $request = Application::getInstance()->request;
+        $request = Application::instance()->request;
         if (!$request->isUploaded($name))
             return false;
 
@@ -76,7 +76,7 @@ class Uploader
             }
         }
 
-        $request = Application::getInstance()->request;
+        $request = Application::instance()->request;
         if (!$request->isUploaded($this->formFieldName))
             throw new Exception('File for \'' . $this->formFieldName . '\' is not uploaded');
 

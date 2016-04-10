@@ -17,7 +17,7 @@ class TwigExtensions
 
     public function getFunctions()
     {
-        $app = Application::getInstance();
+        $app = Application::instance();
         return [
 
             'asset' => new \Twig_Function_Function(function ($path) use ($app) {return $app->assets->publish($path);}),

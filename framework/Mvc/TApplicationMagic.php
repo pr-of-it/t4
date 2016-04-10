@@ -5,8 +5,7 @@ namespace T4\Mvc;
 use T4\Core\Collection;
 use T4\Core\Config;
 use T4\Core\Flash;
-use T4\Core\Std;
-use T4\Dbal\Connection;
+use T4\Dbal\Connections;
 use T4\Fs\Helpers;
 use T4\Http\Request;
 
@@ -14,7 +13,7 @@ use T4\Http\Request;
  * Application properties lazy loading
  * Trait TApplicationMagic
  * @package T4\Mvc
- * @mixins T4\Mvc\Application
+ * @mixin \T4\Mvc\Application
  */
 trait TApplicationMagic
 {
@@ -50,6 +49,14 @@ trait TApplicationMagic
             $this->setConfig(new Config([]));
         }
         $this->config->routes = $config ?: new Config([]);
+        return $this;
+    }
+
+    public function getRouter() : IRouter
+    {
+        /** @var \T4\Mvc\IRouter $class */
+        $class = Router::class;
+        return $class::instance()->setConfig($this->config->routes);
     }
 
     public function setSections(Config $config = null)
@@ -88,11 +95,7 @@ trait TApplicationMagic
     {
         static $db = null;
         if (null === $db) {
-            $db = new Std();
-            foreach ($this->config->db as $connection => $connectionConfig) {
-                $db->{$connection} = new Connection($connectionConfig);
-            }
-            $this->db = $db;
+            $db = new Connections($this->config->db);
         }
         return $db;
     }
@@ -121,7 +124,7 @@ trait TApplicationMagic
 
     protected function getAssets()
     {
-        return AssetsManager::getInstance();
+        return AssetsManager::instance();
     }
 
     protected function getFlash()
