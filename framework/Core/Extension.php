@@ -2,8 +2,6 @@
 
 namespace T4\Core;
 
-use T4\Mvc\IApplication;
-
 abstract class Extension
 {
 
