@@ -3,7 +3,6 @@
 namespace T4\Mail;
 
 use T4\Core\Std;
-use T4\Mvc\Application;
 
 class Sender
     extends \PHPMailer
@@ -11,7 +10,11 @@ class Sender
 
     protected function getConfig()
     {
-        $config = Application::instance()->config;
+        if ('cli' == PHP_SAPI) {
+            $config = \T4\Console\Application::instance()->config;
+        } else {
+            $config = \T4\Mvc\Application::instance()->config;
+        }
         if (empty($config->mail)) {
             $config->mail = new Std();
         }
