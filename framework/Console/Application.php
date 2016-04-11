@@ -5,25 +5,30 @@ namespace T4\Console;
 use T4\Core\Config;
 use T4\Core\Exception;
 use T4\Core\ISingleton;
-use T4\Core\Std;
 use T4\Core\TSingleton;
 use T4\Core\TStdGetSet;
-use T4\Dbal\Connection;
+use T4\Dbal\Connections;
 use T4\Threads\Helpers;
 
 
 /**
  * Class Application
  * @package T4\Console
+ *
  * @property \T4\Core\Config $config
  * @property \T4\Console\Request $request
  * @property \T4\Dbal\Connection[] $db
  */
 class Application
-    implements ISingleton
+    implements
+        ISingleton,
+        IApplication
 {
 
-    use TSingleton, TStdGetSet;
+    use
+        TStdGetSet,
+        TSingleton;
+
     use TRunCommand;
 
     const CMD_PATTERN = '~^(\/?)([^\/]*?)(\/([^\/]*?))?$~';
@@ -33,12 +38,28 @@ class Application
     const SUCCESS_CODE = 0;
     const ERROR_CODE = 1;
 
+    /**
+     * @return string
+     */
+    public function getPath()
+    {
+        return \ROOT_PATH_PROTECTED;
+    }
+
+    /**
+     * @param Config|null $config
+     * @return $this
+     */
+    public function setConfig(Config $config = null)
+    {
+        $this->config = $config ?: new Config([]);
+        return $this;
+    }
+
     public function run()
     {
         try {
-
             $this->runRequest($this->request);
-
         } catch (Exception $e) {
             $this->halt('ERROR: ' . $e->getMessage());
         }
@@ -52,6 +73,7 @@ class Application
         if (!class_exists($commandClassName))
             throw new Exception('Command class ' . $commandClassName . ' is not found');
 
+        /** @var \T4\Console\Command $command */
         $command = new $commandClassName;
         $command->action($route['action'], $route['options']);
     }
@@ -107,26 +129,13 @@ class Application
      * Lazy Getters
      */
 
-    public function getConfig()
+    protected function getDb()
     {
-        try {
-            return new Config(ROOT_PATH_PROTECTED . DS . 'config.php');
-        } catch (Exception $e) {
-            $this->halt('BOOTSTRAP ERROR: ' . $e->getMessage());
+        static $db = null;
+        if (null === $db) {
+            $db = new Connections($this->config->db);
         }
-    }
-
-    public function getDb()
-    {
-        try {
-            $db = new Std();
-            foreach ($this->config->db as $connection => $connectionConfig) {
-                $db->{$connection} = new Connection($connectionConfig);
-            }
-            return $db;
-        } catch (Exception $e) {
-            $this->halt('BOOTSTRAP ERROR: ' . $e->getMessage());
-        }
+        return $db;
     }
 
     public function getRequest()

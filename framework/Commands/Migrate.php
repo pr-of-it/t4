@@ -2,7 +2,6 @@
 
 namespace T4\Commands;
 
-use T4\Console\Application;
 use T4\Console\Command;
 use T4\Console\Exception;
 use T4\Dbal\QueryBuilder;
@@ -45,14 +44,14 @@ class Migrate
 
     protected function isInstalled()
     {
-        $connection = Application::instance(true)->db->default;
+        $connection = $this->app->db->default;
         $driver = $connection->getDriver();
         return $driver->existsTable($connection, self::TABLE_NAME);
     }
 
     protected function install()
     {
-        $connection = Application::instance()->db->default;
+        $connection = $this->app->db->default;
         $driver = $connection->getDriver();
         $driver->createTable($connection, self::TABLE_NAME,
             [

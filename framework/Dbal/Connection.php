@@ -31,7 +31,11 @@ class Connection
         }
     }
 
-    protected function getPdoObject($config)
+    /**
+     * @param \T4\Core\Config $config
+     * @return \PDO
+     */
+    protected function getPdoObject(Config $config)
     {
         $dsn = $config->driver . ':host=' . $config->host . ';dbname=' . $config->dbname;
         if (!empty($config->port)) {
