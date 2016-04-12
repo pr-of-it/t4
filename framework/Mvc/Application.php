@@ -53,14 +53,19 @@ class Application
         $this->extensions = new Std;
         if (isset($this->config->extensions)) {
             foreach ($this->config->extensions as $extension => $options) {
-                $extensionClassName = 'Extensions\\' . ucfirst($extension) . '\\Extension';
-                if (class_exists('\\App\\' . $extensionClassName)) {
-                    $extensionClassName = '\\App\\' . $extensionClassName;
+
+                if (!empty($options->class)) {
+                    $extensionClassName = $options->class;
                 } else {
-                    $extensionClassName = '\\T4\\' . $extensionClassName;
+                    $extensionClassName = 'Extensions\\' . ucfirst($extension) . '\\Extension';
+                    if (class_exists('\\App\\' . $extensionClassName)) {
+                        $extensionClassName = '\\App\\' . $extensionClassName;
+                    } else {
+                        $extensionClassName = '\\T4\\Mvc\\' . $extensionClassName;
+                    }
                 }
+
                 $this->extensions->{$extension} = new $extensionClassName($options);
-                $this->extensions->{$extension}->setApp($this);
                 if (!isset($options->autoload) || true == $options->autoload) {
                     $this->extensions->{$extension}->init();
                 }
