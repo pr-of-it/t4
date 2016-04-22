@@ -21,6 +21,9 @@ class Helpers
         if ($allSubDomains)
             $domain = self::getUniversalDomainName($domain);
         setcookie($name, $value, $expire, '/', $domain, false, true);
+        if ($expire > time()) {
+            $_COOKIE[$name] = $value;
+        }
     }
 
     public static function issetCookie($name)
