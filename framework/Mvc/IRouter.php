@@ -7,7 +7,6 @@ use T4\Core\ISingleton;
 use T4\Http\Request;
 
 interface IRouter
-    extends ISingleton
 {
 
     public function setConfig(Config $config);

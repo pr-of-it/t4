@@ -58,15 +58,4 @@ trait TApplicationPaths
         return is_dir($modulePath) && is_readable($modulePath);
     }
 
-    /**
-     * @param string $module
-     * @param string $controller
-     * @return bool
-     */
-    public function existsController($module = null, $controller)
-    {
-        $controllerClassName = (null === $module ? '\\App\\Controllers\\' : '\\App\\Modules\\' . ucfirst($module) . '\\Controllers\\') . ucfirst($controller);
-        return $this->existsModule($module) && class_exists($controllerClassName) && is_subclass_of($controllerClassName, '\T4\Mvc\Controller');
-    }
-
 }

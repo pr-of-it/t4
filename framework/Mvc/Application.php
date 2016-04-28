@@ -22,9 +22,12 @@ use T4\Threads\Helpers;
  * @property string $routeConfigPath
  *
  * @property \T4\Core\Config $config
- * @property \T4\Mvc\IRouter $router
+ * @property \T4\Core\Std $extensions
  * @property \T4\Dbal\Connections|\T4\Dbal\Connection[] $db
+ *
+ * @property \T4\Mvc\IRouter $router
  * @property \T4\Http\Request $request
+ *
  * @property \App\Models\User $user
  * @property \T4\Mvc\Module[] $modules
  * @property \T4\Mvc\AssetsManager $assets
@@ -43,19 +46,20 @@ class Application
 
     use TRunCommand;
 
-    /**
-     * @var \T4\Core\Std
-     */
-    public $extensions;
+    protected function init()
+    {
+        Session::init();
+        $this->initExtensions();
+    }
 
     protected function initExtensions()
     {
         $this->extensions = new Std;
         if (isset($this->config->extensions)) {
-            foreach ($this->config->extensions as $extension => $options) {
+            foreach ($this->config->extensions as $extension => $config) {
 
-                if (!empty($options->class)) {
-                    $extensionClassName = $options->class;
+                if (!empty($config->class)) {
+                    $extensionClassName = $config->class;
                 } else {
                     $extensionClassName = 'Extensions\\' . ucfirst($extension) . '\\Extension';
                     if (class_exists('\\App\\' . $extensionClassName)) {
@@ -65,59 +69,31 @@ class Application
                     }
                 }
 
-                $this->extensions->{$extension} = new $extensionClassName($options);
-                if (!isset($options->autoload) || true == $options->autoload) {
+                $this->extensions->{$extension} = new $extensionClassName($config);
+                if (!isset($config->autoload) || true == $config->autoload) {
                     $this->extensions->{$extension}->init();
                 }
             }
         }
     }
 
-    /**
-     * Запуск веб-приложения
-     * и формирование ответа
-     */
     public function run()
     {
         try {
 
-            Session::init();
-            $this->initExtensions();
-            $this->runRequest($this->request);
+            $this->init();
 
+            $route = $this->router->parseRequest($this->request);
+            $this->runRoute($route, $route->format);
+
+        } catch (E404Exception $e) {
+            $this->action404($e->getMessage());
+        } catch (E403Exception $e) {
+            $this->action403($e->getMessage());
         } catch (Exception $e) {
-            try {
-                if ($e instanceof E404Exception) {
-                    header("HTTP/1.0 404 Not Found", true, 404);
-                    if (!empty($this->config->errors['404'])) {
-                        $this->runRoute($this->config->errors['404']);
-                    } else {
-                        echo $e->getMessage();
-                    }
-                } elseif ($e instanceof E403Exception) {
-                    header('HTTP/1.0 403 Forbidden', true, 403);
-                    if (!empty($this->config->errors['403'])) {
-                        $this->runRoute($this->config->errors['403']);
-                    } else {
-                        echo $e->getMessage();
-                    }
-                } else {
-                    echo $e->getMessage();
-                    die;
-                }
-            } catch (Exception $e2) {
-                echo $e2->getMessage();
-                die;
-            }
+            echo $e->getMessage();
+            die;
         }
-    }
-    /**
-     * @param \T4\Http\Request $request
-     */
-    protected function runRequest(Request $request)
-    {
-        $route = $this->router->parseRequest($request);
-        $this->runRoute($route, $route->format);
     }
 
     /**
@@ -127,12 +103,8 @@ class Application
      * @throws E403Exception
      * @throws Exception
      */
-    public function runRoute($route, $format = 'html')
+    public function runRoute(Route $route, $format = 'html')
     {
-        if (!($route instanceof Route)) {
-            $route = new Route((string)$route);
-        }
-
         $controller = $this->createController($route->module, $route->controller);
         $this->runController($controller, $route->action, $route->params, $format);
     }
@@ -150,11 +122,11 @@ class Application
     {
         $controller->action($action, $params);
         $data = $controller->getData();
+        $front = new Front($this);
 
         switch ($format) {
             case 'json':
-                header('Content-Type: application/json; charset=utf-8');
-                echo json_encode($data->toArray(), JSON_UNESCAPED_UNICODE);
+                $front->output($data, 'json');
                 die;
             case 'xml':
                 header('Content-Type: text/xml; charset=utf-8');
@@ -181,8 +153,39 @@ class Application
 
 
     /**
-     * Вызов блока
-     * @param string $path Внутренний путь до блока
+     * @param null $module
+     * @param $controller
+     * @return bool
+     */
+    public function existsController($module = null, $controller)
+    {
+        $controllerClassName = (empty($module) ? '\\App\\Controllers\\' : '\\App\\Modules\\' . ucfirst($module) . '\\Controllers\\') . ucfirst($controller);
+        return $this->existsModule($module) && class_exists($controllerClassName) && is_subclass_of($controllerClassName, Controller::class);
+    }
+
+    /**
+     * @param string $module
+     * @param string $controller
+     * @throws \T4\Core\Exception
+     * @return \T4\Mvc\Controller
+     */
+    public function createController($module = null, $controller)
+    {
+        if (!$this->existsController($module ?:  null, $controller)) {
+            throw new Exception('Controller ' . $controller . ' does not exist');
+        }
+
+        if (empty($module))
+            $controllerClass = '\\App\\Controllers\\' . $controller;
+        else
+            $controllerClass = '\\App\\Modules\\' . ucfirst($module) . '\\Controllers\\' . ucfirst($controller);
+
+        $controller = new $controllerClass;
+        return $controller;
+    }
+
+    /**
+     * @param string $path
      * @param string $template Шаблон блока
      * @param array $params Параметры, передаваемые блоку
      * @throws \T4\Core\Exception
@@ -224,25 +227,28 @@ class Application
 
     }
 
-    /**
-     * Возвращает экземпляр контроллера
-     * @param string $module
-     * @param string $controller
-     * @throws \T4\Core\Exception
-     * @return \T4\Mvc\Controller
-     */
-    public function createController($module, $controller)
+    public function action404($message = null)
     {
-        if (!$this->existsController($module ?:  null, $controller))
-            throw new Exception('Controller ' . $controller . ' does not exist');
+        header("HTTP/1.0 404 Not Found", true, 404);
+        if (!empty($this->config->errors['404'])) {
+            $route = new Route($this->config->errors['404']);
+            $route->params->message = $message;
+            $this->runRoute($route);
+        } else {
+            echo $message;
+        }
+    }
 
-        if (empty($module))
-            $controllerClass = '\\App\\Controllers\\' . $controller;
-        else
-            $controllerClass = '\\App\\Modules\\' . ucfirst($module) . '\\Controllers\\' . ucfirst($controller);
-
-        $controller = new $controllerClass;
-        return $controller;
+    public function action403($message = null)
+    {
+        header('HTTP/1.0 403 Forbidden', true, 403);
+        if (!empty($this->config->errors['403'])) {
+            $route = new Route($this->config->errors['403']);
+            $route->params->message = $message;
+            $this->runRoute($route);
+        } else {
+            echo $message;
+        }
     }
 
 }
