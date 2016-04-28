@@ -7,6 +7,25 @@ require_once realpath(__DIR__ . '/../../framework/boot.php');
 class ConfigTest extends PHPUnit_Framework_TestCase
 {
 
+    const TEST_CONFIG_FILE = __DIR__ . DS . 'config.test.php';
+
+    protected function setUp()
+    {
+        file_put_contents(self::TEST_CONFIG_FILE, <<<FILE
+<?php
+return [
+    'db' => [
+        'default' => [
+            'driver' => 'mysql',
+            'host' => 'localhost'
+        ]
+    ],
+    'name' => 'test',
+];
+FILE
+        );
+    }
+
     /**
      * @expectedException T4\Core\Exception
      */
@@ -17,9 +36,9 @@ class ConfigTest extends PHPUnit_Framework_TestCase
 
     public function testLoad()
     {
-        $conf1 = new Config(__DIR__ . DS . 'config.test.php');
+        $conf1 = new Config(self::TEST_CONFIG_FILE);
         $conf2 = new Config();
-        $conf2->load(__DIR__ . DS . 'config.test.php');
+        $conf2->load(self::TEST_CONFIG_FILE);
         $this->assertEquals(
             $conf2,
             $conf1
@@ -29,7 +48,7 @@ class ConfigTest extends PHPUnit_Framework_TestCase
     public function testValidConfig()
     {
         $config = new Config;
-        $config->load(__DIR__ . DS . 'config.test.php');
+        $config->load(self::TEST_CONFIG_FILE);
         $this->assertInstanceOf(
             'T4\Core\Std',
             $config->db
@@ -51,6 +70,11 @@ class ConfigTest extends PHPUnit_Framework_TestCase
             $config->name
         );
 
+    }
+
+    protected function tearDown()
+    {
+        unlink(self::TEST_CONFIG_FILE);
     }
 
 }

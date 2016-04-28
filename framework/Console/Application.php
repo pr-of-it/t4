@@ -15,6 +15,7 @@ use T4\Threads\Helpers;
  * Class Application
  * @package T4\Console
  *
+ * @property string $path
  * @property \T4\Core\Config $config
  * @property \T4\Console\Request $request
  * @property \T4\Dbal\Connection[] $db
