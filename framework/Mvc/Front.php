@@ -12,22 +12,29 @@ class Front
     const FORMAT_DEFAULT = 'html';
 
     protected $app;
+    protected $controller;
 
-    public function __construct(IApplication $app)
+    public function __construct(IApplication $app, Controller $controller = null)
     {
         $this->app = $app;
+        $this->controller = $controller;
     }
 
-    public function getTemplateFileName(Route $route)
+    public function getTemplateFileName(Route $route, $format = null)
     {
-        return $route->action . '.' . $route->format;
+        $format = $format ?: $route->format;
+        return $route->action . '.' . $format;
     }
 
-    public function output(Std $data, $format = self::FORMAT_DEFAULT)
+    public function output(Route $route, Std $data, $format = null)
     {
+        $format = $format ?: $route->format;
+        $format = $format ?: self::FORMAT_DEFAULT;
         if (!in_array($format, self::FORMATS)) {
             throw new Exception('Invalid output format');
         }
+
+        $template = $this->getTemplateFileName($route, $format);
 
         switch ($format) {
             case 'json':
@@ -36,12 +43,12 @@ class Front
                 break;
             case 'xml':
                 header('Content-Type: text/xml; charset=utf-8');
-                //$controller->view->display($action . '.' . $format, $data);
+                $this->controller->view->display($template, $data);
                 break;
             default:
             case 'html':
                 header('Content-Type: text/html; charset=utf-8');
-                //$controller->view->display($action . '.' . $format, $data);
+                $this->controller->view->display($template, $data);
                 break;
         }
     }

@@ -84,7 +84,7 @@ class Application
             $this->init();
 
             $route = $this->router->parseRequest($this->request);
-            $this->runRoute($route, $route->format);
+            $this->runRoute($route);
 
         } catch (E404Exception $e) {
             $this->action404($e->getMessage());
@@ -103,41 +103,17 @@ class Application
      * @throws E403Exception
      * @throws Exception
      */
-    public function runRoute(Route $route, $format = 'html')
+    public function runRoute(Route $route, $format = null)
     {
-        $controller = $this->createController($route->module, $route->controller);
-        $this->runController($controller, $route->action, $route->params, $format);
-    }
-
-    /**
-     * @param Controller $controller
-     * @param string $action
-     * @param array $params
-     * @param string $format
-     * @throws ControllerException
-     * @throws E403Exception
-     * @throws E404Exception
-     */
-    public function runController(Controller $controller, $action, $params = [], $format = 'html')
-    {
-        $controller->action($action, $params);
-        $data = $controller->getData();
-        $front = new Front($this);
-
-        switch ($format) {
-            case 'json':
-                $front->output($data, 'json');
-                die;
-            case 'xml':
-                header('Content-Type: text/xml; charset=utf-8');
-                $controller->view->display($action . '.' . $format, $data);
-                break;
-            default:
-            case 'html':
-                header('Content-Type: text/html; charset=utf-8');
-                $controller->view->display($action . '.' . $format, $data);
-                break;
+        if (null === $format) {
+            $format = $route->format;
         }
+        $controller = $this->createController($route->module, $route->controller);
+        $controller->action($route->action, $route->params);
+        $data = $controller->getData();
+
+        $front = new Front($this, $controller);
+        $front->output($route, $data, $format);
     }
 
     /**
@@ -181,6 +157,11 @@ class Application
             $controllerClass = '\\App\\Modules\\' . ucfirst($module) . '\\Controllers\\' . ucfirst($controller);
 
         $controller = new $controllerClass;
+
+        $view = new View('twig', $controller->getTemplatePaths());
+        $controller->view = $view;
+        $view->setController($controller);
+
         return $controller;
     }
 
@@ -233,7 +214,7 @@ class Application
         if (!empty($this->config->errors['404'])) {
             $route = new Route($this->config->errors['404']);
             $route->params->message = $message;
-            $this->runRoute($route);
+            $this->runRoute($route, 'html');
         } else {
             echo $message;
         }
@@ -245,7 +226,7 @@ class Application
         if (!empty($this->config->errors['403'])) {
             $route = new Route($this->config->errors['403']);
             $route->params->message = $message;
-            $this->runRoute($route);
+            $this->runRoute($route, 'html');
         } else {
             echo $message;
         }

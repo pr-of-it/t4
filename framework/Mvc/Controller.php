@@ -33,8 +33,6 @@ abstract class Controller
     {
         $this->data = new Std();
         $this->app = Application::instance();
-        $this->view = new View('twig', $this->getTemplatePaths());
-        $this->view->setController($this);
     }
 
     public function getTemplatePaths()
