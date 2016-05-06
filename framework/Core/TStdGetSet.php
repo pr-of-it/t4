@@ -2,6 +2,12 @@
 
 namespace T4\Core;
 
+/**
+ * Trait TStdGetSet
+ * @package T4\Core
+ *
+ * @implements \ArrayAccess
+ */
 trait TStdGetSet
 {
 
