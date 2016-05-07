@@ -46,8 +46,9 @@ trait TActiveRecord
             $class = get_class($this);
             $driver = $class::getDbDriver();
             $driver->save($this);
-            if ($this->isNew())
+            if ($this->isNew()) {
                 $this->wasNew = true;
+            }
             $this->setNew(false);
         } else {
             return false;

@@ -511,6 +511,8 @@ class Mysql
                             $model->{$key}->save();
                         }
                         $model->{$column} = $model->{$key}->getPk();
+                    } elseif (empty($model->{$key})) {
+                        $model->{$column} = null;
                     }
                     break;
             }
