@@ -62,33 +62,6 @@ class StdTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(1, count($obj));
     }
 
-    public function testArrayable()
-    {
-        $array1 = ['foo' => 1, 'bar' => 2, 'baz' => 3];
-        $obj1 = new \T4\Core\Std($array1);
-        $this->assertEquals(1, $obj1->foo);
-        $this->assertEquals(2, $obj1->bar);
-        $this->assertEquals(3, $obj1->baz);
-
-        $obj2 = new \T4\Core\Std();
-        $obj2->fromArray($array1);
-        $this->assertEquals(1, $obj2->foo);
-        $this->assertEquals(2, $obj2->bar);
-        $this->assertEquals(3, $obj2->baz);
-
-        $this->assertEquals($array1, $obj2->toArray());
-
-        $array2 = ['foo' => 1, 'bar' => ['baz' => 11, 'bla' => 12]];
-        $obj3 = new \T4\Core\Std($array2);
-        $this->assertEquals(1, $obj3->foo);
-        $this->assertTrue($obj3->bar instanceof T4\Core\Std);
-        $this->assertEquals(11, $obj3->bar->baz);
-        $this->assertEquals(12, $obj3->bar->bla);
-
-        $this->assertEquals($array2, $obj3->toArray());
-
-    }
-
     public function testMerge()
     {
         $obj1 = new \T4\Core\Std(['foo' => 1]);

@@ -58,10 +58,11 @@ class Std
     {
         $data = [];
         foreach ($this->__data as $key => $value) {
-            if ($value instanceof self) {
-                $data[$key] = $value->toArray();
+            $val = $this->innerGet($key);
+            if ($val instanceof self) {
+                $data[$key] = $val->toArray();
             } else {
-                $data[$key] = $value;
+                $data[$key] = $val;
             }
         }
         return $data;

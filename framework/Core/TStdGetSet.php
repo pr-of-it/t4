@@ -31,8 +31,9 @@ trait TStdGetSet
     protected function innerGet($key)
     {
         $method = 'get' . ucfirst($key);
-        if (method_exists($this, $method))
+        if (method_exists($this, $method)) {
             return $this->$method();
+        }
         return isset($this->__data[$key]) ? $this->__data[$key] : null;
     }
 
