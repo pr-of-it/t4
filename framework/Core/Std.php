@@ -57,12 +57,12 @@ class Std
     public function toArray()
     {
         $data = [];
-        foreach ($this->__data as $key => $value) {
-            $val = $this->innerGet($key);
-            if ($val instanceof self) {
-                $data[$key] = $val->toArray();
+        foreach (array_keys($this->__data) as $key) {
+            $value = $this->innerGet($key);
+            if ($value instanceof self) {
+                $data[$key] = $value->toArray();
             } else {
-                $data[$key] = $val;
+                $data[$key] = $value;
             }
         }
         return $data;
