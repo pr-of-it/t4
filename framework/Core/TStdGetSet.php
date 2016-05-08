@@ -7,6 +7,8 @@ namespace T4\Core;
  * @package T4\Core
  *
  * @implements \ArrayAccess
+ * @implements \Iterator
+ * @implements \Countable
  */
 trait TStdGetSet
 {
@@ -83,7 +85,7 @@ trait TStdGetSet
     }
 
     /**
-     * ArrayAccess implementation
+     * \ArrayAccess implementation
      */
     public function offsetExists($offset)
     {
@@ -103,6 +105,42 @@ trait TStdGetSet
     public function offsetSet($offset, $value)
     {
         $this->innerSet($offset, $value);
+    }
+
+    /**
+     * \Iterator implementation
+     */
+    public function current()
+    {
+        return $this->innerGet(key($this->__data));
+    }
+
+    public function next()
+    {
+        next($this->__data);
+    }
+
+    public function key()
+    {
+        return key($this->__data);
+    }
+
+    public function valid()
+    {
+        return null !== key($this->__data);
+    }
+
+    public function rewind()
+    {
+        reset($this->__data);
+    }
+
+    /**
+     * \Countable implementation
+     */
+    public function count()
+    {
+        return count($this->__data);
     }
 
     /*

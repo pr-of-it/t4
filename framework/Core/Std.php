@@ -3,11 +3,13 @@
 namespace T4\Core;
 
 class Std
-    implements \ArrayAccess, \Countable, \IteratorAggregate, IArrayable
+    implements \ArrayAccess, \Countable, \Iterator, IArrayable
 {
 
     /**
-     * @implement \ArrayAccess
+     * @implements \ArrayAccess
+     * @implements \Iterator
+     * @implements \Countable
      */
     use TStdGetSet;
 
@@ -16,17 +18,6 @@ class Std
         if (null !== $data) {
             $this->fromArray($data);
         }
-    }
-
-    /**
-     * Countable implementation
-     * @link http://php.net/manual/en/countable.count.php
-     * @return int The custom count as an integer.
-     * The return value is cast to an integer.
-     */
-    public function count()
-    {
-        return count($this->__data);
     }
 
     /**
@@ -126,18 +117,6 @@ class Std
         }
 
         return $this;
-    }
-
-    /**
-     * (PHP 5 &gt;= 5.0.0)<br/>
-     * Retrieve an external iterator
-     * @link http://php.net/manual/en/iteratoraggregate.getiterator.php
-     * @return \Traversable An instance of an object implementing <b>Iterator</b> or
-     * <b>Traversable</b>
-     */
-    public function getIterator()
-    {
-        return new \ArrayIterator($this->__data);
     }
 
 }
