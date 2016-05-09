@@ -64,6 +64,7 @@ class TwigExtensions
         return [
             new \Twig_SimpleFilter('repeat', 'str_repeat'),
             new \Twig_SimpleFilter('count', 'count'),
+            new \Twig_SimpleFilter('sum', 'array_sum'),
             new \Twig_SimpleFilter('basename', 'basename'),
             new \Twig_SimpleFilter('dirname', 'dirname'),
         ];
