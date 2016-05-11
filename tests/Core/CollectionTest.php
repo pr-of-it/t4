@@ -113,6 +113,19 @@ class CollectionTest extends PHPUnit_Framework_TestCase
         );
     }
 
+    public function testFirstLast()
+    {
+        $collection = new Collection([10, 20, 30, 40, 50]);
+        $this->assertEquals(
+            10,
+            $collection->first()
+        );
+        $this->assertEquals(
+            50,
+            $collection->last()
+        );
+    }
+
     public function testExistElement()
     {
         $collection = new Collection();

@@ -2,6 +2,12 @@
 
 namespace T4\Core;
 
+/**
+ * Class TCollection
+ * @package T4\Core
+ *
+ * @implements \T4\Core\ICollection
+ */
 trait TCollection
 {
     use TArrayAccess;
@@ -53,6 +59,16 @@ trait TCollection
     public function slice($offset, $length=null)
     {
         return new static(array_slice($this->storage, $offset, $length));
+    }
+
+    public function first()
+    {
+        return $this->slice(0, 1)[0];
+    }
+
+    public function last()
+    {
+        return $this->slice(-1, 1)[0];
     }
 
     public function existsElement(array $attributes)

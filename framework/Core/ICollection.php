@@ -11,6 +11,8 @@ interface ICollection
     public function merge($values);
 
     public function slice($offset, $length=null);
+    public function first();
+    public function last();
 
     public function existsElement(array $attributes);
     public function findAllByAttributes(array $attributes);
