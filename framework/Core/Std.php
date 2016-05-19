@@ -50,7 +50,7 @@ class Std
         $data = [];
         foreach (array_keys($this->__data) as $key) {
             $value = $this->innerGet($key);
-            if ($value instanceof self) {
+            if ($value instanceof IArrayable) {
                 $data[$key] = $value->toArray();
             } else {
                 $data[$key] = $value;
