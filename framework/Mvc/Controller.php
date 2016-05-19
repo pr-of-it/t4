@@ -78,19 +78,18 @@ abstract class Controller
         return implode('\\', $ret);
     }
 
-    protected function access($action)
+    protected function access($action, $params = [])
     {
         return true;
     }
 
-    protected function beforeAction($action)
+    protected function beforeAction($action, $params = [])
     {
         return true;
     }
 
-    protected function afterAction($action)
+    protected function afterAction($action, $params = [])
     {
-
     }
 
     public function getData()
@@ -115,11 +114,8 @@ abstract class Controller
         }
     }
 
-    final public function action($name, $params = [])
+    public function action($name, $params = [])
     {
-        if ($params instanceof Std) {
-            $params = $params->toArray();
-        }
         $name = ucfirst($name);
         $actionMethodName = 'action' . $name;
 
@@ -127,55 +123,60 @@ abstract class Controller
             throw new E404Exception('Action ' . $name . ' is not found in controller ' . get_class($this));
         }
 
+        // Params
+        if ($params instanceof Std) {
+            $params = $params->toArray();
+        }
+        $p = [];
+        $request = Application::instance()->request;
+
+        foreach ($this->getActionParameters($name) as $param) {
+
+            if (isset($params[$param->name])) {
+                $p[$param->name] = $params[$param->name];
+                unset($params[$param->name]);
+            } elseif (isset($request->post[$param->name])) {
+                $p[$param->name] = $request->post[$param->name];
+            } elseif (isset($request->get[$param->name])) {
+                $p[$param->name] = $request->get[$param->name];
+            } elseif ($param->isDefaultValueAvailable()) {
+                $p[$param->name] = $param->getDefaultValue();
+            } else {
+                throw new ControllerException('Missing argument ' . $param->name . ' for action ' . $actionMethodName);
+            }
+
+            // Arguments class hinting!
+            if (isset($p[$param->name])) {
+                $class = $param->getClass();
+                if (null !== $class && $class instanceof \ReflectionClass) {
+                    if ( is_a($class->name, Std::class, true) ) {
+                        $val = $p[$param->name];
+                        if (is_array($val)) {
+                            $p[$param->name] = new $class->name($val);
+                        } elseif ($val instanceof IArrayable) {
+                            $p[$param->name] = new $class->name($val->toArray());
+                        }
+                    }
+                }
+            }
+
+        }
+
+        $p = array_merge($p, $params);
+        // /Params
+
         if (method_exists($this, 'access')) {
-            $check = $this->access($name);
+            $check = $this->access($name, $p);
             if (false === $check) {
                 throw new E403Exception('Access denied');
             }
         }
 
         // Продолжаем выполнение действия только если из beforeAction не передано false
-        if ($this->beforeAction($name)) {
-
-            $p = [];
-            $request = Application::instance()->request;
-
-            foreach ($this->getActionParameters($name) as $param) {
-
-                if (isset($params[$param->name])) {
-                    $p[$param->name] = $params[$param->name];
-                    unset($params[$param->name]);
-                } elseif (isset($request->post[$param->name])) {
-                    $p[$param->name] = $request->post[$param->name];
-                } elseif (isset($request->get[$param->name])) {
-                    $p[$param->name] = $request->get[$param->name];
-                } elseif ($param->isDefaultValueAvailable()) {
-                    $p[$param->name] = $param->getDefaultValue();
-                } else {
-                    throw new ControllerException('Missing argument ' . $param->name . ' for action ' . $actionMethodName);
-                }
-
-                // Arguments class hinting!
-                if (isset($p[$param->name])) {
-                    $class = $param->getClass();
-                    if (null !== $class && $class instanceof \ReflectionClass) {
-                        if ( is_a($class->name, Std::class, true) ) {
-                            $val = $p[$param->name];
-                            if (is_array($val)) {
-                                $p[$param->name] = new $class->name($val);
-                            } elseif ($val instanceof IArrayable) {
-                                $p[$param->name] = new $class->name($val->toArray());
-                            }
-                        }
-                    }
-                }
-
-            }
-
-            $p = array_merge($p, $params);
+        if ($this->beforeAction($name, $p)) {
 
             $this->$actionMethodName(...array_values($p));
-            $this->afterAction($name);
+            $this->afterAction($name, $p);
         }
 
         return $this->data;
