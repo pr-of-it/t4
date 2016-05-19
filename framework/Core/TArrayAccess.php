@@ -29,7 +29,7 @@ trait TArrayAccess
 
     protected function innerGet($offset)
     {
-        return isset($this->storage[$offset]) ? $this->storage[$offset] : null;
+        return array_key_exists($offset, $this->storage) ? $this->storage[$offset] : null;
     }
 
     protected function innerSet($offset, $value)
@@ -129,6 +129,20 @@ trait TArrayAccess
     public function toArray()
     {
         return $this->storage;
+    }
+
+    public function toArrayRecursive()
+    {
+        $data = [];
+        foreach (array_keys($this->storage) as $key) {
+            $value = $this->innerGet($key);
+            if ($value instanceof IArrayable) {
+                $data[$key] = $value->toArrayRecursive();
+            } else {
+                $data[$key] = $value;
+            }
+        }
+        return $data;
     }
 
     /*

@@ -50,8 +50,24 @@ class Std
         $data = [];
         foreach (array_keys($this->__data) as $key) {
             $value = $this->innerGet($key);
-            if ($value instanceof IArrayable) {
+            if ($value instanceof self) {
                 $data[$key] = $value->toArray();
+            } else {
+                $data[$key] = $value;
+            }
+        }
+        return $data;
+    }
+    /**
+     * @return array
+     */
+    public function toArrayRecursive()
+    {
+        $data = [];
+        foreach (array_keys($this->__data) as $key) {
+            $value = $this->innerGet($key);
+            if ($value instanceof IArrayable) {
+                $data[$key] = $value->toArrayRecursive();
             } else {
                 $data[$key] = $value;
             }
