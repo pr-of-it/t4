@@ -235,4 +235,27 @@ trait TRelations
         }
     }
 
+    protected function saveRelationsAfterHasOne($key)
+    {
+        /** @var \T4\Orm\Model $class */
+        $class = get_class($this);
+        $relation = $class::getRelations()[$key];
+        $column = $class::getRelationLinkName($relation);
+
+        /** @var \T4\Orm\Model $oldSubModel */
+        $oldSubModel = $this->getRelationLazy($key);
+        /** @var \T4\Orm\Model $newSubModel */
+        $newSubModel = $this->{$key};
+
+        if ( !empty($oldSubModel) && (empty($newSubModel) || $newSubModel->getPk() != $oldSubModel->getPk()) ) {
+            $oldSubModel->{$column} = null;
+            $oldSubModel->save();
+        }
+
+        if ( !empty($newSubModel) ) {
+            $newSubModel->{$column} = $this->getPk();
+            $newSubModel->save();
+        }
+    }
+
 }

@@ -569,15 +569,6 @@ class Pgsql
         foreach ($relations as $key => $relation) {
             switch ($relation['type']) {
 
-                case $class::HAS_ONE:
-                    if (!empty($model->{$key}) && $model->{$key} instanceof Model) {
-                        $column = $class::getRelationLinkName($relation);
-                        $subModel = $model->{$key};
-                        $subModel->{$column} = $model->getPk();
-                        $subModel->save();
-                    }
-                    break;
-
                 case $class::MANY_TO_MANY:
                     if (!empty($model->{$key}) && $model->{$key} instanceof Collection) {
                         $sets = [];

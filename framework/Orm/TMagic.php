@@ -4,27 +4,33 @@ namespace T4\Orm;
 
 use T4\Core\Std;
 
+/**
+ * Class TMagic
+ * @package T4\Orm
+ *
+ * @mixin \T4\Orm\Model
+ */
 trait TMagic
 {
 
     public function __isset($key)
     {
-        if (parent::__isset($key))
+        if (parent::__isset($key)) {
             return true;
+        }
 
+        /** @var \T4\Orm\Model $class */
         $class = get_class($this);
 
-        // Такое свойство есть в перечне полей модели, но установлено не было
-        $columns = $class::getColumns();
-        if (isset($columns[$key]))
+        if (array_key_exists($key, $class::getColumns())) {
             return true;
+        }
 
-        // Такое свойство есть в перечне связей, но установлено не было
-        $relations = $class::getRelations();
         $keys = explode('.', $key);
         $key = array_shift($keys);
-        if (isset($relations[$key]))
+        if (array_key_exists($key, $class::getRelations())) {
             return true;
+        }
 
         return false;
     }

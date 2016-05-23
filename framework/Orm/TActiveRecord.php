@@ -70,13 +70,13 @@ trait TActiveRecord
     {
         foreach (static::getRelations() as $key => $relation) {
             switch ($relation['type']) {
-                /*
+
                 case static::HAS_ONE:
-                    if (!empty($model->{$key}) && $model->{$key} instanceof Model ) {
-                        $this->afterSaveModelSaveHasOne($model, $key);
+                    if ( null === $this->{$key} || $this->{$key} instanceof Model ) {
+                        $this->saveRelationsAfterHasOne($key);
                     }
                     break;
-                    */
+
                 case static::HAS_MANY:
                     if (!empty($this->{$key}) && $this->{$key} instanceof Collection ) {
                         $this->saveRelationsAfterHasMany($key);

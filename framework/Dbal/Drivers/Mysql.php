@@ -531,12 +531,6 @@ class Mysql
         foreach ($relations as $key => $relation) {
             switch ($relation['type']) {
 
-                case $class::HAS_ONE:
-                    if (!empty($model->{$key}) && $model->{$key} instanceof Model ) {
-                        $this->afterSaveModelSaveHasOne($model, $key);
-                    }
-                    break;
-
                 case $class::MANY_TO_MANY:
                     if ( !empty($model->{$key}) && $model->{$key} instanceof Collection ) {
                         $this->afterSaveModelSaveManyToMany($model, $key);
@@ -546,18 +540,6 @@ class Mysql
             }
         }
 
-    }
-
-    protected function afterSaveModelSaveHasOne(Model $model, $key)
-    {
-        /** @var \T4\Orm\Model $class */
-        $class = get_class($model);
-        $relation = $class::getRelations()[$key];
-        $column = $class::getRelationLinkName($relation);
-
-        $subModel = $model->{$key};
-        $subModel->{$column} = $model->getPk();
-        $subModel->save();
     }
 
     protected function afterSaveModelSaveManyToMany(Model $model, $key)
