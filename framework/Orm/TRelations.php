@@ -14,7 +14,6 @@ trait TRelations
 {
 
     /**
-     * Список связей модели
      * @return array
      */
     public static function getRelations()
@@ -33,19 +32,22 @@ trait TRelations
     }
 
     /**
-     * Возвращает имя поля связи
      * @param array $relation
      * @return string
      */
     public static function getRelationLinkName($relation)
     {
-        if (!empty($relation['on']))
+        if (!empty($relation['on'])) {
             return $relation['on'];
+        }
 
-        if (!empty($relation['by']))
+        if (!empty($relation['by'])) {
             return $relation['by'];
+        }
 
+        /** @var \T4\Orm\Model $class */
         $class = get_called_class();
+
         switch ($relation['type']) {
             case $class::BELONGS_TO:
                 $class = explode('\\', $relation['model']);
@@ -67,6 +69,10 @@ trait TRelations
 
     public static function getManyToManyThisLinkColumnName()
     {
+        if (!empty($relation['this'])) {
+            return $relation['this'];
+        }
+
         $class = get_called_class();
         $class = explode('\\', $class);
         $class = array_pop($class);
@@ -75,13 +81,16 @@ trait TRelations
 
     public static function getManyToManyThatLinkColumnName($relation)
     {
+        if (!empty($relation['that'])) {
+            return $relation['that'];
+        }
+
         $class = explode('\\', $relation['model']);
         $class = array_pop($class);
         return '__' . strtolower($class) . '_id';
     }
 
     /**
-     * "Ленивое" получение данных связи для моделей
      * @param string $key
      * @param array $options
      * @return mixed
