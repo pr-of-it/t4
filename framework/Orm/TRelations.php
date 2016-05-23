@@ -142,7 +142,7 @@ trait TRelations
                 $query
                     ->select('t1.*' . $pivotColumnsSql)
                     ->from($relationClass::getTableName())
-                    ->join($linkTable, 't1.' . $relationClass::PK . '=j1.' . static::getManyToManyThatLinkColumnName($relation), 'right')
+                    ->join($linkTable, 't1.' . $relationClass::PK . '=j1.' . static::getManyToManyThatLinkColumnName($relation), 'left')
                     ->where(
                         '(j1.' . static::getManyToManyThisLinkColumnName() . '=:id)'
                         . (isset($options['where']) ? ' AND (' . $options['where'] . ')': '')
