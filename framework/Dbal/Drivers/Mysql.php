@@ -494,8 +494,10 @@ class Mysql
 
     public function save(Model $model)
     {
+        /** @var \T4\Orm\Model $class */
         $class = get_class($model);
         $relations = $class::getRelations();
+        /** @var \T4\Dbal\Connection $connection */
         $connection = $class::getDbConnection();
 
         /*
@@ -548,50 +550,73 @@ class Mysql
                     break;
 
                 case $class::MANY_TO_MANY:
-                    if (!empty($model->{$key}) && $model->{$key} instanceof Collection ) {
+                    if ( !empty($model->{$key}) && $model->{$key} instanceof Collection ) {
 
-                        /** @var Collection $newSubModelsSet */
-                        $newSubModelsSet = $model->{$key};
-
-                        /** @var Collection $oldSubModelsSet */
+                        /** @var \T4\Core\Collection $oldSubModelsSet */
                         $oldSubModelsSet = $model->getRelationLazy($key);
-
+                        /** @var \T4\Core\Collection $newSubModelsSet */
+                        $newSubModelsSet = $model->{$key};
+                        /** @var \T4\Orm\Model $relationModelClass */
+                        $relationModelClass = $relation['model'];
                         $table = $class::getRelationLinkName($relation);
 
-                        $subModelsToDelete = $oldSubModelsSet->filter(function (Model $m) use ($class, $newSubModelsSet) {
-                            return !$newSubModelsSet->existsElement($m->toArray());
-                        });
+                        $thisLinkColumnName = $class::getManyToManyThisLinkColumnName($relation);
+                        $thatLinkColumnName = $class::getManyToManyThatLinkColumnName($relation);
 
-                        if (!$subModelsToDelete->isEmpty()) {
-                            $sql = (new QueryBuilder())
+                        $oldSubModelsSetGroups = $oldSubModelsSet->group(function (Model $oldSubModel) use ($newSubModelsSet) {
+                            return $newSubModelsSet->existsElement([get_class($oldSubModel)::PK => $oldSubModel->getPk()]) ? 'existing' : 'delete';
+                        });
+                        $subModelsToDelete = $oldSubModelsSetGroups['delete'] ?? [];
+                        if (!empty($subModelsToDelete) && !$subModelsToDelete->isEmpty()) {
+                            $query = (new QueryBuilder())
                                 ->delete($table)
-                                ->where($class::getManyToManyThisLinkColumnName($relation) . '=:thisId AND ' . $class::getManyToManyThatLinkColumnName($relation) . '=:thatId');
-                            foreach ($subModelsToDelete as $subModel) {
-                                $connection->execute($sql, [
+                                ->where($thisLinkColumnName . '=:thisId AND ' . $thatLinkColumnName . '=:thatId');
+                            foreach ($subModelsToDelete as $subModelToDelete) {
+                                $connection->execute($query, [
                                     ':thisId' => $model->getPk(),
-                                    ':thatId' => $subModel->getPk()
+                                    ':thatId' => $subModelToDelete->getPk()
                                 ]);
                             }
                         }
 
-                        $subModelsToInsert = $newSubModelsSet->filter(function(Model $m) use ($class, $oldSubModelsSet) {
-                            return $m->isNew() || !$oldSubModelsSet->existsElement($m->toArray());
+                        $newSubModelsSetGroups = $newSubModelsSet->group(function(Model $newSubModel) use ($oldSubModelsSet) {
+                            return $newSubModel->isNew() || !$oldSubModelsSet->existsElement([get_class($newSubModel)::PK => $newSubModel->getPk()]) ? 'insert' : 'existing';
                         });
+                        $subModelsToInsert = $newSubModelsSetGroups['insert'] ?? [];
 
-                        if (!$subModelsToInsert->isEmpty()) {
-                            $coreValues = [$class::getManyToManyThisLinkColumnName($relation) => ':thisId', $class::getManyToManyThatLinkColumnName($relation) => ':thatId'];
-                            $sql = (new QueryBuilder())
-                                ->insert($table)
-                                ->values($coreValues);
-                            foreach ($subModelsToInsert as $subModel) {
-                                if ($subModel->isNew()) {
-                                    $subModel->save();
+                        if (!empty($subModelsToInsert) && !$subModelsToInsert->isEmpty()) {
+
+                            $coreValues = [
+                                $thisLinkColumnName => ':thisId',
+                                $thatLinkColumnName => ':thatId'
+                            ];
+
+                            $pivots = $relationModelClass::getPivots($class, $key);
+                            $pivotValues = [];
+                            if (!empty($pivots)) {
+                                foreach ($pivots as $pivotColumn => $pivot) {
+                                    $pivotValues[$pivotColumn] = ':' . $pivotColumn;
                                 }
-                                $connection->execute($sql, [
-                                    ':thisId' => $model->getPk(),
-                                    ':thatId' => $subModel->getPk()
-                                ]);
                             }
+
+                            $query = (new QueryBuilder())
+                                ->insert($table)
+                                ->values($coreValues + $pivotValues);
+
+                            foreach ($subModelsToInsert as $subModelToInsert) {
+                                if ($subModelToInsert->isNew()) {
+                                    $subModelToInsert->save();
+                                }
+                                $data = [
+                                    ':thisId' => $model->getPk(),
+                                    ':thatId' => $subModelToInsert->getPk()
+                                ];
+                                foreach ($pivotValues as $pivotColumn => $value) {
+                                    $data[':' . $pivotColumn] = $subModelToInsert->{$pivotColumn};
+                                }
+                                $connection->execute($query, $data);
+                            }
+
                         }
 
                     }
