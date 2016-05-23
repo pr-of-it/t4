@@ -611,7 +611,7 @@ class Pgsql
                         $table = $class::getRelationLinkName($relation);
                         $sql = 'DELETE FROM ' . $this->quoteName($table) . ' WHERE "' . $class::getManyToManyThisLinkColumnName() . '"=:id and ' .
                         'not ' . $class::getManyToManyThatLinkColumnName($relation) . ' is null';
-                        [$model->getPk() , $subModel->getPk()] + array_keys($set)                        $connection->execute($sql, [':id' => $model->getPk()]);
+                        $connection->execute($sql, [':id' => $model->getPk()]);
                         if (!empty($sets)) {
                             $sql = 'INSERT INTO ' . $this->quoteName($table) . '
                                     ("' . implode('","', $columns) .  '")
