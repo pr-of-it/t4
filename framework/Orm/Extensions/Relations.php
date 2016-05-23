@@ -22,7 +22,7 @@ class Relations
                     $query
                         ->delete()
                         ->table($linkTable)
-                        ->where($class::getManyToManyThisLinkColumnName().'=:id');
+                        ->where($class::getManyToManyThisLinkColumnName($relation).'=:id');
                     $query->params([':id'=>$model->getPk()]);
                     $class::getDbConnection()->execute($query);
             }

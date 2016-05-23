@@ -67,7 +67,7 @@ trait TRelations
 
     }
 
-    public static function getManyToManyThisLinkColumnName()
+    public static function getManyToManyThisLinkColumnName($relation)
     {
         if (!empty($relation['this'])) {
             return $relation['this'];
@@ -144,7 +144,7 @@ trait TRelations
                     ->from($relationClass::getTableName())
                     ->join($linkTable, 't1.' . $relationClass::PK . '=j1.' . static::getManyToManyThatLinkColumnName($relation), 'left')
                     ->where(
-                        '(j1.' . static::getManyToManyThisLinkColumnName() . '=:id)'
+                        '(j1.' . static::getManyToManyThisLinkColumnName($relation) . '=:id)'
                         . (isset($options['where']) ? ' AND (' . $options['where'] . ')': '')
                     );
                 if (isset($options['order'])) {

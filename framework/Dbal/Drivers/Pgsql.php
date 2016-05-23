@@ -120,7 +120,7 @@ class Pgsql
         return $name . ' ' . $ddl;
     }
 
-    protected function createIndexDDL($tableName, $name = '', $options = '')
+    protected function createIndexDDL($tableName, $name = '', $options)
     {
 
         if (!isset($options['type']))
@@ -592,7 +592,11 @@ class Pgsql
 
                         $pivots = $relation['model']::getPivots($class, $key);
 
-                        $columns = array_merge([$class::getManyToManyThisLinkColumnName(),$class::getManyToManyThatLinkColumnName($relation)], array_keys($pivots));
+                        $columns = array_merge(
+                            [$class::getManyToManyThisLinkColumnName($relation)],
+                            [$class::getManyToManyThatLinkColumnName($relation)],
+                            array_keys($pivots)
+                        );
                         $params = [];
 
                         foreach ($model->{$key} as $subModel) {
@@ -609,7 +613,7 @@ class Pgsql
                         }
 
                         $table = $class::getRelationLinkName($relation);
-                        $sql = 'DELETE FROM ' . $this->quoteName($table) . ' WHERE "' . $class::getManyToManyThisLinkColumnName() . '"=:id and ' .
+                        $sql = 'DELETE FROM ' . $this->quoteName($table) . ' WHERE "' . $class::getManyToManyThisLinkColumnName($relation) . '"=:id and ' .
                         'not ' . $class::getManyToManyThatLinkColumnName($relation) . ' is null';
                         $connection->execute($sql, [':id' => $model->getPk()]);
                         if (!empty($sets)) {

@@ -565,7 +565,7 @@ class Mysql
                         if (!$subModelsToDelete->isEmpty()) {
                             $sql = (new QueryBuilder())
                                 ->delete($table)
-                                ->where($class::getManyToManyThisLinkColumnName() . '=:thisId AND ' . $class::getManyToManyThatLinkColumnName($relation) . '=:thatId');
+                                ->where($class::getManyToManyThisLinkColumnName($relation) . '=:thisId AND ' . $class::getManyToManyThatLinkColumnName($relation) . '=:thatId');
                             foreach ($subModelsToDelete as $subModel) {
                                 $connection->execute($sql, [
                                     ':thisId' => $model->getPk(),
@@ -579,7 +579,7 @@ class Mysql
                         });
 
                         if (!$subModelsToInsert->isEmpty()) {
-                            $coreValues = [$class::getManyToManyThisLinkColumnName() => ':thisId', $class::getManyToManyThatLinkColumnName($relation) => ':thatId'];
+                            $coreValues = [$class::getManyToManyThisLinkColumnName($relation) => ':thisId', $class::getManyToManyThatLinkColumnName($relation) => ':thatId'];
                             $sql = (new QueryBuilder())
                                 ->insert($table)
                                 ->values($coreValues);
