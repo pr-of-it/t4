@@ -2,6 +2,14 @@
 
 namespace T4\Orm;
 
+use T4\Core\Collection;
+
+/**
+ * Class TActiveRecord
+ * @package T4\Orm
+ *
+ * @mixin \T4\Orm\Model
+ */
 trait TActiveRecord
 {
 
@@ -53,8 +61,36 @@ trait TActiveRecord
         } else {
             return false;
         }
+        $this->saveRelationsAfter();
         $this->afterSave();
         return $this;
+    }
+
+    protected function saveRelationsAfter()
+    {
+        foreach (static::getRelations() as $key => $relation) {
+            switch ($relation['type']) {
+                /*
+                case static::HAS_ONE:
+                    if (!empty($model->{$key}) && $model->{$key} instanceof Model ) {
+                        $this->afterSaveModelSaveHasOne($model, $key);
+                    }
+                    break;
+                    */
+                case static::HAS_MANY:
+                    if (!empty($this->{$key}) && $this->{$key} instanceof Collection ) {
+                        $this->saveRelationsAfterHasMany($key);
+                    }
+                    break;
+                /*
+                case $class::MANY_TO_MANY:
+                    if ( !empty($model->{$key}) && $model->{$key} instanceof Collection ) {
+                        $this->afterSaveModelSaveManyToMany($model, $key);
+                    }
+                    break;
+                */
+            }
+        }
     }
 
     protected function afterSave()

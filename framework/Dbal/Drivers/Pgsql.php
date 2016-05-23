@@ -490,7 +490,9 @@ class Pgsql
                 case $class::BELONGS_TO:
                     $column = $class::getRelationLinkName($def);
                     if (!in_array($column, $cols)) {
-                        if (isset($model->{$column}) && !is_null($model->{$column})) {
+                        // @todo: test this!
+                        // if (isset($model->{$column}) && !is_null($model->{$column})) {
+                        if (isset($model->{$column})) {
                             $cols[] = $this->quoteName($column);
                             $prep[] = ':' . $column;
                             $sets[] = '' . $this->quoteName($column) . '=:' . $column;
@@ -573,16 +575,6 @@ class Pgsql
                         $subModel = $model->{$key};
                         $subModel->{$column} = $model->getPk();
                         $subModel->save();
-                    }
-                    break;
-
-                case $class::HAS_MANY:
-                    if (!empty($model->{$key}) && $model->{$key} instanceof Collection) {
-                        $column = $class::getRelationLinkName($relation);
-                        foreach ($model->{$key} as $subModel) {
-                            $subModel->{$column} = $model->getPk();
-                            $subModel->save();
-                        }
                     }
                     break;
 

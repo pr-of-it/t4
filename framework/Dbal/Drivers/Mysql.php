@@ -461,7 +461,9 @@ class Mysql
                 case $class::BELONGS_TO:
                     $column = $class::getRelationLinkName($def);
                     if (!in_array($column, $cols)) {
-                        if (isset($model->{$column}) && !is_null($model->{$column})) {
+                        // todo: test this!
+                        //if (isset($model->{$column}) && !is_null($model->{$column})) {
+                        if (isset($model->{$column})) {
                             $sets[$column] = ':' . $column;
                             $data[':'.$column] = $model->{$column};
                         } elseif (isset($model->{$rel}) && $model->{$rel} instanceof Model) {
@@ -535,12 +537,6 @@ class Mysql
                     }
                     break;
 
-                case $class::HAS_MANY:
-                    if (!empty($model->{$key}) && $model->{$key} instanceof Collection ) {
-                        $this->afterSaveModelSaveHasMany($model, $key);
-                    }
-                    break;
-
                 case $class::MANY_TO_MANY:
                     if ( !empty($model->{$key}) && $model->{$key} instanceof Collection ) {
                         $this->afterSaveModelSaveManyToMany($model, $key);
@@ -562,19 +558,6 @@ class Mysql
         $subModel = $model->{$key};
         $subModel->{$column} = $model->getPk();
         $subModel->save();
-    }
-
-    protected function afterSaveModelSaveHasMany(Model $model, $key)
-    {
-        /** @var \T4\Orm\Model $class */
-        $class = get_class($model);
-        $relation = $class::getRelations()[$key];
-        $column = $class::getRelationLinkName($relation);
-
-        foreach ( $model->{$key} as $subModel ) {
-            $subModel->{$column} = $model->getPk();
-            $subModel->save();
-        }
     }
 
     protected function afterSaveModelSaveManyToMany(Model $model, $key)

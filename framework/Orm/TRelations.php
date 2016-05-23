@@ -203,4 +203,36 @@ trait TRelations
 
     }
 
+    protected function saveRelationsAfterHasMany($key)
+    {
+        /** @var \T4\Orm\Model $class */
+        $class = get_class($this);
+        $relation = $class::getRelations()[$key];
+        $column = $class::getRelationLinkName($relation);
+
+        /** @var \T4\Core\Collection $oldSubModelsSet */
+        $oldSubModelsSet = $this->getRelationLazy($key);
+        /** @var \T4\Core\Collection $newSubModelsSet */
+        $newSubModelsSet = $this->{$key};
+
+        $toDeletePks =
+            array_diff(
+                $oldSubModelsSet->collect($relation['model']::PK),
+                $newSubModelsSet->collect($relation['model']::PK)
+            );
+
+        foreach ($toDeletePks as $toDeletePk) {
+            /** @var \T4\Orm\Model $subModel */
+            $subModel = $oldSubModelsSet->findByAttributes([$relation['model']::PK => $toDeletePk]);
+            $subModel->{$column} = null;
+            $subModel->save();
+        }
+
+        foreach ( $newSubModelsSet ?: [] as $subModel ) {
+            /** @var \T4\Orm\Model $subModel */
+            $subModel->{$column} = $this->getPk();
+            $subModel->save();
+        }
+    }
+
 }
