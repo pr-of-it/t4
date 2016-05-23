@@ -41,6 +41,7 @@ class Pgsql
         return implode('.', $parts);
     }
 
+
     protected function createColumnDDL($table, $name, $options)
     {
         $name = $this->quoteName($name);
@@ -588,23 +589,36 @@ class Pgsql
                 case $class::MANY_TO_MANY:
                     if (!empty($model->{$key}) && $model->{$key} instanceof Collection) {
                         $sets = [];
+
+                        $pivots = $relation['model']::getPivots($class, $key);
+
+                        $columns = array_merge([$class::getManyToManyThisLinkColumnName(),$class::getManyToManyThatLinkColumnName($relation)], array_keys($pivots));
+                        $params = [];
+
                         foreach ($model->{$key} as $subModel) {
                             if ($subModel->isNew()) {
                                 $this->saveColumns($subModel);
                             }
-                            $sets[] = '(' . $model->getPk() . ',' . $subModel->getPk() . ')';
+
+                            $set = [];
+                            foreach ($pivots as $pivotColumnName => $pivotColumn) {
+                                $set[':pivot_' . $model->getPk() . '_' . $subModel->getPk() . '_' . $pivotColumnName] = $subModel->$pivotColumnName;
+                            }
+                            $params += $set;
+                            $sets[] = '(' . implode(',', array_merge([$model->getPk() , $subModel->getPk()],array_keys($set))) . ')';
                         }
 
                         $table = $class::getRelationLinkName($relation);
-                        $sql = 'DELETE FROM ' . $this->quoteName($table) . ' WHERE "' . $class::getManyToManyThisLinkColumnName() . '"=:id';
-                        $connection->execute($sql, [':id' => $model->getPk()]);
+                        $sql = 'DELETE FROM ' . $this->quoteName($table) . ' WHERE "' . $class::getManyToManyThisLinkColumnName() . '"=:id and ' .
+                        'not ' . $class::getManyToManyThatLinkColumnName($relation) . ' is null';
+                        [$model->getPk() , $subModel->getPk()] + array_keys($set)                        $connection->execute($sql, [':id' => $model->getPk()]);
                         if (!empty($sets)) {
                             $sql = 'INSERT INTO ' . $this->quoteName($table) . '
-                                    ("' . $class::getManyToManyThisLinkColumnName() . '", "' . $class::getManyToManyThatLinkColumnName($relation) . '")
+                                    ("' . implode('","', $columns) .  '")
                                     VALUES
-                                    ' . (implode(', ', $sets)) . '
+                                    ' . implode(', ', $sets) . '
                                     ';
-                            $connection->execute($sql);
+                            $connection->execute($sql, $params);
                         }
                     }
                     break;
