@@ -534,8 +534,10 @@ class Pgsql
 
     public function save(Model $model)
     {
+        /** @var \T4\Orm\Model $class */
         $class = get_class($model);
         $relations = $class::getRelations();
+        /** @var \T4\Dbal\Connection $connection */
         $connection = $class::getDbConnection();
 
         /*
