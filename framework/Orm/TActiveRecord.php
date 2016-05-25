@@ -51,9 +51,8 @@ trait TActiveRecord
     public function save()
     {
         if ($this->validate() && $this->beforeSave()) {
-            $class = get_class($this);
-            $driver = $class::getDbDriver();
-            $driver->save($this);
+            $this->saveRelationsBefore();
+            get_class($this)::getDbDriver()->save($this);
             if ($this->isNew()) {
                 $this->wasNew = true;
             }
@@ -64,6 +63,19 @@ trait TActiveRecord
         $this->saveRelationsAfter();
         $this->afterSave();
         return $this;
+    }
+
+    protected function saveRelationsBefore()
+    {
+        foreach (static::getRelations() as $key => $relation) {
+            switch ($relation['type']) {
+                case static::BELONGS_TO:
+                    if ( null === $this->{$key} || $this->{$key} instanceof Model ) {
+                        $this->saveRelationsBeforeBelongsTo($key);
+                    }
+                    break;
+            }
+        }
     }
 
     protected function saveRelationsAfter()

@@ -539,27 +539,7 @@ class Pgsql
         $relations = $class::getRelations();
         /** @var \T4\Dbal\Connection $connection */
         $connection = $class::getDbConnection();
-
-        /*
-         * TODO это тут лишнее, перенести в saveColumns
-         * Сохраняем связанные данные, которым не требуется ID нашей записи
-         */
-        foreach ($relations as $key => $relation) {
-            switch ($relation['type']) {
-                case $class::BELONGS_TO:
-                    $column = $class::getRelationLinkName($relation);
-                    if (!empty($model->{$key}) && $model->{$key} instanceof Model) {
-                        if ($model->{$key}->isNew()) {
-                            $model->{$key}->save();
-                        }
-                        $model->{$column} = $model->{$key}->getPk();
-                    } elseif (empty($model->{$key})) {
-                        $model->{$column} = null;
-                    }
-                    break;
-            }
-        }
-
+        
         /*
          * Сохраняем поля самой модели
          */

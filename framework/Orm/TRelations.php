@@ -203,6 +203,58 @@ trait TRelations
 
     }
 
+    /**
+     * Prepare (save) "BELONGS TO" relations
+     * @param string $key
+     */
+    protected function saveRelationsBeforeBelongsTo($key)
+    {
+        /** @var \T4\Orm\Model $class */
+        $class = get_class($this);
+        $relation = $class::getRelations()[$key];
+        $column = $class::getRelationLinkName($relation);
+
+        if ($this->{$key} instanceof Model) {
+            if ( $this->{$key}->isNew() ) {
+                $this->{$key}->save();
+            }
+            $this->{$column} = $this->{$key}->getPk();
+        } else {
+            $this->{$column} = null;
+        }
+    }
+
+    /**
+     * Prepare (save) "HAS ONE" relations
+     * @param string $key
+     */
+    protected function saveRelationsAfterHasOne($key)
+    {
+        /** @var \T4\Orm\Model $class */
+        $class = get_class($this);
+        $relation = $class::getRelations()[$key];
+        $column = $class::getRelationLinkName($relation);
+
+        /** @var \T4\Orm\Model $oldSubModel */
+        $oldSubModel = $this->getRelationLazy($key);
+        /** @var \T4\Orm\Model $newSubModel */
+        $newSubModel = $this->{$key};
+
+        if ( !empty($oldSubModel) && (empty($newSubModel) || $newSubModel->getPk() != $oldSubModel->getPk()) ) {
+            $oldSubModel->{$column} = null;
+            $oldSubModel->save();
+        }
+
+        if ( !empty($newSubModel) ) {
+            $newSubModel->{$column} = $this->getPk();
+            $newSubModel->save();
+        }
+    }
+
+    /**
+     * Prepare (save) "HAS MANY" relations
+     * @param string $key
+     */
     protected function saveRelationsAfterHasMany($key)
     {
         /** @var \T4\Orm\Model $class */
@@ -234,28 +286,5 @@ trait TRelations
             $subModel->save();
         }
     }
-
-    protected function saveRelationsAfterHasOne($key)
-    {
-        /** @var \T4\Orm\Model $class */
-        $class = get_class($this);
-        $relation = $class::getRelations()[$key];
-        $column = $class::getRelationLinkName($relation);
-
-        /** @var \T4\Orm\Model $oldSubModel */
-        $oldSubModel = $this->getRelationLazy($key);
-        /** @var \T4\Orm\Model $newSubModel */
-        $newSubModel = $this->{$key};
-
-        if ( !empty($oldSubModel) && (empty($newSubModel) || $newSubModel->getPk() != $oldSubModel->getPk()) ) {
-            $oldSubModel->{$column} = null;
-            $oldSubModel->save();
-        }
-
-        if ( !empty($newSubModel) ) {
-            $newSubModel->{$column} = $this->getPk();
-            $newSubModel->save();
-        }
-    }
-
+    
 }
