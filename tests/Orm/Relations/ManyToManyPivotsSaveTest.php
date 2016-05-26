@@ -207,100 +207,11 @@ namespace T4\Tests\Orm\Relations {
             ]);
         }
 
-        /*
-        public function testAdd1()
-        {
-            $cat = Category::findByPK(1);
-            $cat->items->add(Item::findByPK(2));
-            $cat->save();
-
-            $this->assertSelectAll(Category::getTableName(), [
-                ['__id' => 1, 'num' => 1],
-                ['__id' => 2, 'num' => 2],
-                ['__id' => 3, 'num' => 3],
-                ['__id' => 4, 'num' => 4],
-            ]);
-
-            $this->assertSelectAll(Item::getTableName(), [
-                ['__id' => 1, 'num' => 1],
-                ['__id' => 2, 'num' => 2],
-                ['__id' => 3, 'num' => 3],
-                ['__id' => 4, 'num' => 4],
-            ]);
-
-            $this->assertSelectAll('cats_to_items', [
-                ['__id' => 1, '__category_id' => 1, '__item_id' => 1],
-                ['__id' => 2, '__category_id' => 2, '__item_id' => 2],
-                ['__id' => 3, '__category_id' => 2, '__item_id' => 3],
-                ['__id' => 4, '__category_id' => 3, '__item_id' => 2],
-                ['__id' => 5, '__category_id' => 1, '__item_id' => 2],
-            ]);
-        }
-
-        public function testAdd2()
-        {
-            $cat = Category::findByPK(1);
-            $cat->items->add(new Item(['num' => 5]));
-            $cat->save();
-
-            $this->assertSelectAll(Category::getTableName(), [
-                ['__id' => 1, 'num' => 1],
-                ['__id' => 2, 'num' => 2],
-                ['__id' => 3, 'num' => 3],
-                ['__id' => 4, 'num' => 4],
-            ]);
-
-            $this->assertSelectAll(Item::getTableName(), [
-                ['__id' => 1, 'num' => 1],
-                ['__id' => 2, 'num' => 2],
-                ['__id' => 3, 'num' => 3],
-                ['__id' => 4, 'num' => 4],
-                ['__id' => 5, 'num' => 5],
-            ]);
-
-            $this->assertSelectAll('cats_to_items', [
-                ['__id' => 1, '__category_id' => 1, '__item_id' => 1],
-                ['__id' => 2, '__category_id' => 2, '__item_id' => 2],
-                ['__id' => 3, '__category_id' => 2, '__item_id' => 3],
-                ['__id' => 4, '__category_id' => 3, '__item_id' => 2],
-                ['__id' => 5, '__category_id' => 1, '__item_id' => 5],
-            ]);
-        }
-
-        public function testUnset()
-        {
-            $cat = Category::findByPK(1);
-            unset($cat->items[0]);
-            $cat->save();
-
-            $cat = Category::findByPK(2);
-            unset($cat->items[1]);
-            $cat->save();
-
-            $this->assertSelectAll(Category::getTableName(), [
-                ['__id' => 1, 'num' => 1],
-                ['__id' => 2, 'num' => 2],
-                ['__id' => 3, 'num' => 3],
-                ['__id' => 4, 'num' => 4],
-            ]);
-
-            $this->assertSelectAll(Item::getTableName(), [
-                ['__id' => 1, 'num' => 1],
-                ['__id' => 2, 'num' => 2],
-                ['__id' => 3, 'num' => 3],
-                ['__id' => 4, 'num' => 4],
-            ]);
-
-            $this->assertSelectAll('cats_to_items', [
-                ['__id' => 2, '__category_id' => 2, '__item_id' => 2],
-                ['__id' => 4, '__category_id' => 3, '__item_id' => 2],
-            ]);
-        }
-
-        public function testClear()
+        public function testUpdatePivots()
         {
             $cat = Category::findByPK(2);
-            $cat->items = new Collection();
+            $cat->items[0]->publish = '2000-10-10';
+            $cat->items[1]->publish = '2000-10-11';
             $cat->save();
 
             $this->assertSelectAll(Category::getTableName(), [
@@ -318,12 +229,13 @@ namespace T4\Tests\Orm\Relations {
             ]);
 
             $this->assertSelectAll('cats_to_items', [
-                ['__id' => 1, '__category_id' => 1, '__item_id' => 1],
-                ['__id' => 4, '__category_id' => 3, '__item_id' => 2],
+                ['__id' => 1, '__category_id' => 1, '__item_id' => 1, 'publish' => '2000-01-01'],
+                ['__id' => 2, '__category_id' => 2, '__item_id' => 2, 'publish' => '2000-10-10'],
+                ['__id' => 3, '__category_id' => 2, '__item_id' => 3, 'publish' => '2000-10-11'],
+                ['__id' => 4, '__category_id' => 3, '__item_id' => 2, 'publish' => '2000-03-02'],
             ]);
         }
 
-        */
     }
 
 }

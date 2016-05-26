@@ -534,72 +534,11 @@ class Pgsql
 
     public function save(Model $model)
     {
-        /** @var \T4\Orm\Model $class */
-        $class = get_class($model);
-        $relations = $class::getRelations();
-        /** @var \T4\Dbal\Connection $connection */
-        $connection = $class::getDbConnection();
-        
         $this->saveColumns($model);
-
-        /*
-        * И еще раз сохраняем связанные данные, которым требовался ID нашей записи
-        */
-        /*
-        foreach ($relations as $key => $relation) {
-            switch ($relation['type']) {
-
-                case $class::MANY_TO_MANY:
-                    if (!empty($model->{$key}) && $model->{$key} instanceof Collection) {
-                        $sets = [];
-
-                        $pivots = $relation['model']::getPivots($class, $key);
-
-                        $columns = array_merge(
-                            [$class::getManyToManyThisLinkColumnName($relation)],
-                            [$class::getManyToManyThatLinkColumnName($relation)],
-                            array_keys($pivots)
-                        );
-                        $params = [];
-
-                        foreach ($model->{$key} as $subModel) {
-                            if ($subModel->isNew()) {
-                                $this->saveColumns($subModel);
-                            }
-
-                            $set = [];
-                            foreach ($pivots as $pivotColumnName => $pivotColumn) {
-                                $set[':pivot_' . $model->getPk() . '_' . $subModel->getPk() . '_' . $pivotColumnName] = $subModel->$pivotColumnName;
-                            }
-                            $params += $set;
-                            $sets[] = '(' . implode(',', array_merge([$model->getPk() , $subModel->getPk()],array_keys($set))) . ')';
-                        }
-
-                        $table = $class::getRelationLinkName($relation);
-                        $sql = 'DELETE FROM ' . $this->quoteName($table) . ' WHERE "' . $class::getManyToManyThisLinkColumnName($relation) . '"=:id and ' .
-                        'not ' . $class::getManyToManyThatLinkColumnName($relation) . ' is null';
-                        $connection->execute($sql, [':id' => $model->getPk()]);
-                        if (!empty($sets)) {
-                            $sql = 'INSERT INTO ' . $this->quoteName($table) . '
-                                    ("' . implode('","', $columns) .  '")
-                                    VALUES
-                                    ' . implode(', ', $sets) . '
-                                    ';
-                            $connection->execute($sql, $params);
-                        }
-                    }
-                    break;
-
-            }
-
-        }
-        */
-
     }
 
     public function delete(Model $model)
     {
-
         $class = get_class($model);
         $connection = $class::getDbConnection();
 
@@ -608,7 +547,6 @@ class Pgsql
             WHERE ' . $class::PK . '=:id
         ';
         $connection->execute($sql, [':id' => $model->getPk()]);
-
     }
 
 }

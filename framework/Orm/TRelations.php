@@ -310,6 +310,10 @@ trait TRelations
         /** @var \T4\Core\Collection $newSubModelsSet */
         $newSubModelsSet = $this->{$key};
 
+        /**
+         * Delete old links
+         */
+
         $oldSubModelsSetGroups = $oldSubModelsSet->group(function (Model $oldSubModel) use ($newSubModelsSet) {
             return $newSubModelsSet->existsElement([get_class($oldSubModel)::PK => $oldSubModel->getPk()]) ? 'existing' : 'delete';
         });
@@ -325,6 +329,10 @@ trait TRelations
                 ]);
             }
         }
+
+        /**
+         * Insert new links with pivots
+         */
 
         $newSubModelsSetGroups = $newSubModelsSet->group(function(Model $newSubModel) use ($oldSubModelsSet) {
             return $newSubModel->isNew() || !$oldSubModelsSet->existsElement([get_class($newSubModel)::PK => $newSubModel->getPk()]) ? 'insert' : 'existing';
@@ -362,8 +370,38 @@ trait TRelations
                 }
                 $connection->execute($query, $data);
             }
-
         }
+
+        /**
+         * Update pivots in existing links
+         */
+
+        $subModelsToUpdate = $newSubModelsSetGroups['existing'] ?? new Collection();
+        $pivots = $relationModelClass::getPivots($class, $key);
+        if (!$subModelsToUpdate->isEmpty() && !empty($pivots)) {
+
+            $pivotValues = [];
+            foreach ($pivots as $pivotColumn => $pivot) {
+                $pivotValues[$pivotColumn] = ':' . $pivotColumn;
+            }
+
+            $query = (new QueryBuilder())
+                ->update($linkTableName)
+                ->where($thisLinkColumnName . '=:thisId AND ' . $thatLinkColumnName . '=:thatId')
+                ->values($pivotValues);
+
+            foreach ($subModelsToUpdate as $subModelToUpdate) {
+                $data = [
+                    ':thisId' => $this->getPk(),
+                    ':thatId' => $subModelToUpdate->getPk()
+                ];
+                foreach ($pivotValues as $pivotColumn => $value) {
+                    $data[':' . $pivotColumn] = $subModelToUpdate->{$pivotColumn};
+                }
+                $connection->execute($query, $data);
+            }
+        }
+
     }
 
     }
