@@ -540,14 +540,12 @@ class Pgsql
         /** @var \T4\Dbal\Connection $connection */
         $connection = $class::getDbConnection();
         
-        /*
-         * Сохраняем поля самой модели
-         */
         $this->saveColumns($model);
 
         /*
         * И еще раз сохраняем связанные данные, которым требовался ID нашей записи
         */
+        /*
         foreach ($relations as $key => $relation) {
             switch ($relation['type']) {
 
@@ -593,7 +591,9 @@ class Pgsql
                     break;
 
             }
+
         }
+        */
 
     }
 

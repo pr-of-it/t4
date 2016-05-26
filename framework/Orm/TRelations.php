@@ -285,5 +285,87 @@ trait TRelations
             $subModel->save();
         }
     }
-    
-}
+
+    /**
+     * Prepare (save) "MANY TO MANY" relations
+     * @param string $key
+     */
+    protected function saveRelationsAfterManyToMany($key)
+    {
+        /** @var \T4\Orm\Model $class */
+        $class = get_class($this);
+        $relation = $class::getRelations()[$key];
+
+        /** @var \T4\Dbal\Connection $connection */
+        $connection = $class::getDbConnection();
+
+        /** @var \T4\Core\Collection $oldSubModelsSet */
+        $oldSubModelsSet = $this->getRelationLazy($key);
+        /** @var \T4\Core\Collection $newSubModelsSet */
+        $newSubModelsSet = $this->{$key};
+
+        /** @var \T4\Orm\Model $relationModelClass */
+        $relationModelClass = $relation['model'];
+        $table = $class::getRelationLinkName($relation);
+
+        $thisLinkColumnName = $class::getManyToManyThisLinkColumnName($relation);
+        $thatLinkColumnName = $class::getManyToManyThatLinkColumnName($relation);
+
+        $oldSubModelsSetGroups = $oldSubModelsSet->group(function (Model $oldSubModel) use ($newSubModelsSet) {
+            return $newSubModelsSet->existsElement([get_class($oldSubModel)::PK => $oldSubModel->getPk()]) ? 'existing' : 'delete';
+        });
+        $subModelsToDelete = $oldSubModelsSetGroups['delete'] ?? [];
+        if (!empty($subModelsToDelete) && !$subModelsToDelete->isEmpty()) {
+            $query = (new QueryBuilder())
+                ->delete($table)
+                ->where($thisLinkColumnName . '=:thisId AND ' . $thatLinkColumnName . '=:thatId');
+            foreach ($subModelsToDelete as $subModelToDelete) {
+                $connection->execute($query, [
+                    ':thisId' => $this->getPk(),
+                    ':thatId' => $subModelToDelete->getPk()
+                ]);
+            }
+        }
+
+        $newSubModelsSetGroups = $newSubModelsSet->group(function(Model $newSubModel) use ($oldSubModelsSet) {
+            return $newSubModel->isNew() || !$oldSubModelsSet->existsElement([get_class($newSubModel)::PK => $newSubModel->getPk()]) ? 'insert' : 'existing';
+        });
+        $subModelsToInsert = $newSubModelsSetGroups['insert'] ?? [];
+
+        if (!empty($subModelsToInsert) && !$subModelsToInsert->isEmpty()) {
+
+            $coreValues = [
+                $thisLinkColumnName => ':thisId',
+                $thatLinkColumnName => ':thatId'
+            ];
+
+            $pivots = $relationModelClass::getPivots($class, $key);
+            $pivotValues = [];
+            if (!empty($pivots)) {
+                foreach ($pivots as $pivotColumn => $pivot) {
+                    $pivotValues[$pivotColumn] = ':' . $pivotColumn;
+                }
+            }
+
+            $query = (new QueryBuilder())
+                ->insert($table)
+                ->values($coreValues + $pivotValues);
+
+            foreach ($subModelsToInsert as $subModelToInsert) {
+                if ($subModelToInsert->isNew()) {
+                    $subModelToInsert->save();
+                }
+                $data = [
+                    ':thisId' => $this->getPk(),
+                    ':thatId' => $subModelToInsert->getPk()
+                ];
+                foreach ($pivotValues as $pivotColumn => $value) {
+                    $data[':' . $pivotColumn] = $subModelToInsert->{$pivotColumn};
+                }
+                $connection->execute($query, $data);
+            }
+
+        }
+    }
+
+    }

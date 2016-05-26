@@ -4,6 +4,7 @@ namespace T4\Tests\Orm\Relations;
 
 use PHPUnit_Extensions_Database_DataSet_IDataSet;
 use PHPUnit_Extensions_Database_DB_IDatabaseConnection;
+use T4\Dbal\QueryBuilder;
 
 require_once realpath(__DIR__ . '/../../../framework/boot.php');
 
@@ -52,6 +53,19 @@ abstract class BaseTest
     protected function getDataSet()
     {
         // TODO: Implement getDataSet() method.
+    }
+    
+    protected function assertSelectAll($table, $assertedData)
+    {
+        $data =
+            $this->getT4Connection()
+                ->query(
+                    (new QueryBuilder())->select()->from($table)
+                )->fetchAll(\PDO::FETCH_ASSOC);
+        $this->assertEquals(count($assertedData), count($data));
+        foreach ($data as $i => $row) {
+            $this->assertEquals($row, $assertedData[$i]);
+        }
     }
 
 }

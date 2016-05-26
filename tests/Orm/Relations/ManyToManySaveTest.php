@@ -29,7 +29,7 @@ namespace T4\Tests\Orm\Relations {
 
     require_once realpath(__DIR__ . '/../../../framework/boot.php');
 
-    use T4\Dbal\QueryBuilder;
+    use T4\Core\Collection;
     use T4\Tests\Orm\Relations\ManyToManyModels\Category;
     use T4\Tests\Orm\Relations\ManyToManyModels\Item;
 
@@ -51,9 +51,9 @@ namespace T4\Tests\Orm\Relations {
             ');
             Item::setConnection($this->getT4Connection());
 
-            $this->getT4Connection()->execute('CREATE TABLE cats_to_items (__category_id BIGINT, __item_id BIGINT)');
+            $this->getT4Connection()->execute('CREATE TABLE cats_to_items (__id SERIAL, __category_id BIGINT, __item_id BIGINT)');
             $this->getT4Connection()->execute('
-              INSERT INTO cats_to_items (__category_id, __item_id) VALUES (1, 1), (2, 2), (2, 3), (3, 2), (4, NULL )
+              INSERT INTO cats_to_items (__category_id, __item_id) VALUES (1, 1), (2, 2), (2, 3), (3, 2)
             ');
 
         }
@@ -73,108 +73,184 @@ namespace T4\Tests\Orm\Relations {
             $item = Item::findByPK(1);
             $item->save();
 
-            $data =
-                Category::getDbConnection()
-                    ->query(
-                        (new QueryBuilder())->select()->from(Category::getTableName())
-                    )->fetchAll(\PDO::FETCH_ASSOC);
+            $this->assertSelectAll(Category::getTableName(), [
+                ['__id' => 1, 'num' => 1],
+                ['__id' => 2, 'num' => 2],
+                ['__id' => 3, 'num' => 3],
+                ['__id' => 4, 'num' => 4],
+            ]);
 
-            $this->assertEquals(['__id' => 1, 'num' => 1], $data[0]);
-            $this->assertEquals(['__id' => 2, 'num' => 2], $data[1]);
-            $this->assertEquals(['__id' => 3, 'num' => 3], $data[2]);
-            $this->assertEquals(['__id' => 4, 'num' => 4], $data[3]);
+            $this->assertSelectAll(Item::getTableName(), [
+                ['__id' => 1, 'num' => 1],
+                ['__id' => 2, 'num' => 2],
+                ['__id' => 3, 'num' => 3],
+                ['__id' => 4, 'num' => 4],
+            ]);
 
-            $data =
-                Item::getDbConnection()
-                    ->query(
-                        (new QueryBuilder())->select()->from(Item::getTableName())
-                    )->fetchAll(\PDO::FETCH_ASSOC);
-
-            $this->assertEquals(['__id' => 1, 'num' => 1], $data[0]);
-            $this->assertEquals(['__id' => 2, 'num' => 2], $data[1]);
-            $this->assertEquals(['__id' => 3, 'num' => 3], $data[2]);
-            $this->assertEquals(['__id' => 4, 'num' => 4], $data[3]);
+            $this->assertSelectAll('cats_to_items', [
+                ['__id' => 1, '__category_id' => 1, '__item_id' => 1],
+                ['__id' => 2, '__category_id' => 2, '__item_id' => 2],
+                ['__id' => 3, '__category_id' => 2, '__item_id' => 3],
+                ['__id' => 4, '__category_id' => 3, '__item_id' => 2],
+            ]);
         }
 
-        /*
         public function testCreateWORelation()
         {
             $cat = new Category;
-            $cat->num = 2;
+            $cat->num = 5;
             $cat->save();
 
-            $data =
-                Category::getDbConnection()
-                    ->query(
-                        (new QueryBuilder())->select()->from(Category::getTableName())
-                    )->fetchAll(\PDO::FETCH_ASSOC);
+            $item = new Item;
+            $item->num = 5;
+            $item->save();
 
-            $this->assertEquals(['__id' => 1, 'num' => 1], $data[0]);
-            $this->assertEquals(['__id' => 2, 'num' => 2], $data[1]);
+            $this->assertSelectAll(Category::getTableName(), [
+                ['__id' => 1, 'num' => 1],
+                ['__id' => 2, 'num' => 2],
+                ['__id' => 3, 'num' => 3],
+                ['__id' => 4, 'num' => 4],
+                ['__id' => 5, 'num' => 5],
+            ]);
 
-            $data =
-                Item::getDbConnection()
-                    ->query(
-                        (new QueryBuilder())->select()->from(Item::getTableName())
-                    )->fetchAll(\PDO::FETCH_ASSOC);
+            $this->assertSelectAll(Item::getTableName(), [
+                ['__id' => 1, 'num' => 1],
+                ['__id' => 2, 'num' => 2],
+                ['__id' => 3, 'num' => 3],
+                ['__id' => 4, 'num' => 4],
+                ['__id' => 5, 'num' => 5],
+            ]);
 
-            $this->assertEquals(['__id' => 1, 'num' => 1, '__category_id' => 1],    $data[0]);
-            $this->assertEquals(['__id' => 2, 'num' => 2, '__category_id' => 1],    $data[1]);
-            $this->assertEquals(['__id' => 3, 'num' => 3, '__category_id' => null], $data[2]);
+            $this->assertSelectAll('cats_to_items', [
+                ['__id' => 1, '__category_id' => 1, '__item_id' => 1],
+                ['__id' => 2, '__category_id' => 2, '__item_id' => 2],
+                ['__id' => 3, '__category_id' => 2, '__item_id' => 3],
+                ['__id' => 4, '__category_id' => 3, '__item_id' => 2],
+            ]);
         }
 
-        public function testCreateWRelation()
+        public function testCreateWRelation1()
         {
             $cat = new Category;
-            $cat->num = 2;
+            $cat->num = 5;
             $cat->items->add(Item::findByPK(3));
-            $cat->items->add(new Item(['num' => 4]));
+            $cat->items->add(Item::findByPK(4));
             $cat->save();
 
-            $data =
-                Category::getDbConnection()
-                    ->query(
-                        (new QueryBuilder())->select()->from(Category::getTableName())
-                    )->fetchAll(\PDO::FETCH_ASSOC);
+            $this->assertSelectAll(Category::getTableName(), [
+                ['__id' => 1, 'num' => 1],
+                ['__id' => 2, 'num' => 2],
+                ['__id' => 3, 'num' => 3],
+                ['__id' => 4, 'num' => 4],
+                ['__id' => 5, 'num' => 5],
+            ]);
 
-            $this->assertEquals(['__id' => 1, 'num' => 1], $data[0]);
-            $this->assertEquals(['__id' => 2, 'num' => 2], $data[1]);
+            $this->assertSelectAll(Item::getTableName(), [
+                ['__id' => 1, 'num' => 1],
+                ['__id' => 2, 'num' => 2],
+                ['__id' => 3, 'num' => 3],
+                ['__id' => 4, 'num' => 4],
+            ]);
 
-            $data =
-                Item::getDbConnection()
-                    ->query(
-                        (new QueryBuilder())->select()->from(Item::getTableName())
-                    )->fetchAll(\PDO::FETCH_ASSOC);
-
-            $this->assertEquals(['__id' => 1, 'num' => 1, '__category_id' => 1],    $data[0]);
-            $this->assertEquals(['__id' => 2, 'num' => 2, '__category_id' => 1],    $data[1]);
-            $this->assertEquals(['__id' => 3, 'num' => 3, '__category_id' => 2],    $data[2]);
-            $this->assertEquals(['__id' => 4, 'num' => 4, '__category_id' => 2],    $data[3]);
+            $this->assertSelectAll('cats_to_items', [
+                ['__id' => 1, '__category_id' => 1, '__item_id' => 1],
+                ['__id' => 2, '__category_id' => 2, '__item_id' => 2],
+                ['__id' => 3, '__category_id' => 2, '__item_id' => 3],
+                ['__id' => 4, '__category_id' => 3, '__item_id' => 2],
+                ['__id' => 5, '__category_id' => 5, '__item_id' => 3],
+                ['__id' => 6, '__category_id' => 5, '__item_id' => 4],
+            ]);
         }
 
-        public function testAdd()
+        public function testCreateWRelation2()
         {
-            $cat = Category::findByPK(1);
-            $cat->items->add(Item::findByPK(3));
+            $cat = new Category;
+            $cat->num = 5;
+            $cat->items->add(new Item(['num' => 5]));
             $cat->save();
 
-            $data =
-                Category::getDbConnection()
-                    ->query(
-                        (new QueryBuilder())->select()->from(Category::getTableName())
-                    )->fetchAll(\PDO::FETCH_ASSOC);
+            $this->assertSelectAll(Category::getTableName(), [
+                ['__id' => 1, 'num' => 1],
+                ['__id' => 2, 'num' => 2],
+                ['__id' => 3, 'num' => 3],
+                ['__id' => 4, 'num' => 4],
+                ['__id' => 5, 'num' => 5],
+            ]);
 
-            $this->assertEquals(['__id' => 1, 'num' => 1], $data[0]);
+            $this->assertSelectAll(Item::getTableName(), [
+                ['__id' => 1, 'num' => 1],
+                ['__id' => 2, 'num' => 2],
+                ['__id' => 3, 'num' => 3],
+                ['__id' => 4, 'num' => 4],
+                ['__id' => 5, 'num' => 5],
+            ]);
 
-            $data =
-                Item::getDbConnection()
-                    ->query(
-                        (new QueryBuilder())->select()->from(Item::getTableName())
-                    )->fetchAll(\PDO::FETCH_ASSOC);
+            $this->assertSelectAll('cats_to_items', [
+                ['__id' => 1, '__category_id' => 1, '__item_id' => 1],
+                ['__id' => 2, '__category_id' => 2, '__item_id' => 2],
+                ['__id' => 3, '__category_id' => 2, '__item_id' => 3],
+                ['__id' => 4, '__category_id' => 3, '__item_id' => 2],
+                ['__id' => 5, '__category_id' => 5, '__item_id' => 5],
+            ]);
+        }
 
-            $this->assertEquals(['__id' => 1, 'num' => 1, '__category_id' => 1],    $data[0]);
-            $this->assertEquals(['__id' => 2, 'num' => 2, '__category_id' => 1],    $data[1]);
-            $this->assertEquals(['__id' => 3, 'num' => 3, '__category_id' => 1],    $data[2]);
+        public function testAdd1()
+        {
+            $cat = Category::findByPK(1);
+            $cat->items->add(Item::findByPK(2));
+            $cat->save();
+
+            $this->assertSelectAll(Category::getTableName(), [
+                ['__id' => 1, 'num' => 1],
+                ['__id' => 2, 'num' => 2],
+                ['__id' => 3, 'num' => 3],
+                ['__id' => 4, 'num' => 4],
+            ]);
+
+            $this->assertSelectAll(Item::getTableName(), [
+                ['__id' => 1, 'num' => 1],
+                ['__id' => 2, 'num' => 2],
+                ['__id' => 3, 'num' => 3],
+                ['__id' => 4, 'num' => 4],
+            ]);
+
+            $this->assertSelectAll('cats_to_items', [
+                ['__id' => 1, '__category_id' => 1, '__item_id' => 1],
+                ['__id' => 2, '__category_id' => 2, '__item_id' => 2],
+                ['__id' => 3, '__category_id' => 2, '__item_id' => 3],
+                ['__id' => 4, '__category_id' => 3, '__item_id' => 2],
+                ['__id' => 5, '__category_id' => 1, '__item_id' => 2],
+            ]);
+        }
+
+        public function testAdd2()
+        {
+            $cat = Category::findByPK(1);
+            $cat->items->add(new Item(['num' => 5]));
+            $cat->save();
+
+            $this->assertSelectAll(Category::getTableName(), [
+                ['__id' => 1, 'num' => 1],
+                ['__id' => 2, 'num' => 2],
+                ['__id' => 3, 'num' => 3],
+                ['__id' => 4, 'num' => 4],
+            ]);
+
+            $this->assertSelectAll(Item::getTableName(), [
+                ['__id' => 1, 'num' => 1],
+                ['__id' => 2, 'num' => 2],
+                ['__id' => 3, 'num' => 3],
+                ['__id' => 4, 'num' => 4],
+                ['__id' => 5, 'num' => 5],
+            ]);
+
+            $this->assertSelectAll('cats_to_items', [
+                ['__id' => 1, '__category_id' => 1, '__item_id' => 1],
+                ['__id' => 2, '__category_id' => 2, '__item_id' => 2],
+                ['__id' => 3, '__category_id' => 2, '__item_id' => 3],
+                ['__id' => 4, '__category_id' => 3, '__item_id' => 2],
+                ['__id' => 5, '__category_id' => 1, '__item_id' => 5],
+            ]);
         }
 
         public function testUnset()
@@ -183,50 +259,56 @@ namespace T4\Tests\Orm\Relations {
             unset($cat->items[0]);
             $cat->save();
 
-            $data =
-                Category::getDbConnection()
-                    ->query(
-                        (new QueryBuilder())->select()->from(Category::getTableName())
-                    )->fetchAll(\PDO::FETCH_ASSOC);
+            $cat = Category::findByPK(2);
+            unset($cat->items[1]);
+            $cat->save();
 
-            $this->assertEquals(['__id' => 1, 'num' => 1], $data[0]);
+            $this->assertSelectAll(Category::getTableName(), [
+                ['__id' => 1, 'num' => 1],
+                ['__id' => 2, 'num' => 2],
+                ['__id' => 3, 'num' => 3],
+                ['__id' => 4, 'num' => 4],
+            ]);
 
-            $data =
-                Item::getDbConnection()
-                    ->query(
-                        (new QueryBuilder())->select()->from(Item::getTableName())
-                    )->fetchAll(\PDO::FETCH_ASSOC);
+            $this->assertSelectAll(Item::getTableName(), [
+                ['__id' => 1, 'num' => 1],
+                ['__id' => 2, 'num' => 2],
+                ['__id' => 3, 'num' => 3],
+                ['__id' => 4, 'num' => 4],
+            ]);
 
-            $this->assertEquals(['__id' => 1, 'num' => 1, '__category_id' => null],    $data[0]);
-            $this->assertEquals(['__id' => 2, 'num' => 2, '__category_id' => 1],    $data[1]);
-            $this->assertEquals(['__id' => 3, 'num' => 3, '__category_id' => null],    $data[2]);
+            $this->assertSelectAll('cats_to_items', [
+                ['__id' => 2, '__category_id' => 2, '__item_id' => 2],
+                ['__id' => 4, '__category_id' => 3, '__item_id' => 2],
+            ]);
         }
 
         public function testClear()
         {
-            $cat = Category::findByPK(1);
+            $cat = Category::findByPK(2);
             $cat->items = new Collection();
             $cat->save();
 
-            $data =
-                Category::getDbConnection()
-                    ->query(
-                        (new QueryBuilder())->select()->from(Category::getTableName())
-                    )->fetchAll(\PDO::FETCH_ASSOC);
+            $this->assertSelectAll(Category::getTableName(), [
+                ['__id' => 1, 'num' => 1],
+                ['__id' => 2, 'num' => 2],
+                ['__id' => 3, 'num' => 3],
+                ['__id' => 4, 'num' => 4],
+            ]);
 
-            $this->assertEquals(['__id' => 1, 'num' => 1], $data[0]);
+            $this->assertSelectAll(Item::getTableName(), [
+                ['__id' => 1, 'num' => 1],
+                ['__id' => 2, 'num' => 2],
+                ['__id' => 3, 'num' => 3],
+                ['__id' => 4, 'num' => 4],
+            ]);
 
-            $data =
-                Item::getDbConnection()
-                    ->query(
-                        (new QueryBuilder())->select()->from(Item::getTableName())
-                    )->fetchAll(\PDO::FETCH_ASSOC);
-
-            $this->assertEquals(['__id' => 1, 'num' => 1, '__category_id' => null],    $data[0]);
-            $this->assertEquals(['__id' => 2, 'num' => 2, '__category_id' => null],    $data[1]);
-            $this->assertEquals(['__id' => 3, 'num' => 3, '__category_id' => null],    $data[2]);
+            $this->assertSelectAll('cats_to_items', [
+                ['__id' => 1, '__category_id' => 1, '__item_id' => 1],
+                ['__id' => 4, '__category_id' => 3, '__item_id' => 2],
+            ]);
         }
-        */
+
     }
 
 }

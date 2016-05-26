@@ -94,13 +94,13 @@ trait TActiveRecord
                         $this->saveRelationsAfterHasMany($key);
                     }
                     break;
-                /*
-                case $class::MANY_TO_MANY:
-                    if ( !empty($model->{$key}) && $model->{$key} instanceof Collection ) {
-                        $this->afterSaveModelSaveManyToMany($model, $key);
+                
+                case static::MANY_TO_MANY:
+                    if ( !empty($this->{$key}) && $this->{$key} instanceof Collection ) {
+                        $this->saveRelationsAfterManyToMany($key);
                     }
                     break;
-                */
+                
             }
         }
     }
