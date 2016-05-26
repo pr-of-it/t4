@@ -299,17 +299,16 @@ trait TRelations
         /** @var \T4\Dbal\Connection $connection */
         $connection = $class::getDbConnection();
 
+        /** @var \T4\Orm\Model $relationModelClass */
+        $relationModelClass = $relation['model'];
+        $linkTableName = $class::getRelationLinkName($relation);
+        $thisLinkColumnName = $class::getManyToManyThisLinkColumnName($relation);
+        $thatLinkColumnName = $class::getManyToManyThatLinkColumnName($relation);
+
         /** @var \T4\Core\Collection $oldSubModelsSet */
         $oldSubModelsSet = $this->getRelationLazy($key);
         /** @var \T4\Core\Collection $newSubModelsSet */
         $newSubModelsSet = $this->{$key};
-
-        /** @var \T4\Orm\Model $relationModelClass */
-        $relationModelClass = $relation['model'];
-        $table = $class::getRelationLinkName($relation);
-
-        $thisLinkColumnName = $class::getManyToManyThisLinkColumnName($relation);
-        $thatLinkColumnName = $class::getManyToManyThatLinkColumnName($relation);
 
         $oldSubModelsSetGroups = $oldSubModelsSet->group(function (Model $oldSubModel) use ($newSubModelsSet) {
             return $newSubModelsSet->existsElement([get_class($oldSubModel)::PK => $oldSubModel->getPk()]) ? 'existing' : 'delete';
@@ -317,7 +316,7 @@ trait TRelations
         $subModelsToDelete = $oldSubModelsSetGroups['delete'] ?? [];
         if (!empty($subModelsToDelete) && !$subModelsToDelete->isEmpty()) {
             $query = (new QueryBuilder())
-                ->delete($table)
+                ->delete($linkTableName)
                 ->where($thisLinkColumnName . '=:thisId AND ' . $thatLinkColumnName . '=:thatId');
             foreach ($subModelsToDelete as $subModelToDelete) {
                 $connection->execute($query, [
@@ -331,7 +330,6 @@ trait TRelations
             return $newSubModel->isNew() || !$oldSubModelsSet->existsElement([get_class($newSubModel)::PK => $newSubModel->getPk()]) ? 'insert' : 'existing';
         });
         $subModelsToInsert = $newSubModelsSetGroups['insert'] ?? [];
-
         if (!empty($subModelsToInsert) && !$subModelsToInsert->isEmpty()) {
 
             $coreValues = [
@@ -348,7 +346,7 @@ trait TRelations
             }
 
             $query = (new QueryBuilder())
-                ->insert($table)
+                ->insert($linkTableName)
                 ->values($coreValues + $pivotValues);
 
             foreach ($subModelsToInsert as $subModelToInsert) {
