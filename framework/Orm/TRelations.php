@@ -60,8 +60,7 @@ trait TRelations
                 return '__' . strtolower($class) . '_id';
             case $class::MANY_TO_MANY:
                 $thisTableName = $class::getTableName();
-                $relationClass = (false !== strpos($relation['model'], 'App\\')) ? $relation['model'] : '\\App\\Models\\' . $relation['model'];
-                $thatTableName = $relationClass::getTableName();
+                $thatTableName = $relation['model']::getTableName();
                 return $thisTableName < $thatTableName ? $thisTableName . '_to_' . $thatTableName : $thatTableName . '_to_' . $thisTableName;
         }
 
