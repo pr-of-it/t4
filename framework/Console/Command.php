@@ -13,7 +13,7 @@ class Command
      */
     public $app;
 
-    final public function __construct()
+    public function __construct()
     {
         $this->app = \T4\Console\Application::instance();
     }
@@ -29,7 +29,7 @@ class Command
 
     }
 
-    final public function action($name, $params = [])
+    public function action($name, $params = [])
     {
         $name = ucfirst($name);
         $actionMethodName = 'action' . $name;
@@ -65,7 +65,7 @@ class Command
      * @return \ReflectionParameter[]
      * @throws Exception
      */
-    final protected function getActionParameters($name)
+    protected function getActionParameters($name)
     {
         $actionMethodName = 'action' . ucfirst($name);
         if (method_exists($this, $actionMethodName)) {
