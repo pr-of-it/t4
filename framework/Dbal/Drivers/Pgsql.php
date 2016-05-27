@@ -55,7 +55,7 @@ class Pgsql
                 break;
             case 'relation':
             case 'link':
-                $ddl = 'BIGINT NOT NULL DEFAULT \'0\'';
+                $ddl = 'BIGINT';
                 break;
             case 'serial':
                 $ddl = 'SERIAL';

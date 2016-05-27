@@ -55,7 +55,7 @@ class Mysql
                 break;
             case 'relation':
             case 'link':
-                $ddl = 'BIGINT UNSIGNED NOT NULL DEFAULT \'0\'';
+                $ddl = 'BIGINT UNSIGNED NULL DEFAULT NULL';
                 break;
             case 'serial':
                 $ddl = 'SERIAL';
