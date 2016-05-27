@@ -45,9 +45,9 @@ abstract class Model
     static protected $extensions = [];
 
     /**
-     * @var \T4\Dbal\Connection
+     * @var \T4\Dbal\Connection[]
      */
-    static protected $connection;
+    static private $connections;
 
     /**
      * @return array
@@ -128,10 +128,9 @@ abstract class Model
             } else {
                 $app = \T4\Mvc\Application::instance();
             }
-            static::$connection = $app->db->{$connection};
-        } elseif ($connection instanceof Connection) {
-            static::$connection = $connection;
+            $connection = $app->db->{$connection};
         }
+        self::$connections[get_called_class()] = $connection;
     }
 
     /**
@@ -139,10 +138,10 @@ abstract class Model
      */
     static public function getDbConnection()
     {
-        if (null == static::$connection) {
+        if ( !isset(self::$connections[get_called_class()]) ) {
             static::setConnection(static::getDbConnectionName());
         }
-        return static::$connection;
+        return self::$connections[get_called_class()];
     }
 
     /**
