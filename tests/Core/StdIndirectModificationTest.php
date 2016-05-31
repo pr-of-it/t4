@@ -26,7 +26,7 @@ namespace T4\Tests\Core\Std {
         public function testMutate()
         {
             /**
-             * THIS TEST FAILS!
+             * THIS TEST FAILS! 
             $obj = new TestStdClass();
             $obj->foo[] = 'bla';
             $obj->bar += 2;
