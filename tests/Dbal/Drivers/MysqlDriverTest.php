@@ -39,7 +39,7 @@ class MysqlDriverTest extends PHPUnit_Framework_TestCase {
             $reflector->invokeArgs($driver, ['foo', ['type' => 'pk']])
         );
         $this->assertEquals(
-            '`foo` BIGINT UNSIGNED NOT NULL DEFAULT \'0\'',
+            '`foo` BIGINT UNSIGNED NULL DEFAULT NULL',
             $reflector->invokeArgs($driver, ['foo', ['type' => 'relation']])
         );
         $this->assertEquals(
@@ -176,7 +176,7 @@ class MysqlDriverTest extends PHPUnit_Framework_TestCase {
         $this->assertEquals(
             'CREATE TABLE `foo`' . "\n" . '(' . "\n" .
             '`__id` SERIAL,' . "\n" .
-            '`lnk` BIGINT UNSIGNED NOT NULL DEFAULT \'0\',' . "\n" .
+            '`lnk` BIGINT UNSIGNED NULL DEFAULT NULL,' . "\n" .
             '`foo` INT,' . "\n" .
             '`bar` VARCHAR(255),' . "\n" .
             'PRIMARY KEY (`__id`),' . "\n" .
