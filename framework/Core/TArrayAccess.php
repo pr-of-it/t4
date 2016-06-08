@@ -122,7 +122,9 @@ trait TArrayAccess
 
     public function fromArray($data)
     {
-        $this->storage = $data;
+        foreach ($data as $offset => $value) {
+            $this[$offset] = $value;
+        }
         return $this;
     }
 

@@ -2,8 +2,6 @@
 
 namespace T4\Dbal;
 
-use T4\Core\Std;
-
 class Condition
 {
 
