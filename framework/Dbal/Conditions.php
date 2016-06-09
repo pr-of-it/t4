@@ -8,7 +8,7 @@ use T4\Core\Collection;
  * Class Condition
  * @package T4\Dbal
  *
- * @property $where
+ * @property \T4\Core\Collection $where
  * @property $order
  * @property $offset
  * @property $limit
@@ -19,42 +19,30 @@ class Conditions
     extends Collection
 {
 
-    protected function innerSet($offset, $value)
+    public function __construct($data = null)
     {
-        if (is_numeric($offset) && !($value instanceof Condition)) {
-            $value = new Condition($value);
-        }
-        parent::innerSet($offset, $value);
-    }
-
-    public function __construct($data = null, $self = false)
-    {
-        if (!$self) {
-            $this->where = new self($data, true);
-        } else {
-            parent::__construct($data);
+        $this->where = new Collection();
+        if (null !== $data) {
+            foreach ($data as $offset => &$value) {
+                if (!($value instanceof Condition)) {
+                    $value = new Condition($value);
+                }
+                $this->where[$offset] = $value;
+            }
         }
     }
 
-    public function count($self = false)
+    public function count()
     {
-        if (!$self) {
-            return $this->where->count(true);
-        } else {
-            return parent::count();
-        }
+        return $this->where->count();
     }
 
-    public function append($value, $self = false)
+    public function append($value)
     {
         if (!($value instanceof Condition)) {
             $value = new Condition($value);
         }
-        if (!$self) {
-            $this->where->append($value, true);
-        } else {
-            parent::append($value);
-        }
+        $this->where->append($value);
         return $this;
     }
 
@@ -63,31 +51,9 @@ class Conditions
         if (!($value instanceof Condition)) {
             $value = new Condition($value);
         }
-        if (!$self) {
-            $this->where->prepend($value, true);
-        } else {
-            parent::prepend($value);
-        }
+        $this->where->prepend($value);
         return $this;
     }
-
-    /*
-    public function merge($values, $self = false)
-    {
-        foreach ($values as &$value)
-        {
-            if (!($value instanceof Condition)) {
-                $value = new Condition($value);
-            }
-        }
-        if (!$self) {
-            $this->where->merge($values, true);
-        } else {
-            parent::merge($values);
-        }
-        return $this;
-    }
-    */
 
     public function order($val)
     {
