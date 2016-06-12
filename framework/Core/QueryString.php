@@ -1,9 +1,11 @@
 <?php
+
 namespace T4\Core;
 
 class QueryString
   extends Collection
 {
+
     public function __construct($data = null)
     {
         if (null !== $data && is_string($data)) {
@@ -29,4 +31,5 @@ class QueryString
     {
         return http_build_query($this->toArray());
     }
+    
 }
