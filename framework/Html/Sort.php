@@ -15,6 +15,7 @@ class Sort
         if (!empty($this[$field])){
             $url->query[$field] = $this[$field];
         }
+        return $url;
         
     }
 }
