@@ -21,4 +21,9 @@ class Sort
         
     }
 
+    public function getOptions($options = [])
+    {
+        return array_merge($options, ['order' => $this->toArray()]);
+    }
+
 }
