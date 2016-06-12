@@ -2,6 +2,7 @@
 
 class QueryStringTest extends PHPUnit_Framework_TestCase
 {
+
     public function testFromString()
     {
         $url = new \T4\Core\QueryString();
@@ -20,4 +21,5 @@ class QueryStringTest extends PHPUnit_Framework_TestCase
     {
         $this->assertEquals('foo=bar&baz=42', new \T4\Core\QueryString(['foo' => 'bar', 'baz' => 42]));
     }
+    
 }
