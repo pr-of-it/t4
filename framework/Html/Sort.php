@@ -23,7 +23,11 @@ class Sort
 
     public function getOptions($options = [])
     {
-        return array_merge($options, ['order' => $this->by ?? '']);
+        if (!empty($this->by)){
+            return array_merge($options, ['order' => $this->by]);
+        } else {
+            return $options;
+        }
     }
 
 }
