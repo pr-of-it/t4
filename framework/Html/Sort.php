@@ -14,8 +14,8 @@ class Sort
         if (null == $url){
             $url = new Url();
         }
-        if (!empty($this[$field])){
-            $url->query[$field] = $this[$field];
+        if (!empty($this)){
+            $url->query[$field] = $this;
         }
         return $url;
         
@@ -23,7 +23,7 @@ class Sort
 
     public function getOptions($options = [])
     {
-        return array_merge($options, ['order' => $this->toArray()]);
+        return array_merge($options, ['order' => $this->by ?? '']);
     }
 
 }
