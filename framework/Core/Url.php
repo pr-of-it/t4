@@ -33,10 +33,10 @@ class Url
         if (false === $url) {
             return $this;
         }
-        $this->protocol = isset($url['scheme']) ? $url['scheme'] : null;
-        $this->host = isset($url['host']) ? $url['host'] : null;
-        $this->port = isset($url['port']) ? $url['port'] : null;
-        $this->path = isset($url['path']) ? $url['path'] : null;
+        $this->protocol = $url['scheme'] ?? null;
+        $this->host = $url['host'] ?? null;
+        $this->port = $url['port'] ?? null;
+        $this->path = $url['path'] ?? null;
 
         if (null == $this->host && null !== $this->path) {
             $pathParts = explode('/', $this->path);
@@ -47,8 +47,8 @@ class Url
             }
         }
 
-        $this->query = isset($url['query']) ? $url['query'] : null;
-        $this->fragment = isset($url['fragment']) ? $url['fragment'] : null;
+        $this->query = isset($url['query']) ? new QueryString($url['query']) : null;
+        $this->fragment = $url['fragment'] ?? null;
         return $this;
     }
 
