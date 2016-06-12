@@ -6,8 +6,8 @@ class QueryStringTest extends PHPUnit_Framework_TestCase
     {
         $url = new \T4\Core\QueryString();
         $url->fromString('foo=bar&baz=42');
-        $this->assertEquals('bar', $url->foo);
-        $this->assertEquals(42, $url->baz);
+        $this->assertEquals('bar', $url['foo']);
+        $this->assertEquals(42, $url['baz']);
     }
 
     public function testToString()
