@@ -167,7 +167,7 @@ class Helpers
      * @param string $path
      * @return int
      */
-    static public function dirMTime($path)
+    public static function dirMTime($path)
     {
         clearstatcache();
         return max(array_map(function ($f) {

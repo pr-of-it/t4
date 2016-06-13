@@ -52,7 +52,7 @@ abstract class Model
     /**
      * @return array
      */
-    static public function getSchema()
+    public static function getSchema()
     {
         static $schema = null;
         if (null === $schema) {
@@ -74,7 +74,7 @@ abstract class Model
     /**
      * @return array
      */
-    static public function getColumns()
+    public static function getColumns()
     {
         return static::getSchema()['columns'];
     }
@@ -84,7 +84,7 @@ abstract class Model
      * @param string $relationName
      * @return array mixed
      */
-    static public function getPivots($class, $relationName)
+    public static function getPivots($class, $relationName)
     {
         $schema = static::getSchema();
         if (empty($schema['pivots']) || empty($schema['pivots'][$class]) || empty($schema['pivots'][$class][$relationName])) {
@@ -97,7 +97,7 @@ abstract class Model
     /**
      * @return string
      */
-    static public function getTableName()
+    public static function getTableName()
     {
         $schema = static::getSchema();
         if (isset($schema['table']))
@@ -111,7 +111,7 @@ abstract class Model
     /**
      * @return string
      */
-    static public function getDbConnectionName()
+    public static function getDbConnectionName()
     {
         $schema = static::getSchema();
         return !empty($schema['db']) ? $schema['db'] : 'default';
@@ -120,7 +120,7 @@ abstract class Model
     /**
      * @param string|\T4\Dbal\Connection $connection
      */
-    static public function setConnection($connection)
+    public static function setConnection($connection)
     {
         if (is_string($connection)) {
             if ('cli' == PHP_SAPI) {
@@ -136,7 +136,7 @@ abstract class Model
     /**
      * @return \T4\Dbal\Connection
      */
-    static public function getDbConnection()
+    public static function getDbConnection()
     {
         if ( !isset(self::$connections[get_called_class()]) ) {
             static::setConnection(static::getDbConnectionName());
@@ -147,7 +147,7 @@ abstract class Model
     /**
      * @return \T4\Dbal\IDriver
      */
-    static public function getDbDriver()
+    public static function getDbDriver()
     {
         return static::getDbConnection()->getDriver();
     }
@@ -155,7 +155,7 @@ abstract class Model
     /**
      * @return array
      */
-    static public function getExtensions()
+    public static function getExtensions()
     {
         return !empty(static::$extensions) ?
             array_merge(['standard', 'relations'], static::$extensions) :

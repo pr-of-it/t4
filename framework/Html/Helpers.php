@@ -15,14 +15,14 @@ class Helpers
 
     const TREE_LEVEL_SYMBOL = '-';
 
-    static public function element($el, $name = '', $options = [], $attrs = [])
+    public static function element($el, $name = '', $options = [], $attrs = [])
     {
         $elClass = '\T4\Html\Elements\\' . ucfirst($el);
         $el = new $elClass($name, $options, $attrs);
         return $el->render();
     }
 
-    static public function blockOptionInput($name, $options, $value = null, $htmlOptions = [])
+    public static function blockOptionInput($name, $options, $value = null, $htmlOptions = [])
     {
         $htmlOptions['name'] = $name;
         switch ($options['type']) {
@@ -61,7 +61,7 @@ class Helpers
      * @param array $htmlOptions
      * @return string
      */
-    static public function select(Collection $data, $selected = 0, $options = [], $htmlOptions = [])
+    public static function select(Collection $data, $selected = 0, $options = [], $htmlOptions = [])
     {
         if (empty($options['valueColumn']))
             $options['valueColumn'] = Model::PK;
@@ -114,7 +114,7 @@ class Helpers
      * @param array $options
      * @return string
      */
-    static public function selectTree(Collection $data, $selected = 0, $options = [], $htmlOptions = [])
+    public static function selectTree(Collection $data, $selected = 0, $options = [], $htmlOptions = [])
     {
         $options = array_merge($options instanceof Std ? $options->toArray() : $options, ['tree']);
         if (empty($options['treeLevelColumn']))
@@ -122,13 +122,13 @@ class Helpers
         return self::select($data, $selected, $options, $htmlOptions);
     }
 
-    static public function selectTreeByModel($model, $selected = 0, $options = [], $htmlOptions = [])
+    public static function selectTreeByModel($model, $selected = 0, $options = [], $htmlOptions = [])
     {
         $data = $model::findAllTree();
         return self::selectTree($data, $selected, $options, $htmlOptions);
     }
 
-    static public function ulTree(Collection $tree, $options = [], $htmlOptions = [])
+    public static function ulTree(Collection $tree, $options = [], $htmlOptions = [])
     {
         if (0 == count($tree))
             return '';

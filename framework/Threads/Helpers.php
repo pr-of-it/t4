@@ -11,7 +11,7 @@ class Helpers
      * @throws Exception
      * @return int Child process PID
      */
-    static public function run(callable $callback, $args = [])
+    public static function run(callable $callback, $args = [])
     {
         if (!function_exists('pcntl_fork')) {
             throw new Exception('No pcntl is installed');
