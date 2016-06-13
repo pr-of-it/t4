@@ -21,11 +21,11 @@ class mTestMigration extends T4\Orm\Migration
 
 class CommentTestModel extends T4\Orm\Model
 {
-    static protected $schema = [
+    protected static $schema = [
         'table' => 'comments',
         'columns' => [
             'num' => ['type' => 'int'],
         ]
     ];
-    static protected $extensions = ['tree'];
+    protected static $extensions = ['tree'];
 }

@@ -37,12 +37,12 @@ abstract class Model
      * - on
      * @var array
      */
-    static protected $schema = [];
+    protected static $schema = [];
 
     /**
      * @var array
      */
-    static protected $extensions = [];
+    protected static $extensions = [];
 
     /**
      * @var \T4\Dbal\Connection[]

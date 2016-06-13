@@ -160,7 +160,7 @@ class Helpers
         return $ret;
     }
 
-    static protected function hasTreeElementChildren(Collection $tree, $index)
+    protected static function hasTreeElementChildren(Collection $tree, $index)
     {
         if (isset($tree[$index + 1]) && $tree[$index + 1]->__lvl > $tree[$index]->__lvl)
             return true;
@@ -168,7 +168,7 @@ class Helpers
             return false;
     }
 
-    static protected function getAllChildrenByIndex(Collection $tree, $index)
+    protected static function getAllChildrenByIndex(Collection $tree, $index)
     {
         $lvl = $tree[$index]->__lvl;
         $tail = array_slice($tree->toArray(), $index + 1);

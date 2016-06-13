@@ -7,7 +7,7 @@ use T4\Orm\Model;
 require_once realpath(__DIR__ . '/../../../framework/boot.php');
 
 class DummyModel extends Model {
-    static protected $schema = [
+    protected static $schema = [
         'columns' => [],
     ];
 }
