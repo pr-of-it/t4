@@ -47,7 +47,7 @@ abstract class Model
     /**
      * @var \T4\Dbal\Connection[]
      */
-    static private $connections;
+    private static $connections;
 
     /**
      * @return array
