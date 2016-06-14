@@ -14,7 +14,7 @@ class Sort
         if (null == $url){
             $url = new Url();
         }
-        if (!empty($this)){
+        if (!empty($this->by)){
             $url->query[$field] = $this;
         }
         return $url;
