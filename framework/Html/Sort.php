@@ -35,7 +35,7 @@ class Sort
         if (!empty($this->by)) {
             $order = ['order' => $this->by];
             if (!empty($this->direction)) {
-                $order['order'] = $this->by . ' ' . $this->direction;
+                $order['order'] .= ' ' . $this->direction;
             }
             return array_merge($options, $order);
         } else {
