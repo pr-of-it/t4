@@ -25,6 +25,7 @@ class Sort
         if (!empty($this->by)) {
             $url->query[$field] = $this;
         }
+
         return $url;
 
     }
@@ -32,7 +33,11 @@ class Sort
     public function getOptions($options = [])
     {
         if (!empty($this->by)) {
-            return array_merge($options, ['order' => $this->by . ' ' . $this->direction]);
+            $order = ['order' => $this->by];
+            if (!empty($this->direction)) {
+                $order['order'] = $this->by . ' ' . $this->direction;
+            }
+            return array_merge($options, $order);
         } else {
             return $options;
         }
