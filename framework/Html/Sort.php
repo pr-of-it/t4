@@ -11,7 +11,7 @@ class Sort
 
     public function __construct($data)
     {
-        if (!empty($this->by)) {
+        if (!empty($data['by'])) {
             parent::__construct($data);
         }
 
