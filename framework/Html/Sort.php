@@ -22,7 +22,7 @@ class Sort
         if (null == $url) {
             $url = new Url();
         }
-        if (is_string($url)){
+        if (is_string($url)) {
             $url = new Url($url);
         }
         if (!empty($this->by)) {
