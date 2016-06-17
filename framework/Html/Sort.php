@@ -26,7 +26,7 @@ class Sort
             $url = new Url($url);
         }
         if (!empty($this->by)) {
-            $url->query[$field] = $this;
+            $url->query[$field] = $this->toArray();
         }
 
         return $url;
