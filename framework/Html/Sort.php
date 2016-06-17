@@ -22,11 +22,11 @@ class Sort
         if (null == $url) {
             $url = new Url();
         }
-        if (is_string($url)){
+        if (is_string($url)) {
             $url = new Url($url);
         }
         if (!empty($this->by)) {
-            $url->query[$field] = $this;
+            $url->query[$field] = $this->toArray();
         }
 
         return $url;
