@@ -17,10 +17,13 @@ class Sort
 
     }
 
-    public function makeUrl(Url $url = null, $field = 'sort')
+    public function makeUrl($url = null, $field = 'sort')
     {
         if (null == $url) {
             $url = new Url();
+        }
+        if (is_string($url)){
+            $url = new Url($url);
         }
         if (!empty($this->by)) {
             $url->query[$field] = $this;
