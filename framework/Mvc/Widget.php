@@ -14,9 +14,7 @@ abstract class Widget
     {
         $this->app = Application::instance();
         $this->options = new Std();
-        foreach ($options as $key => $value) {
-            $this->options->{$key} = $value;
-        }
+        $this->options->fromArray($options);
     }
 
     abstract public function render();
