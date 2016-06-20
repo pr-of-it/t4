@@ -2,6 +2,7 @@
 
 class PagerTest extends PHPUnit_Framework_TestCase
 {
+
     public function testRenderDefaults()
     {
         $pager = new \T4\Widgets\Pager([
