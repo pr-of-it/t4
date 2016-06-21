@@ -66,7 +66,7 @@ HTML
     public function testRenderUrlencoded()
     {
         $pager = new \T4\Widgets\Pager([
-            'url' => urlencode('/test?page=%d'),
+            'url' => urlencode('/test?page=%d&foo[bar]=baz&baz[bar]=foo'),
             'total' => 25,
             'size' => 14,
             'active' => 2
@@ -74,15 +74,15 @@ HTML
         $this->expectOutputString(<<<HTML
         <ul class="pagination">
             <li><a
-                    href="/test?page=1">&laquo;</a></li>
+                    href="/test?page=1&foo[bar]=baz&baz[bar]=foo">&laquo;</a></li>
                             <li>
-                    <a href="/test?page=1">1</a>
+                    <a href="/test?page=1&foo[bar]=baz&baz[bar]=foo">1</a>
                 </li>
                                 <li class="active">
-                    <a href="/test?page=2">2</a>
+                    <a href="/test?page=2&foo[bar]=baz&baz[bar]=foo">2</a>
                 </li>
                             <li class="disabled"><a
-                    href="/test?page=2">&raquo;</a>
+                    href="/test?page=2&foo[bar]=baz&baz[bar]=foo">&raquo;</a>
             </li>
         </ul>
 HTML
