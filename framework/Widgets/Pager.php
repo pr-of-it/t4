@@ -1,5 +1,4 @@
 <?php
-
 namespace T4\Widgets;
 
 use T4\Core\QueryString;
@@ -17,53 +16,53 @@ class Pager
     public function __construct($options = [])
     {
         parent::__construct($options);
-
-        if (!isset($this->options->total))
+        if (!isset($this->options->total)) {
             throw new Exception('Total count of objects for pager is empty!');
-
-        if (!isset($this->options->size) || empty($this->options->size))
+        }
+        if (!isset($this->options->size) || empty($this->options->size)) {
             $this->options->size = self::DEFAULT_PAGE_SIZE;
-
-        if (!isset($this->options->active) || empty($this->options->active))
+        }
+        if (!isset($this->options->active) || empty($this->options->active)) {
             $this->options->active = 1;
-
+        }
         if (!isset($this->options->url) || empty($this->options->url)) {
             $url = clone $this->app->request->url;
             $this->options->url = $url;
         }
-        
         if (is_string($this->options->url)) {
             $this->options->url = new Url($this->options->url);
         }
-        
         $query = $this->options->url->query;
-        if (empty($query)){
+        if (empty($query)) {
             $query = new QueryString();
         }
-
         if (!isset($query['page']) || empty($query['page'])) {
             $query['page'] = '%d';
             $this->options->url->query = $query;
         }
-
-
     }
 
     public function render()
     {
         $pagesCount = ceil($this->options->total / $this->options->size);
-        if (!$pagesCount)
+        if (!$pagesCount) {
             return;
-
+        }
         $displayed = [
-            1, 2, 3,
-            $this->options->active - 1, $this->options->active, $this->options->active + 1,
-            $pagesCount - 2, $pagesCount - 1, $pagesCount
+            1,
+            2,
+            3,
+            $this->options->active - 1,
+            $this->options->active,
+            $this->options->active + 1,
+            $pagesCount - 2,
+            $pagesCount - 1,
+            $pagesCount
         ];
-        $displayed = array_unique(array_filter($displayed, function ($d) use ($pagesCount) {
-            return $d >= 1 && $d <= $pagesCount;
-        }));
-
+        $displayed = array_unique(array_filter($displayed,
+            function ($d) use ($pagesCount) {
+                return $d >= 1 && $d <= $pagesCount;
+            }));
         if (($this->options->active - 1) - 3 == 2) {
             $displayed[] = 4;
         }
@@ -74,7 +73,8 @@ class Pager
         $url = urldecode($this->options->url);
         ?>
         <ul class="pagination">
-            <li<?php echo($this->options->active == 1 ? ' class="disabled"' : ''); ?>><a
+            <li<?php echo($this->options->active == 1 ? ' class="disabled"' : ''); ?>>
+                <a
                     href="<?php printf($url, 1); ?>">&laquo;</a></li>
             <?php
             $prev = 1;
@@ -85,17 +85,18 @@ class Pager
                 }
                 ?>
                 <li<?php echo($this->options->active == $page ? ' class="active"' : ''); ?>>
-                    <a href="<?php printf($url, $page); ?>"><?php echo $page; ?></a>
+                    <a href="<?php printf($url,
+                        $page); ?>"><?php echo $page; ?></a>
                 </li>
                 <?php
                 $prev = $page;
             }
             ?>
-            <li<?php echo($this->options->active == $pagesCount ? ' class="disabled"' : ''); ?>><a
+            <li<?php echo($this->options->active == $pagesCount ? ' class="disabled"' : ''); ?>>
+                <a
                     href="<?php printf($url, $page); ?>">&raquo;</a>
             </li>
         </ul>
-    <?php
+        <?php
     }
-
 }
