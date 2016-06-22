@@ -2,6 +2,8 @@
 
 namespace T4\Widgets;
 
+use T4\Core\QueryString;
+use T4\Core\Url;
 use T4\Mvc\Widget;
 
 class Pager
@@ -27,9 +29,23 @@ class Pager
 
         if (!isset($this->options->url) || empty($this->options->url)) {
             $url = clone $this->app->request->url;
-            $url->query['page'] = '%d';
             $this->options->url = $url;
         }
+        
+        if (is_string($this->options->url)) {
+            $this->options->url = new Url($this->options->url);
+        }
+        
+        $query = $this->options->url->query;
+        if (empty($query)){
+            $query = new QueryString();
+        }
+
+        if (!isset($query['page']) || empty($query['page'])) {
+            $query['page'] = '%d';
+            $this->options->url->query = $query;
+        }
+
 
     }
 
