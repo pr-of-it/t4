@@ -39,7 +39,7 @@ class QueryBuilder
             $this->select = ['*'];
         } else {
             $what = $this->prepareWhat(func_get_args());
-            $this->select = array_values(array_diff(array_merge(!empty($this->select) ? $this->select : [], $what), ['*']));
+            $this->select = array_diff(array_merge(!empty($this->select) ? $this->select : [], $what), ['*']);
         }
         $this->mode = 'select';
         return $this;
@@ -106,17 +106,24 @@ class QueryBuilder
         return $this;
     }
 
-    public function join($table, $on, $type = 'full')
+    public function join($table, $on, $type = 'full', $alias = '')
     {
         if (!isset($this->joins)) {
             $this->joins = [];
         }
         $join = [[
             'table' => $table,
+            'alias' => $alias,
             'on' => $on,
             'type' => $type,
         ]];
         $this->joins = array_merge($this->joins, $join);
+        return $this;
+    }
+
+    public function joins(array $joins)
+    {
+        $this->joins = array_merge($this->joins, $joins);
         return $this;
     }
 
@@ -176,6 +183,48 @@ class QueryBuilder
     public function getParams()
     {
         return $this->params;
+    }
+
+    /**
+     * Merges queries
+     *
+     * @param array|QueryBuilder|\T4\Core\IArrayable $prototype
+     * @param string $operator AND, OR
+     * @return self
+     * @throws \InvalidArgumentException
+     * @throws \DomainException
+     */
+    public function merge($prototype, $operator = 'and')
+    {
+        if ($prototype instanceof \T4\Core\IArrayable) {
+            $prototype = $prototype->toArray();
+        }
+        if (!is_array($prototype) && !$prototype instanceof \ArrayAccess) {
+            throw new \InvalidArgumentException('Invalid builder type!');
+        }
+        if (!empty($this->mode) && !empty($prototype['mode']) && $this->mode !== $prototype['mode']) {
+            throw new \DomainException('Query mode is not much!');
+        }
+        if (!empty($prototype['select'])) {
+            $this->select($prototype['select']);
+        }
+        if (!empty($prototype['from'])) {
+            $this->from($prototype['from']);
+        }
+        if (!empty($prototype['where'])) {
+            $this->where = "($this->where) $operator ($prototype[where])";
+        }
+        foreach(['group','order','limit','offset'] as $property) {
+            if (!empty($prototype[$property])) {
+                $this->$property = $prototype[$property];
+            }
+        }
+        foreach(['joins','params','insertTables','updateTables','deleteTables','values','params'] as $arrayProperty) {
+            if (!empty($prototype[$arrayProperty])) {
+                $this->$arrayProperty = array_merge($this->$arrayProperty ?? [], $prototype[$arrayProperty]);
+            }
+        }
+        return $this;
     }
 
 }

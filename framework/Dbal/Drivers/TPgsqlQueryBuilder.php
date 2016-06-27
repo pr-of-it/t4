@@ -38,7 +38,10 @@ trait TPgsqlQueryBuilder
         if ($query->select == ['*']) {
             $sql .= '*';
         } else {
-            $select = array_map([get_called_class(), 'quoteName'], $query->select);
+            $select = [];
+            foreach ($query->select as $alias => $column) {
+                $select[] = $this->quoteName($column) . (!is_numeric($alias) ? ' as "' . $alias . '"' : '');
+            }
             $sql .= implode(', ', $select);
         }
         $sql .= "\n";
@@ -56,7 +59,7 @@ trait TPgsqlQueryBuilder
             $driver = $this;
             $joins = array_map(function ($x) use ($driver) {
                 static $c = 1;
-                $table =  $this->aliasTableName($x['table'], 'join', $c++);
+                $table = empty($x['alias']) ? $this->aliasTableName($x['table'], 'join', $c++) : $this->quoteName($x['table']) . ' as ' . $this->quoteName($x['alias']);
                 $x['table'] = $table;
                 return $x;
             }, $query->joins);
@@ -72,6 +75,8 @@ trait TPgsqlQueryBuilder
                     case 'right':
                         $ret = 'RIGHT JOIN';
                         break;
+                    default:
+                        $ret = 'INNER JOIN';
                 }
                 $j[] = $ret . ' ' . $join['table'] . ' ON ' . $join['on'];
             };

@@ -346,13 +346,9 @@ class Pgsql
     {
         $query = new QueryBuilder();
         $query
-            ->select('*')
+            ->select('t1.*')
             ->from($class::getTableName())
-            ->where(!empty($options['where']) ? $options['where'] : '')
-            ->order(!empty($options['order']) ? $options['order'] : '')
-            ->offset(!empty($options['offset']) ? $options['offset'] : '')
-            ->limit(!empty($options['limit']) ? $options['limit'] : '')
-            ->params(!empty($options['params']) ? $options['params'] : []);
+            ->merge($options);
         return $this->findAllByQuery($class, $query);
     }
 
@@ -360,13 +356,10 @@ class Pgsql
     {
         $query = new QueryBuilder();
         $query
-            ->select('*')
+            ->select('t1.*')
             ->from($class::getTableName())
-            ->where(!empty($options['where']) ? $options['where'] : '')
-            ->order(!empty($options['order']) ? $options['order'] : '')
-            ->offset(!empty($options['offset']) ? $options['offset'] : '')
             ->limit(1)
-            ->params(!empty($options['params']) ? $options['params'] : []);
+            ->merge($options);
         return $this->findByQuery($class, $query);
     }
 
@@ -374,13 +367,11 @@ class Pgsql
     {
         $query = new QueryBuilder();
         $query
-            ->select('*')
+            ->select('t1.*')
             ->from($class::getTableName())
-            ->where('' . $this->quoteName($column) . '=:value' . (!empty($options['where']) ? ' AND (' . $options['where'] . ')' : ''))
-            ->order(!empty($options['order']) ? $options['order'] : '')
-            ->offset(!empty($options['offset']) ? $options['offset'] : '')
-            ->limit(!empty($options['limit']) ? $options['limit'] : '')
-            ->params([':value' => $value] + (!empty($options['params']) ? $options['params'] : []));
+            ->where('' . $this->quoteName($column) . '=:value')
+            ->params([':value' => $value])
+            ->merge($options);
         return $this->findAllByQuery($class, $query);
     }
 
@@ -388,13 +379,12 @@ class Pgsql
     {
         $query = new QueryBuilder();
         $query
-            ->select('*')
+            ->select('t1.*')
             ->from($class::getTableName())
             ->where('' . $this->quoteName($column) . '=:value')
-            ->order(!empty($options['order']) ? $options['order'] : '')
-            ->offset(!empty($options['offset']) ? $options['offset'] : '')
             ->limit(1)
-            ->params([':value' => $value]);
+            ->params([':value' => $value])
+            ->merge($options);
         return $this->findByQuery($class, $query);
     }
 
@@ -410,24 +400,28 @@ class Pgsql
 
     public function countAll($class, $options = [])
     {
+        unset($options['select'], $options['limit'], $options['offset'], $options['order']);
+
         $query = new QueryBuilder();
         $query
             ->select('COUNT(*)')
             ->from($class::getTableName())
-            ->where(!empty($options['where']) ? $options['where'] : '')
-            ->params(!empty($options['params']) ? $options['params'] : []);
+            ->merge($options);
 
         return $class::getDbConnection()->query($query->getQuery($this), $query->getParams())->fetchScalar();
     }
 
     public function countAllByColumn($class, $column, $value, $options = [])
     {
+        unset($options['select'], $options['limit'], $options['offset'], $options['order']);
+
         $query = new QueryBuilder();
         $query
             ->select('COUNT(*)')
             ->from($class::getTableName())
             ->where('`' . $column . '`=:value')
-            ->params([':value' => $value]);
+            ->params([':value' => $value])
+            ->merge($options);
 
         return $class::getDbConnection()->query($query->getQuery($this), $query->getParams())->fetchScalar();
     }

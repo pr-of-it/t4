@@ -78,8 +78,6 @@ class ModelDataProvider
     {
         if (null === $this->total) {
             $options = $this->options;
-            unset($options['limit']);
-            unset($options['offset']);
             $this->total = $this->class::countAll($options);
         }
         return $this->total;

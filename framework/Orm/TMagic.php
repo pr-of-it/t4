@@ -67,15 +67,14 @@ trait TMagic
         $class = get_class($this);
         $relations = $class::getRelations();
         $keys = explode('.', $key);
-        $key = array_shift($keys);
 
-        if (isset($relations[$key])) {
-            $this->setRelation($key, $value);
+        if (isset($relations[$keys[0]])) {
+            $this->setRelation($keys, $value);
             return;
         }
 
         // Non-relation columns
-        parent::__set($key, $value);
+        parent::__set($keys[0], $value);
     }
 
     /**

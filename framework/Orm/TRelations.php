@@ -162,10 +162,11 @@ trait TRelations
         }
     }
 
-    protected function setRelation($key, $value)
+    protected function setRelation($keys, $value)
     {
         $class = get_class($this);
         $relations = $class::getRelations();
+        $key = array_shift($keys);
         if (empty($relations[$key])) {
             throw new Exception('No such relation: ' . $key . ' in model of ' . $class . ' class');
         }
@@ -176,11 +177,27 @@ trait TRelations
             case $class::HAS_ONE:
             case $class::BELONGS_TO:
                 $relationClass = $relation['model'];
-                if (empty($value) || $value instanceof $relationClass) {
-                    $this->$key = $value;
-                } else {
-                    $this->$key = $relationClass::findByPk($value);
+                
+                if (empty($keys)) { // relation model fetching
+                    if (empty($value) || $value instanceof $relationClass) {
+                        $this->$key = $value;
+                    } else {
+                        $this->$key = $relationClass::findByPk($value);
+                    }
+                } else { // model relation structure batch restoring
+                    if (empty($this->innerIsSet($key))) {
+                        $this->innerSet($key, $relationModel = new $relationClass);
+                    } else {
+                        $relationModel = $this->innerGet($key);
+                    }
+                    if ($relationModel instanceof \T4\Core\Std) {
+                        $relationModel->{implode('.', $keys)} = $value;
+                    } else {
+                        $relationModel[implode('.', $keys)] = $value;
+                    }
+
                 }
+                
                 break;
 
             case $class::HAS_MANY:
