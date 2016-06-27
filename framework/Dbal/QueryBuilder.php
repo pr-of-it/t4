@@ -128,6 +128,32 @@ class QueryBuilder
     }
 
     /**
+     * Joins data from BelongsTo model relation
+     *
+     * @param string|\T4\Orm\Model $modelClass
+     * @param string               $relationName
+     * @return self
+     * @throws \BadMethodCallException
+     * @throws \InvalidArgumentException
+     */
+    public function with(string $modelClass, string $relationName)
+    {
+        $relation = $modelClass::getRelation($relationName);
+        if (empty($relation)) {
+            throw new \BadMethodCallException('Relation does not exists!');
+        }
+        if ($relation['type'] !== \T4\Orm\Model::BELONGS_TO) {
+            throw new \InvalidArgumentException('Only Belongs to relations are supported!');
+        }
+        /** @var \T4\Orm\Model $relationClass */
+        $relationClass = $relation['model'];
+        $columns = array_map(function($column) use ($relationName) { return "$relationName.$column"; }, array_keys($relationClass::getColumns()));
+        $this->select(array_combine($columns,$columns));
+        $this->join($relationClass::getTableName(), $relationName . '.' . $modelClass::PK . ' = t1.' . $modelClass::getRelationLinkName($relation) , 'left', $relationName);
+        return $this;
+    }
+
+    /**
      * @todo: split this???
      */
     public function where($where)
