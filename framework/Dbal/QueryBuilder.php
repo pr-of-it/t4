@@ -131,7 +131,7 @@ class QueryBuilder
      * Joins data from BelongsTo model relation
      *
      * @param string|\T4\Orm\Model $modelClass
-     * @param string               $relationPath point-splitted relation names
+     * @param string               $relationPath point-splitted relation chain
      * @return self
      * @throws \BadMethodCallException
      * @throws \InvalidArgumentException
@@ -255,7 +255,7 @@ class QueryBuilder
             $this->from($prototype['from']);
         }
         if (!empty($prototype['where'])) {
-            $this->where = "($this->where) $operator ($prototype[where])";
+            $this->where = empty($this->where) ? $prototype['where'] : "($this->where) $operator ($prototype[where])";
         }
         foreach(['group','order','limit','offset'] as $property) {
             if (!empty($prototype[$property])) {
