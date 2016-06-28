@@ -131,25 +131,42 @@ class QueryBuilder
      * Joins data from BelongsTo model relation
      *
      * @param string|\T4\Orm\Model $modelClass
-     * @param string               $relationName
+     * @param string               $relationPath point-splitted relation names
      * @return self
      * @throws \BadMethodCallException
      * @throws \InvalidArgumentException
      */
-    public function with(string $modelClass, string $relationName)
+    public function with(string $modelClass, string $relationPath)
     {
-        $relation = $modelClass::getRelation($relationName);
-        if (empty($relation)) {
-            throw new \BadMethodCallException('Relation does not exists!');
+        $relationNames = explode('.', $relationPath);
+        foreach ($relationNames as $index => $relationName) {
+            $relation = $modelClass::getRelation($relationName);
+            if (empty($relation)) {
+                throw new \BadMethodCallException('Relation does not exists!');
+            }
+            if ($relation['type'] !== \T4\Orm\Model::BELONGS_TO) {
+                throw new \InvalidArgumentException('Only Belongs to relations are supported!');
+            }
+
+            /** @var \T4\Orm\Model $relationClass */
+            $relationClass = $relation['model'];
+            $relationParents = array_slice($relationNames, 0, $index);
+            $aliasPointed = empty($relationParents) ? $relationName : implode('.',$relationParents) . '.' . $relationName;
+            $relationPathUnderscored = implode('_', $relationParents);
+            $aliasUnderscored = empty($relationParents) ? $relationName : $relationPathUnderscored . '_' . $relationName;
+
+            $select = [];
+            $columnNames = array_keys($relationClass::getColumns());
+            foreach ($columnNames as $columnName) {
+                $select["$aliasPointed.$columnName"] = "$aliasUnderscored.$columnName";
+            }
+            $this->select($select);
+
+            if (empty($this->joins) || empty(array_filter($this->joins, function($join) use ($aliasUnderscored) { return $join['alias'] == $aliasUnderscored; }))) {
+                $this->join($relationClass::getTableName(), $aliasUnderscored . '.' . $relationClass::PK . ' = ' . ($relationPathUnderscored ?: 't1') . '.' . $modelClass::getRelationLinkName($relation), 'left', $aliasUnderscored);
+            }
+            $modelClass = $relationClass;
         }
-        if ($relation['type'] !== \T4\Orm\Model::BELONGS_TO) {
-            throw new \InvalidArgumentException('Only Belongs to relations are supported!');
-        }
-        /** @var \T4\Orm\Model $relationClass */
-        $relationClass = $relation['model'];
-        $columns = array_map(function($column) use ($relationName) { return "$relationName.$column"; }, array_keys($relationClass::getColumns()));
-        $this->select(array_combine($columns,$columns));
-        $this->join($relationClass::getTableName(), $relationName . '.' . $modelClass::PK . ' = t1.' . $modelClass::getRelationLinkName($relation) , 'left', $relationName);
         return $this;
     }
 
