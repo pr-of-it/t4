@@ -75,6 +75,9 @@ trait TPgsqlQueryBuilder
                     case 'right':
                         $ret = 'RIGHT JOIN';
                         break;
+                    case 'inner':
+                        $ret = 'INNER JOIN';
+                        break;
                     default:
                         $ret = 'INNER JOIN';
                 }
