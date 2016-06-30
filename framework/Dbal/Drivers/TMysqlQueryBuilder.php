@@ -63,15 +63,17 @@ trait TMysqlQueryBuilder
             $j = [];
             foreach ($joins as $join) {
                 switch ($join['type']) {
-                    case 'full':
-                        $ret = 'FULL JOIN';
-                        break;
                     case 'left':
                         $ret = 'LEFT JOIN';
                         break;
                     case 'right':
                         $ret = 'RIGHT JOIN';
                         break;
+                    case 'inner':
+                        $ret = 'INNER JOIN';
+                        break;
+                    default:
+                        $ret = 'INNER JOIN';
                 }
                 $j[] = $ret . ' ' . $join['table'] . ' ON ' . $join['on'];
             };
