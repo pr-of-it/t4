@@ -134,11 +134,11 @@ class CollectionTest extends PHPUnit_Framework_TestCase
         $el2 = new \T4\Core\Std(['id' => 2, 'title' => 'bar', 'text' => 'BarBarBar']);
         $collection->append($el2);
 
-        $this->assertTrue($collection->existsElement(['id' =>  1]));
-        $this->assertFalse($collection->existsElement(['id' =>  3]));
-        $this->assertTrue($collection->existsElement(['title' =>  'foo']));
-        $this->assertTrue($collection->existsElement(['title' =>  'foo', 'text' => 'FooFooFoo']));
-        $this->assertFalse($collection->existsElement(['title' =>  'foo', 'text' => 'BarBarBar']));
+        $this->assertTrue($collection->existsElement(['id' => 1]));
+        $this->assertFalse($collection->existsElement(['id' => 3]));
+        $this->assertTrue($collection->existsElement(['title' => 'foo']));
+        $this->assertTrue($collection->existsElement(['title' => 'foo', 'text' => 'FooFooFoo']));
+        $this->assertFalse($collection->existsElement(['title' => 'foo', 'text' => 'BarBarBar']));
     }
 
     public function testSort()
@@ -153,11 +153,15 @@ class CollectionTest extends PHPUnit_Framework_TestCase
         $expected = new Collection(['a' => -1, 'b' => 0, 'c' => 42, 1 => '1', 10 => 1, 20 => 2, 30 => 3, 31 => '111', 32 => '11']);
         $this->assertEquals(array_keys($expected->toArray()), array_keys($result->toArray()));
 
-        $result = $collection->uasort(function ($a, $b) { return $a < $b ? 1 : ($a > $b ? -1 : 0);});
+        $result = $collection->uasort(function ($a, $b) {
+            return $a < $b ? 1 : ($a > $b ? -1 : 0);
+        });
         $expected = new Collection([31 => '111', 'c' => 42, 32 => '11', 30 => 3, 20 => 2, 10 => 1, 1 => '1', 'b' => 0, 'a' => -1]);
         $this->assertEquals(array_values($expected->toArray()), array_values($result->toArray()));
 
-        $result = $collection->uksort(function ($a, $b) { return $a < $b ? 1 : ($a > $b ? -1 : 0);});
+        $result = $collection->uksort(function ($a, $b) {
+            return $a < $b ? 1 : ($a > $b ? -1 : 0);
+        });
         $expected = new Collection([32 => '11', 31 => '111', 30 => 3, 20 => 2, 10 => 1, 1 => '1', 'c' => 42, 'b' => 0, 'a' => -1]);
         $this->assertEquals(array_keys($expected->toArray()), array_keys($result->toArray()));
     }
@@ -174,7 +178,9 @@ class CollectionTest extends PHPUnit_Framework_TestCase
     public function testMap()
     {
         $collection = new Collection([1, 2, 3]);
-        $result = $collection->map(function ($x) {return $x*2;});
+        $result = $collection->map(function ($x) {
+            return $x * 2;
+        });
         $expected = new Collection([2, 4, 6]);
         $this->assertEquals(array_values($expected->toArray()), array_values($result->toArray()));
     }
@@ -234,7 +240,9 @@ class CollectionTest extends PHPUnit_Framework_TestCase
             '2000-01-04' => new Collection([['date' => '2000-01-04', 'title' => 'Fourth']]),
         ], $grouped);
 
-        $grouped = $collection->group(function ($x) {return date('m-d', strtotime($x['date']));});
+        $grouped = $collection->group(function ($x) {
+            return date('m-d', strtotime($x['date']));
+        });
         $this->assertEquals([
             '01-01' => new Collection([['date' => '2000-01-01', 'title' => 'First'], ['date' => '2000-01-01', 'title' => 'Second']]),
             '01-02' => new Collection([['date' => '2000-01-02', 'title' => 'Third']]),
@@ -245,7 +253,7 @@ class CollectionTest extends PHPUnit_Framework_TestCase
     public function testReduce()
     {
         $collection = new Collection([1, 2, 3, 4]);
-        $reduced = $collection->reduce(0, function($carry, $item) {
+        $reduced = $collection->reduce(0, function ($carry, $item) {
             return $carry + $item;
         });
         $this->assertEquals(10, $reduced);
@@ -273,10 +281,10 @@ class CollectionTest extends PHPUnit_Framework_TestCase
         $collection[] = 1;
         $collection[] = 2;
         $collection[] = 3;
-        $this->assertEquals([1,2,3], $collection->toArray());
+        $this->assertEquals([1, 2, 3], $collection->toArray());
 
         $collection1 = new Collection();
-        $collection1->fromArray([3,4,5]);
+        $collection1->fromArray([3, 4, 5]);
 
         $collection2 = new Collection();
         $collection2[] = 3;
@@ -286,4 +294,34 @@ class CollectionTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($collection1, $collection2);
     }
 
+    public function testIndex()
+    {
+        $collection = new Collection();
+        $collection->append(['id'=>1,'id2'=>2,'val'=>'a']);
+        $collection->append(['id'=>2,'id2'=>3,'val'=>'b']);
+        $collection->append(['id'=>4,'id2'=>3,'val'=>'c']);
+        $collection->append(['id'=>7,'id2'=>2,'val'=>'']);
+
+        $indexed = $collection->index('id');
+        $this->assertEquals([
+            1 => ['id'=>1,'id2'=>2,'val'=>'a'],
+            2 => ['id'=>2,'id2'=>3,'val'=>'b'],
+            4 => ['id'=>4,'id2'=>3,'val'=>'c'],
+            7 => ['id'=>7,'id2'=>2,'val'=>'']
+        ], $indexed);
+
+        $indexed = $collection->index('id2');
+        $this->assertEquals([
+            2 => ['id'=>7,'id2'=>2,'val'=>''],
+            3 => ['id'=>4,'id2'=>3,'val'=>'c']
+        ], $indexed);
+
+        $indexed = $collection->index('val');
+        $this->assertEquals([
+            'a' => ['id'=>1,'id2'=>2,'val'=>'a'],
+            'b' => ['id'=>2,'id2'=>3,'val'=>'b'],
+            'c' => ['id'=>4,'id2'=>3,'val'=>'c'],
+            '' => ['id'=>7,'id2'=>2,'val'=>'']
+        ], $indexed);
+    }
 }
