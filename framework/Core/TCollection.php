@@ -261,5 +261,19 @@ trait TCollection
             call_user_func_array([$element, $method], $params);
         }
     }
-
+    
+    /**
+     * return array indices by chosen attribute
+     * @param string $by
+     * @return array
+     */
+    public function index(string $by) {
+        $ret = [];
+        foreach ($this as $element) {
+            if (isset($element[$by])) {
+                $ret[$element[$by]] = $element;
+            }
+        }
+        return $ret;
+    }
 }
