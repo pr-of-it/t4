@@ -42,7 +42,7 @@ class Request
             else
                 $protocol = 'http';
         }
-        $host = !empty($_SERVER['SERVER_NAME']) ? $_SERVER['SERVER_NAME'] : $_SERVER['HTTP_X_REWRITE_URL'];
+        $host = !empty($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : $_SERVER['HTTP_X_REWRITE_URL'];
         $path = $_SERVER['REQUEST_URI'];
 
         $this->url = new Url($protocol . '://' . $host . ($port != 80 && $port != 443 ? ':' . $port : '') . $path);
