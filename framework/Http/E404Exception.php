@@ -2,11 +2,13 @@
 
 namespace T4\Http;
 
-use T4\Core\Exception;
-
-
 class E404Exception
     extends Exception
 {
+    
+    public function __construct($message = '', Exception $previous = null)
+    {
+        parent::__construct($message, 404, $previous);
+    }
 
 }

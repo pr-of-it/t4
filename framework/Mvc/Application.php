@@ -86,10 +86,8 @@ class Application
             $route = $this->router->parseRequest($this->request);
             $this->runRoute($route);
 
-        } catch (E404Exception $e) {
-            $this->action404($e->getMessage());
-        } catch (E403Exception $e) {
-            $this->action403($e->getMessage());
+        } catch (\T4\Http\Exception $e) {
+            $this->actionHttpException($e);
         } catch (Exception $e) {
             echo $e->getMessage();
             die;
@@ -208,28 +206,16 @@ class Application
 
     }
 
-    public function action404($message = null)
+    public function actionHttpException(\T4\Http\Exception $exception)
     {
-        header("HTTP/1.0 404 Not Found", true, 404);
-        if (!empty($this->config->errors['404'])) {
-            $route = new Route($this->config->errors['404']);
-            $route->params->message = $message;
+        http_response_code($exception->getCode());
+        if (!empty($this->config->errors[$exception->getCode()])) {
+            $route = new Route($this->config->errors[$exception->getCode()]);
+            $route->params->message = $exception->getMessage();
             $this->runRoute($route, 'html');
         } else {
-            echo $message;
+            echo $exception->getMessage();
         }
     }
-
-    public function action403($message = null)
-    {
-        header('HTTP/1.0 403 Forbidden', true, 403);
-        if (!empty($this->config->errors['403'])) {
-            $route = new Route($this->config->errors['403']);
-            $route->params->message = $message;
-            $this->runRoute($route, 'html');
-        } else {
-            echo $message;
-        }
-    }
-
+    
 }
