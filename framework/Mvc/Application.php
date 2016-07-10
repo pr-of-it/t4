@@ -83,7 +83,12 @@ class Application
 
             $this->init();
 
-            $route = $this->router->parseRequest($this->request);
+            try {
+                $route = $this->router->parseRequest($this->request);
+            } catch (RouterException $routerException) {
+                throw new E404Exception($routerException->getMessage());
+            }
+
             $this->runRoute($route);
 
         } catch (\T4\Http\Exception $e) {
