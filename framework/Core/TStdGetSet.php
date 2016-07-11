@@ -17,7 +17,11 @@ trait TStdGetSet
 
     public function getData()
     {
-        return $this->__data;
+        $ret = [];
+        foreach (array_keys($this->__data) as $key) {
+            $ret[$key] = $this->innerGet($key);
+        }
+        return $ret;
     }
 
     protected function innerIsSet($key)

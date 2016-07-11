@@ -57,7 +57,9 @@ class Twig
     
     public function render($template, $data = [])
     {
-        if ($data instanceof IArrayable) {
+        if ($data instanceof Std) {
+            $data = $data->getData();
+        } elseif ($data instanceof IArrayable) {
             $data = $data->toArray();
         } else {
             $data = (array)$data;

@@ -3,6 +3,7 @@
 namespace T4\Mvc\Renderers;
 
 use T4\Core\IArrayable;
+use T4\Core\Std;
 use T4\Mvc\ARenderer;
 use T4\Mvc\Controller;
 
@@ -18,7 +19,9 @@ class Vanilla
 
     public function render($template, $data = [])
     {
-        if ($data instanceof IArrayable) {
+        if ($data instanceof Std) {
+            extract($data->getData());
+        } elseif ($data instanceof IArrayable) {
             extract($data->toArray());
         } else {
             extract((array)$data);

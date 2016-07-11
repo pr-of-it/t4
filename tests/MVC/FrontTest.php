@@ -59,7 +59,7 @@ class FrontTest extends PHPUnit_Framework_TestCase
         $front = new \T4\Mvc\Front(new TestApp);
 
         ob_start();
-        @$front->output(new \T4\Core\Std(['foo' => 'bar', 'baz' => 42]), 'json');
+        @$front->output(new \T4\Mvc\Route(['format' => 'json']), new \T4\Core\Std(['foo' => 'bar', 'baz' => 42]), 'json');
         $real = ob_get_contents();
         ob_end_clean();
 
