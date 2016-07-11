@@ -3,7 +3,7 @@
 namespace T4\Mvc;
 
 use T4\Core\Exception;
-use T4\Core\Std;
+use T4\Core\IArrayable;
 
 class Front
 {
@@ -26,7 +26,7 @@ class Front
         return $route->action . '.' . $format;
     }
 
-    public function output(Route $route, Std $data, $format = null)
+    public function output(Route $route, IArrayable $data, $format = null)
     {
         $format = $format ?: $route->format;
         $format = $format ?: self::FORMAT_DEFAULT;

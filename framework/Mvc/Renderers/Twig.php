@@ -2,6 +2,7 @@
 
 namespace T4\Mvc\Renderers;
 
+use T4\Core\IArrayable;
 use T4\Core\Std;
 use T4\Mvc\Application;
 use T4\Mvc\ARenderer;
@@ -53,12 +54,14 @@ class Twig
         $this->twig->addGlobal('controller', $this->links->controller);
     }
 
+    
     public function render($template, $data = [])
     {
-        if ($data instanceof Std)
-            $data = $data->getData();
-        else
+        if ($data instanceof IArrayable) {
+            $data = $data->toArray();
+        } else {
             $data = (array)$data;
+        }
 
         return $this->twig->render($template, $data);
     }
