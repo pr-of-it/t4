@@ -93,10 +93,8 @@ class Application
 
         } catch (\T4\Http\Exception $e) {
             $this->actionHttpException($e);
-        } catch (Exception $e) {
+        } catch (\Throwable $e) {
             echo $e->getMessage();
-        } finally {
-            die;
         }
     }
 
