@@ -103,7 +103,7 @@ class Std
 
     /**
      * @param \T4\Core\IArrayable|array $data
-     * @return \T4\Core\Std $this
+     * @return static $this
      * @throws \T4\Core\MultiException
      */
     public function fill($data)
