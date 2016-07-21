@@ -63,6 +63,7 @@ class TwigExtensions
     {
         return [
             new \Twig_SimpleFilter('repeat', 'str_repeat'),
+            new \Twig_SimpleFilter('unique', 'array_unique'),
             new \Twig_SimpleFilter('count', 'count'),
             new \Twig_SimpleFilter('sum', function ($val) {return is_array($val) ? array_sum($val) : 0;}),
             new \Twig_SimpleFilter('basename', 'basename'),
