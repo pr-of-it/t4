@@ -293,24 +293,36 @@ class CollectionTest extends PHPUnit_Framework_TestCase
         $collection->append(['id'=>2,'id2'=>3,'val'=>'b']);
         $collection->append(['id'=>4,'id2'=>3,'val'=>'c']);
         $collection->append(['id'=>7,'id2'=>2,'val'=>'']);
+
         $indexed = $collection->index('id');
-        $this->assertEquals([
-            1 => ['id'=>1,'id2'=>2,'val'=>'a'],
-            2 => ['id'=>2,'id2'=>3,'val'=>'b'],
-            4 => ['id'=>4,'id2'=>3,'val'=>'c'],
-            7 => ['id'=>7,'id2'=>2,'val'=>'']
-        ], $indexed);
+        $this->assertEquals(
+            [
+                1 => ['id'=>1,'id2'=>2,'val'=>'a'],
+                2 => ['id'=>2,'id2'=>3,'val'=>'b'],
+                4 => ['id'=>4,'id2'=>3,'val'=>'c'],
+                7 => ['id'=>7,'id2'=>2,'val'=>'']
+            ],
+            $indexed
+        );
+
         $indexed = $collection->index('id2');
-        $this->assertEquals([
-            2 => ['id'=>7,'id2'=>2,'val'=>''],
-            3 => ['id'=>4,'id2'=>3,'val'=>'c']
-        ], $indexed);
+        $this->assertEquals(
+            [
+                2 => ['id'=>7,'id2'=>2,'val'=>''],
+                3 => ['id'=>4,'id2'=>3,'val'=>'c']
+            ],
+            $indexed
+        );
+
         $indexed = $collection->index('val');
-        $this->assertEquals([
-            'a' => ['id'=>1,'id2'=>2,'val'=>'a'],
-            'b' => ['id'=>2,'id2'=>3,'val'=>'b'],
-            'c' => ['id'=>4,'id2'=>3,'val'=>'c'],
-            '' => ['id'=>7,'id2'=>2,'val'=>'']
-        ], $indexed);
+        $this->assertEquals(
+            [
+                'a' => ['id'=>1,'id2'=>2,'val'=>'a'],
+                'b' => ['id'=>2,'id2'=>3,'val'=>'b'],
+                'c' => ['id'=>4,'id2'=>3,'val'=>'c'],
+                '' => ['id'=>7,'id2'=>2,'val'=>'']
+            ],
+            $indexed
+        );
     }
 }

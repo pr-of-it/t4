@@ -263,15 +263,23 @@ trait TCollection
     }
     
     /**
-     * return array indices by chosen attribute
-     * @param string $by
-     * @return array
+     * @param $by
+     * @return array|static[]
      */
-    public function index(string $by) {
+    public function index($by) {
         $ret = [];
         foreach ($this as $element) {
-            if (isset($element[$by])) {
-                $ret[$element[$by]] = $element;
+            if ($by instanceof \Closure) {
+                $key = $by($element);
+                $ret[$key] = $element;
+            } elseif (is_array($element)) {
+                if (isset($element[$by])) {
+                    $ret[$element[$by]] = $element;
+                }
+            } elseif (is_object($element)) {
+                if (isset($element->$by)) {
+                    $ret[$element->$by] = $element;
+                }
             }
         }
         return $ret;
