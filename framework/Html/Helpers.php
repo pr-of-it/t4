@@ -75,15 +75,21 @@ class Helpers
         if (empty($options['disabled']))
             $options['disabled'] = [];
 
-        if ($options instanceof Std)
+        if ($options instanceof Std) {
             $options = $options->getData();
+        }
 
-        $html = '<select' .
-            (isset($htmlOptions['id']) ? ' id="' . $htmlOptions['id'] . '"' : '') .
-            (isset($htmlOptions['name']) ? ' name="' . $htmlOptions['name'] . '"' : '') .
-            (isset($htmlOptions['class']) ? ' class="' . $htmlOptions['class'] . '"' : '') .
-            (in_array('disabled', $htmlOptions) ? ' disabled="disabled"' : '') .
-            '>' . "\n";
+        $htmlOptionsText = [];
+        foreach ($htmlOptions as $key => $value) {
+            if (is_numeric($key)) {
+                $htmlOptionsText[] = $value;
+            } else {
+                $htmlOptionsText[] = $key . '="' . $value . '"';
+            }
+        }
+        $htmlOptionsText = implode(' ', $htmlOptionsText);
+
+        $html = '<select ' . $htmlOptionsText . '>' . "\n";
         if (isset($options['null']) && $options['null']) {
             $data->prepend([$options['valueColumn'] => 0, $options['titleColumn'] => '---']);
         }
