@@ -135,6 +135,8 @@ abstract class Controller
             if (isset($params[$param->name])) {
                 $p[$param->name] = $params[$param->name];
                 unset($params[$param->name]);
+            } elseif (isset($request->body[$param->name])) {
+                $p[$param->name] = $request->body[$param->name];
             } elseif (isset($request->post[$param->name])) {
                 $p[$param->name] = $request->post[$param->name];
             } elseif (isset($request->get[$param->name])) {
