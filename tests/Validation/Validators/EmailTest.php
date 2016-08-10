@@ -17,9 +17,17 @@ class EmailTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \T4\Validation\Exceptions\InvalidEmail
+     * @expectedException \T4\Validation\Exceptions\EmptyValue
      */
     public function testNegative1()
+    {
+        $validator = new Email();
+        $validator('');
+    }
+    /**
+     * @expectedException \T4\Validation\Exceptions\InvalidEmail
+     */
+    public function testNegative2()
     {
         $validator = new Email();
         $validator('test');
@@ -28,7 +36,7 @@ class EmailTest extends \PHPUnit_Framework_TestCase
     /**
      * @expectedException \T4\Validation\Exceptions\InvalidEmail
      */
-    public function testNegative2()
+    public function testNegative3()
     {
         $validator = new Email();
         $validator('test@test.com   ');
