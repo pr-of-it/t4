@@ -3,16 +3,17 @@
 namespace T4\Tests\Validation\Validators;
 
 use T4\Validation\Validators\Email;
+use T4\Validation\Validators\Url;
 
 require_once realpath(__DIR__ . '/../../../framework/boot.php');
 
-class EmailTest extends \PHPUnit_Framework_TestCase
+class UrlTest extends \PHPUnit_Framework_TestCase
 {
 
     public function testPositive()
     {
-        $validator = new Email();
-        $result = $validator('test@test.com');
+        $validator = new Url();
+        $result = $validator('http://test.org');
         $this->assertTrue($result);
     }
 
@@ -21,25 +22,25 @@ class EmailTest extends \PHPUnit_Framework_TestCase
      */
     public function testNegative1()
     {
-        $validator = new Email();
+        $validator = new Url();
         $validator('');
     }
     /**
-     * @expectedException \T4\Validation\Exceptions\InvalidEmail
+     * @expectedException \T4\Validation\Exceptions\InvalidUrl
      */
     public function testNegative2()
     {
-        $validator = new Email();
+        $validator = new Url();
         $validator('test');
     }
 
     /**
-     * @expectedException \T4\Validation\Exceptions\InvalidEmail
+     * @expectedException \T4\Validation\Exceptions\InvalidUrl
      */
     public function testNegative3()
     {
-        $validator = new Email();
-        $validator('test@test.com   ');
+        $validator = new Url();
+        $validator('  http://test.org');
     }
 
 }

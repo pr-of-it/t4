@@ -1,6 +1,6 @@
 <?php
 
-namespace T4\Tests\Validation\Validators\Std;
+namespace T4\Tests\Validation\Validators;
 
 use T4\Validation\Validators\Boolean;
 
