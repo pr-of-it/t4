@@ -2,6 +2,8 @@
 
 namespace T4\Tests\Validation\Validators;
 
+use T4\Validation\Error;
+use T4\Validation\Exceptions\InvalidBoolean;
 use T4\Validation\Validators\Boolean;
 
 require_once realpath(__DIR__ . '/../../../framework/boot.php');
@@ -38,13 +40,18 @@ class BooleanTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($result);
     }
 
-    /**
-     * @expectedException \T4\Validation\Exceptions\InvalidBoolean
-     */
     public function testNegative()
     {
-        $validator = new Boolean();
-        $validator('foo');
+        $value = 'foo';
+        try {
+            $validator = new Boolean();
+            $validator($value);
+        } catch (Error $e) {
+            $this->assertInstanceOf(InvalidBoolean::class, $e);
+            $this->assertEquals($value, $e->value);
+            return;
+        }
+        $this->assertTrue(false);
     }
 
 }

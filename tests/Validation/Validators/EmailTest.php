@@ -2,6 +2,9 @@
 
 namespace T4\Tests\Validation\Validators;
 
+use T4\Validation\Error;
+use T4\Validation\Exceptions\EmptyValue;
+use T4\Validation\Exceptions\InvalidEmail;
 use T4\Validation\Validators\Email;
 
 require_once realpath(__DIR__ . '/../../../framework/boot.php');
@@ -16,30 +19,46 @@ class EmailTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($result);
     }
 
-    /**
-     * @expectedException \T4\Validation\Exceptions\EmptyValue
-     */
     public function testNegative1()
     {
-        $validator = new Email();
-        $validator('');
-    }
-    /**
-     * @expectedException \T4\Validation\Exceptions\InvalidEmail
-     */
-    public function testNegative2()
-    {
-        $validator = new Email();
-        $validator('test');
+        $value = '';
+        try {
+            $validator = new Email();
+            $validator($value);
+        } catch (Error $e) {
+            $this->assertInstanceOf(EmptyValue::class, $e);
+            $this->assertEquals($value, $e->value);
+            return;
+        }
+        $this->assertTrue(false);
     }
 
-    /**
-     * @expectedException \T4\Validation\Exceptions\InvalidEmail
-     */
+    public function testNegative2()
+    {
+        $value = 'test';
+        try {
+            $validator = new Email();
+            $validator($value);
+        } catch (Error $e) {
+            $this->assertInstanceOf(InvalidEmail::class, $e);
+            $this->assertEquals($value, $e->value);
+            return;
+        }
+        $this->assertTrue(false);
+    }
+
     public function testNegative3()
     {
-        $validator = new Email();
-        $validator('test@test.com   ');
+        $value = 'test@test.com   ';
+        try {
+            $validator = new Email();
+            $validator($value);
+        } catch (Error $e) {
+            $this->assertInstanceOf(InvalidEmail::class, $e);
+            $this->assertEquals($value, $e->value);
+            return;
+        }
+        $this->assertTrue(false);
     }
 
 }

@@ -2,7 +2,9 @@
 
 namespace T4\Tests\Validation\Validators;
 
-use T4\Validation\Validators\Email;
+use T4\Validation\Error;
+use T4\Validation\Exceptions\EmptyValue;
+use T4\Validation\Exceptions\InvalidUrl;
 use T4\Validation\Validators\Url;
 
 require_once realpath(__DIR__ . '/../../../framework/boot.php');
@@ -17,30 +19,46 @@ class UrlTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($result);
     }
 
-    /**
-     * @expectedException \T4\Validation\Exceptions\EmptyValue
-     */
     public function testNegative1()
     {
-        $validator = new Url();
-        $validator('');
-    }
-    /**
-     * @expectedException \T4\Validation\Exceptions\InvalidUrl
-     */
-    public function testNegative2()
-    {
-        $validator = new Url();
-        $validator('test');
+        $value = '';
+        try {
+            $validator = new Url();
+            $validator($value);
+        } catch (Error $e) {
+            $this->assertInstanceOf(EmptyValue::class, $e);
+            $this->assertEquals($value, $e->value);
+            return;
+        }
+        $this->assertTrue(false);
     }
 
-    /**
-     * @expectedException \T4\Validation\Exceptions\InvalidUrl
-     */
+    public function testNegative2()
+    {
+        $value = 'test';
+        try {
+            $validator = new Url();
+            $validator($value);
+        } catch (Error $e) {
+            $this->assertInstanceOf(InvalidUrl::class, $e);
+            $this->assertEquals($value, $e->value);
+            return;
+        }
+        $this->assertTrue(false);
+    }
+
     public function testNegative3()
     {
-        $validator = new Url();
-        $validator('  http://test.org');
+        $value = '  http://test.org';
+        try {
+            $validator = new Url();
+            $validator($value);
+        } catch (Error $e) {
+            $this->assertInstanceOf(InvalidUrl::class, $e);
+            $this->assertEquals($value, $e->value);
+            return;
+        }
+        $this->assertTrue(false);
     }
 
 }
