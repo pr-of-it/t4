@@ -98,6 +98,14 @@ class PgsqlDriverTest extends PHPUnit_Framework_TestCase {
             '"foo" VARCHAR(123)',
             $reflector->invokeArgs($driver, ['table', 'foo', ['type' => 'string', 'length' => 123]])
         );
+        $this->assertEquals(
+            '"foo" JSON',
+            $reflector->invokeArgs($driver, ['table', 'foo', ['type' => 'json']])
+        );
+        $this->assertEquals(
+            '"foo" JSONB',
+            $reflector->invokeArgs($driver, ['table', 'foo', ['type' => 'jsonb']])
+        );
     }
 
     public function testCreateIndexDDL()

@@ -111,7 +111,8 @@ class Mysql
                 }
                 break;
             case 'json':
-                $ddl = 'TEXT';
+            case 'jsonb':
+                $ddl = 'LONGTEXT';
                 break;
             case 'datetime':
                 $ddl = 'DATETIME';

@@ -87,8 +87,13 @@ class Pgsql
                 $ddl = 'REAL';
                 break;
             case 'text':
-            case 'json':
                 $ddl = 'TEXT';
+                break;
+            case 'json':
+                $ddl = 'JSON';
+                break;
+            case 'jsonb':
+                $ddl = 'JSONB';
                 break;
             case 'datetime':
                 $ddl = 'TIMESTAMP';

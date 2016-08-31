@@ -120,6 +120,14 @@ class MysqlDriverTest extends PHPUnit_Framework_TestCase {
             '`foo` VARCHAR(123)',
             $reflector->invokeArgs($driver, ['foo', ['type' => 'string', 'length' => 123]])
         );
+        $this->assertEquals(
+            '`foo` LONGTEXT',
+            $reflector->invokeArgs($driver, ['foo', ['type' => 'json']])
+        );
+        $this->assertEquals(
+            '`foo` LONGTEXT',
+            $reflector->invokeArgs($driver, ['foo', ['type' => 'jsonb']])
+        );
     }
 
     public function testCreateIndexDDL()
