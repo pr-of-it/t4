@@ -15,7 +15,7 @@ class Equals
             $options['where'] = '1';
         }
         $options['where'] .= ' AND ' . $this->name . ' = :' . $this->name;
-        $options['params'][$this->name] = $this->value;
+        $options['params'][':' . $this->name] = $this->value;
         return $options;
     }
 }

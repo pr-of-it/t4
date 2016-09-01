@@ -28,4 +28,6 @@ abstract class Filter
 
     abstract public function getQueryOptions(Connection $connection, $options = []) : array;
 
+    //abstract public function renderFormElement(array $htmlOptions = []) : string;
+
 }
