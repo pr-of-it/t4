@@ -68,6 +68,16 @@ class Connection
     }
 
     /**
+     * @param string $string
+     * @param int $parameter_type
+     * @return string
+     */
+    public function quote(string $string, $parameter_type = \PDO::PARAM_STR)
+    {
+        return $this->pdo->quote($string, $parameter_type);
+    }
+
+    /**
      * @param string|\T4\Dbal\QueryBuilder $query
      * @return \T4\Dbal\Statement
      */
