@@ -23,4 +23,15 @@ class Error
         parent::__construct($message, $code, $previous);
     }
 
+    public function getValue()
+    {
+        return $this->value;
+    }
+
+    public function setValue($val)
+    {
+        $this->value = $val;
+        return $this;
+    }
+
 }
