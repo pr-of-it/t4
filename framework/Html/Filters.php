@@ -42,7 +42,7 @@ class Filters
         }
 
         $view = new View('Twig');
-        $view->addTemplatePath($dir);
+        $view->addTemplateRawPath($dir);
         return $view->render($template, [
             'filters' => $this,
             'html' => $htmlOptions,

@@ -41,6 +41,11 @@ class View
         $this->renderer->addTemplatePath($path);
     }
 
+    public function addTemplateRawPath($path)
+    {
+        $this->renderer->addTemplateRawPath($path);
+    }
+
     /**
      * @var \T4\Mvc\Controller
      */

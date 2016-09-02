@@ -42,7 +42,7 @@ abstract class Filter
         }
 
         $view = new View('Twig');
-        $view->addTemplatePath($dir);
+        $view->addTemplateRawPath($dir);
         return $view->render($template, [
             'name' => $this->name,
             'value' => $this->value,

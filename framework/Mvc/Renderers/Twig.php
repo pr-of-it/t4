@@ -47,6 +47,14 @@ class Twig
         $this->twig->setLoader($loader);
     }
 
+    public function addTemplateRawPath($path)
+    {
+        parent::addTemplateRawPath($path);
+        $loader = $this->twig->getLoader();
+        $loader->setPaths($this->paths);
+        $this->twig->setLoader($loader);
+    }
+
     // TODO: непонятно что с этим делать. Вообще-то надо во View этот метод использовать, а не здесь
     public function setController(Controller $controller)
     {
