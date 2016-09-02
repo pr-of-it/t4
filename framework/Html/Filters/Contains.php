@@ -9,12 +9,12 @@ class Contains
     extends Filter
 {
 
-    public function getQueryOptions(Connection $connection, $options = []) : array
+    public function getQueryOptions($options = []) : array
     {
         if (empty($options['where'])) {
             $options['where'] = '1';
         }
-        $options['where'] .= ' AND ' . $this->name . ' LIKE ' . $connection->quote('%' . $this->value . '%') . '';
+        $options['where'] .= ' AND ' . $this->name . ' LIKE ' . $this->getConnection()->quote('%' . $this->value . '%') . '';
         return $options;
     }
 }

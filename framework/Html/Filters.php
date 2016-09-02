@@ -22,9 +22,8 @@ class Filters
 
     public function modifyQueryOptions($options = [])
     {
-        $app = Application::instance();
         foreach ($this as $name => $filter) {
-            $options = $filter->getQueryOptions($app->db->{static::$schema['filters'][$name]['connection'] ?? 'default'}, $options);
+            $options = $filter->getQueryOptions($options);
         }
         return $options;
     }

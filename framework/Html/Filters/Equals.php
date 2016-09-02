@@ -9,7 +9,7 @@ class Equals
     extends Filter
 {
 
-    public function getQueryOptions(Connection $connection, $options = []) : array
+    public function getQueryOptions($options = []) : array
     {
         if (empty($options['where'])) {
             $options['where'] = '1';

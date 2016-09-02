@@ -3,7 +3,9 @@
 namespace T4\Html;
 
 use T4\Dbal\Connection;
+use T4\Mvc\Application;
 use T4\Mvc\View;
+use T4\Orm\Model;
 
 abstract class Filter
 {
@@ -27,7 +29,18 @@ abstract class Filter
         return $this;
     }
 
-    abstract public function getQueryOptions(Connection $connection, $options = []) : array;
+    protected function getConnection() : Connection
+    {
+        if (isset($this->options['model']) && $this->options['model'] instanceof Model) {
+            return $this->options['model']->getDbConnection();
+        } elseif (isset($this->options['connection']) && is_string($this->options['connection'])) {
+            return Application::instance()->db->{$this->options['connection']};
+        } else {
+            return Application::instance()->db->default;
+        }
+    }
+
+    abstract public function getQueryOptions($options = []) : array;
 
     public function renderFormElement(array $htmlOptions = []) : string
     {
