@@ -5,6 +5,22 @@ namespace T4\Fs;
 class Helpers
 {
 
+    public static function makeCanonicalPath($path)
+    {
+        $path = str_replace(DS, '/', $path);
+        $ROOT_PATH           = str_replace(DS, '/', ROOT_PATH);
+        $ROOT_PATH_PROTECTED = str_replace(DS, '/', ROOT_PATH_PROTECTED);
+        $ROOT_PATH_PUBLIC    = str_replace(DS, '/', ROOT_PATH_PUBLIC);
+
+        if (0 === strpos($path, $ROOT_PATH_PUBLIC)) {
+            return substr_replace($path, '/', 0, strlen($ROOT_PATH_PUBLIC) + 1);
+        } elseif (0 === strpos($path, $ROOT_PATH_PROTECTED)) {
+            return substr_replace($path, '//', 0, strlen($ROOT_PATH_PROTECTED)+1);
+        } elseif (0 === strpos($path, $ROOT_PATH)) {
+            return substr_replace($path, '///', 0, strlen($ROOT_PATH)+1);
+        }
+    }
+
     public static function getRealPath($path)
     {
         if (0 === strpos($path, '///')) {

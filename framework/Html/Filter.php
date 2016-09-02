@@ -3,6 +3,7 @@
 namespace T4\Html;
 
 use T4\Dbal\Connection;
+use T4\Mvc\View;
 
 abstract class Filter
 {
@@ -28,6 +29,26 @@ abstract class Filter
 
     abstract public function getQueryOptions(Connection $connection, $options = []) : array;
 
-    //abstract public function renderFormElement(array $htmlOptions = []) : string;
+    public function renderFormElement(array $htmlOptions = []) : string
+    {
+        if (isset($this->options['template'])) {
+            $dir = dirname($this->options['template']);
+            $template = basename($this->options['template']);
+        } else {
+            $reflector = new \ReflectionClass(static::class);
+            $filename = $reflector->getFileName();
+            $dir = dirname($filename);
+            $template = pathinfo(basename($filename), PATHINFO_FILENAME) . '.html';
+        }
+
+        $view = new View('Twig');
+        $view->addTemplatePath($dir);
+        return $view->render($template, [
+            'name' => $this->name,
+            'value' => $this->value,
+            'options' => $this->options,
+            'html' => $htmlOptions,
+        ]);
+    }
 
 }

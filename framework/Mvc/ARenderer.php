@@ -24,7 +24,7 @@ abstract class ARenderer
 
     public function addTemplatePath($path)
     {
-        $this->paths[] = Helpers::getRealPath($path);
+        $this->paths[] = Helpers::getRealPath($path) ?: $path;
     }
 
     final protected function findTemplate($template)

@@ -3,8 +3,10 @@
 namespace T4\Tests\Html\Filters;
 
 use T4\Html\Filters\BeginsWith;
-
 use T4\Dbal\Connection;
+
+require_once realpath(__DIR__ . '/../../../framework/boot.php');
+
 
 class BeginsWithTestTestConnection extends Connection {
     public function __construct()
@@ -12,8 +14,6 @@ class BeginsWithTestTestConnection extends Connection {
         $this->pdo = new \PDO('sqlite:example.db');
     }
 }
-
-require_once realpath(__DIR__ . '/../../../framework/boot.php');
 
 class BeginsWithTest extends \PHPUnit_Framework_TestCase
 {
@@ -36,6 +36,19 @@ class BeginsWithTest extends \PHPUnit_Framework_TestCase
             )
         );
     }
+
+    /*
+     * @todo: Проблемы с кэшем Твига, жесткая связь!
+    public function testRenderFormElementVanilla()
+    {
+        $filter = new BeginsWith('foo', 'Bar');
+
+        $this->assertEquals(
+            '<input type="text" name="foo" value="Bar"',
+            $filter->renderFormElement()
+        );
+    }
+    */
 
     protected function tearDown()
     {
