@@ -23,6 +23,9 @@ class Filters
     public function modifyQueryOptions($options = [])
     {
         foreach ($this as $name => $filter) {
+            if ('' === $filter->getValue()) {
+                continue;
+            }
             $options = $filter->getQueryOptions($options);
         }
         return $options;

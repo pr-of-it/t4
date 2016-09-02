@@ -64,4 +64,9 @@ abstract class Filter
         ]);
     }
 
+    public function getValue()
+    {
+        return $this->value;
+    }
+
 }
