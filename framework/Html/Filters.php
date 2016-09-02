@@ -15,13 +15,8 @@ class Filters
 
     public function __construct($data = null)
     {
-        if (null !== $data) {
-            foreach ($data as $key => $value) {
-                if (!isset(static::$schema[$key])) {
-                    throw new Exception('Неверное имя фильтра');
-                }
-                $this->$key = new static::$schema[$key]['class']($key, $value, static::$schema[$key]['options'] ?? null);
-            }
+        foreach (static::$schema as $key => $value) {
+            $this->$key = new $value['class']($key, $data[$key] ?? null, $value['options'] ?? null);
         }
     }
 
