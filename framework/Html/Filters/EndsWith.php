@@ -11,6 +11,9 @@ class EndsWith
 
     public function getQueryOptions($options = []) : array
     {
+        if ('' === $this->value) {
+            return $options;
+        }
         if (empty($options['where'])) {
             $options['where'] = 'TRUE';
         }
