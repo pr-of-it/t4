@@ -2,9 +2,9 @@
 
 namespace T4\Html;
 
-use T4\Core\Exception;
 use T4\Core\Std;
 use T4\Mvc\Application;
+use T4\Mvc\View;
 
 class Filters
     extends Std
@@ -15,7 +15,7 @@ class Filters
 
     public function __construct($data = null)
     {
-        foreach (static::$schema as $key => $value) {
+        foreach (static::$schema['filters'] as $key => $value) {
             $this->$key = new $value['class']($key, $data[$key] ?? null, $value['options'] ?? null);
         }
     }
@@ -24,9 +24,29 @@ class Filters
     {
         $app = Application::instance();
         foreach ($this as $name => $filter) {
-            $options = $filter->getQueryOptions($app->db->{static::$schema[$name]['connection'] ?? 'default'}, $options);
+            $options = $filter->getQueryOptions($app->db->{static::$schema['filters'][$name]['connection'] ?? 'default'}, $options);
         }
         return $options;
+    }
+
+    public function renderForm(array $htmlOptions = []) : string
+    {
+        if (isset(static::$schema['template'])) {
+            $dir = dirname(static::$schema['template']);
+            $template = basename(static::$schema['template']);
+        } else {
+            $reflector = new \ReflectionClass(static::class);
+            $filename = $reflector->getFileName();
+            $dir = dirname($filename);
+            $template = pathinfo(basename($filename), PATHINFO_FILENAME) . '.html';
+        }
+
+        $view = new View('Twig');
+        $view->addTemplatePath($dir);
+        return $view->render($template, [
+            'filters' => $this,
+            'html' => $htmlOptions,
+        ]);
     }
 
 }
