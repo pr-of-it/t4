@@ -29,7 +29,7 @@ abstract class Controller
      */
     public $view;
 
-    final public function __construct()
+    public function __construct()
     {
         $this->data = new Std();
         $this->app = Application::instance();
