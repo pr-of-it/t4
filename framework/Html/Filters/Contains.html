@@ -1,1 +1,1 @@
-<input type="text" id="{{ html.id ? html.id : 'filters['~name~']' }}" name="{{ html.name ? html.name : 'filters['~name~']' }}" value="{{ value }}"{% for key, value in html %}{% if not(key in ['id', 'name']) %} {{ key }}="{{ value }}"{% endif %}{% endfor %}>
+<input type="{{ html.type | default('text') }}" id="{{ html.id | default('filters['~name~']') }}" name="{{ html.name | default('filters['~name~']') }}" value="{{ value }}"{% for key, value in html %}{% if not(key in ['id', 'name']) %} {{ key }}="{{ value }}"{% endif %}{% endfor %}>
