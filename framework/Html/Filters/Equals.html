@@ -1,10 +1,1 @@
-{% if options.values %}
-    <select id="{{ html.id | default('filters['~name~']') }}" name="{{ html.name | default('filters['~name~']') }}"{% for key, value in html %}{% if not(key in ['id', 'name']) %} {{ key }}="{{ value }}"{% endif %}{% endfor %}>
-        <option></option>
-        {% for key, title in options.values %}
-            <option value="{{ key }}"{% if (value is not null) and (value is not same as('')) and (key == value) %} selected{% endif %}>{{ title }}</option>
-        {% endfor %}
-    </select>
-{% else %}
-    <input type="{{ html.type | default('text') }}" id="{{ html.id | default('filters['~name~']') }}" name="{{ html.name | default('filters['~name~']') }}" value="{{ value }}"{% for key, value in html %}{% if not(key in ['id', 'name']) %} {{ key }}="{{ value }}"{% endif %}{% endfor %}>
-{% endif %}
+<input type="{{ html.type | default('text') }}" id="{{ html.id | default('filters['~name~']') }}" name="{{ html.name | default('filters['~name~']') }}" value="{{ value }}"{% for key, value in html %}{% if not(key in ['id', 'name', 'type']) %} {{ key }}="{{ value }}"{% endif %}{% endfor %}>
