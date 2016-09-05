@@ -2,7 +2,6 @@
 
 namespace T4\Html\Filters;
 
-use T4\Dbal\Connection;
 use T4\Html\Filter;
 
 class EndsWith
@@ -11,7 +10,7 @@ class EndsWith
 
     public function getQueryOptions($options = []) : array
     {
-        if ('' === $this->value) {
+        if ('' === $this->value || null === $this->value) {
             return $options;
         }
         if (empty($options['where'])) {

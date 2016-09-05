@@ -4,7 +4,7 @@ namespace T4\Html\Filters;
 
 use T4\Html\Filter;
 
-class Contains
+class DateEquals
     extends Filter
 {
 
@@ -16,7 +16,8 @@ class Contains
         if (empty($options['where'])) {
             $options['where'] = 'TRUE';
         }
-        $options['where'] .= ' AND ' . $this->name . ' LIKE ' . $this->getConnection()->quote('%' . $this->value . '%') . '';
+        $options['where'] .= ' AND CAST(' . $this->name . ' AS DATE) = :' . $this->name;
+        $options['params'][':' . $this->name] = $this->value;
         return $options;
     }
 }
