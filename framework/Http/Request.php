@@ -23,6 +23,7 @@ use T4\Core\Session;
  * @property \T4\Core\Std $body
  * @property \T4\Core\Std $files
  * @property \T4\Core\Std $headers
+ * @property string $referer
  */
 class Request
     extends Std
@@ -81,6 +82,7 @@ class Request
         }
 
         $this->headers = new Std($this->getHttpHeaders());
+        $this->referer = $_SERVER['HTTP_REFERER'];
     }
 
     public function getProtocol()
