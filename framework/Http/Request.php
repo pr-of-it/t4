@@ -82,7 +82,7 @@ class Request
         }
 
         $this->headers = new Std($this->getHttpHeaders());
-        $this->referer = $_SERVER['HTTP_REFERER'];
+        $this->referer = $_SERVER['HTTP_REFERER'] ?? null;
     }
 
     public function getProtocol()
