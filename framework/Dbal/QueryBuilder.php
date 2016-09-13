@@ -240,7 +240,9 @@ class QueryBuilder
     public function merge($prototype, $operator = 'and')
     {
         if ($prototype instanceof \T4\Core\IArrayable) {
+            $params = $prototype->getParams();
             $prototype = $prototype->toArray();
+            $prototype['params'] = $params;
         }
         if (!is_array($prototype) && !$prototype instanceof \ArrayAccess) {
             throw new \InvalidArgumentException('Invalid builder type!');
