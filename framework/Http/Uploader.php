@@ -129,16 +129,18 @@ class Uploader
 
     protected function suggestUploadedFileName($path, $name)
     {
-        if (!file_exists($path . DS . $name))
+        if (!file_exists($path . DS . strtolower($name))) {
             return strtolower($name);
+        }
 
         $filename = pathinfo($name, \PATHINFO_FILENAME);
         $extension = pathinfo($name, \PATHINFO_EXTENSION);
         preg_match('~(.*?)(_(\d+))?$~', $filename, $m);
         $i = isset($m[3]) ? (int)$m[3] + 1 : 1;
 
-        while (file_exists($path . DS . ($file = $m[1] . '_' . $i . '.' . $extension)))
+        while ( file_exists( $path . DS . ($file = strtolower($m[1] . '_' . $i . '.' . $extension)) ) ) {
             $i++;
+        }
 
         return strtolower($file);
     }
