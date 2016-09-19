@@ -28,6 +28,10 @@ class UploaderTest extends PHPUnit_Framework_TestCase
             'test_1.html',
             $reflector->invokeArgs($uploader, [$tmpDir, 'test.html'])
         );
+        $this->assertEquals(
+            'test_1.html',
+            $reflector->invokeArgs($uploader, [$tmpDir, 'TEST.html'])
+        );
 
         file_put_contents($tmpDir . DS . 'test_1.html', 'TEST');
         $this->assertEquals(
@@ -37,6 +41,10 @@ class UploaderTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(
             'test_2.html',
             $reflector->invokeArgs($uploader, [$tmpDir, 'test_1.html'])
+        );
+        $this->assertEquals(
+            'test_2.html',
+            $reflector->invokeArgs($uploader, [$tmpDir, 'Test_2.html'])
         );
 
         unlink($tmpDir . DS . 'test.html');

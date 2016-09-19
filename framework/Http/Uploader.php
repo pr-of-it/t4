@@ -142,7 +142,7 @@ class Uploader
             $i++;
         }
 
-        return strtolower($file);
+        return $file;
     }
 
 }
