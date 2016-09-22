@@ -31,15 +31,27 @@ class ModelDataProvider
      * @param array $options
      * @throws Exception
      */
-    public function __construct($class, array $options = [])
+    public function __construct($class = null, array $options = [])
     {
-        if (!(is_subclass_of($class, Model::class, true))) {
+        if (!empty($class) && !(is_subclass_of($class, Model::class, true))) {
             throw new Exception('Invalid model class given');
         }
-        $this->class = $class;
+        if (!empty($class)) {
+            $this->setClass($class);
+        }
         if (!empty($options)) {
             $this->setOptions($options);
         }
+    }
+
+    /**
+     * @param string $class
+     * @return $this
+     */
+    public function setClass($class)
+    {
+        $this->class = $class;
+        return $this;
     }
 
     /**
@@ -119,6 +131,11 @@ class ModelDataProvider
         }
 
         return $this->class::findAll($options);
+    }
+
+    public function getAll()
+    {
+        return $this->class::findAll($this->options);
     }
 
 }

@@ -56,12 +56,19 @@ abstract class Filter
 
         $view = new View('Twig');
         $view->addTemplateRawPath($dir);
-        return $view->render($template, [
-            'name' => $this->name,
-            'value' => $this->value,
-            'options' => $this->options,
-            'html' => $htmlOptions,
-        ]);
+
+        $props = [];
+        foreach (array_keys(get_object_vars($this)) as $prop) {
+            $props[$prop] = $this->$prop;
+        }
+
+        return $view->render(
+            $template,
+            $props +
+                [
+                'html' => $htmlOptions,
+                ]
+        );
     }
 
 }
