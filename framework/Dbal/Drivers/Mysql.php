@@ -347,7 +347,7 @@ class Mysql
     {
         $query = new QueryBuilder($options);
         $query
-            ->select('*')
+            ->select('t1.*')
             ->from($class::getTableName());
         return $this->findAllByQuery($class, $query);
     }
@@ -356,7 +356,7 @@ class Mysql
     {
         $query = new QueryBuilder($options);
         $query
-            ->select('*')
+            ->select('t1.*')
             ->from($class::getTableName());
         return $this->findByQuery($class, $query);
     }
