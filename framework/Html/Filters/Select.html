@@ -1,4 +1,7 @@
 <select id="{{ html.id | default('filters['~name~']') }}" name="{{ html.name | default('filters['~name~']') }}"{% for key, value in html %}{% if not(key in ['id', 'name', 'type']) %} {{ key }}="{{ value }}"{% endif %}{% endfor %}>
+    {% if options.empty %}
+        <option value="{{ options.empty.value | default(0) }}">{{ options.empty.title | default('---') }}</option>
+    {% endif %}
     {% for item in data %}
         <option value="{{ attribute(item, dataValueColumn) }}"{% if value==attribute(item, dataValueColumn) %} selected{% endif %}>{{ attribute(item, dataTitleColumn) }}</option>
     {% endfor %}
