@@ -345,29 +345,19 @@ class Mysql
 
     public function findAll($class, $options = [])
     {
-        $query = new QueryBuilder();
+        $query = new QueryBuilder($options);
         $query
             ->select('*')
-            ->from($class::getTableName())
-            ->where(!empty($options['where']) ? $options['where'] : '')
-            ->order(!empty($options['order']) ? $options['order'] : '')
-            ->offset(!empty($options['offset']) ? $options['offset'] : '')
-            ->limit(!empty($options['limit']) ? $options['limit'] : '')
-            ->params(!empty($options['params']) ? $options['params'] : []);
+            ->from($class::getTableName());
         return $this->findAllByQuery($class, $query);
     }
 
     public function find($class, $options = [])
     {
-        $query = new QueryBuilder();
+        $query = new QueryBuilder($options);
         $query
             ->select('*')
-            ->from($class::getTableName())
-            ->where(!empty($options['where']) ? $options['where'] : '')
-            ->order(!empty($options['order']) ? $options['order'] : '')
-            ->offset(!empty($options['offset']) ? $options['offset'] : '')
-            ->limit(1)
-            ->params(!empty($options['params']) ? $options['params'] : []);
+            ->from($class::getTableName());
         return $this->findByQuery($class, $query);
     }
 

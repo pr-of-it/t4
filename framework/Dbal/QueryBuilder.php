@@ -13,6 +13,37 @@ class QueryBuilder
     extends Std
 {
 
+    public function __construct($data = [])
+    {
+        if (!empty($data)) {
+            if (isset($data['select'])) {
+                $this->select($data['select']);
+            } elseif (isset($data['insert'])) {
+                $this->insert($data['select']);
+            } elseif (isset($data['update'])) {
+                $this->update($data['select']);
+            } elseif (isset($data['delete'])) {
+                $this->delete($data['select']);
+            }
+            $this->table(!empty($data['table']) ? $data['table'] : '');
+            $this->tables(!empty($data['tables']) ? $data['tables'] : '');
+            $this->where(!empty($data['where']) ? $data['where'] : '');
+            $this->from(!empty($data['from']) ? $data['from'] : '');
+            $this->joins(!empty($data['joins']) ? $data['joins'] : []);
+            $this->where(!empty($data['where']) ? $data['where'] : '');
+            $this->group(!empty($data['group']) ? $data['group'] : '');
+            $this->order(!empty($data['order']) ? $data['order'] : '');
+            if (isset($data['offset'])) {
+                $this->offset($data['offset']);
+            }
+            if (isset($data['limit'])) {
+                $this->limit($data['limit']);
+            }
+            $this->values(!empty($data['values']) ? $data['values'] : []);
+            $this->params(!empty($data['params']) ? $data['params'] : []);
+        }
+    }
+
     protected $params = [];
 
     protected function trim($s)
@@ -39,7 +70,7 @@ class QueryBuilder
             $this->select = ['*'];
         } else {
             $what = $this->prepareWhat(func_get_args());
-            $this->select = array_diff(array_merge(!empty($this->select) ? $this->select : [], $what), ['*']);
+            $this->select = array_values(array_diff(array_merge(!empty($this->select) ? $this->select : [], $what), ['*']));
         }
         $this->mode = 'select';
         return $this;
@@ -102,7 +133,7 @@ class QueryBuilder
     public function from($what)
     {
         $what = $this->prepareWhat(func_get_args());
-        $this->from = array_merge(!empty($this->from) ? $this->from : [], $what);
+        $this->from = array_values(array_filter(array_merge(!empty($this->from) ? $this->from : [], $what)));
         return $this;
     }
 
@@ -123,7 +154,7 @@ class QueryBuilder
 
     public function joins(array $joins)
     {
-        $this->joins = array_merge($this->joins, $joins);
+        $this->joins = array_merge($this->joins ?? [], $joins);
         return $this;
     }
 

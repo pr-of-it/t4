@@ -34,7 +34,7 @@ class QueryBuilderMysqlTest extends PHPUnit_Framework_TestCase
             ->join('bar', 'j2.id<t2.id', 'left')
             ->join('baz', 'j3.id>:baz', 'right')
             ->getQuery('mysql');
-        $this->assertEquals("SELECT t1.`a1`, j1.`a2`\nFROM `test1` AS t1, `test2` AS t2\nFULL JOIN `foo` AS j1 ON j1.id=t1.id\nLEFT JOIN `bar` AS j2 ON j2.id<t2.id\nRIGHT JOIN `baz` AS j3 ON j3.id>:baz", $query);
+        $this->assertEquals("SELECT t1.`a1`, j1.`a2`\nFROM `test1` AS t1, `test2` AS t2\nINNER JOIN `foo` AS j1 ON j1.id=t1.id\nLEFT JOIN `bar` AS j2 ON j2.id<t2.id\nRIGHT JOIN `baz` AS j3 ON j3.id>:baz", $query);
     }
 
     public function testMysqlMakeInsertQuery()
