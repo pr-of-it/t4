@@ -1,0 +1,15 @@
+<a href="{% if value == 'ASC' %}{{ this.modifyUrl(app.request.url, name, 'DESC') }}{% elseif not value or value == 'DESC' %}{{ this.modifyUrl(app.request.url, name, 'ASC') }}{% endif %}">
+    {{ html.title }}
+</a>
+
+<a href="{{ this.modifyUrl(app.request.url, name, 'ASC') }}">
+    <i class="fa fa-arrow-down{% if value == 'ASC' %} fa-border{% endif %}"></i>
+</a>
+<a href="{{ this.modifyUrl(app.request.url, name, 'DESC') }}">
+    <i class="fa fa-arrow-up{% if value == 'DESC' %} fa-border{% endif %}"></i>
+</a>
+{% if value %}
+    <a href="{{ this.modifyUrl(app.request.url, name, null) }}">
+        <i class="fa fa-remove"></i>
+    </a>
+{% endif %}
