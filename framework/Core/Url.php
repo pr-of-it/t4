@@ -58,7 +58,7 @@ class Url
         $ret .= $this->host ? $this->host : '';
         $ret .= $this->port ? ':' . $this->port : '';
         $ret .= $this->path ? $this->path : '';
-        $ret .= $this->query ? '?' . $this->query : '';
+        $ret .= (string)$this->query ? '?' . (string)$this->query : '';
         $ret .= $this->fragment ? '#' . $this->fragment : '';
         return $ret;
     }

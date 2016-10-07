@@ -29,7 +29,7 @@ class QueryString
 
     public function toString()
     {
-        return http_build_query($this->toArray());
+        return http_build_query($this->toArrayRecursive());
     }
     
 }
