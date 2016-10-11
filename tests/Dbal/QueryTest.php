@@ -46,6 +46,11 @@ class QueryTest extends PHPUnit_Framework_TestCase
             ['foo', 'bar'],
             $reflector->invokeArgs($query, [ [' `"foo', 'bar"`  '] ])
         );
+
+        $this->assertEquals(
+            ['foo AS f', '`bar` b'],
+            $reflector->invokeArgs($query, [ ['foo AS f, `bar` b'] ])
+        );
     }
 
     public function testColumns()
@@ -130,6 +135,29 @@ class QueryTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($q, $query);
         $this->assertEquals('select', $query->mode);
         $this->assertEquals(['*'], $query->columns);
+        $this->assertEquals(['foo', 'bar'], $query->tables);
+    }
+
+    public function testModes()
+    {
+        $query = new \T4\Dbal\Query();
+
+        $q = $query->insert('foo');
+        $this->assertInstanceOf(\T4\Dbal\Query::class, $q);
+        $this->assertEquals($q, $query);
+        $this->assertEquals('insert', $query->mode);
+        $this->assertEquals(['foo'], $query->tables);
+
+        $q = $query->update('foo, bar');
+        $this->assertInstanceOf(\T4\Dbal\Query::class, $q);
+        $this->assertEquals($q, $query);
+        $this->assertEquals('update', $query->mode);
+        $this->assertEquals(['foo', 'bar'], $query->tables);
+
+        $q = $query->delete(['foo', 'bar']);
+        $this->assertInstanceOf(\T4\Dbal\Query::class, $q);
+        $this->assertEquals($q, $query);
+        $this->assertEquals('delete', $query->mode);
         $this->assertEquals(['foo', 'bar'], $query->tables);
     }
 

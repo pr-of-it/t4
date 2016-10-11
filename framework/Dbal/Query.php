@@ -12,6 +12,7 @@ use T4\Core\Std;
  *
  * @property array $columns
  * @property array $tables
+ * @property array $joins
  */
 class Query
     extends Std
@@ -23,7 +24,11 @@ class Query
      */
     protected function trimName($s)
     {
-        return trim($s, " \"'`\t\n\r\0\x0B");
+        $trimmed = trim($s, " \"'`\t\n\r\0\x0B");
+        if (false !== strpos($trimmed, ' ') || false !== stripos($trimmed, 'as')) {
+            return $s;
+        }
+        return $trimmed;
     }
 
     /**
@@ -125,5 +130,48 @@ class Query
         $this->mode = 'select';
         return $this;
     }
+
+    /**
+     * Set all tables and insert mode on
+     * @param mixed $tables
+     * @return $this
+     */
+    public function insert($tables = null)
+    {
+        if (null !== $tables) {
+            $this->tables($tables);
+        }
+        $this->mode = 'insert';
+        return $this;
+    }
+
+    /**
+     * Set all tables and update mode on
+     * @param mixed $tables
+     * @return $this
+     */
+    public function update($tables = null)
+    {
+        if (null !== $tables) {
+            $this->tables($tables);
+        }
+        $this->mode = 'update';
+        return $this;
+    }
+
+    /**
+     * Set all tables and de;ete mode on
+     * @param mixed $tables
+     * @return $this
+     */
+    public function delete($tables = null)
+    {
+        if (null !== $tables) {
+            $this->tables($tables);
+        }
+        $this->mode = 'delete';
+        return $this;
+    }
+
 
 }
