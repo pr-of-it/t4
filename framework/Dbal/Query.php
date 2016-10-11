@@ -198,4 +198,25 @@ class Query
         return $this;
     }
 
+    /**
+     * @param array $joins
+     * @return $this
+     */
+    public function joins($joins)
+    {
+        $this->joins = [];
+        foreach ($joins as $join) {
+            $j = [
+                'table' => $this->trimName($join['table']),
+                'on' => $join['on'],
+                'type' => $join['type'],
+            ];
+            if (!empty($alias)) {
+                $j['alias'] = $this->trimName($join['alias']);
+            }
+            $this->joins = array_merge($this->joins, [$join]);
+        }
+        return $this;
+    }
+
 }

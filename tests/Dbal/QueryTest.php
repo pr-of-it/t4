@@ -161,7 +161,7 @@ class QueryTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(['foo', 'bar'], $query->tables);
     }
 
-    public function testJoin()
+    public function testJoins()
     {
         $query = new \T4\Dbal\Query();
         $query->select()->from('foo');
@@ -192,6 +192,19 @@ class QueryTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(['foo'], $query->tables);
         $this->assertEquals([
             ['table' => 'bar', 'on' => 'bar.id=foo.bar_id', 'type' => 'full'],
+            ['table' => 'baz', 'on' => 'baz.id=foo.baz_id', 'type' => 'left'],
+            ['table' => 'bla', 'on' => 'bla.id=foo.bla_id', 'type' => 'right', 'alias' => 'b'],
+        ], $query->joins);
+
+        $q = $query->joins([
+            ['table' => 'baz', 'on' => 'baz.id=foo.baz_id', 'type' => 'left'],
+            ['table' => 'bla', 'on' => 'bla.id=foo.bla_id', 'type' => 'right', 'alias' => 'b'],
+        ]);
+        $this->assertInstanceOf(\T4\Dbal\Query::class, $q);
+        $this->assertEquals($q, $query);
+        $this->assertEquals('select', $query->mode);
+        $this->assertEquals(['foo'], $query->tables);
+        $this->assertEquals([
             ['table' => 'baz', 'on' => 'baz.id=foo.baz_id', 'type' => 'left'],
             ['table' => 'bla', 'on' => 'bla.id=foo.bla_id', 'type' => 'right', 'alias' => 'b'],
         ], $query->joins);
