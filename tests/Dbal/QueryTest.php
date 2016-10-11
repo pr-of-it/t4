@@ -161,18 +161,43 @@ class QueryTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(['foo', 'bar'], $query->tables);
     }
 
-    /*
-
-    public function testAssignJoin()
+    public function testJoin()
     {
-        $builder = new \T4\Dbal\QueryBuilder();
+        $query = new \T4\Dbal\Query();
+        $query->select()->from('foo');
 
-        $b = $builder->select()->from('test1')->join('test2', 'j1.id=t1.id');
-        $this->assertInstanceOf('\T4\Dbal\QueryBuilder', $b);
-        $this->assertEquals($b, $builder);
-        $this->assertEquals(['test1'], $builder->from);
-        $this->assertEquals([['table' => 'test2', 'on' => 'j1.id=t1.id', 'type' => 'full', 'alias' => '']], $builder->joins);
+        $q = $query->join('bar', 'bar.id=foo.bar_id');
+        $this->assertInstanceOf(\T4\Dbal\Query::class, $q);
+        $this->assertEquals($q, $query);
+        $this->assertEquals('select', $query->mode);
+        $this->assertEquals(['foo'], $query->tables);
+        $this->assertEquals([
+            ['table' => 'bar', 'on' => 'bar.id=foo.bar_id', 'type' => 'full'],
+        ], $query->joins);
+
+        $q = $query->join('baz', 'baz.id=foo.baz_id', 'left');
+        $this->assertInstanceOf(\T4\Dbal\Query::class, $q);
+        $this->assertEquals($q, $query);
+        $this->assertEquals('select', $query->mode);
+        $this->assertEquals(['foo'], $query->tables);
+        $this->assertEquals([
+            ['table' => 'bar', 'on' => 'bar.id=foo.bar_id', 'type' => 'full'],
+            ['table' => 'baz', 'on' => 'baz.id=foo.baz_id', 'type' => 'left'],
+        ], $query->joins);
+
+        $q = $query->join('bla', 'bla.id=foo.bla_id', 'right', 'b');
+        $this->assertInstanceOf(\T4\Dbal\Query::class, $q);
+        $this->assertEquals($q, $query);
+        $this->assertEquals('select', $query->mode);
+        $this->assertEquals(['foo'], $query->tables);
+        $this->assertEquals([
+            ['table' => 'bar', 'on' => 'bar.id=foo.bar_id', 'type' => 'full'],
+            ['table' => 'baz', 'on' => 'baz.id=foo.baz_id', 'type' => 'left'],
+            ['table' => 'bla', 'on' => 'bla.id=foo.bla_id', 'type' => 'right', 'alias' => 'b'],
+        ], $query->joins);
     }
+
+    /*
 
     public function testAssignWhere()
     {

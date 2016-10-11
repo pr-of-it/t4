@@ -49,65 +49,6 @@ class Query
     }
 
     /**
-     * Add one table to query
-     * @param mixed $table
-     * @return $this
-     */
-    public function table($table = [])
-    {
-        $tables = $this->prepareNames(func_get_args());
-        $this->tables = array_merge($this->tables ?: [], $tables);
-        return $this;
-    }
-
-    /**
-     * Set all query's tables
-     * @param mixed $table
-     * @return $this
-     */
-    public function tables($table = [])
-    {
-        $tables = $this->prepareNames(func_get_args());
-        $this->tables = $tables;
-        return $this;
-    }
-
-    /**
-     * Add one column name to query
-     * @param mixed $column
-     * @return $this
-     */
-    public function column($column = '*')
-    {
-        if ('*' == $column) {
-            $this->columns = ['*'];
-        } else {
-            $columns = $this->prepareNames(func_get_args());
-            $this->columns = array_merge(
-                empty($this->columns) || ['*'] == $this->columns ? [] : $this->columns,
-                array_values(array_diff($columns, ['*']))
-            );
-        }
-        return $this;
-    }
-
-    /**
-     * Set all query's columns
-     * @param mixed $columns
-     * @return $this
-     */
-    public function columns($columns = '*')
-    {
-        if ('*' == $columns) {
-            $this->columns = ['*'];
-        } else {
-            $columns = $this->prepareNames(func_get_args());
-            $this->columns = array_values(array_diff($columns, ['*']));
-        }
-        return $this;
-    }
-
-    /**
      * Set all columns and select mode on
      * @param mixed $columns
      * @return $this
@@ -173,5 +114,88 @@ class Query
         return $this;
     }
 
+    /**
+     * Add one table to query
+     * @param mixed $table
+     * @return $this
+     */
+    public function table($table = [])
+    {
+        $tables = $this->prepareNames(func_get_args());
+        $this->tables = array_merge($this->tables ?: [], $tables);
+        return $this;
+    }
+
+    /**
+     * Set all query's tables
+     * @param mixed $table
+     * @return $this
+     */
+    public function tables($table = [])
+    {
+        $tables = $this->prepareNames(func_get_args());
+        $this->tables = $tables;
+        return $this;
+    }
+
+    /**
+     * Add one column name to query
+     * @param mixed $column
+     * @return $this
+     */
+    public function column($column = '*')
+    {
+        if ('*' == $column) {
+            $this->columns = ['*'];
+        } else {
+            $columns = $this->prepareNames(func_get_args());
+            $this->columns = array_merge(
+                empty($this->columns) || ['*'] == $this->columns ? [] : $this->columns,
+                array_values(array_diff($columns, ['*']))
+            );
+        }
+        return $this;
+    }
+
+    /**
+     * Set all query's columns
+     * @param mixed $columns
+     * @return $this
+     */
+    public function columns($columns = '*')
+    {
+        if ('*' == $columns) {
+            $this->columns = ['*'];
+        } else {
+            $columns = $this->prepareNames(func_get_args());
+            $this->columns = array_values(array_diff($columns, ['*']));
+        }
+        return $this;
+    }
+
+    /**
+     * Add one join statement to query
+     * @param string $table
+     * @param string $on
+     * @param string $type
+     * @param string $alias
+     * @return $this
+     */
+    public function join($table, $on, $type = 'full', $alias = '')
+    {
+        if (!isset($this->joins)) {
+            $this->joins = [];
+        }
+        $join = [
+            'table' => $this->trimName($table),
+            'on' => $on,
+            'type' => $type,
+        ];
+        if (!empty($alias)) {
+            $join['alias'] = $this->trimName($alias);
+        }
+        $this->joins = array_merge($this->joins, [$join]);
+        return $this;
+    }
 
 }
