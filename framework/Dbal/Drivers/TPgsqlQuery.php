@@ -9,9 +9,9 @@ use T4\Dbal\Query;
  * Class TMysqlQuery
  * @package T4\Dbal\Drivers
  *
- * @mixin \T4\Dbal\Drivers\Mysql
+ * @mixin \T4\Dbal\Drivers\Pgsql
  */
-trait TMysqlQuery
+trait TPgsqlQuery
 {
 
     public function makeQueryString(Query $query)
@@ -69,6 +69,9 @@ trait TMysqlQuery
             $j = [];
             foreach ($joins as $join) {
                 switch ($join['type']) {
+                    case 'full':
+                        $ret = 'FULL JOIN';
+                        break;
                     case 'left':
                         $ret = 'LEFT JOIN';
                         break;
@@ -107,14 +110,14 @@ trait TMysqlQuery
             $sql .= "\n";
         }
 
+        if (!empty($query->offset)) {
+            $sql .= 'OFFSET ' . $query->offset;
+            $sql .= "\n";
+        }
+
         if (!empty($query->limit)) {
-            if (!empty($query->offset)) {
-                $sql .= 'LIMIT ' . $query->offset . ', ' . $query->limit;
-                $sql .= "\n";
-            } else {
-                $sql .= 'LIMIT ' . $query->limit;
-                $sql .= "\n";
-            }
+            $sql .= 'LIMIT ' . $query->limit;
+            $sql .= "\n";
         }
 
         $sql = preg_replace('~\n$~', '', $sql);
@@ -176,21 +179,6 @@ trait TMysqlQuery
             $sql .= "\n";
         }
 
-        if (!empty($query->order)) {
-            $sql .= 'ORDER BY ' . implode(', ', $query->order);
-            $sql .= "\n";
-        }
-
-        if (!empty($query->limit)) {
-            if (!empty($query->offset)) {
-                $sql .= 'LIMIT ' . $query->offset . ', ' . $query->limit;
-                $sql .= "\n";
-            } else {
-                $sql .= 'LIMIT ' . $query->limit;
-                $sql .= "\n";
-            }
-        }
-
         $sql = preg_replace('~\n$~', '', $sql);
         return $sql;
     }
@@ -204,7 +192,8 @@ trait TMysqlQuery
         $sql  = 'DELETE FROM ';
         $driver = $this;
         $tables = array_map(function ($x) use ($driver) {
-            return $driver->quoteName($x);
+            static $c = 1;
+            return $this->getTableNameAlias($x, 'main', $c++);
         }, $query->tables);
         $sql .= implode(', ', $tables);
         $sql .= "\n";
@@ -212,21 +201,6 @@ trait TMysqlQuery
         if (!empty($query->where)) {
             $sql .= 'WHERE ' . $query->where;
             $sql .= "\n";
-        }
-
-        if (!empty($query->order)) {
-            $sql .= 'ORDER BY ' . implode(', ', $query->order);
-            $sql .= "\n";
-        }
-
-        if (!empty($query->limit)) {
-            if (!empty($query->offset)) {
-                $sql .= 'LIMIT ' . $query->offset . ', ' . $query->limit;
-                $sql .= "\n";
-            } else {
-                $sql .= 'LIMIT ' . $query->limit;
-                $sql .= "\n";
-            }
         }
 
         $sql = preg_replace('~\n$~', '', $sql);

@@ -13,6 +13,7 @@ class Pgsql
 {
 
     use TPgsqlQueryBuilder;
+    use TPgsqlQuery;
 
     protected $selectNoQouteTemplate = '~count|avg|group_concat|min|max|sum~i';
 

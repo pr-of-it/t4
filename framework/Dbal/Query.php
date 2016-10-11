@@ -117,14 +117,13 @@ class Query
     }
 
     /**
-     * Set all tables and set action to select
+     * Set all tables
      * @param mixed $table
      * @return $this
      */
     public function from($table = [])
     {
         $this->tables(...func_get_args());
-        $this->action = 'select';
         return $this;
     }
 

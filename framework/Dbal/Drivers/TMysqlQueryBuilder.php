@@ -22,7 +22,7 @@ trait TMysqlQueryBuilder
         }
     }
 
-    protected function getTableNameAlias($name, $type='main', $counter)
+    protected function aliasTableName($name, $type='main', $counter)
     {
         $typeAliases = ['main' => 't', 'join' => 'j'];
         return $this->quoteName($name) . ' AS ' . $typeAliases[$type] . $counter;
@@ -47,7 +47,7 @@ trait TMysqlQueryBuilder
         $driver = $this;
         $from = array_map(function ($x) use ($driver) {
             static $c = 1;
-            return $this->getTableNameAlias($x, 'main', $c++);
+            return $this->aliasTableName($x, 'main', $c++);
         }, $query->from);
         $sql .= implode(', ', $from);
         $sql .= "\n";
@@ -56,7 +56,7 @@ trait TMysqlQueryBuilder
             $driver = $this;
             $joins = array_map(function ($x) use ($driver) {
                 static $c = 1;
-                $table =  $this->getTableNameAlias($x['table'], 'join', $c++);
+                $table =  $this->aliasTableName($x['table'], 'join', $c++);
                 $x['table'] = $table;
                 return $x;
             }, $query->joins);

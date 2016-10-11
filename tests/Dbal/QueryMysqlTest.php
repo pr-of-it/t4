@@ -45,8 +45,8 @@ class QueryMysqlTest extends PHPUnit_Framework_TestCase
             ->from('test1, test2')
             ->join('foo', 'j1.id=t1.id')
             ->join('bar', 'j2.id<t2.id', 'left')
-            ->join('baz', 'j3.id>:baz', 'right');
-        $this->assertEquals("SELECT t1.`a1`, j1.`a2`\nFROM `test1` AS t1, `test2` AS t2\nINNER JOIN `foo` AS j1 ON j1.id=t1.id\nLEFT JOIN `bar` AS j2 ON j2.id<t2.id\nRIGHT JOIN `baz` AS j3 ON j3.id>:baz", $driver->makeQueryString($query));
+            ->join('baz', 'j3.id>:baz', 'right', 'bzz');
+        $this->assertEquals("SELECT t1.`a1`, j1.`a2`\nFROM `test1` AS t1, `test2` AS t2\nINNER JOIN `foo` AS j1 ON j1.id=t1.id\nLEFT JOIN `bar` AS j2 ON j2.id<t2.id\nRIGHT JOIN `baz` AS `bzz` ON j3.id>:baz", $driver->makeQueryString($query));
     }
 
     public function testMysqlMakeInsertQuery()
@@ -88,7 +88,7 @@ class QueryMysqlTest extends PHPUnit_Framework_TestCase
         $this->assertEquals("DELETE FROM `test1`, `test2`\nWHERE foo=:foo", $driver->makeQueryString($query));
 
         $query = new \T4\Dbal\Query();
-        $query = $query->delete()->tables('test1, test2')->where('foo=:foo');
+        $query = $query->delete()->from('test1, test2')->where('foo=:foo');
         $this->assertEquals("DELETE FROM `test1`, `test2`\nWHERE foo=:foo", $driver->makeQueryString($query));
     }
 
