@@ -359,7 +359,7 @@ class Pgsql
 
     public function find($class, $options = [])
     {
-        $query = new QueryBuilder($options);
+        $query = new QueryBuilder();
         $query
             ->select('t1.*')
             ->from($class::getTableName())
