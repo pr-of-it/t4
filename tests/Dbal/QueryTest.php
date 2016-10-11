@@ -210,19 +210,56 @@ class QueryTest extends PHPUnit_Framework_TestCase
         ], $query->joins);
     }
 
-    /*
-
-    public function testAssignWhere()
+    public function testWhere()
     {
-        $builder = new \T4\Dbal\QueryBuilder();
+        $query = new \T4\Dbal\Query();
 
-        $b = $builder->select()->from('test')->where('id=:id');
-        $this->assertInstanceOf('\T4\Dbal\QueryBuilder', $b);
-        $this->assertEquals($b, $builder);
-        $this->assertEquals(['*'], $builder->select);
-        $this->assertEquals(['test'], $builder->from);
-        $this->assertEquals('id=:id', $builder->where);
+        $q = $query->select()->from('foo')->where('foo.id=1');
+        $this->assertInstanceOf(\T4\Dbal\Query::class, $q);
+        $this->assertEquals($q, $query);
+        $this->assertEquals('select', $query->mode);
+        $this->assertEquals(['*'], $query->columns);
+        $this->assertEquals(['foo'], $query->tables);
+        $this->assertEquals('foo.id=1', $query->where);
     }
+
+    public function testGroup()
+    {
+        $query = new \T4\Dbal\Query();
+
+        $q = $query->select()->from('foo')->where('foo.id=1')->group('id');
+        $this->assertInstanceOf(\T4\Dbal\Query::class, $q);
+        $this->assertEquals($q, $query);
+        $this->assertEquals('select', $query->mode);
+        $this->assertEquals(['*'], $query->columns);
+        $this->assertEquals(['foo'], $query->tables);
+        $this->assertEquals('foo.id=1', $query->where);
+        $this->assertEquals(['id'], $query->group);
+
+        $q = $query->select()->from('foo')->group('id, name');
+        $this->assertInstanceOf(\T4\Dbal\Query::class, $q);
+        $this->assertEquals($q, $query);
+        $this->assertEquals('select', $query->mode);
+        $this->assertEquals(['*'], $query->columns);
+        $this->assertEquals(['foo'], $query->tables);
+        $this->assertEquals(['id', 'name'], $query->group);
+    }
+
+    public function testHaving()
+    {
+        $query = new \T4\Dbal\Query();
+
+        $q = $query->select()->from('foo')->group('id')->having('name=:name');
+        $this->assertInstanceOf(\T4\Dbal\Query::class, $q);
+        $this->assertEquals($q, $query);
+        $this->assertEquals('select', $query->mode);
+        $this->assertEquals(['*'], $query->columns);
+        $this->assertEquals(['foo'], $query->tables);
+        $this->assertEquals(['id'], $query->group);
+        $this->assertEquals('name=:name', $query->having);
+    }
+
+    /*
 
     public function testAssignOrder()
     {

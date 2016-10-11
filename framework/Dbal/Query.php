@@ -13,6 +13,10 @@ use T4\Core\Std;
  * @property array $columns
  * @property array $tables
  * @property array $joins
+ *
+ * @property string $where
+ * @property array $group
+ * @property string $having
  */
 class Query
     extends Std
@@ -199,6 +203,7 @@ class Query
     }
 
     /**
+     * Set all query's joins
      * @param array $joins
      * @return $this
      */
@@ -216,6 +221,37 @@ class Query
             }
             $this->joins = array_merge($this->joins, [$join]);
         }
+        return $this;
+    }
+
+    /**
+     * @param string $where
+     * @return $this
+     */
+    public function where($where)
+    {
+        $this->where = $where;
+        return $this;
+    }
+
+    /**
+     * @param string $group
+     * @return $this
+     */
+    public function group($group)
+    {
+        $group = $this->prepareNames(func_get_args());
+        $this->group = $group;
+        return $this;
+    }
+
+    /**
+     * @param string $having
+     * @return $this
+     */
+    public function having($having)
+    {
+        $this->having = $having;
         return $this;
     }
 
