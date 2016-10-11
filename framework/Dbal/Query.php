@@ -8,7 +8,7 @@ use T4\Core\Std;
  * Class Query
  * @package T4\Dbal
  *
- * @property string $mode
+ * @property string $action
  *
  * @property array $columns
  * @property array $tables
@@ -27,6 +27,44 @@ use T4\Core\Std;
 class Query
     extends Std
 {
+
+    public function __construct($data = [])
+    {
+        $data = (array)$data;
+        if (isset($data['action'])) {
+            $this->action = $data['action'];
+            unset($data['action']);
+        }
+        if (isset($data['columns'])) {
+            $this->columns($data['columns']);
+            unset($data['columns']);
+        }
+        if (isset($data['tables'])) {
+            $this->tables($data['tables']);
+            unset($data['tables']);
+        }
+        if (isset($data['joins'])) {
+            $this->joins($data['joins']);
+            unset($data['joins']);
+        }
+        if (isset($data['group'])) {
+            $this->group($data['group']);
+            unset($data['group']);
+        }
+        if (isset($data['order'])) {
+            $this->order($data['order']);
+            unset($data['order']);
+        }
+        if (isset($data['values'])) {
+            $this->values($data['values']);
+            unset($data['values']);
+        }
+        if (isset($data['params'])) {
+            $this->params($data['params']);
+            unset($data['params']);
+        }
+        parent::__construct($data);
+    }
 
     /**
      * @param string $s
@@ -67,31 +105,31 @@ class Query
     }
 
     /**
-     * Set all columns and select mode on
+     * Set all columns and set action to select
      * @param mixed $columns
      * @return $this
      */
     public function select($columns = '*')
     {
         $this->columns(...func_get_args());
-        $this->mode = 'select';
+        $this->action = 'select';
         return $this;
     }
 
     /**
-     * Set all tables and select mode on
+     * Set all tables and set action to select
      * @param mixed $table
      * @return $this
      */
     public function from($table = [])
     {
         $this->tables(...func_get_args());
-        $this->mode = 'select';
+        $this->action = 'select';
         return $this;
     }
 
     /**
-     * Set all tables and insert mode on
+     * Set all tables and set action to insert
      * @param mixed $tables
      * @return $this
      */
@@ -100,12 +138,12 @@ class Query
         if (null !== $tables) {
             $this->tables($tables);
         }
-        $this->mode = 'insert';
+        $this->action = 'insert';
         return $this;
     }
 
     /**
-     * Set all tables and update mode on
+     * Set all tables and set action to update
      * @param mixed $tables
      * @return $this
      */
@@ -114,12 +152,12 @@ class Query
         if (null !== $tables) {
             $this->tables($tables);
         }
-        $this->mode = 'update';
+        $this->action = 'update';
         return $this;
     }
 
     /**
-     * Set all tables and de;ete mode on
+     * Set all tables and set action to delete
      * @param mixed $tables
      * @return $this
      */
@@ -128,7 +166,7 @@ class Query
         if (null !== $tables) {
             $this->tables($tables);
         }
-        $this->mode = 'delete';
+        $this->action = 'delete';
         return $this;
     }
 

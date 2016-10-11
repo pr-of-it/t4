@@ -60,21 +60,21 @@ class QueryTest extends PHPUnit_Framework_TestCase
         $this->assertInstanceOf(\T4\Dbal\Query::class, $q);
         $this->assertEquals($q, $query);
         $this->assertEquals(['*'], $query->columns);
-        $this->assertEquals('select', $query->mode);
+        $this->assertEquals('select', $query->action);
 
         $query = new \T4\Dbal\Query();
         $q = $query->select('*');
         $this->assertInstanceOf(\T4\Dbal\Query::class, $q);
         $this->assertEquals($q, $query);
         $this->assertEquals(['*'], $query->columns);
-        $this->assertEquals('select', $query->mode);
+        $this->assertEquals('select', $query->action);
 
         $query = new \T4\Dbal\Query();
         $q = $query->select()->column('*');
         $this->assertInstanceOf(\T4\Dbal\Query::class, $q);
         $this->assertEquals($q, $query);
         $this->assertEquals(['*'], $query->columns);
-        $this->assertEquals('select', $query->mode);
+        $this->assertEquals('select', $query->action);
 
         $query = new \T4\Dbal\Query();
 
@@ -82,13 +82,13 @@ class QueryTest extends PHPUnit_Framework_TestCase
         $this->assertInstanceOf(\T4\Dbal\Query::class, $q);
         $this->assertEquals($q, $query);
         $this->assertEquals(['foo1'], $query->columns);
-        $this->assertEquals('select', $query->mode);
+        $this->assertEquals('select', $query->action);
 
         $q = $q->column('bar1');
         $this->assertInstanceOf(\T4\Dbal\Query::class, $q);
         $this->assertEquals($q, $query);
         $this->assertEquals(['foo1', 'bar1'], $query->columns);
-        $this->assertEquals('select', $query->mode);
+        $this->assertEquals('select', $query->action);
     }
 
     public function testTablesAndFrom()
@@ -98,66 +98,66 @@ class QueryTest extends PHPUnit_Framework_TestCase
         $q = $query->select()->table('foo');
         $this->assertInstanceOf(\T4\Dbal\Query::class, $q);
         $this->assertEquals($q, $query);
-        $this->assertEquals('select', $query->mode);
+        $this->assertEquals('select', $query->action);
         $this->assertEquals(['*'], $query->columns);
         $this->assertEquals(['foo'], $query->tables);
 
         $q = $query->select()->table('bar');
         $this->assertInstanceOf(\T4\Dbal\Query::class, $q);
         $this->assertEquals($q, $query);
-        $this->assertEquals('select', $query->mode);
+        $this->assertEquals('select', $query->action);
         $this->assertEquals(['*'], $query->columns);
         $this->assertEquals(['foo', 'bar'], $query->tables);
 
         $q = $query->select()->tables('foo, `bar`');
         $this->assertInstanceOf(\T4\Dbal\Query::class, $q);
         $this->assertEquals($q, $query);
-        $this->assertEquals('select', $query->mode);
+        $this->assertEquals('select', $query->action);
         $this->assertEquals(['*'], $query->columns);
         $this->assertEquals(['foo', 'bar'], $query->tables);
 
         $q = $query->select()->tables('foo', '`bar`');
         $this->assertInstanceOf(\T4\Dbal\Query::class, $q);
         $this->assertEquals($q, $query);
-        $this->assertEquals('select', $query->mode);
+        $this->assertEquals('select', $query->action);
         $this->assertEquals(['*'], $query->columns);
         $this->assertEquals(['foo', 'bar'], $query->tables);
 
         $q = $query->select()->tables(['foo', '`bar`']);
         $this->assertInstanceOf(\T4\Dbal\Query::class, $q);
         $this->assertEquals($q, $query);
-        $this->assertEquals('select', $query->mode);
+        $this->assertEquals('select', $query->action);
         $this->assertEquals(['*'], $query->columns);
         $this->assertEquals(['foo', 'bar'], $query->tables);
 
         $q = $query->select()->from('foo', 'bar');
         $this->assertInstanceOf(\T4\Dbal\Query::class, $q);
         $this->assertEquals($q, $query);
-        $this->assertEquals('select', $query->mode);
+        $this->assertEquals('select', $query->action);
         $this->assertEquals(['*'], $query->columns);
         $this->assertEquals(['foo', 'bar'], $query->tables);
     }
 
-    public function testModes()
+    public function testAction()
     {
         $query = new \T4\Dbal\Query();
 
         $q = $query->insert('foo');
         $this->assertInstanceOf(\T4\Dbal\Query::class, $q);
         $this->assertEquals($q, $query);
-        $this->assertEquals('insert', $query->mode);
+        $this->assertEquals('insert', $query->action);
         $this->assertEquals(['foo'], $query->tables);
 
         $q = $query->update('foo, bar');
         $this->assertInstanceOf(\T4\Dbal\Query::class, $q);
         $this->assertEquals($q, $query);
-        $this->assertEquals('update', $query->mode);
+        $this->assertEquals('update', $query->action);
         $this->assertEquals(['foo', 'bar'], $query->tables);
 
         $q = $query->delete(['foo', 'bar']);
         $this->assertInstanceOf(\T4\Dbal\Query::class, $q);
         $this->assertEquals($q, $query);
-        $this->assertEquals('delete', $query->mode);
+        $this->assertEquals('delete', $query->action);
         $this->assertEquals(['foo', 'bar'], $query->tables);
     }
 
@@ -169,7 +169,7 @@ class QueryTest extends PHPUnit_Framework_TestCase
         $q = $query->join('bar', 'bar.id=foo.bar_id');
         $this->assertInstanceOf(\T4\Dbal\Query::class, $q);
         $this->assertEquals($q, $query);
-        $this->assertEquals('select', $query->mode);
+        $this->assertEquals('select', $query->action);
         $this->assertEquals(['foo'], $query->tables);
         $this->assertEquals([
             ['table' => 'bar', 'on' => 'bar.id=foo.bar_id', 'type' => 'full'],
@@ -178,7 +178,7 @@ class QueryTest extends PHPUnit_Framework_TestCase
         $q = $query->join('baz', 'baz.id=foo.baz_id', 'left');
         $this->assertInstanceOf(\T4\Dbal\Query::class, $q);
         $this->assertEquals($q, $query);
-        $this->assertEquals('select', $query->mode);
+        $this->assertEquals('select', $query->action);
         $this->assertEquals(['foo'], $query->tables);
         $this->assertEquals([
             ['table' => 'bar', 'on' => 'bar.id=foo.bar_id', 'type' => 'full'],
@@ -188,7 +188,7 @@ class QueryTest extends PHPUnit_Framework_TestCase
         $q = $query->join('bla', 'bla.id=foo.bla_id', 'right', 'b');
         $this->assertInstanceOf(\T4\Dbal\Query::class, $q);
         $this->assertEquals($q, $query);
-        $this->assertEquals('select', $query->mode);
+        $this->assertEquals('select', $query->action);
         $this->assertEquals(['foo'], $query->tables);
         $this->assertEquals([
             ['table' => 'bar', 'on' => 'bar.id=foo.bar_id', 'type' => 'full'],
@@ -202,7 +202,7 @@ class QueryTest extends PHPUnit_Framework_TestCase
         ]);
         $this->assertInstanceOf(\T4\Dbal\Query::class, $q);
         $this->assertEquals($q, $query);
-        $this->assertEquals('select', $query->mode);
+        $this->assertEquals('select', $query->action);
         $this->assertEquals(['foo'], $query->tables);
         $this->assertEquals([
             ['table' => 'baz', 'on' => 'baz.id=foo.baz_id', 'type' => 'left'],
@@ -217,7 +217,7 @@ class QueryTest extends PHPUnit_Framework_TestCase
         $q = $query->select()->from('foo')->where('foo.id=1');
         $this->assertInstanceOf(\T4\Dbal\Query::class, $q);
         $this->assertEquals($q, $query);
-        $this->assertEquals('select', $query->mode);
+        $this->assertEquals('select', $query->action);
         $this->assertEquals(['*'], $query->columns);
         $this->assertEquals(['foo'], $query->tables);
         $this->assertEquals('foo.id=1', $query->where);
@@ -230,7 +230,7 @@ class QueryTest extends PHPUnit_Framework_TestCase
         $q = $query->select()->from('foo')->where('foo.id=1')->group('id');
         $this->assertInstanceOf(\T4\Dbal\Query::class, $q);
         $this->assertEquals($q, $query);
-        $this->assertEquals('select', $query->mode);
+        $this->assertEquals('select', $query->action);
         $this->assertEquals(['*'], $query->columns);
         $this->assertEquals(['foo'], $query->tables);
         $this->assertEquals('foo.id=1', $query->where);
@@ -239,7 +239,7 @@ class QueryTest extends PHPUnit_Framework_TestCase
         $q = $query->select()->from('foo')->group('id, name');
         $this->assertInstanceOf(\T4\Dbal\Query::class, $q);
         $this->assertEquals($q, $query);
-        $this->assertEquals('select', $query->mode);
+        $this->assertEquals('select', $query->action);
         $this->assertEquals(['*'], $query->columns);
         $this->assertEquals(['foo'], $query->tables);
         $this->assertEquals(['id', 'name'], $query->group);
@@ -252,7 +252,7 @@ class QueryTest extends PHPUnit_Framework_TestCase
         $q = $query->select()->from('foo')->group('id')->having('name=:name');
         $this->assertInstanceOf(\T4\Dbal\Query::class, $q);
         $this->assertEquals($q, $query);
-        $this->assertEquals('select', $query->mode);
+        $this->assertEquals('select', $query->action);
         $this->assertEquals(['*'], $query->columns);
         $this->assertEquals(['foo'], $query->tables);
         $this->assertEquals(['id'], $query->group);
@@ -266,7 +266,7 @@ class QueryTest extends PHPUnit_Framework_TestCase
         $q = $query->select()->from('foo')->order('foo.id');
         $this->assertInstanceOf(\T4\Dbal\Query::class, $q);
         $this->assertEquals($q, $query);
-        $this->assertEquals('select', $query->mode);
+        $this->assertEquals('select', $query->action);
         $this->assertEquals(['*'], $query->columns);
         $this->assertEquals(['foo'], $query->tables);
         $this->assertEquals(['foo.id'], $query->order);
@@ -274,7 +274,7 @@ class QueryTest extends PHPUnit_Framework_TestCase
         $q = $query->select()->from('foo')->order('id, `name`');
         $this->assertInstanceOf(\T4\Dbal\Query::class, $q);
         $this->assertEquals($q, $query);
-        $this->assertEquals('select', $query->mode);
+        $this->assertEquals('select', $query->action);
         $this->assertEquals(['*'], $query->columns);
         $this->assertEquals(['foo'], $query->tables);
         $this->assertEquals(['id', 'name'], $query->order);
@@ -282,7 +282,7 @@ class QueryTest extends PHPUnit_Framework_TestCase
         $q = $query->select()->from('foo')->order('"id" DESC, `name` asc');
         $this->assertInstanceOf(\T4\Dbal\Query::class, $q);
         $this->assertEquals($q, $query);
-        $this->assertEquals('select', $query->mode);
+        $this->assertEquals('select', $query->action);
         $this->assertEquals(['*'], $query->columns);
         $this->assertEquals(['foo'], $query->tables);
         $this->assertEquals(['"id" DESC', '`name` asc'], $query->order);
@@ -295,7 +295,7 @@ class QueryTest extends PHPUnit_Framework_TestCase
         $q = $query->select()->from('foo')->offset(10);
         $this->assertInstanceOf(\T4\Dbal\Query::class, $q);
         $this->assertEquals($q, $query);
-        $this->assertEquals('select', $query->mode);
+        $this->assertEquals('select', $query->action);
         $this->assertEquals(['*'], $query->columns);
         $this->assertEquals(['foo'], $query->tables);
         $this->assertEquals(10, $query->offset);
@@ -303,7 +303,7 @@ class QueryTest extends PHPUnit_Framework_TestCase
         $q = $query->select()->from('foo')->limit(20);
         $this->assertInstanceOf(\T4\Dbal\Query::class, $q);
         $this->assertEquals($q, $query);
-        $this->assertEquals('select', $query->mode);
+        $this->assertEquals('select', $query->action);
         $this->assertEquals(['*'], $query->columns);
         $this->assertEquals(['foo'], $query->tables);
         $this->assertEquals(20, $query->limit);
@@ -316,14 +316,14 @@ class QueryTest extends PHPUnit_Framework_TestCase
         $q = $query->insert('foo')->value('a', 1);
         $this->assertInstanceOf(\T4\Dbal\Query::class, $q);
         $this->assertEquals($q, $query);
-        $this->assertEquals('insert', $query->mode);
+        $this->assertEquals('insert', $query->action);
         $this->assertEquals(['foo'], $query->tables);
         $this->assertEquals(['a' => 1], $query->values);
 
         $q = $query->insert('foo')->value('"b" ', 2);
         $this->assertInstanceOf(\T4\Dbal\Query::class, $q);
         $this->assertEquals($q, $query);
-        $this->assertEquals('insert', $query->mode);
+        $this->assertEquals('insert', $query->action);
         $this->assertEquals(['foo'], $query->tables);
         $this->assertEquals(['a' => 1, 'b' => 2], $query->values);
     }
@@ -335,21 +335,21 @@ class QueryTest extends PHPUnit_Framework_TestCase
         $q = $query->insert('foo')->values([]);
         $this->assertInstanceOf(\T4\Dbal\Query::class, $q);
         $this->assertEquals($q, $query);
-        $this->assertEquals('insert', $query->mode);
+        $this->assertEquals('insert', $query->action);
         $this->assertEquals(['foo'], $query->tables);
         $this->assertEquals([], $query->values);
 
         $q = $query->insert('foo')->values(['a' => 1, 'b' => 2]);
         $this->assertInstanceOf(\T4\Dbal\Query::class, $q);
         $this->assertEquals($q, $query);
-        $this->assertEquals('insert', $query->mode);
+        $this->assertEquals('insert', $query->action);
         $this->assertEquals(['foo'], $query->tables);
         $this->assertEquals(['a' => 1, 'b' => 2], $query->values);
 
         $q = $query->insert('foo')->values([' `a`' => 1, '"b" ' => 2]);
         $this->assertInstanceOf(\T4\Dbal\Query::class, $q);
         $this->assertEquals($q, $query);
-        $this->assertEquals('insert', $query->mode);
+        $this->assertEquals('insert', $query->action);
         $this->assertEquals(['foo'], $query->tables);
         $this->assertEquals(['a' => 1, 'b' => 2], $query->values);
     }
@@ -361,7 +361,7 @@ class QueryTest extends PHPUnit_Framework_TestCase
         $q = $query->select()->from('foo')->where('id=:id')->param('id', 1);
         $this->assertInstanceOf(\T4\Dbal\Query::class, $q);
         $this->assertEquals($q, $query);
-        $this->assertEquals('select', $query->mode);
+        $this->assertEquals('select', $query->action);
         $this->assertEquals(['foo'], $query->tables);
         $this->assertEquals('id=:id', $query->where);
         $this->assertEquals(['id' => 1], $query->params);
@@ -369,7 +369,7 @@ class QueryTest extends PHPUnit_Framework_TestCase
         $q = $query->param(':bar', 'baz');
         $this->assertInstanceOf(\T4\Dbal\Query::class, $q);
         $this->assertEquals($q, $query);
-        $this->assertEquals('select', $query->mode);
+        $this->assertEquals('select', $query->action);
         $this->assertEquals(['foo'], $query->tables);
         $this->assertEquals('id=:id', $query->where);
         $this->assertEquals(['id' => 1, ':bar' => 'baz'], $query->params);
@@ -382,10 +382,47 @@ class QueryTest extends PHPUnit_Framework_TestCase
         $q = $query->select()->from('foo')->where('id=:id')->params(['id' => 1, ':bar' => 'baz']);
         $this->assertInstanceOf(\T4\Dbal\Query::class, $q);
         $this->assertEquals($q, $query);
-        $this->assertEquals('select', $query->mode);
+        $this->assertEquals('select', $query->action);
         $this->assertEquals(['foo'], $query->tables);
         $this->assertEquals('id=:id', $query->where);
         $this->assertEquals(['id' => 1, ':bar' => 'baz'], $query->params);
+    }
+
+    public function testFromArray()
+    {
+        $query = new \T4\Dbal\Query([
+            'action' => 'select',
+            'columns' => 'foo, `bar`, "baz" AS b',
+            'tables' => ' tbl  ',
+            'joins' => [
+                ['table' => 'tb1', 'on' => 'tb1.id=tbl.baz_id', 'type' => 'left'],
+                ['table' => 'tb2', 'on' => 'tb2.id=tbl.bla_id', 'type' => 'right', 'alias' => 'b2'],
+            ],
+            'where' => 'id=:id',
+            'group' => 'grp1, grp2',
+            'having' => 'name=:name',
+            'order' => 'created DESC',
+            'offset' => 20,
+            'limit' => 10,
+            'values' => ['`id`' => 1, 'name' => 'Test'],
+            'params' => [':id' => 11, ':name' => 'Test1'],
+        ]);
+
+        $this->assertInstanceOf(\T4\Dbal\Query::class, $query);
+        $this->assertEquals('select', $query->action);
+        $this->assertEquals(['foo', 'bar', '"baz" AS b'], $query->columns);
+        $this->assertEquals(['tbl'], $query->tables);
+        $this->assertEquals([
+            ['table' => 'tb1', 'on' => 'tb1.id=tbl.baz_id', 'type' => 'left'],
+            ['table' => 'tb2', 'on' => 'tb2.id=tbl.bla_id', 'type' => 'right', 'alias' => 'b2'],
+        ], $query->joins);
+        $this->assertEquals('id=:id', $query->where);
+        $this->assertEquals(['grp1', 'grp2'], $query->group);
+        $this->assertEquals(['created DESC'], $query->order);
+        $this->assertEquals(20, $query->offset);
+        $this->assertEquals(10, $query->limit);
+        $this->assertEquals(['id' => 1, 'name' => 'Test'], $query->values);
+        $this->assertEquals([':id' => 11, ':name' => 'Test1'], $query->params);
     }
 
 }
