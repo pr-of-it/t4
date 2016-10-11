@@ -288,116 +288,70 @@ class QueryTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(['"id" DESC', '`name` asc'], $query->order);
     }
 
-    /*
-
-    public function testAssignOrder()
+    public function testOffsetLimit()
     {
-        $builder = new \T4\Dbal\QueryBuilder();
+        $query = new \T4\Dbal\Query();
 
-        $b = $builder->select()->from('test')->where('id=:id')->order('id DESC');
-        $this->assertInstanceOf('\T4\Dbal\QueryBuilder', $b);
-        $this->assertEquals($b, $builder);
-        $this->assertEquals(['*'], $builder->select);
-        $this->assertEquals(['test'], $builder->from);
-        $this->assertEquals('id=:id', $builder->where);
-        $this->assertEquals('id DESC', $builder->order);
+        $q = $query->select()->from('foo')->offset(10);
+        $this->assertInstanceOf(\T4\Dbal\Query::class, $q);
+        $this->assertEquals($q, $query);
+        $this->assertEquals('select', $query->mode);
+        $this->assertEquals(['*'], $query->columns);
+        $this->assertEquals(['foo'], $query->tables);
+        $this->assertEquals(10, $query->offset);
+
+        $q = $query->select()->from('foo')->limit(20);
+        $this->assertInstanceOf(\T4\Dbal\Query::class, $q);
+        $this->assertEquals($q, $query);
+        $this->assertEquals('select', $query->mode);
+        $this->assertEquals(['*'], $query->columns);
+        $this->assertEquals(['foo'], $query->tables);
+        $this->assertEquals(20, $query->limit);
     }
 
-    public function testAssignOffsetLimit()
+    public function testValue()
     {
-        $builder = new \T4\Dbal\QueryBuilder();
+        $query = new \T4\Dbal\Query();
 
-        $b = $builder->offset(0);
-        $this->assertInstanceOf('\T4\Dbal\QueryBuilder', $b);
-        $this->assertEquals($b, $builder);
-        $this->assertEquals(0, $builder->offset);
+        $q = $query->insert('foo')->value('a', 1);
+        $this->assertInstanceOf(\T4\Dbal\Query::class, $q);
+        $this->assertEquals($q, $query);
+        $this->assertEquals('insert', $query->mode);
+        $this->assertEquals(['foo'], $query->tables);
+        $this->assertEquals(['a' => 1], $query->values);
 
-        $b = $builder->offset(10);
-        $this->assertInstanceOf('\T4\Dbal\QueryBuilder', $b);
-        $this->assertEquals($b, $builder);
-        $this->assertEquals(10, $builder->offset);
-
-        $b = $builder->offset('abcd');
-        $this->assertInstanceOf('\T4\Dbal\QueryBuilder', $b);
-        $this->assertEquals($b, $builder);
-        $this->assertEquals(0, $builder->offset);
-
-        $b = $builder->limit(0);
-        $this->assertInstanceOf('\T4\Dbal\QueryBuilder', $b);
-        $this->assertEquals($b, $builder);
-        $this->assertEquals(0, $builder->limit);
-
-        $b = $builder->limit(10);
-        $this->assertInstanceOf('\T4\Dbal\QueryBuilder', $b);
-        $this->assertEquals($b, $builder);
-        $this->assertEquals(10, $builder->limit);
-
-        $b = $builder->limit('abcd');
-        $this->assertInstanceOf('\T4\Dbal\QueryBuilder', $b);
-        $this->assertEquals($b, $builder);
-        $this->assertEquals(0, $builder->limit);
+        $q = $query->insert('foo')->value('"b" ', 2);
+        $this->assertInstanceOf(\T4\Dbal\Query::class, $q);
+        $this->assertEquals($q, $query);
+        $this->assertEquals('insert', $query->mode);
+        $this->assertEquals(['foo'], $query->tables);
+        $this->assertEquals(['a' => 1, 'b' => 2], $query->values);
     }
 
-    public function testAssignInsert()
+    public function testValues()
     {
-        $builder = new \T4\Dbal\QueryBuilder();
+        $query = new \T4\Dbal\Query();
 
-        $b = $builder->insert('test');
-        $this->assertInstanceOf('\T4\Dbal\QueryBuilder', $b);
-        $this->assertEquals($b, $builder);
-        $this->assertEquals('insert', $builder->mode);
-        $this->assertEquals(['test'], $builder->insertTables);
+        $q = $query->insert('foo')->values([]);
+        $this->assertInstanceOf(\T4\Dbal\Query::class, $q);
+        $this->assertEquals($q, $query);
+        $this->assertEquals('insert', $query->mode);
+        $this->assertEquals(['foo'], $query->tables);
+        $this->assertEquals([], $query->values);
 
-        $b = $builder->values(['foo' => ':foo', 'bar' => ':bar']);
-        $this->assertInstanceOf('\T4\Dbal\QueryBuilder', $b);
-        $this->assertEquals($b, $builder);
-        $this->assertEquals(['foo' => ':foo', 'bar' => ':bar'], $builder->values);
+        $q = $query->insert('foo')->values(['a' => 1, 'b' => 2]);
+        $this->assertInstanceOf(\T4\Dbal\Query::class, $q);
+        $this->assertEquals($q, $query);
+        $this->assertEquals('insert', $query->mode);
+        $this->assertEquals(['foo'], $query->tables);
+        $this->assertEquals(['a' => 1, 'b' => 2], $query->values);
+
+        $q = $query->insert('foo')->values([' `a`' => 1, '"b" ' => 2]);
+        $this->assertInstanceOf(\T4\Dbal\Query::class, $q);
+        $this->assertEquals($q, $query);
+        $this->assertEquals('insert', $query->mode);
+        $this->assertEquals(['foo'], $query->tables);
+        $this->assertEquals(['a' => 1, 'b' => 2], $query->values);
     }
-
-    public function testAssignUpdate()
-    {
-        $builder = new \T4\Dbal\QueryBuilder();
-
-        $b = $builder->update('test');
-        $this->assertInstanceOf('\T4\Dbal\QueryBuilder', $b);
-        $this->assertEquals($b, $builder);
-        $this->assertEquals('update', $builder->mode);
-        $this->assertEquals(['test'], $builder->updateTables);
-
-        $b = $builder->table('test1');
-        $this->assertInstanceOf('\T4\Dbal\QueryBuilder', $b);
-        $this->assertEquals($b, $builder);
-        $this->assertEquals('update', $builder->mode);
-        $this->assertEquals(['test', 'test1'], $builder->updateTables);
-
-        $b = $builder->values(['foo' => ':foo', 'bar' => ':bar']);
-        $this->assertInstanceOf('\T4\Dbal\QueryBuilder', $b);
-        $this->assertEquals($b, $builder);
-        $this->assertEquals(['foo' => ':foo', 'bar' => ':bar'], $builder->values);
-    }
-
-    public function testAssignDelete()
-    {
-        $builder = new \T4\Dbal\QueryBuilder();
-        $b = $builder->delete('test')->where('foo=:foo');
-
-        $this->assertInstanceOf('\T4\Dbal\QueryBuilder', $b);
-        $this->assertEquals($b, $builder);
-        $this->assertEquals('delete', $builder->mode);
-        $this->assertEquals(['test'], $builder->deleteTables);
-        $this->assertEquals('foo=:foo', $builder->where);
-
-        $builder = new \T4\Dbal\QueryBuilder();
-        $b = $builder->delete('test1, test2')->where('foo=:foo AND bar<:bar')->order('id')->limit(10);
-
-        $this->assertInstanceOf('\T4\Dbal\QueryBuilder', $b);
-        $this->assertEquals($b, $builder);
-        $this->assertEquals('delete', $builder->mode);
-        $this->assertEquals(['test1', 'test2'], $builder->deleteTables);
-        $this->assertEquals('foo=:foo AND bar<:bar', $builder->where);
-        $this->assertEquals('id', $builder->order);
-        $this->assertEquals(10, $builder->limit);
-    }
-    */
 
 }

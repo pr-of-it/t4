@@ -18,6 +18,10 @@ use T4\Core\Std;
  * @property array $group
  * @property string $having
  * @property array $order
+ * @property int $offset
+ * @property int $limit
+ *
+ * @property array $values
  */
 class Query
     extends Std
@@ -234,6 +238,7 @@ class Query
     }
 
     /**
+     * Sets WHERE condition
      * @param string $where
      * @return $this
      */
@@ -244,6 +249,7 @@ class Query
     }
 
     /**
+     * Sets group values
      * @param string $group
      * @return $this
      */
@@ -255,6 +261,7 @@ class Query
     }
 
     /**
+     * Sets HAVING condition
      * @param string $having
      * @return $this
      */
@@ -265,6 +272,7 @@ class Query
     }
 
     /**
+     * Sets order directions
      * @param string $order
      * @return $this
      */
@@ -272,6 +280,52 @@ class Query
     {
         $order = $this->prepareNames(func_get_args());
         $this->order = $order;
+        return $this;
+    }
+
+    /**
+     * Sets offset
+     * @param int $offset
+     * @return $this
+     */
+    public function offset(int $offset)
+    {
+        $this->offset = $offset;
+        return $this;
+    }
+
+    /**
+     * Sets limit
+     * @param int $limit
+     * @return $this
+     */
+    public function limit(int $limit)
+    {
+        $this->limit = $limit;
+        return $this;
+    }
+
+    /**
+     * Add one query's value for insert
+     * @param string $key
+     * @param mixed $value
+     * @return $this
+     */
+    public function value($key, $value)
+    {
+        $this->values = array_merge($this->values ?? [], [$this->trimName($key) => $value]);
+        return $this;
+    }
+
+    /**
+     * Sets all query's values for insert
+     * @param array $values
+     * @return $this
+     */
+    public function values(array $values = [])
+    {
+        $values = array_combine(array_map([$this, 'trimName'], array_keys($values)), array_values($values));
+        $this->values = $values;
         return $this;
     }
 
