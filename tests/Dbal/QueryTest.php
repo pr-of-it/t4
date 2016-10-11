@@ -406,6 +406,7 @@ class QueryTest extends PHPUnit_Framework_TestCase
             'limit' => 10,
             'values' => ['`id`' => 1, 'name' => 'Test'],
             'params' => [':id' => 11, ':name' => 'Test1'],
+            'attr1' => 'val1',
         ]);
 
         $this->assertInstanceOf(\T4\Dbal\Query::class, $query);
@@ -423,6 +424,7 @@ class QueryTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(10, $query->limit);
         $this->assertEquals(['id' => 1, 'name' => 'Test'], $query->values);
         $this->assertEquals([':id' => 11, ':name' => 'Test1'], $query->params);
+        $this->assertEquals('val1', $query->attr1);
     }
 
 }
