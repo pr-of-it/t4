@@ -22,6 +22,7 @@ use T4\Core\Std;
  * @property int $limit
  *
  * @property array $values
+ * @property array $params
  */
 class Query
     extends Std
@@ -326,6 +327,29 @@ class Query
     {
         $values = array_combine(array_map([$this, 'trimName'], array_keys($values)), array_values($values));
         $this->values = $values;
+        return $this;
+    }
+
+    /**
+     * Sets one bind parameter
+     * @param string $key
+     * @param mixed $value
+     * @return $this
+     */
+    public function param($key, $value)
+    {
+        $this->params = array_merge($this->params ?? [], [$key => $value]);
+        return $this;
+    }
+
+    /**
+     * Sets all query's bind parameters
+     * @param array $values
+     * @return $this
+     */
+    public function params(array $values = [])
+    {
+        $this->params = $values;
         return $this;
     }
 

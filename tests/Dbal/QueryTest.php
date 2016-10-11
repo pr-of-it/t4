@@ -354,4 +354,38 @@ class QueryTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(['a' => 1, 'b' => 2], $query->values);
     }
 
+    public function testParam()
+    {
+        $query = new \T4\Dbal\Query();
+
+        $q = $query->select()->from('foo')->where('id=:id')->param('id', 1);
+        $this->assertInstanceOf(\T4\Dbal\Query::class, $q);
+        $this->assertEquals($q, $query);
+        $this->assertEquals('select', $query->mode);
+        $this->assertEquals(['foo'], $query->tables);
+        $this->assertEquals('id=:id', $query->where);
+        $this->assertEquals(['id' => 1], $query->params);
+
+        $q = $query->param(':bar', 'baz');
+        $this->assertInstanceOf(\T4\Dbal\Query::class, $q);
+        $this->assertEquals($q, $query);
+        $this->assertEquals('select', $query->mode);
+        $this->assertEquals(['foo'], $query->tables);
+        $this->assertEquals('id=:id', $query->where);
+        $this->assertEquals(['id' => 1, ':bar' => 'baz'], $query->params);
+    }
+
+    public function testParams()
+    {
+        $query = new \T4\Dbal\Query();
+
+        $q = $query->select()->from('foo')->where('id=:id')->params(['id' => 1, ':bar' => 'baz']);
+        $this->assertInstanceOf(\T4\Dbal\Query::class, $q);
+        $this->assertEquals($q, $query);
+        $this->assertEquals('select', $query->mode);
+        $this->assertEquals(['foo'], $query->tables);
+        $this->assertEquals('id=:id', $query->where);
+        $this->assertEquals(['id' => 1, ':bar' => 'baz'], $query->params);
+    }
+
 }
