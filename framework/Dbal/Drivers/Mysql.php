@@ -13,6 +13,7 @@ class Mysql
 {
 
     use TMysqlQueryBuilder;
+    use TMysqlQuery;
 
     protected $selectNoQouteTemplate = '~count|avg|group_concat|min|max|sum~i';
 

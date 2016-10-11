@@ -3,42 +3,49 @@
 namespace T4\Dbal\Drivers;
 
 use T4\Dbal\Exception;
-use T4\Dbal\QueryBuilder;
+use T4\Dbal\Query;
 
-trait TMysqlQueryBuilder
+
+/**
+ * Class TMysqlQuery
+ * @package T4\Dbal\Drivers
+ *
+ * @mixin \T4\Dbal\Drivers\Mysql
+ */
+trait TMysqlQuery
 {
 
-    public function makeQuery(QueryBuilder $query)
+    public function makeQueryString(Query $query)
     {
-        switch ($query->mode) {
+        switch ($query->action) {
             case 'select':
-                return $this->makeQuerySelect($query);
+                return $this->makeQueryStringSelect($query);
             case 'insert':
-                return $this->makeQueryInsert($query);
+                return $this->makeQueryStringInsert($query);
             case 'update':
-                return $this->makeQueryUpdate($query);
+                return $this->makeQueryStringUpdate($query);
             case 'delete':
-                return $this->makeQueryDelete($query);
+                return $this->makeQueryStringDelete($query);
         }
     }
 
-    protected function getTableNameAlias($name, $type='main', $counter)
+    protected function aliasTableName($name, $type='main', $counter)
     {
         $typeAliases = ['main' => 't', 'join' => 'j'];
         return $this->quoteName($name) . ' AS ' . $typeAliases[$type] . $counter;
     }
 
-    protected function makeQuerySelect(QueryBuilder $query)
+    protected function makeQueryStringSelect(Query $query)
     {
-        if (empty($query->select) || empty($query->from)) {
-            throw new Exception('SELECT statement must have both \'select\' and \'from\' parts');
+        if (empty($query->columns) || empty($query->tables)) {
+            throw new Exception('SELECT statement must have both \'columns\' and \'tables\' parts');
         }
 
         $sql  = 'SELECT ';
-        if ($query->select == ['*']) {
+        if ($query->columns == ['*']) {
             $sql .= '*';
         } else {
-            $select = array_map([$this, 'quoteName'], $query->select);
+            $select = array_map([$this, 'quoteName'], $query->columns);
             $sql .= implode(', ', $select);
         }
         $sql .= "\n";
@@ -47,8 +54,8 @@ trait TMysqlQueryBuilder
         $driver = $this;
         $from = array_map(function ($x) use ($driver) {
             static $c = 1;
-            return $this->getTableNameAlias($x, 'main', $c++);
-        }, $query->from);
+            return $this->aliasTableName($x, 'main', $c++);
+        }, $query->tables);
         $sql .= implode(', ', $from);
         $sql .= "\n";
 
@@ -56,7 +63,7 @@ trait TMysqlQueryBuilder
             $driver = $this;
             $joins = array_map(function ($x) use ($driver) {
                 static $c = 1;
-                $table =  $this->getTableNameAlias($x['table'], 'join', $c++);
+                $table =  $this->aliasTableName($x['table'], 'join', $c++);
                 $x['table'] = $table;
                 return $x;
             }, $query->joins);
@@ -87,12 +94,17 @@ trait TMysqlQueryBuilder
         }
 
         if (!empty($query->group)) {
-            $sql .= 'GROUP BY ' . $query->group;
+            $sql .= 'GROUP BY ' . implode(', ', $query->group);
+            $sql .= "\n";
+        }
+
+        if (!empty($query->having)) {
+            $sql .= 'HAVING ' . $query->having;
             $sql .= "\n";
         }
 
         if (!empty($query->order)) {
-            $sql .= 'ORDER BY ' . $query->order;
+            $sql .= 'ORDER BY ' . implode(', ', $query->order);
             $sql .= "\n";
         }
 
@@ -110,17 +122,17 @@ trait TMysqlQueryBuilder
         return $sql;
     }
 
-    protected function makeQueryInsert(QueryBuilder $query)
+    protected function makeQueryStringInsert(Query $query)
     {
-        if (empty($query->insertTables) || empty($query->values)) {
-            throw new Exception('INSERT statement must have both \'insert tables\' and \'values\' parts');
+        if (empty($query->tables) || empty($query->values)) {
+            throw new Exception('INSERT statement must have both \'tables\' and \'values\' parts');
         }
 
         $sql  = 'INSERT INTO ';
         $driver = $this;
         $tables = array_map(function ($x) use ($driver) {
             return $driver->quoteName($x);
-        }, $query->insertTables);
+        }, $query->tables);
         $sql .= implode(', ', $tables);
         $sql .= "\n";
 
@@ -138,17 +150,17 @@ trait TMysqlQueryBuilder
         return $sql;
     }
 
-    protected function makeQueryUpdate(QueryBuilder $query)
+    protected function makeQueryStringUpdate(Query $query)
     {
-        if (empty($query->updateTables) || empty($query->values)) {
-            throw new Exception('UPDATE statement must have both \'update tables\' and \'values\' parts');
+        if (empty($query->tables) || empty($query->values)) {
+            throw new Exception('UPDATE statement must have both \'tables\' and \'values\' parts');
         }
 
         $sql  = 'UPDATE ';
         $driver = $this;
         $tables = array_map(function ($x) use ($driver) {
             return $driver->quoteName($x);
-        }, $query->updateTables);
+        }, $query->tables);
         $sql .= implode(', ', $tables);
         $sql .= "\n";
 
@@ -166,7 +178,7 @@ trait TMysqlQueryBuilder
         }
 
         if (!empty($query->order)) {
-            $sql .= 'ORDER BY ' . $query->order;
+            $sql .= 'ORDER BY ' . implode(', ', $query->order);
             $sql .= "\n";
         }
 
@@ -184,17 +196,17 @@ trait TMysqlQueryBuilder
         return $sql;
     }
 
-    protected function makeQueryDelete(QueryBuilder $query)
+    protected function makeQueryStringDelete(Query $query)
     {
-        if (empty($query->deleteTables)) {
-            throw new Exception('DELETE statement must have \'delete tables\' part');
+        if (empty($query->tables)) {
+            throw new Exception('DELETE statement must have \'tables\' part');
         }
 
         $sql  = 'DELETE FROM ';
         $driver = $this;
         $tables = array_map(function ($x) use ($driver) {
             return $driver->quoteName($x);
-        }, $query->deleteTables);
+        }, $query->tables);
         $sql .= implode(', ', $tables);
         $sql .= "\n";
 
@@ -204,7 +216,7 @@ trait TMysqlQueryBuilder
         }
 
         if (!empty($query->order)) {
-            $sql .= 'ORDER BY ' . $query->order;
+            $sql .= 'ORDER BY ' . implode(', ', $query->order);
             $sql .= "\n";
         }
 
