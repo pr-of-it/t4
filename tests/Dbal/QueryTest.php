@@ -259,6 +259,35 @@ class QueryTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('name=:name', $query->having);
     }
 
+    public function testOrder()
+    {
+        $query = new \T4\Dbal\Query();
+
+        $q = $query->select()->from('foo')->order('foo.id');
+        $this->assertInstanceOf(\T4\Dbal\Query::class, $q);
+        $this->assertEquals($q, $query);
+        $this->assertEquals('select', $query->mode);
+        $this->assertEquals(['*'], $query->columns);
+        $this->assertEquals(['foo'], $query->tables);
+        $this->assertEquals(['foo.id'], $query->order);
+
+        $q = $query->select()->from('foo')->order('id, `name`');
+        $this->assertInstanceOf(\T4\Dbal\Query::class, $q);
+        $this->assertEquals($q, $query);
+        $this->assertEquals('select', $query->mode);
+        $this->assertEquals(['*'], $query->columns);
+        $this->assertEquals(['foo'], $query->tables);
+        $this->assertEquals(['id', 'name'], $query->order);
+
+        $q = $query->select()->from('foo')->order('"id" DESC, `name` asc');
+        $this->assertInstanceOf(\T4\Dbal\Query::class, $q);
+        $this->assertEquals($q, $query);
+        $this->assertEquals('select', $query->mode);
+        $this->assertEquals(['*'], $query->columns);
+        $this->assertEquals(['foo'], $query->tables);
+        $this->assertEquals(['"id" DESC', '`name` asc'], $query->order);
+    }
+
     /*
 
     public function testAssignOrder()

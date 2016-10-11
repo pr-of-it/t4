@@ -17,6 +17,7 @@ use T4\Core\Std;
  * @property string $where
  * @property array $group
  * @property string $having
+ * @property array $order
  */
 class Query
     extends Std
@@ -29,7 +30,15 @@ class Query
     protected function trimName($s)
     {
         $trimmed = trim($s, " \"'`\t\n\r\0\x0B");
-        if (false !== strpos($trimmed, ' ') || false !== stripos($trimmed, 'as')) {
+        if (
+            false !== strpos($trimmed, ' ')
+            ||
+            false !== stripos($trimmed, 'as')
+            ||
+            false !== stripos($trimmed, 'asc')
+            ||
+            false !== stripos($trimmed, 'desc')
+        ) {
             return $s;
         }
         return $trimmed;
@@ -252,6 +261,17 @@ class Query
     public function having($having)
     {
         $this->having = $having;
+        return $this;
+    }
+
+    /**
+     * @param string $order
+     * @return $this
+     */
+    public function order($order)
+    {
+        $order = $this->prepareNames(func_get_args());
+        $this->order = $order;
         return $this;
     }
 
