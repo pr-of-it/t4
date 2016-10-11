@@ -297,7 +297,7 @@ class QueryBuilder
                 $this->$property = $prototype[$property];
             }
         }
-        foreach(['joins','params','insertTables','updateTables','deleteTables','values','params'] as $arrayProperty) {
+        foreach(['joins','params','insertTables','updateTables','deleteTables','values'] as $arrayProperty) {
             if (!empty($prototype[$arrayProperty])) {
                 $this->$arrayProperty = array_merge($this->$arrayProperty ?? [], $prototype[$arrayProperty]);
             }
