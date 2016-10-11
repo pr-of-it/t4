@@ -14,7 +14,7 @@ use T4\Dbal\Query;
 trait TMysqlQuery
 {
 
-    public function makeQueryString(Query $query)
+    public function makeQueryString(Query $query) : string
     {
         switch ($query->action) {
             case 'select':

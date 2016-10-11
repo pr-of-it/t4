@@ -78,7 +78,7 @@ class Connection
     }
 
     /**
-     * @param string|\T4\Dbal\QueryBuilder $query
+     * @param string|\T4\Dbal\QueryBuilder|\T4\Dbal\Query $query
      * @return \T4\Dbal\Statement
      */
     public function prepare($query)
@@ -86,12 +86,15 @@ class Connection
         if ($query instanceof QueryBuilder) {
             $query = $query->getQuery($this->getDriver());
         }
+        if ($query instanceof Query) {
+            $query = $this->getDriver()->makeQueryString($query);
+        }
         $statement = $this->pdo->prepare($query);
         return $statement;
     }
 
     /**
-     * @param string|\T4\Dbal\QueryBuilder $query
+     * @param string|\T4\Dbal\QueryBuilder|\T4\Dbal\Query $query
      * @param array $params
      * @return bool
      */
@@ -101,12 +104,16 @@ class Connection
             $params = array_merge($params, $query->getParams());
             $query = $query->getQuery($this->getDriver());
         }
+        if ($query instanceof Query) {
+            $params = array_merge($params, $query->params);
+            $query = $this->getDriver()->makeQueryString($query);
+        }
         $statement = $this->pdo->prepare($query);
         return $statement->execute($params);
     }
 
     /**
-     * @param string|\T4\Dbal\QueryBuilder $query
+     * @param string|\T4\Dbal\QueryBuilder|\T4\Dbal\Query $query
      * @param array $params
      * @return \T4\Dbal\Statement
      */
@@ -115,6 +122,10 @@ class Connection
         if ($query instanceof QueryBuilder) {
             $params = array_merge($params, $query->getParams());
             $query = $query->getQuery($this->getDriver());
+        }
+        if ($query instanceof Query) {
+            $params = array_merge($params, $query->params);
+            $query = $this->getDriver()->makeQueryString($query);
         }
         $statement = $this->pdo->prepare($query);
         $statement->execute($params);

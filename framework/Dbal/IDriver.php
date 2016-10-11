@@ -10,6 +10,8 @@ interface IDriver
 
     public function quoteName($name);
 
+    public function makeQueryString(Query $query) : string;
+
     public function createTable(Connection $connection, $tableName, $columns = [], $indexes = [], $extensions = []);
 
     public function existsTable(Connection $connection, $tableName);
