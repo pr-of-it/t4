@@ -5,6 +5,7 @@ namespace T4\Dbal\Drivers;
 use T4\Core\Collection;
 use T4\Dbal\Connection;
 use T4\Dbal\IDriver;
+use T4\Dbal\Query;
 use T4\Dbal\QueryBuilder;
 use T4\Orm\Model;
 
@@ -326,6 +327,10 @@ class Pgsql
             $params = $query->getParams();
             $query = $query->getQuery($this);
         }
+        if ($query instanceof Query) {
+            $params = array_merge($params, $query->params);
+            $query = $this->makeQueryString($query);
+        }
         $result = $class::getDbConnection()->query($query, $params)->fetchAll(\PDO::FETCH_CLASS, $class);
         if (!empty($result)) {
             $ret = new Collection($result);
@@ -341,6 +346,10 @@ class Pgsql
         if ($query instanceof QueryBuilder) {
             $params = $query->getParams();
             $query = $query->getQuery($this);
+        }
+        if ($query instanceof Query) {
+            $params = array_merge($params, $query->params);
+            $query = $this->makeQueryString($query);
         }
         $result = $class::getDbConnection()->query($query, $params)->fetchObject($class);
         if (!empty($result))
@@ -400,6 +409,12 @@ class Pgsql
             $params = $query->getParams();
             $query = clone $query;
             $query = $query->select('COUNT(*)')->getQuery($this);
+        }
+        if ($query instanceof Query) {
+            $params = array_merge($params, $query->params);
+            $query = clone $query;
+            $query->select('COUNT(*)');
+            $query = $this->makeQueryString($query);
         }
         return $class::getDbConnection()->query($query, $params)->fetchScalar();
     }
