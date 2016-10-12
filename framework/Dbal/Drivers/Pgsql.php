@@ -331,7 +331,8 @@ class Pgsql
             $params = array_merge($params, $query->params);
             $query = $this->makeQueryString($query);
         }
-        $result = $class::getDbConnection()->query($query, $params)->fetchAll(\PDO::FETCH_CLASS, $class);
+        /** @var \T4\Orm\Model $class */
+        $result = $class::getDbConnection()->query($query, $params)->fetchAllObjects($class);
         if (!empty($result)) {
             $ret = new Collection($result);
             $ret->setNew(false);
@@ -351,6 +352,7 @@ class Pgsql
             $params = array_merge($params, $query->params);
             $query = $this->makeQueryString($query);
         }
+        /** @var \T4\Orm\Model $class */
         $result = $class::getDbConnection()->query($query, $params)->fetchObject($class);
         if (!empty($result))
             $result->setNew(false);
@@ -359,6 +361,7 @@ class Pgsql
 
     public function findAll($class, $options = [])
     {
+        /** @var \T4\Orm\Model $class */
         $query = new QueryBuilder();
         $query
             ->select('t1.*')
@@ -369,6 +372,7 @@ class Pgsql
 
     public function find($class, $options = [])
     {
+        /** @var \T4\Orm\Model $class */
         $query = new QueryBuilder();
         $query
             ->select('t1.*')
@@ -380,6 +384,7 @@ class Pgsql
 
     public function findAllByColumn($class, $column, $value, $options = [])
     {
+        /** @var \T4\Orm\Model $class */
         $query = new QueryBuilder();
         $query
             ->select('t1.*')
@@ -392,6 +397,7 @@ class Pgsql
 
     public function findByColumn($class, $column, $value, $options = [])
     {
+        /** @var \T4\Orm\Model $class */
         $query = new QueryBuilder();
         $query
             ->select('t1.*')
@@ -405,6 +411,7 @@ class Pgsql
 
     public function countAllByQuery($class, $query, $params = [])
     {
+        /** @var \T4\Orm\Model $class */
         if ($query instanceof QueryBuilder) {
             $params = $query->getParams();
             $query = clone $query;
@@ -422,20 +429,19 @@ class Pgsql
     public function countAll($class, $options = [])
     {
         unset($options['select'], $options['limit'], $options['offset'], $options['order']);
-
+        /** @var \T4\Orm\Model $class */
         $query = new QueryBuilder();
         $query
             ->select('COUNT(*)')
             ->from($class::getTableName())
             ->merge($options);
-
         return $class::getDbConnection()->query($query->getQuery($this), $query->getParams())->fetchScalar();
     }
 
     public function countAllByColumn($class, $column, $value, $options = [])
     {
         unset($options['select'], $options['limit'], $options['offset'], $options['order']);
-
+        /** @var \T4\Orm\Model $class */
         $query = new QueryBuilder();
         $query
             ->select('COUNT(*)')
@@ -443,7 +449,6 @@ class Pgsql
             ->where('`' . $column . '`=:value')
             ->params([':value' => $value])
             ->merge($options);
-
         return $class::getDbConnection()->query($query->getQuery($this), $query->getParams())->fetchScalar();
     }
 
@@ -478,6 +483,7 @@ class Pgsql
      */
     protected function saveColumns(Model $model)
     {
+        /** @var \T4\Orm\Model $class */
         $class = get_class($model);
         $columns = $class::getColumns();
         $relations = $class::getRelations();
@@ -554,6 +560,7 @@ class Pgsql
 
     public function delete(Model $model)
     {
+        /** @var \T4\Orm\Model $class */
         $class = get_class($model);
         $connection = $class::getDbConnection();
 

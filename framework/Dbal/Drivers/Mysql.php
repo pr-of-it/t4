@@ -327,7 +327,8 @@ class Mysql
             $params = array_merge($params, $query->params);
             $query = $this->makeQueryString($query);
         }
-        $result = $class::getDbConnection()->query($query, $params)->fetchAll(\PDO::FETCH_CLASS, $class);
+        /** @var \T4\Orm\Model $class */
+        $result = $class::getDbConnection()->query($query, $params)->fetchAllObjects($class);
         if (!empty($result)) {
             $ret = new Collection($result);
             $ret->setNew(false);
@@ -347,6 +348,7 @@ class Mysql
             $params = array_merge($params, $query->params);
             $query = $this->makeQueryString($query);
         }
+        /** @var \T4\Orm\Model $class */
         $result = $class::getDbConnection()->query($query, $params)->fetchObject($class);
         if (!empty($result))
             $result->setNew(false);
@@ -355,6 +357,7 @@ class Mysql
 
     public function findAll($class, $options = [])
     {
+        /** @var \T4\Orm\Model $class */
         $query = new QueryBuilder($options);
         $query
             ->select('t1.*')
@@ -364,6 +367,7 @@ class Mysql
 
     public function find($class, $options = [])
     {
+        /** @var \T4\Orm\Model $class */
         $query = new QueryBuilder($options);
         $query
             ->select('t1.*')
@@ -373,6 +377,7 @@ class Mysql
 
     public function findAllByColumn($class, $column, $value, $options = [])
     {
+        /** @var \T4\Orm\Model $class */
         $query = new QueryBuilder();
         $query
             ->select('*')
@@ -387,6 +392,7 @@ class Mysql
 
     public function findByColumn($class, $column, $value, $options = [])
     {
+        /** @var \T4\Orm\Model $class */
         $query = new QueryBuilder();
         $query
             ->select('*')
@@ -412,11 +418,13 @@ class Mysql
             $query->select('COUNT(*)');
             $query = $this->makeQueryString($query);
         }
+        /** @var \T4\Orm\Model $class */
         return $class::getDbConnection()->query($query, $params)->fetchScalar();
     }
 
     public function countAll($class, $options = [])
     {
+        /** @var \T4\Orm\Model $class */
         $query = new QueryBuilder();
         $query
             ->select('COUNT(*)')
@@ -428,6 +436,7 @@ class Mysql
 
     public function countAllByColumn($class, $column, $value, $options = [])
     {
+        /** @var \T4\Orm\Model $class */
         $query = new QueryBuilder();
         $query
             ->select('COUNT(*)')
@@ -445,6 +454,7 @@ class Mysql
      */
     protected function saveColumns(Model $model)
     {
+        /** @var \T4\Orm\Model $class */
         $class = get_class($model);
         $columns = $class::getColumns();
         $relations = $class::getRelations();
@@ -509,7 +519,7 @@ class Mysql
 
     public function delete(Model $model)
     {
-
+        /** @var \T4\Orm\Model $class */
         $class = get_class($model);
         $connection = $class::getDbConnection();
 

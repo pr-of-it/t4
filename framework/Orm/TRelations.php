@@ -151,7 +151,8 @@ trait TRelations
                 }
                 $query->params([':id' => $this->getPk()]);
 
-                $result = $relationClass::getDbConnection()->query($query)->fetchAll(\PDO::FETCH_CLASS, $relationClass);
+                /** @var \T4\Orm\Model $relationClass */
+                $result = $relationClass::getDbConnection()->query($query)->fetchAllObjects($relationClass);
                 if (!empty($result)) {
                     $ret = new Collection($result);
                     $ret->setNew(false);

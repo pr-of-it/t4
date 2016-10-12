@@ -58,8 +58,9 @@ trait TCrud
      */
     public function refresh()
     {
-        if ($this->isNew())
+        if ($this->isNew()) {
             return $this;
+        }
         $class = get_class($this);
         $this->merge($class::findByPk($this->getPk())->toArray());
         return $this;
@@ -70,12 +71,13 @@ trait TCrud
      */
 
     /**
-     * @param string|\T4\Dbal\QueryBuilder $query
+     * @param string|\T4\Dbal\QueryBuilder|\T4\Dbal\Query $query
      * @param array $params
      * @return static
      */
     public static function findAllByQuery($query, $params = [])
     {
+        /** @var \T4\Dbal\IDriver $driver */
         $driver = static::getDbDriver();
         $models = $driver->findAllByQuery(get_called_class(), $query, $params);
         $models->afterFind();
@@ -83,12 +85,13 @@ trait TCrud
     }
 
     /**
-     * @param string|\T4\Dbal\QueryBuilder $query
+     * @param string|\T4\Dbal\QueryBuilder|\T4\Dbal\Query $query
      * @param array $params
      * @return static
      */
     public static function findByQuery($query, $params = [])
     {
+        /** @var \T4\Dbal\IDriver $driver */
         $driver = static::getDbDriver();
         $model = $driver->findByQuery(get_called_class(), $query, $params);
         if (!empty($model)) {
@@ -103,6 +106,7 @@ trait TCrud
      */
     public static function findAll($options = [])
     {
+        /** @var \T4\Dbal\IDriver $driver */
         $driver = static::getDbDriver();
         $models = $driver->findAll(get_called_class(), $options);
         $models->afterFind();
@@ -115,6 +119,7 @@ trait TCrud
      */
     public static function find($options = [])
     {
+        /** @var \T4\Dbal\IDriver $driver */
         $driver = static::getDbDriver();
         $model = $driver->find(get_called_class(), $options);
         if (!empty($model)) {
@@ -131,6 +136,7 @@ trait TCrud
      */
     public static function findAllByColumn($column, $value, $options = [])
     {
+        /** @var \T4\Dbal\IDriver $driver */
         $driver = static::getDbDriver();
         $models = $driver->findAllByColumn(get_called_class(), $column, $value, $options);
         $models->afterFind();
@@ -145,6 +151,7 @@ trait TCrud
      */
     public static function findByColumn($column, $value, $options = [])
     {
+        /** @var \T4\Dbal\IDriver $driver */
         $driver = static::getDbDriver();
         $model = $driver->findByColumn(get_called_class(), $column, $value, $options);
         if (!empty($model)) {
@@ -163,12 +170,13 @@ trait TCrud
     }
 
     /**
-     * @param string|\T4\Dbal\QueryBuilder $query
+     * @param string|\T4\Dbal\QueryBuilder|\T4\Dbal\Query $query
      * @param array $params
      * @return int
      */
     public static function countAllByQuery($query, $params = [])
     {
+        /** @var \T4\Dbal\IDriver $driver */
         $driver = static::getDbDriver();
         return $driver->countAllByQuery(get_called_class(), $query, $params);
     }
@@ -179,6 +187,7 @@ trait TCrud
      */
     public static function countAll($options = [])
     {
+        /** @var \T4\Dbal\IDriver $driver */
         $driver = static::getDbDriver();
         return $driver->countAll(get_called_class(), $options);
     }
@@ -191,6 +200,7 @@ trait TCrud
      */
     public static function countAllByColumn($column, $value, $options = [])
     {
+        /** @var \T4\Dbal\IDriver $driver */
         $driver = static::getDbDriver();
         return $driver->countAllByColumn(get_called_class(), $column, $value, $options);
     }

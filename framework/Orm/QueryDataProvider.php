@@ -106,7 +106,7 @@ class QueryDataProvider
             if ($pages > 1) {
                 $query = $query . ' OFFSET ' . ( ($i - 1) * $this->pageSize );
                 if (empty($this->class)) {
-                    yield $i => new Collection( $this->getConnection()->query($query, $this->params)->fetchAll(\PDO::FETCH_CLASS, Std::class) );
+                    yield $i => new Collection( $this->getConnection()->query($query, $this->params)->fetchAllObjects(Std::class) );
                 } else {
                     yield $i => $this->class::findAllByQuery($query, $this->params);
                 }
@@ -127,7 +127,7 @@ class QueryDataProvider
         }
 
         if (empty($this->class)) {
-            return new Collection( $this->getConnection()->query($query, $this->params)->fetchAll(\PDO::FETCH_CLASS, Std::class) );
+            return new Collection( $this->getConnection()->query($query, $this->params)->fetchAllObjects(Std::class) );
         } else {
             return $this->class::findAllByQuery($query, $this->params);
         }
