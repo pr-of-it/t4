@@ -166,7 +166,7 @@ class Connection
 
     public function rollbackTransaction()
     {
-        return $this->pdo->rollback();
+        return $this->pdo->rollBack();
     }
 
     public function commitTransaction()
