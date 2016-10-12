@@ -388,6 +388,13 @@ class QueryTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(['id' => 1, ':bar' => 'baz'], $query->params);
     }
 
+    public function testFromString()
+    {
+        $query = new \T4\Dbal\Query('SELECT * FROM foo WHERE bar=42');
+        $this->assertInstanceOf(\T4\Dbal\Query::class, $query);
+        $this->assertEquals('SELECT * FROM foo WHERE bar=42', $query->string);
+    }
+
     public function testFromArray()
     {
         $query = new \T4\Dbal\Query([

@@ -16,6 +16,9 @@ trait TPgsqlQuery
 
     public function makeQueryString(Query $query) : string
     {
+        if (!empty($query->string)) {
+            return $query->string;
+        }
         switch ($query->action) {
             case 'select':
                 return $this->makeQueryStringSelect($query);

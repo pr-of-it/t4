@@ -8,6 +8,8 @@ use T4\Core\Std;
  * Class Query
  * @package T4\Dbal
  *
+ * @property string $string
+ *
  * @property string $action
  *
  * @property array $columns
@@ -28,9 +30,19 @@ class Query
     extends Std
 {
 
+    /**
+     * Query constructor.
+     * @param array|string $data
+     */
     public function __construct($data = [])
     {
+        if (is_string($data)) {
+            $this->string = $data;
+            return;
+        }
+        
         $data = (array)$data;
+        
         if (isset($data['action'])) {
             $this->action = $data['action'];
             unset($data['action']);

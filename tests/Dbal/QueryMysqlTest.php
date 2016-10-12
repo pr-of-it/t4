@@ -5,6 +5,15 @@ require_once realpath(__DIR__ . '/../../framework/boot.php');
 class QueryMysqlTest extends PHPUnit_Framework_TestCase
 {
 
+    public function testMysqlMakeStringQuery()
+    {
+        $driver = new \T4\Dbal\Drivers\Mysql();
+        $query = new \T4\Dbal\Query('SELECT * FROM `foo` WHERE `bar`=42');
+
+        $this->assertEquals('SELECT * FROM `foo` WHERE `bar`=42', $query->string);
+        $this->assertEquals('SELECT * FROM `foo` WHERE `bar`=42', $driver->makeQueryString($query));
+    }
+
     public function testMysqlMakeSelectQuery()
     {
         $driver = new \T4\Dbal\Drivers\Mysql();
