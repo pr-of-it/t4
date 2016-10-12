@@ -5,12 +5,10 @@ namespace T4\Dbal;
 use T4\Orm\Model;
 
 interface IDriver
-    extends IDriverQueryBuilder
+    extends IDriverQueryBuilder, IDriverQuery
 {
 
     public function quoteName($name);
-
-    public function makeQueryString(Query $query) : string;
 
     public function createTable(Connection $connection, $tableName, $columns = [], $indexes = [], $extensions = []);
 
