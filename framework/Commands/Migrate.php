@@ -4,7 +4,7 @@ namespace T4\Commands;
 
 use T4\Console\Command;
 use T4\Console\Exception;
-use T4\Dbal\QueryBuilder;
+use T4\Dbal\Query;
 use T4\Fs\Helpers;
 use T4\Orm\Migration;
 use T4\Orm\Model;
@@ -90,15 +90,15 @@ class Migrate
 
     protected function getLastMigrationTime()
     {
-        $query = new QueryBuilder();
+        $query = new Query();
         $query->select('time')->from(self::TABLE_NAME)->order(Model::PK . ' DESC')->limit(1);
         return $this->app->db->default->query($query)->fetchScalar() ?: 0;
     }
 
     protected function save(Migration $migration)
     {
-        $query = new QueryBuilder();
-        $query->insert(self::TABLE_NAME)->values(['time' => ':time'])->params([':time' => $migration->getTimestamp()]);
+        $query = new Query();
+        $query->insert()->table(self::TABLE_NAME)->values(['time' => ':time'])->params([':time' => $migration->getTimestamp()]);
         $this->app->db->default->execute($query);
     }
 
@@ -149,13 +149,13 @@ class Migrate
 
     protected function delete(Migration $migration)
     {
-        $query = new QueryBuilder();
+        $query = new Query();
         if ($this->app->db->default->getDriverName() == 'mysql') {
             $column = '`time`';
         } else {
             $column = '"time"';
         }
-        $query->delete(self::TABLE_NAME)->where($column . '=:time')->params([':time' => $migration->getTimestamp()]);
+        $query->delete()->table(self::TABLE_NAME)->where($column . '=:time')->params([':time' => $migration->getTimestamp()]);
         $this->app->db->default->execute($query);
     }
 
