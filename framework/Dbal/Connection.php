@@ -4,6 +4,10 @@ namespace T4\Dbal;
 
 use T4\Core\Config;
 
+/**
+ * Class Connection
+ * @package T4\Dbal
+ */
 class Connection
 {
 
@@ -27,13 +31,14 @@ class Connection
         try {
             $this->pdo = $this->getPdoObject($this->config);
         } catch (\PDOException $e) {
-            throw new Exception($e->getMessage());
+            throw new Exception($e->getMessage(), $e->getCode(), $e);
         }
     }
 
     /**
      * @param \T4\Core\Config $config
      * @return \PDO
+     * @throws \PDOException
      */
     protected function getPdoObject(Config $config)
     {
