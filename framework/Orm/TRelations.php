@@ -377,7 +377,8 @@ trait TRelations
                 }
             }
 
-            $query = (new Query())
+            $query =
+                (new Query())
                 ->insert($linkTableName)
                 ->values($coreValues + $pivotValues);
 
@@ -410,7 +411,8 @@ trait TRelations
                 $pivotValues[$pivotColumn] = ':' . $pivotColumn;
             }
 
-            $query = (new Query())
+            $query =
+                (new Query())
                 ->update($linkTableName)
                 ->where($thisLinkColumnName . '=:thisId AND ' . $thatLinkColumnName . '=:thatId')
                 ->values($pivotValues);
@@ -423,7 +425,8 @@ trait TRelations
                 foreach ($pivotValues as $pivotColumn => $value) {
                     $data[':' . $pivotColumn] = $subModelToUpdate->{$pivotColumn};
                 }
-                $connection->execute($query->params($data));
+                $query->params($data);
+                $connection->execute($query);
             }
         }
 
