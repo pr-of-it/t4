@@ -13,20 +13,24 @@ abstract class Migration
      */
     protected $db;
 
-    final public function __construct()
+    public function __construct()
     {
         $this->setDb('default');
     }
 
-    final public function setDb($db)
+    /**
+     * @param \T4\Dbal\Connection|string $db
+     * @return $this
+     */
+    public function setDb($db)
     {
-        $app = Application::instance();
         if (is_string($db)) {
+            $app = Application::instance();
             $this->db = $app->db->{$db};
         } elseif ($db instanceof Connection) {
             $this->db = $db;
         }
-
+        return $this;
     }
 
     final public function getName()
