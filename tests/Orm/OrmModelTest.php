@@ -105,7 +105,7 @@ class OrmModelTest extends PHPUnit_Extensions_Database_TestCase
         $connection = $this->getT4Connection();
         Book::setConnection($connection);
 
-        $query = $connection->prepare("INSERT INTO `books` (`title`, `author`) VALUES (:title, :author)");
+        $query = $connection->prepare(new \T4\Dbal\Query("INSERT INTO `books` (`title`, `author`) VALUES (:title, :author)"));
         $query->execute([':title' => 'Foo', ':author' => 'Bar']);
         $query->execute([':title' => 'Baz', ':author' => 'Bla']);
 

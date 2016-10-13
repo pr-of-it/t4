@@ -78,18 +78,13 @@ class Connection
     }
 
     /**
-     * @param string|\T4\Dbal\QueryBuilder|\T4\Dbal\Query $query
+     * @param \T4\Dbal\Query $query
      * @return \T4\Dbal\Statement
      */
-    public function prepare($query)
+    public function prepare(Query $query)
     {
-        if ($query instanceof QueryBuilder) {
-            $query = $query->getQuery($this->getDriver());
-        }
-        if ($query instanceof Query) {
-            $query = $this->getDriver()->makeQueryString($query);
-        }
-        $statement = $this->pdo->prepare($query);
+        $sql = $this->getDriver()->makeQueryString($query);
+        $statement = $this->pdo->prepare($sql);
         return $statement;
     }
 
