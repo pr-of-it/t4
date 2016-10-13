@@ -2,7 +2,7 @@
 
 namespace T4\Orm\Extensions;
 
-use T4\Dbal\QueryBuilder;
+use T4\Dbal\Query;
 
 trait TTreeMagic
 {
@@ -65,11 +65,12 @@ trait TTreeMagic
         switch ($method) {
 
             case 'refreshTreeColumns':
-                $sql = new QueryBuilder();
-                $sql->select(['__lft', '__rgt', '__lvl', '__prt'])
+                $sql = (new Query())
+                    ->select(['__lft', '__rgt', '__lvl', '__prt'])
                     ->from($tableName)
-                    ->where('t1.' . $class::PK . '=:id');
-                $columns = $connection->query($sql, [':id' => $model->getPk()])->fetch();
+                    ->where($class::PK . '=:id')
+                    ->params([':id' => $model->getPk()]);
+                $columns = $connection->query($sql)->fetch(\PDO::FETCH_ASSOC);
                 $model->merge($columns);
                 return $model;
 
@@ -80,7 +81,7 @@ trait TTreeMagic
                     return $model->__rgt - $model->__lft;
 
             case 'findAllParents':
-                $query = new QueryBuilder();
+                $query = new Query();
                 $query
                     ->select('*')
                     ->from($class::getTableName())
@@ -90,7 +91,7 @@ trait TTreeMagic
                 return $class::findAllByQuery($query);
 
             case 'findAllChildren':
-                $query = new QueryBuilder();
+                $query = new Query();
                 $query
                     ->select('*')
                     ->from($class::getTableName())
@@ -100,7 +101,7 @@ trait TTreeMagic
                 return $class::findAllByQuery($query);
 
             case 'hasChildren':
-                $query = new QueryBuilder();
+                $query = new Query();
                 $query
                     ->select('COUNT(*)')
                     ->from($class::getTableName())
@@ -110,7 +111,7 @@ trait TTreeMagic
                 return 0 != $connection->query($query)->fetchScalar();
 
             case 'findSubTree':
-                $query = new QueryBuilder();
+                $query = new Query();
                 $query
                     ->select('*')
                     ->from($class::getTableName())
@@ -120,7 +121,7 @@ trait TTreeMagic
                 return $class::findAllByQuery($query);
 
             case 'hasPrevSibling':
-                $query = new QueryBuilder();
+                $query = new Query();
                 $query
                     ->select('COUNT(*)')
                     ->from($class::getTableName())
@@ -129,7 +130,7 @@ trait TTreeMagic
                 return 0 != $connection->query($query)->fetchScalar();
 
             case 'getPrevSibling':
-                $query = new QueryBuilder();
+                $query = new Query();
                 $query
                     ->select('*')
                     ->from($class::getTableName())
@@ -140,7 +141,7 @@ trait TTreeMagic
                 return $class::findByQuery($query);
 
             case 'hasNextSibling':
-                $query = new QueryBuilder();
+                $query = new Query();
                 $query
                     ->select('COUNT(*)')
                     ->from($class::getTableName())
@@ -149,7 +150,7 @@ trait TTreeMagic
                 return 0 != $connection->query($query)->fetchScalar();
 
             case 'getNextSibling':
-                $query = new QueryBuilder();
+                $query = new Query();
                 $query
                     ->select('*')
                     ->from($class::getTableName())

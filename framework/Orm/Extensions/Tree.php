@@ -2,7 +2,7 @@
 
 namespace T4\Orm\Extensions;
 
-use T4\Dbal\QueryBuilder;
+use T4\Dbal\Query;
 use T4\Orm\Exception;
 use T4\Orm\Extension;
 use T4\Orm\Model;
@@ -39,12 +39,12 @@ class Tree
             'parent' => [
                 'type' => Model::BELONGS_TO,
                 'model' => $class,
-                'on' => '__prt',
+                'by' => '__prt',
             ],
             'children' => [
                 'type' => Model::HAS_MANY,
                 'model' => $class,
-                'on' => '__prt',
+                'by' => '__prt',
             ],
         ];
     }
@@ -81,8 +81,7 @@ class Tree
             $diff = $element->__lft - $model->__lft;
             $lvldiff = $element->__lvl - $model->__lvl;
 
-            $query = new QueryBuilder();
-            $query
+            $query = (new Query())
                 ->update()
                 ->table($tableName)
                 ->values([
@@ -91,8 +90,8 @@ class Tree
                     '__lvl' => '__lvl + :lvldiff',
                     '__prt' => 'CASE WHEN __id=:id THEN :parentid ELSE __prt END',
                 ])
-                ->where('__lft>=:lft AND __rgt<=:rgt');
-            $query->params([':id' => $model->getPk(), 'parentid'=>$element->__prt, ':lft' => $model->__lft, ':rgt' => $model->__rgt, ':diff' => $diff, ':lvldiff' => $lvldiff]);
+                ->where('__lft>=:lft AND __rgt<=:rgt')
+                ->params([':id' => $model->getPk(), 'parentid'=>$element->__prt, ':lft' => $model->__lft, ':rgt' => $model->__rgt, ':diff' => $diff, ':lvldiff' => $lvldiff]);
             $connection->execute($query);
 
             $this->removeFromTreeByElement($model);
@@ -136,8 +135,7 @@ class Tree
             $diff = $element->__rgt - $model->__lft + 1;
             $lvldiff = $element->__lvl - $model->__lvl;
 
-            $query = new QueryBuilder();
-            $query
+            $query = (new Query())
                 ->update()
                 ->table($tableName)
                 ->values([
@@ -146,8 +144,8 @@ class Tree
                     '__lvl' => '__lvl + :lvldiff',
                     '__prt' => 'CASE WHEN __id=:id THEN :parentid ELSE __prt END',
                 ])
-                ->where('__lft>=:lft AND __rgt<=:rgt');
-            $query->params([':id' => $model->getPk(), 'parentid'=>$element->__prt, ':lft' => $model->__lft, ':rgt' => $model->__rgt, ':diff' => $diff, ':lvldiff' => $lvldiff]);
+                ->where('__lft>=:lft AND __rgt<=:rgt')
+                ->params([':id' => $model->getPk(), 'parentid'=>$element->__prt, ':lft' => $model->__lft, ':rgt' => $model->__rgt, ':diff' => $diff, ':lvldiff' => $lvldiff]);
             $connection->execute($query);
 
             $this->removeFromTreeByElement($model);
@@ -192,8 +190,7 @@ class Tree
 
         if (!$model->isNew()) {
 
-            $query = new QueryBuilder();
-            $query
+            $query = (new Query())
                 ->update()
                 ->table($tableName)
                 ->values([
@@ -202,8 +199,8 @@ class Tree
                     '__lvl' => '__lvl + :lvldiff',
                     '__prt' => 'CASE WHEN __id=:id THEN :parentid ELSE __prt END',
                 ])
-                ->where('__lft>=:lft AND __rgt<=:rgt');
-            $query->params([':lft'=>$model->__lft, ':rgt'=>$model->__rgt, ':diff'=>$diff, ':lvldiff'=>$lvlDiff, ':id'=>$model->getPk(), ':parentid'=>$parent->getPk()]);
+                ->where('__lft>=:lft AND __rgt<=:rgt')
+                ->params([':lft'=>$model->__lft, ':rgt'=>$model->__rgt, ':diff'=>$diff, ':lvldiff'=>$lvlDiff, ':id'=>$model->getPk(), ':parentid'=>$parent->getPk()]);
             $connection->execute($query);
 
             $this->removeFromTreeByElement($model);
@@ -241,18 +238,21 @@ class Tree
 
         $width = $model->getTreeWidth();
 
-        $sql = "
+        $query = (new Query("
             UPDATE " . $tableName . "
             SET __rgt = __rgt + :width + 1
             WHERE __rgt >= :rgt
-        ";
-        $connection->execute($sql, [':width' => $width, ':rgt' => $parent->__rgt]);
-        $sql = "
+            "))
+            ->params([':width' => $width, ':rgt' => $parent->__rgt]);
+        $connection->execute($query);
+
+        $query = (new Query("
             UPDATE " . $tableName . "
             SET __lft = __lft + :width + 1
             WHERE __lft > :rgt
-        ";
-        $connection->execute($sql, [':width' => $width, ':rgt' => $parent->__rgt]);
+            "))
+            ->params([':width' => $width, ':rgt' => $parent->__rgt]);
+        $connection->execute($query);
 
         $model->__lft = $parent->__rgt;
         $model->__rgt = $parent->__rgt + $width;
@@ -275,8 +275,8 @@ class Tree
         /** @var \T4\Dbal\Connection $connection */
         $connection = $class::getDbConnection();
 
-        $query = new QueryBuilder();
-        $query->select('MIN(__lft)')->from($tableName);
+        $query = (new Query())
+            ->select('MIN(__lft)')->from($tableName);
         $minLft = (int)$connection->query($query)->fetchScalar();
 
         $width = $model->getTreeWidth();
@@ -284,15 +284,16 @@ class Tree
 
         if (!$model->isNew()) {
             $model->refreshTreeColumns();
-            $sql = "
+            $query = (new Query("
                 UPDATE `" . $tableName . "`
                 SET
                     `__lft` = `__lft` - :lft + :min,
                     `__rgt` = `__rgt` - :lft + :min,
                     `__lvl` = `__lvl` - :lvl
                 WHERE `__lft` >= :lft AND `__rgt` <= :rgt
-            ";
-            $connection->execute($sql, [':min' => $minLft, ':width'=> $width, ':lft' => $model->__lft, ':rgt' => $model->__rgt, ':lvl' => $model->__lvl]);
+                "))
+                ->params([':min' => $minLft, ':width'=> $width, ':lft' => $model->__lft, ':rgt' => $model->__rgt, ':lvl' => $model->__lvl]);
+            $connection->execute($query);
             $this->removeFromTreeByElement($model);
         }
 
@@ -303,10 +304,10 @@ class Tree
     }
 
     /**
-     * Подготовка модели к вставке в дерево в качестве последнего корня
+     * Prepares model for insert into tree as last root
      * @param \T4\Orm\Model $model
      */
-    protected function insertModelAsLastRoot(Model &$model)
+    protected function insertModelAsLastRoot(Model $model)
     {
         /** @var \T4\Orm\Model $class */
         $class = get_class($model);
@@ -314,8 +315,9 @@ class Tree
         /** @var \T4\Dbal\Connection $connection */
         $connection = $class::getDbConnection();
 
-        $query = new QueryBuilder();
-        $query->select('MAX(__rgt)')->from($tableName);
+        $query = (new Query())
+            ->select('MAX(__rgt)')
+            ->from($tableName);
         $maxRgt = (int)$connection->query($query)->fetchScalar();
 
         if ($model->isNew()) {
@@ -323,12 +325,11 @@ class Tree
             $model->__lft = $maxRgt + 1;
             $model->__rgt = $model->__lft + 1;
             $model->__lvl = 0;
-            $model->__prt = 0;
+            $model->__prt = null;
 
         } else {
 
-            $query = new QueryBuilder();
-            $query
+            $query = (new Query())
                 ->update()
                 ->table($tableName)
                 ->values([
@@ -336,8 +337,8 @@ class Tree
                     '__rgt' => '__rgt + :max - :lft + 1',
                     '__lvl' => '__lvl - :lvl',
                 ])
-                ->where('__lft>=:lft AND __rgt<=:rgt');
-            $query->params([':max' => $maxRgt, ':lft' => $model->__lft, ':rgt' => $model->__rgt, ':lvl' => $model->__lvl]);
+                ->where('__lft>=:lft AND __rgt<=:rgt')
+                ->params([':max' => $maxRgt, ':lft' => $model->__lft, ':rgt' => $model->__rgt, ':lvl' => $model->__lvl]);
             $connection->execute($query);
 
             $this->removeFromTreeByElement($model);
@@ -345,8 +346,7 @@ class Tree
             // TODO: calculate new __lft, __rgt!
             $model->refreshTreeColumns();
             $model->__lvl = 0;
-            $model->__prt = 0;
-
+            $model->__prt = null;
         }
     }
 
@@ -407,9 +407,11 @@ class Tree
         /** @var \T4\Dbal\Connection $connection */
         $connection = $class::getDbConnection();
 
-        $query = new QueryBuilder();
-        $query->delete()->table($tableName)->where('__lft>:lft AND __rgt<:rgt');
-        $query->params([':lft' => $model->__lft, ':rgt' => $model->__rgt]);
+        $query = (new Query())
+            ->delete()
+            ->table($tableName)
+            ->where('__lft>:lft AND __rgt<:rgt')
+            ->params([':lft' => $model->__lft, ':rgt' => $model->__rgt]);
         $connection->execute($query);
 
         $this->removeFromTreeByLftRgt($connection, $tableName, $model->__lft, $model->__rgt);

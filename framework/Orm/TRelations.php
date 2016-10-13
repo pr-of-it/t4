@@ -3,7 +3,7 @@
 namespace T4\Orm;
 
 use T4\Core\Collection;
-use T4\Dbal\QueryBuilder;
+use T4\Dbal\Query;
 
 /**
  * Trait TRelations
@@ -97,15 +97,18 @@ trait TRelations
      */
     public function getRelationLazy($key, $options = [])
     {
+        /** @var \T4\Orm\Model $class */
         $class = get_class($this);
         $relations = $class::getRelations();
-        if (empty($relations[$key]))
+        if (empty($relations[$key])) {
             throw new Exception('No such column or relation: ' . $key . ' in model of ' . $class . ' class');
+        }
 
         $relation = $relations[$key];
         switch ($relation['type']) {
 
             case $class::BELONGS_TO:
+                /** @var \T4\Orm\Model $relationClass */
                 $relationClass = $relation['model'];
                 $link = $class::getRelationLinkName($relation);
                 $subModel = $relationClass::findByPK($this->{$link});
@@ -116,18 +119,21 @@ trait TRelations
                 break;
 
             case $class::HAS_ONE:
+                /** @var \T4\Orm\Model $relationClass */
                 $relationClass = $relation['model'];
                 $link = $class::getRelationLinkName($relation);
                 return $relationClass::findByColumn($link, $this->getPk(), $options);
                 break;
 
             case $class::HAS_MANY:
+                /** @var \T4\Orm\Model $relationClass */
                 $relationClass = $relation['model'];
                 $link = $class::getRelationLinkName($relation);
                 return $relationClass::findAllByColumn($link, $this->getPk(), $options);
                 break;
 
             case $class::MANY_TO_MANY:
+                /** @var \T4\Orm\Model $relationClass */
                 $relationClass = $relation['model'];
                 $linkTable = $class::getRelationLinkName($relation);
                 $pivots = $relationClass::getPivots($class, $key);
@@ -137,7 +143,7 @@ trait TRelations
                     $pivotColumnsSql = '';
                 }
 
-                $query = new QueryBuilder();
+                $query = new Query();
                 $query
                     ->select('t1.*' . $pivotColumnsSql)
                     ->from($relationClass::getTableName())
@@ -337,14 +343,14 @@ trait TRelations
         });
         $subModelsToDelete = $oldSubModelsSetGroups['delete'] ?? [];
         if (!empty($subModelsToDelete) && !$subModelsToDelete->isEmpty()) {
-            $query = (new QueryBuilder())
+            $query = (new Query())
                 ->delete($linkTableName)
                 ->where($thisLinkColumnName . '=:thisId AND ' . $thatLinkColumnName . '=:thatId');
             foreach ($subModelsToDelete as $subModelToDelete) {
-                $connection->execute($query, [
+                $connection->execute($query->params([
                     ':thisId' => $this->getPk(),
                     ':thatId' => $subModelToDelete->getPk()
-                ]);
+                ]));
             }
         }
 
@@ -371,7 +377,7 @@ trait TRelations
                 }
             }
 
-            $query = (new QueryBuilder())
+            $query = (new Query())
                 ->insert($linkTableName)
                 ->values($coreValues + $pivotValues);
 
@@ -386,7 +392,8 @@ trait TRelations
                 foreach ($pivotValues as $pivotColumn => $value) {
                     $data[':' . $pivotColumn] = $subModelToInsert->{$pivotColumn};
                 }
-                $connection->execute($query, $data);
+                $query->params($data);
+                $connection->execute($query);
             }
         }
 
@@ -403,7 +410,7 @@ trait TRelations
                 $pivotValues[$pivotColumn] = ':' . $pivotColumn;
             }
 
-            $query = (new QueryBuilder())
+            $query = (new Query())
                 ->update($linkTableName)
                 ->where($thisLinkColumnName . '=:thisId AND ' . $thatLinkColumnName . '=:thatId')
                 ->values($pivotValues);
@@ -416,7 +423,7 @@ trait TRelations
                 foreach ($pivotValues as $pivotColumn => $value) {
                     $data[':' . $pivotColumn] = $subModelToUpdate->{$pivotColumn};
                 }
-                $connection->execute($query, $data);
+                $connection->execute($query->params($data));
             }
         }
 
