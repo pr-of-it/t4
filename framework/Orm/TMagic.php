@@ -38,10 +38,11 @@ trait TMagic
     public function __get($key)
     {
         $st = parent::__get($key);
-        if (null !== $st)
+        if (null !== $st) {
             return $st;
+        }
 
-        // Такое свойство есть в перечне связей, но установлено не было
+        /** @var \T4\Orm\Model $class */
         $class = get_class($this);
         $relations = $class::getRelations();
         $keys = explode('.', $key);

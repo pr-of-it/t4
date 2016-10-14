@@ -61,8 +61,12 @@ trait TCrud
         if ($this->isNew()) {
             return $this;
         }
+        /** @var \T4\Orm\Model $class */
         $class = get_class($this);
         $this->merge($class::findByPk($this->getPk())->toArray());
+        foreach ($class::getRelations() as $key => $relation) {
+            unset($this->$key);
+        }
         return $this;
     }
 

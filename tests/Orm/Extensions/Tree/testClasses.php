@@ -2,6 +2,10 @@
 
 class mTestMigration extends T4\Orm\Migration
 {
+    public function __construct()
+    {
+    }
+
     public function up()
     {
         $this->createTable('comments',

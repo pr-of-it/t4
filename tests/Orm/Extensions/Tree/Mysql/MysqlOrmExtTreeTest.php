@@ -119,6 +119,8 @@ class MysqlOrmExtTreeTest extends PHPUnit_Extensions_Database_TestCase
                 $comment222->num = 222;
                 $comment222->parent = $comment22;
                 $comment222->save();
+                /** @todo: wtf? this is made for $comment22->children refresh AFTER its child is added! */
+                $comment22->refresh();
         $comment3 = new CommentTestModel();
         $comment3->num = 3;
         $comment3->save();
@@ -131,25 +133,25 @@ class MysqlOrmExtTreeTest extends PHPUnit_Extensions_Database_TestCase
             $comment44->save();
 
         $this->_testDbElement($comment1->getPk(),   1, 4, 0, 0);
-        $this->_testDbElement($comment11->getPk(),  2, 3, 1, $comment1->getPk());
+            $this->_testDbElement($comment11->getPk(),  2, 3, 1, $comment1->getPk());
         $this->_testDbElement($comment2->getPk(),   5, 10, 0, 0);
-        $this->_testDbElement($comment22->getPk(),  6, 9, 1, $comment2->getPk());
-        $this->_testDbElement($comment222->getPk(), 7, 8, 2, $comment22->getPk());
+            $this->_testDbElement($comment22->getPk(),  6, 9, 1, $comment2->getPk());
+                $this->_testDbElement($comment222->getPk(), 7, 8, 2, $comment22->getPk());
         $this->_testDbElement($comment3->getPk(),   11, 12, 0, 0);
         $this->_testDbElement($comment4->getPk(),   13, 16, 0, 0);
-        $this->_testDbElement($comment44->getPk(),  14, 15, 1, $comment4->getPk());
+            $this->_testDbElement($comment44->getPk(),  14, 15, 1, $comment4->getPk());
 
         $comment3->parent = $comment1;
         $comment3->save();
 
         $this->_testDbElement($comment1->getPk(),   1, 6, 0, 0);
-        $this->_testDbElement($comment11->getPk(),  2, 3, 1, $comment1->getPk());
-        $this->_testDbElement($comment3->getPk(),   4, 5, 1, $comment1->getPk());
+            $this->_testDbElement($comment11->getPk(),  2, 3, 1, $comment1->getPk());
+            $this->_testDbElement($comment3->getPk(),   4, 5, 1, $comment1->getPk());
         $this->_testDbElement($comment2->getPk(),   7, 12, 0, 0);
-        $this->_testDbElement($comment22->getPk(),  8, 11, 1, $comment2->getPk());
-        $this->_testDbElement($comment222->getPk(), 9, 10, 2, $comment22->getPk());
+            $this->_testDbElement($comment22->getPk(),  8, 11, 1, $comment2->getPk());
+                $this->_testDbElement($comment222->getPk(), 9, 10, 2, $comment22->getPk());
         $this->_testDbElement($comment4->getPk(),   13, 16, 0, 0);
-        $this->_testDbElement($comment44->getPk(),  14, 15, 1, $comment4->getPk());
+            $this->_testDbElement($comment44->getPk(),  14, 15, 1, $comment4->getPk());
 
         $comment22->parent = null;
         $comment22->save();

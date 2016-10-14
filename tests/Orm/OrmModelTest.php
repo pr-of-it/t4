@@ -57,12 +57,12 @@ class OrmModelTest extends PHPUnit_Extensions_Database_TestCase
     {
         $connection = $this->getT4Connection();
 
-        $connection->execute("
+        $connection->execute(new \T4\Dbal\Query("
             INSERT INTO `books`
               (`title`, `author`)
             VALUES
               ('Foo', 'Bar')
-        ");
+        "));
         $this->assertEquals(
             1,
             $connection->lastInsertId()
@@ -92,8 +92,8 @@ class OrmModelTest extends PHPUnit_Extensions_Database_TestCase
             $res->title
         );
 
-        $connection->execute("DELETE FROM `books` WHERE `__id`=:id", [':id' => 1]);
-        $res = $connection->query("SELECT COUNT(*) FROM `books`")->fetchScalar();
+        $connection->execute( (new \T4\Dbal\Query("DELETE FROM `books` WHERE `__id`=:id"))->params([':id' => 1]) );
+        $res = $connection->query(new \T4\Dbal\Query("SELECT COUNT(*) FROM `books`"))->fetchScalar();
         $this->assertEquals(
             0,
             $res
