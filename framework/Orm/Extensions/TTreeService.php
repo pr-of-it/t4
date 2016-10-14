@@ -3,7 +3,7 @@
 namespace T4\Orm\Extensions;
 
 use T4\Dbal\Connection;
-use T4\Dbal\QueryBuilder;
+use T4\Dbal\Query;
 use T4\Orm\Model;
 
 trait TTreeService
@@ -18,15 +18,14 @@ trait TTreeService
      */
     protected function removeFromTreeByLftRgt(Connection $connection, $table, $lft, $rgt)
     {
-        $query = new QueryBuilder();
-        $query
+        $query = (new Query())
             ->update()
             ->table($table)
             ->values([
                 '__lft' => 'CASE WHEN __lft>:rgt THEN __lft - (:width + 1) ELSE __lft END',
                 '__rgt' => 'CASE WHEN __rgt>:rgt THEN __rgt - (:width + 1) ELSE __rgt END',
-            ]);
-        $query->params([':rgt' => $rgt, ':width' => $rgt - $lft]);
+            ])
+            ->params([':rgt' => $rgt, ':width' => $rgt - $lft]);
         $connection->execute($query);
     }
 
@@ -56,8 +55,7 @@ trait TTreeService
      */
     protected function expandTreeBeforeLft(Connection $connection, $table, $lft, $width)
     {
-        $query = new QueryBuilder();
-        $query
+        $query = (new Query())
             ->update()
             ->table($table)
             ->values([
@@ -65,8 +63,8 @@ trait TTreeService
                 '__rgt' => 'CASE WHEN __rgt>=:lft THEN __rgt + (:width + 1) ELSE  __rgt END',
             ])
             ->where('__lft>=:lft OR __rgt>=:lft')
-            ->order('__lft DESC');
-        $query->params([':lft' => $lft, ':width' => $width]);
+            ->order('__lft DESC')
+            ->params([':lft' => $lft, ':width' => $width]);
         $connection->execute($query);
     }
 
@@ -80,8 +78,7 @@ trait TTreeService
      */
     protected function expandTreeAfterLft(Connection $connection, $table, $lft, $width)
     {
-        $query = new QueryBuilder();
-        $query
+        $query = (new Query())
             ->update()
             ->table($table)
             ->values([
@@ -89,8 +86,8 @@ trait TTreeService
                 '__rgt' => 'CASE WHEN __rgt>=:lft THEN __rgt + (:width + 1) ELSE __rgt END',
             ])
             ->where('__lft>:lft OR __rgt>=:lft')
-            ->order('__lft DESC');
-        $query->params([':lft' => $lft, ':width' => $width]);
+            ->order('__lft DESC')
+            ->params([':lft' => $lft, ':width' => $width]);
         $connection->execute($query);
     }
 
@@ -137,8 +134,7 @@ trait TTreeService
      */
     protected function expandTreeAfterRgt(Connection $connection, $table, $rgt, $width)
     {
-        $query = new QueryBuilder();
-        $query
+        $query = (new Query())
             ->update()
             ->table($table)
             ->values([
@@ -146,8 +142,8 @@ trait TTreeService
                 '__rgt' => 'CASE WHEN __rgt>:rgt THEN __rgt + (:width + 1) ELSE __rgt END',
             ])
             ->where('__lft>:rgt OR __rgt>:rgt')
-            ->order('__lft DESC');
-        $query->params([':rgt' => $rgt, ':width' => $width]);
+            ->order('__lft DESC')
+            ->params([':rgt' => $rgt, ':width' => $width]);
         $connection->execute($query);
     }
 
@@ -161,8 +157,7 @@ trait TTreeService
      */
     protected function expandTreeBeforeRgt(Connection $connection, $table, $rgt, $width)
     {
-        $query = new QueryBuilder();
-        $query
+        $query = (new Query())
             ->update()
             ->table($table)
             ->values([
@@ -170,8 +165,8 @@ trait TTreeService
                 '__rgt' => 'CASE WHEN __rgt>=:rgt THEN __rgt + (:width + 1) ELSE __rgt END',
             ])
             ->where('__lft>=:rgt OR __rgt>=:rgt')
-            ->order('__lft DESC');
-        $query->params([':rgt' => $rgt, ':width' => $width]);
+            ->order('__lft DESC')
+            ->params([':rgt' => $rgt, ':width' => $width]);
         $connection->execute($query);
     }
 
