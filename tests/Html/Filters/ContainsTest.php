@@ -3,7 +3,10 @@
 namespace T4\Tests\Html\Filters;
 
 use T4\Dbal\Connection;
+use T4\Dbal\Query;
 use T4\Html\Filters\Contains;
+
+require_once realpath(__DIR__ . '/../../../framework/boot.php');
 
 class ContainsTestTestConnection extends Connection {
     public function __construct()
@@ -12,22 +15,39 @@ class ContainsTestTestConnection extends Connection {
     }
 }
 
-require_once realpath(__DIR__ . '/../../../framework/boot.php');
-
 class ContainsTest extends \PHPUnit_Framework_TestCase
 {
 
-    public function testGetQueryOptions()
+    public function testModifyQuery()
     {
-        $filter = new Contains('foo', 'Bar');
+        $filter = new Contains('foo', 'Bar', ['connection' => new BeginsWithTestTestConnection()]);
 
         $this->assertEquals(
-            ['where' => "1 AND foo LIKE '%Bar%'"],
-            $filter->getQueryOptions(new ContainsTestTestConnection())
+            new Query(['where' => "TRUE AND foo LIKE '%Bar%'"]),
+            $filter->modifyQuery(
+                new Query
+            )
+        );
+
+        $this->assertEquals(
+            new Query(['where' => "first=:first AND foo LIKE '%Bar%'", 'order' => 'id']),
+            $filter->modifyQuery(
+                (new Query)->where('first=:first')->order('id')
+            )
+        );
+    }
+
+    public function testGetQueryOptions()
+    {
+        $filter = new Contains('foo', 'Bar', ['connection' => new ContainsTestTestConnection()]);
+
+        $this->assertEquals(
+            ['where' => "TRUE AND foo LIKE '%Bar%'"],
+            $filter->getQueryOptions()
         );
         $this->assertEquals(
             ['where' => "first=:first AND foo LIKE '%Bar%'", 'order' => 'id'],
-            $filter->getQueryOptions(new ContainsTestTestConnection(),
+            $filter->getQueryOptions(
                 [
                     'where' => 'first=:first',
                     'order' => 'id'

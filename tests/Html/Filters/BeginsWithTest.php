@@ -2,11 +2,11 @@
 
 namespace T4\Tests\Html\Filters;
 
+use T4\Dbal\Query;
 use T4\Html\Filters\BeginsWith;
 use T4\Dbal\Connection;
 
 require_once realpath(__DIR__ . '/../../../framework/boot.php');
-
 
 class BeginsWithTestTestConnection extends Connection {
     public function __construct()
@@ -18,17 +18,36 @@ class BeginsWithTestTestConnection extends Connection {
 class BeginsWithTest extends \PHPUnit_Framework_TestCase
 {
 
-    public function testGetQueryOptions()
+    public function testModifyQuery()
     {
-        $filter = new BeginsWith('foo', 'Bar');
+        $filter = new BeginsWith('foo', 'Bar', ['connection' => new BeginsWithTestTestConnection()]);
 
         $this->assertEquals(
-            ['where' => "1 AND foo LIKE 'Bar%'"],
-            $filter->getQueryOptions(new BeginsWithTestTestConnection())
+            new Query(['where' => "TRUE AND foo LIKE 'Bar%'"]),
+            $filter->modifyQuery(
+                new Query
+            )
+        );
+
+        $this->assertEquals(
+            new Query(['where' => "first=:first AND foo LIKE 'Bar%'", 'order' => 'id']),
+            $filter->modifyQuery(
+                (new Query)->where('first=:first')->order('id')
+            )
+        );
+    }
+
+    public function testGetQueryOptions()
+    {
+        $filter = new BeginsWith('foo', 'Bar', ['connection' => new BeginsWithTestTestConnection()]);
+
+        $this->assertEquals(
+            ['where' => "TRUE AND foo LIKE 'Bar%'"],
+            $filter->getQueryOptions()
         );
         $this->assertEquals(
             ['where' => "first=:first AND foo LIKE 'Bar%'", 'order' => 'id'],
-            $filter->getQueryOptions(new BeginsWithTestTestConnection(),
+            $filter->getQueryOptions(
                 [
                     'where' => 'first=:first',
                     'order' => 'id'
@@ -36,19 +55,6 @@ class BeginsWithTest extends \PHPUnit_Framework_TestCase
             )
         );
     }
-
-    /*
-     * @todo: Проблемы с кэшем Твига, жесткая связь!
-    public function testRenderFormElementVanilla()
-    {
-        $filter = new BeginsWith('foo', 'Bar');
-
-        $this->assertEquals(
-            '<input type="text" name="foo" value="Bar"',
-            $filter->renderFormElement()
-        );
-    }
-    */
 
     protected function tearDown()
     {

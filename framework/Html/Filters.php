@@ -3,6 +3,7 @@
 namespace T4\Html;
 
 use T4\Core\Std;
+use T4\Dbal\Query;
 use T4\Mvc\Application;
 use T4\Mvc\View;
 
@@ -20,9 +21,28 @@ class Filters
         }
     }
 
+    /**
+     * @param \T4\Dbal\Query $query
+     * @return \T4\Dbal\Query
+     */
+    public function modifyQuery(Query $query)
+    {
+        foreach ($this as $name => $filter) {
+            /** @var \T4\Html\Filter $filter */
+            $query = $filter->modifyQuery($query);
+        }
+        return $query;
+    }
+
+    /**
+     * @deprecated
+     * @param array $options
+     * @return array
+     */
     public function modifyQueryOptions($options = [])
     {
         foreach ($this as $name => $filter) {
+            /** @var \T4\Html\Filter $filter */
             $options = $filter->getQueryOptions($options);
         }
         return $options;
