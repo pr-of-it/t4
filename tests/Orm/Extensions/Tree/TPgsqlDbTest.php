@@ -4,6 +4,16 @@ trait TPgsqlDbTest
 {
     protected $connection;
 
+    protected function getT4ConnectionConfig()
+    {
+        return new \T4\Core\Config(['driver' => 'pgsql', 'host' => '127.0.0.1', 'dbname' => 't4test', 'user' => 'postgres', 'password' => 'postgres']);
+    }
+
+    protected function getT4Connection()
+    {
+        return new \T4\Dbal\Connection($this->getT4ConnectionConfig());
+    }
+
     public function setUp()
     {
         $config = $this->getT4ConnectionConfig();
@@ -18,21 +28,14 @@ trait TPgsqlDbTest
         CommentTestModel::setConnection($this->getT4Connection());
     }
 
-    protected function getT4ConnectionConfig()
-    {
-        return new \T4\Core\Std(['driver' => 'pgsql', 'host' => '127.0.0.1', 'dbname' => 't4test', 'user' => 'postgres', 'password' => 'postgres']);
-    }
-
-    protected function getT4Connection()
-    {
-        return new \T4\Dbal\Connection($this->getT4ConnectionConfig());
-    }
-
     protected function _testDbElement($id, $lft, $rgt, $lvl, $prt)
     {
-        $query = new \T4\Dbal\QueryBuilder();
-        $query->select('*')->from('comments')->where('__id=:id')->params([':id'=>$id]);
-
+        $query =
+            (new \T4\Dbal\Query())
+                ->select()
+                ->from('comments')
+                ->where('__id=:id')
+                ->params([':id' => $id]);
         $res = $this->getT4Connection()->query($query)->fetch();
 
         $this->assertEquals($lft, $res['__lft']);

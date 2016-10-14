@@ -30,7 +30,7 @@ namespace T4\Tests\Orm\Relations {
     require_once realpath(__DIR__ . '/../../../framework/boot.php');
 
     use T4\Core\Collection;
-    use T4\Dbal\QueryBuilder;
+    use T4\Dbal\Query;
     use T4\Tests\Orm\Relations\HasManyModels\Category;
     use T4\Tests\Orm\Relations\HasManyModels\Item;
 
@@ -66,7 +66,7 @@ namespace T4\Tests\Orm\Relations {
             $data =
                 Category::getDbConnection()
                     ->query(
-                        (new QueryBuilder())->select()->from(Category::getTableName())
+                        (new Query())->select()->from(Category::getTableName())
                     )->fetchAll(\PDO::FETCH_ASSOC);
 
             $this->assertEquals(['__id' => 1, 'num' => 1], $data[0]);
@@ -74,7 +74,7 @@ namespace T4\Tests\Orm\Relations {
             $data =
                 Item::getDbConnection()
                     ->query(
-                        (new QueryBuilder())->select()->from(Item::getTableName())
+                        (new Query())->select()->from(Item::getTableName())
                     )->fetchAll(\PDO::FETCH_ASSOC);
 
             $this->assertEquals(['__id' => 1, 'num' => 1, '__category_id' => 1],    $data[0]);
@@ -91,7 +91,7 @@ namespace T4\Tests\Orm\Relations {
             $data =
                 Category::getDbConnection()
                     ->query(
-                        (new QueryBuilder())->select()->from(Category::getTableName())
+                        (new Query())->select()->from(Category::getTableName())
                     )->fetchAll(\PDO::FETCH_ASSOC);
 
             $this->assertEquals(['__id' => 1, 'num' => 1], $data[0]);
@@ -100,7 +100,7 @@ namespace T4\Tests\Orm\Relations {
             $data =
                 Item::getDbConnection()
                     ->query(
-                        (new QueryBuilder())->select()->from(Item::getTableName())
+                        (new Query())->select()->from(Item::getTableName())
                     )->fetchAll(\PDO::FETCH_ASSOC);
 
             $this->assertEquals(['__id' => 1, 'num' => 1, '__category_id' => 1],    $data[0]);
@@ -119,7 +119,7 @@ namespace T4\Tests\Orm\Relations {
             $data =
                 Category::getDbConnection()
                     ->query(
-                        (new QueryBuilder())->select()->from(Category::getTableName())
+                        (new Query())->select()->from(Category::getTableName())
                     )->fetchAll(\PDO::FETCH_ASSOC);
 
             $this->assertEquals(['__id' => 1, 'num' => 1], $data[0]);
@@ -128,7 +128,7 @@ namespace T4\Tests\Orm\Relations {
             $data =
                 Item::getDbConnection()
                     ->query(
-                        (new QueryBuilder())->select()->from(Item::getTableName())
+                        (new Query())->select()->from(Item::getTableName())
                     )->fetchAll(\PDO::FETCH_ASSOC);
 
             $this->assertEquals(['__id' => 1, 'num' => 1, '__category_id' => 1],    $data[0]);
@@ -146,7 +146,7 @@ namespace T4\Tests\Orm\Relations {
             $data =
                 Category::getDbConnection()
                     ->query(
-                        (new QueryBuilder())->select()->from(Category::getTableName())
+                        (new Query())->select()->from(Category::getTableName())
                     )->fetchAll(\PDO::FETCH_ASSOC);
 
             $this->assertEquals(['__id' => 1, 'num' => 1], $data[0]);
@@ -154,7 +154,7 @@ namespace T4\Tests\Orm\Relations {
             $data =
                 Item::getDbConnection()
                     ->query(
-                        (new QueryBuilder())->select()->from(Item::getTableName())
+                        (new Query())->select()->from(Item::getTableName())
                     )->fetchAll(\PDO::FETCH_ASSOC);
 
             $this->assertEquals(['__id' => 1, 'num' => 1, '__category_id' => 1],    $data[0]);
@@ -171,7 +171,7 @@ namespace T4\Tests\Orm\Relations {
             $data =
                 Category::getDbConnection()
                     ->query(
-                        (new QueryBuilder())->select()->from(Category::getTableName())
+                        (new Query())->select()->from(Category::getTableName())
                     )->fetchAll(\PDO::FETCH_ASSOC);
 
             $this->assertEquals(['__id' => 1, 'num' => 1], $data[0]);
@@ -179,7 +179,7 @@ namespace T4\Tests\Orm\Relations {
             $data =
                 Item::getDbConnection()
                     ->query(
-                        (new QueryBuilder())->select()->from(Item::getTableName())
+                        (new Query())->select()->from(Item::getTableName())
                     )->fetchAll(\PDO::FETCH_ASSOC);
 
             $this->assertEquals(['__id' => 1, 'num' => 1, '__category_id' => null],    $data[0]);
@@ -196,7 +196,7 @@ namespace T4\Tests\Orm\Relations {
             $data =
                 Category::getDbConnection()
                     ->query(
-                        (new QueryBuilder())->select()->from(Category::getTableName())
+                        (new Query())->select()->from(Category::getTableName())
                     )->fetchAll(\PDO::FETCH_ASSOC);
 
             $this->assertEquals(['__id' => 1, 'num' => 1], $data[0]);
@@ -204,7 +204,7 @@ namespace T4\Tests\Orm\Relations {
             $data =
                 Item::getDbConnection()
                     ->query(
-                        (new QueryBuilder())->select()->from(Item::getTableName())
+                        (new Query())->select()->from(Item::getTableName())
                     )->fetchAll(\PDO::FETCH_ASSOC);
 
             $this->assertEquals(['__id' => 1, 'num' => 1, '__category_id' => null],    $data[0]);

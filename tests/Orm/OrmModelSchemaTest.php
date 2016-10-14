@@ -106,10 +106,10 @@ class OrmModelSchemaTest extends PHPUnit_Framework_TestCase
 
     public function testExtensions()
     {
-        $this->assertEquals(['standard'], BookTestModel1::getExtensions());
-        $this->assertEquals(['standard'], BookTestModel2::getExtensions());
-        $this->assertEquals(['standard'], BookTestModel3::getExtensions());
-        $this->assertEquals(['standard', 'test'], BookTestModel4::getExtensions());
+        $this->assertEquals(['standard', 'relations'], BookTestModel1::getExtensions());
+        $this->assertEquals(['standard', 'relations'], BookTestModel2::getExtensions());
+        $this->assertEquals(['standard', 'relations'], BookTestModel3::getExtensions());
+        $this->assertEquals(['standard', 'relations', 'test'], BookTestModel4::getExtensions());
     }
 
     public function testColumns()
