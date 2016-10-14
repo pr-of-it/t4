@@ -3,6 +3,7 @@
 namespace T4\Tests\Html\Filters;
 
 use T4\Dbal\Connection;
+use T4\Dbal\Query;
 use T4\Html\Filters\EndsWith;
 
 class EndsWithTestTestConnection extends Connection {
@@ -17,12 +18,31 @@ require_once realpath(__DIR__ . '/../../../framework/boot.php');
 class EndsWithTest extends \PHPUnit_Framework_TestCase
 {
 
-    public function testGetQueryOptions()
+    public function testModifyQuery()
     {
-        $filter = new EndsWith('foo', 'Bar');
+        $filter = new EndsWith('foo', 'Bar', ['connection' => new EndsWithTestTestConnection()]);
 
         $this->assertEquals(
-            ['where' => "1 AND foo LIKE '%Bar'"],
+            new Query(['where' => "TRUE AND foo LIKE '%Bar'"]),
+            $filter->modifyQuery(
+                new Query
+            )
+        );
+
+        $this->assertEquals(
+            new Query(['where' => "first=:first AND foo LIKE '%Bar'", 'order' => 'id']),
+            $filter->modifyQuery(
+                (new Query)->where('first=:first')->order('id')
+            )
+        );
+    }
+
+    public function testGetQueryOptions()
+    {
+        $filter = new EndsWith('foo', 'Bar', ['connection' => new EndsWithTestTestConnection()]);
+
+        $this->assertEquals(
+            ['where' => "TRUE AND foo LIKE '%Bar'"],
             $filter->getQueryOptions(new EndsWithTestTestConnection())
         );
         $this->assertEquals(
