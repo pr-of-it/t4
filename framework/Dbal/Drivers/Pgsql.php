@@ -563,12 +563,12 @@ class Pgsql
         /** @var \T4\Orm\Model $class */
         $class = get_class($model);
         $connection = $class::getDbConnection();
-
-        $sql = '
-            DELETE FROM ' . $this->quoteName($class::getTableName()) . '
-            WHERE ' . $class::PK . '=:id
-        ';
-        $connection->execute($sql, [':id' => $model->getPk()]);
+        $query = (new Query())
+            ->delete()
+            ->from($this->quoteName($class::getTableName()))
+            ->where($this->quoteName($class::PK) . '=:id')
+            ->params([':id' => $model->getPk()]);
+        $connection->execute($query);
     }
 
 }

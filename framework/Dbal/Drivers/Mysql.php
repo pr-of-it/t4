@@ -522,13 +522,12 @@ class Mysql
         /** @var \T4\Orm\Model $class */
         $class = get_class($model);
         $connection = $class::getDbConnection();
-
-        $sql = '
-            DELETE FROM `' . $class::getTableName() . '`
-            WHERE `' . $class::PK . '`=\'' . $model->{$class::PK} . '\'
-        ';
-        $connection->execute($sql);
-
+        $query = (new Query())
+            ->delete()
+            ->from($this->quoteName($class::getTableName()))
+            ->where($this->quoteName($class::PK) . '=:id')
+            ->params([':id' => $model->getPk()]);
+        $connection->execute($query);
     }
 
 }
