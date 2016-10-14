@@ -4,6 +4,7 @@ namespace T4\Html;
 
 use T4\Core\QueryString;
 use T4\Core\Url;
+use T4\Dbal\Query;
 use T4\Mvc\View;
 
 class Sorter
@@ -43,6 +44,19 @@ class Sorter
     protected function getColumnName()
     {
         return $this->options['columnName'] ?? $this->name;
+    }
+
+    /**
+     * @param \T4\Dbal\Query $query
+     * @return \T4\Dbal\Query
+     */
+    public function modifyQuery(Query $query): Query
+    {
+        if ( empty($this->value) ) {
+            return $query;
+        }
+        $query->order($this->getColumnName() . ' ' . $this->getValue());
+        return $query;
     }
 
     public function modifyQueryOptions($options = []) : array
