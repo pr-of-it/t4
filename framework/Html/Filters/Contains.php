@@ -32,4 +32,5 @@ class Contains
         $options['where'] .= ' AND ' . $this->name . ' LIKE ' . $this->getConnection()->quote('%' . $this->value . '%') . '';
         return $options;
     }
+
 }
