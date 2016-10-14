@@ -17,7 +17,7 @@ class Equals
             $query->where('TRUE');
         }
         $query->where($query->where . ' AND ' . $this->name . ' = :' . $this->name);
-        $query->params[':' . $this->name] = $this->value;
+        $query->param(':' . $this->name, $this->value);
         return $query;
     }
 

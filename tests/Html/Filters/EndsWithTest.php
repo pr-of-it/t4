@@ -43,11 +43,11 @@ class EndsWithTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(
             ['where' => "TRUE AND foo LIKE '%Bar'"],
-            $filter->getQueryOptions(new EndsWithTestTestConnection())
+            $filter->getQueryOptions()
         );
         $this->assertEquals(
             ['where' => "first=:first AND foo LIKE '%Bar'", 'order' => 'id'],
-            $filter->getQueryOptions(new EndsWithTestTestConnection(),
+            $filter->getQueryOptions(
                 [
                     'where' => 'first=:first',
                     'order' => 'id'

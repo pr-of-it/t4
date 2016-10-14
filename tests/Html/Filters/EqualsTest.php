@@ -32,7 +32,7 @@ class EqualsTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(
             new Query(['where' => "first=:first AND foo = :foo", 'order' => 'id', 'params' => [':first' => 42, ':foo' => 'Bar']]),
             $filter->modifyQuery(
-                (new Query)->where('first=:first')->order('id')->params([':first' => 42])
+                (new Query)->where('first=:first')->order('id')->param(':first', 42)
             )
         );
     }
@@ -43,11 +43,11 @@ class EqualsTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(
             ['where' => "TRUE AND foo = :foo", 'params' => [':foo' => 'Bar']],
-            $filter->getQueryOptions(new EqualsTestConnection())
+            $filter->getQueryOptions()
         );
         $this->assertEquals(
             ['where' => "first=:first AND foo = :foo", 'order' => 'id', 'params' => [':foo' => 'Bar']],
-            $filter->getQueryOptions(new EqualsTestConnection(),
+            $filter->getQueryOptions(
                 [
                     'where' => 'first=:first',
                     'order' => 'id'

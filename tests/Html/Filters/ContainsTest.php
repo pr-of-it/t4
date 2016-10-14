@@ -20,7 +20,7 @@ class ContainsTest extends \PHPUnit_Framework_TestCase
 
     public function testModifyQuery()
     {
-        $filter = new Contains('foo', 'Bar', ['connection' => new BeginsWithTestTestConnection()]);
+        $filter = new Contains('foo', 'Bar', ['connection' => new ContainsTestTestConnection()]);
 
         $this->assertEquals(
             new Query(['where' => "TRUE AND foo LIKE '%Bar%'"]),
