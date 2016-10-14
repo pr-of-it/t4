@@ -78,6 +78,11 @@ class Query
         parent::__construct($data);
     }
 
+    public function isString()
+    {
+        return !empty($this->string);
+    }
+
     public function getParams()
     {
         return $this->__data['params'] ?? [];

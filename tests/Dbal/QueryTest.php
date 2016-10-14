@@ -392,6 +392,7 @@ class QueryTest extends PHPUnit_Framework_TestCase
     {
         $query = new \T4\Dbal\Query('SELECT * FROM foo WHERE bar=42');
         $this->assertInstanceOf(\T4\Dbal\Query::class, $query);
+        $this->assertTrue($query->isString());
         $this->assertEquals('SELECT * FROM foo WHERE bar=42', $query->string);
     }
 
@@ -417,6 +418,7 @@ class QueryTest extends PHPUnit_Framework_TestCase
         ]);
 
         $this->assertInstanceOf(\T4\Dbal\Query::class, $query);
+        $this->assertFalse($query->isString());
         $this->assertEquals('select', $query->action);
         $this->assertEquals(['foo', 'bar', '"baz" AS b'], $query->columns);
         $this->assertEquals(['tbl'], $query->tables);
