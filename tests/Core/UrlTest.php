@@ -83,15 +83,17 @@ class UrlTest extends PHPUnit_Framework_TestCase
         $url = 'test.local/path/to/file?arg1=val1&arg2=val2#frg';
         $obj = new \T4\Core\Url($url);
         $clone = clone $obj;
-        $this->assertEquals(true, $obj == $clone);
-        $this->assertEquals(false, $obj === $clone);
-        $this->assertEquals(false, $obj->query === $clone->query);
+        $this->assertTrue($obj == $clone);
+        $this->assertFalse($obj === $clone);
+        $this->assertTrue($obj->query == $clone->query);
+        $this->assertFalse($obj->query === $clone->query);
         $url = 'test.local/path/to/file';
         $obj = new \T4\Core\Url($url);
         $clone = clone $obj;
-        $this->assertEquals(true, $obj == $clone);
-        $this->assertEquals(false, $obj === $clone);
-        $this->assertEquals(true, $obj->query === $clone->query);
+        $this->assertTrue($obj == $clone);
+        $this->assertFalse($obj === $clone);
+        $this->assertTrue($obj->query == $clone->query);
+        $this->assertTrue($obj->query === $clone->query);
     }
 
 }
