@@ -70,7 +70,9 @@ class Url
 
     public function __clone()
     {
-        $this->query = clone $this->query;
+        if (is_object($this->query)) {
+            $this->query = clone $this->query;
+        }
     }
 
 }
