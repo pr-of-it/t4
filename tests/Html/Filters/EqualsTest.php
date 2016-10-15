@@ -3,7 +3,7 @@
 namespace T4\Tests\Html\Filters;
 
 use T4\Dbal\Connection;
-use T4\Html\Filters\Contains;
+use T4\Dbal\Query;
 use T4\Html\Filters\Equals;
 
 class EqualsTestConnection extends Connection {
@@ -18,17 +18,36 @@ require_once realpath(__DIR__ . '/../../../framework/boot.php');
 class EqualsTest extends \PHPUnit_Framework_TestCase
 {
 
-    public function testGetQueryOptions()
+    public function testModifyQuery()
     {
-        $filter = new Equals('foo', 'Bar');
+        $filter = new Equals('foo', 'Bar', ['connection' => new EqualsTestConnection()]);
 
         $this->assertEquals(
-            ['where' => "1 AND foo = :foo", 'params' => [':foo' => 'Bar']],
-            $filter->getQueryOptions(new EqualsTestConnection())
+            new Query(['where' => "TRUE AND foo = :foo", 'params' => [':foo' => 'Bar']]),
+            $filter->modifyQuery(
+                new Query
+            )
+        );
+
+        $this->assertEquals(
+            new Query(['where' => "first=:first AND foo = :foo", 'order' => 'id', 'params' => [':first' => 42, ':foo' => 'Bar']]),
+            $filter->modifyQuery(
+                (new Query)->where('first=:first')->order('id')->param(':first', 42)
+            )
+        );
+    }
+
+    public function testGetQueryOptions()
+    {
+        $filter = new Equals('foo', 'Bar', ['connection' => new EqualsTestConnection()]);
+
+        $this->assertEquals(
+            ['where' => "TRUE AND foo = :foo", 'params' => [':foo' => 'Bar']],
+            $filter->getQueryOptions()
         );
         $this->assertEquals(
             ['where' => "first=:first AND foo = :foo", 'order' => 'id', 'params' => [':foo' => 'Bar']],
-            $filter->getQueryOptions(new EqualsTestConnection(),
+            $filter->getQueryOptions(
                 [
                     'where' => 'first=:first',
                     'order' => 'id'
