@@ -68,4 +68,9 @@ class Url
         return $this->toString();
     }
 
+    public function __clone()
+    {
+        $this->query = clone $this->query;
+    }
+
 }
