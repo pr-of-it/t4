@@ -66,4 +66,20 @@ class FrontTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('{"foo":"bar","baz":42}', $real);
     }
 
+    public function testJsonOutputForJsonSerializableObject()
+    {
+        $dummy = new class implements \JsonSerializable {
+            public function jsonSerialize()
+            {
+                return ['foo'=>'bar','baz'=>42];
+            }
+        };
+        $front = new \T4\Mvc\Front(new TestApp);
+        ob_start();
+        @$front->output(new \T4\Mvc\Route(['format' => 'json']), $dummy, 'json');
+        $real = ob_get_contents();
+        ob_end_clean();
+
+        $this->assertEquals('{"foo":"bar","baz":42}', $real);
+    }
 }

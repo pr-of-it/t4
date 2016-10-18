@@ -26,7 +26,14 @@ class Front
         return $route->action . '.' . $format;
     }
 
-    public function output(Route $route, IArrayable $data, $format = null)
+    /**
+     * @param Route $route
+     * @param IArrayable|\JsonSerializable $data
+     * @param null $format
+     * @throws Exception
+     * @throws \InvalidArgumentException
+     */
+    public function output(Route $route, $data, $format = null)
     {
         $format = $format ?: $route->format;
         $format = $format ?: self::FORMAT_DEFAULT;
@@ -34,12 +41,16 @@ class Front
             throw new Exception('Invalid output format');
         }
 
+        if (!($data instanceof IArrayable) && !($data instanceof \JsonSerializable)) {
+            throw new \InvalidArgumentException('Argument 2 passed to output() must be an instance of ' . IArrayable::class . ' or ' . \JsonSerializable::class . ', ' . get_class($data) . ' given');
+        }
+
         $template = $this->getTemplateFileName($route, $format);
 
         switch ($format) {
             case 'json':
                 header('Content-Type: application/json; charset=utf-8');
-                echo json_encode($data->toArray(), JSON_UNESCAPED_UNICODE);
+                echo json_encode(($data instanceof \JsonSerializable) ? $data : $data->toArray(), JSON_UNESCAPED_UNICODE);
                 break;
             case 'xml':
                 header('Content-Type: text/xml; charset=utf-8');
