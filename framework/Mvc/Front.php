@@ -27,9 +27,9 @@ class Front
     }
 
     /**
-     * @param Route $route
+     * @param \T4\Mvc\Route $route
      * @param \T4\Core\IArrayable|\JsonSerializable $data
-     * @param null $format
+     * @param string|null $format
      * @throws \T4\Core\Exception
      * @throws \InvalidArgumentException
      */
