@@ -8,6 +8,7 @@ use T4\Html\Filter;
 class EndsWith
     extends Filter
 {
+
     public function modifyQuery(Query $query) : Query
     {
         if ('' === $this->value || null === $this->value) {
@@ -20,7 +21,6 @@ class EndsWith
         return $query;
     }
 
-
     public function getQueryOptions($options = []) : array
     {
         if ('' === $this->value || null === $this->value) {
@@ -32,4 +32,5 @@ class EndsWith
         $options['where'] .= ' AND ' . $this->name . ' LIKE ' . $this->getConnection()->quote('%' . $this->value) . '';
         return $options;
     }
+
 }

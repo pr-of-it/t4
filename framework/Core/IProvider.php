@@ -11,4 +11,5 @@ interface IProvider
 
     public function getPages();
     public function getPage(int $n);
+    public function getAll();
 }

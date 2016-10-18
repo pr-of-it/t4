@@ -2,10 +2,10 @@
 
 namespace T4\Html\Filters;
 
+use T4\Core\IProvider;
 use T4\Dbal\Query;
 use T4\Html\Filter;
 use T4\Orm\Model;
-use T4\Orm\ModelDataProvider;
 
 class Select
     extends Filter
@@ -28,7 +28,7 @@ class Select
         if ( isset($options['class']) ) {
             if ( is_subclass_of($options['class'], Model::class) ) {
                 $this->setData($options['class']::findAll());
-            } elseif ( is_subclass_of($options['class'], ModelDataProvider::class) ) {
+            } elseif ( is_subclass_of($options['class'], IProvider::class) ) {
                 $this->setData( (new $options['class'])->getAll() );
             }
         }

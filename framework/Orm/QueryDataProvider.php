@@ -133,4 +133,14 @@ class QueryDataProvider
         }
     }
 
+    public function getAll()
+    {
+        $query = $this->query;
+        if (empty($this->class)) {
+            return new Collection( $this->getConnection()->query($query, $this->params)->fetchAllObjects(Std::class) );
+        } else {
+            return $this->class::findAllByQuery($query, $this->params);
+        }
+    }
+
 }

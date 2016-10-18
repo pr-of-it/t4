@@ -8,6 +8,7 @@ use T4\Html\Filter;
 class Equals
     extends Filter
 {
+
     public function modifyQuery(Query $query) : Query
     {
         if ('' === $this->value || null === $this->value) {
@@ -16,8 +17,7 @@ class Equals
         if (empty($query->where)) {
             $query->where('TRUE');
         }
-        $query->where($query->where . ' AND ' . $this->name . ' = :' . $this->name);
-        $query->param(':' . $this->name, $this->value);
+        $query->where($query->where . ' AND ' . $this->name . ' = :' . $this->name)->param(':' . $this->name, $this->value);
         return $query;
     }
 
@@ -33,4 +33,5 @@ class Equals
         $options['params'][':' . $this->name] = $this->value;
         return $options;
     }
+
 }
