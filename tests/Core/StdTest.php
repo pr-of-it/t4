@@ -77,6 +77,12 @@ class StdTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(new \T4\Core\Std(['foo' => 11, 'bar' => 21]), $obj2);
     }
 
+    public function testDataKey()
+    {
+        $obj = new \T4\Core\Std(['data' => 42]);
+        $this->assertEquals(42, $obj->data);
+    }
+
     public function testNumericOffsets()
     {
         $obj = new \T4\Core\Std();
