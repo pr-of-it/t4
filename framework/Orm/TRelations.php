@@ -50,6 +50,9 @@ trait TRelations
 
         switch ($relation['type']) {
             case $class::BELONGS_TO:
+                if (!empty($relation['this'])) {
+                    return $relation['this'];
+                }
                 $class = explode('\\', $relation['model']);
                 $class = array_pop($class);
                 return '__' . strtolower($class) . '_id';
@@ -64,6 +67,16 @@ trait TRelations
                 return $thisTableName < $thatTableName ? $thisTableName . '_to_' . $thatTableName : $thatTableName . '_to_' . $thisTableName;
         }
 
+    }
+
+    public static function getBelongsToThatLinkColumnName($relation)
+    {
+        if (!empty($relation['that'])) {
+            return $relation['that'];
+        }
+        /** @var \T4\Orm\Model $relationClass */
+        $relationClass = $relation['model'];
+        return $relationClass::PK;
     }
 
     public static function getManyToManyThisLinkColumnName($relation)
@@ -110,12 +123,17 @@ trait TRelations
             case $class::BELONGS_TO:
                 /** @var \T4\Orm\Model $relationClass */
                 $relationClass = $relation['model'];
-                $link = $class::getRelationLinkName($relation);
-                $subModel = $relationClass::findByPK($this->{$link});
-                if (empty($subModel))
+                $thisColumnName = $class::getRelationLinkName($relation);
+                $subModel = $relationClass::findByColumn(
+                    $class::getBelongsToThatLinkColumnName($relation),
+                    $this->{$thisColumnName},
+                    $options
+                );
+                if (empty($subModel)) {
                     return null;
-                else
-                    return $relationClass::findByPK($this->{$link});
+                } else {
+                    return $subModel;
+                }
                 break;
 
             case $class::HAS_ONE:
