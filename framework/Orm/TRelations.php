@@ -223,6 +223,10 @@ trait TRelations
         }
     }
 
+
+    /**
+     * @todo: This and That using !
+     */
     protected function setRelation($keys, $value)
     {
         $class = get_class($this);
