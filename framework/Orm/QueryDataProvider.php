@@ -67,7 +67,7 @@ class QueryDataProvider
      * @param int $size
      * @return $this
      */
-    public function setPageSize(int $size = 0)
+    public function setPageSize(int $size = 0) : self
     {
         $this->pageSize = $size;
         return $this;
@@ -76,7 +76,7 @@ class QueryDataProvider
     /**
      * @return int
      */
-    public function getPageSize()
+    public function getPageSize() : int
     {
         return $this->pageSize;
     }
@@ -84,7 +84,7 @@ class QueryDataProvider
     /**
      * @return int
      */
-    public function getTotal()
+    public function getTotal() : int
     {
         return (int)$this->getConnection()->query($this->queryForCount, $this->params)->fetchScalar();
     }
@@ -92,7 +92,7 @@ class QueryDataProvider
     /**
      * @return \Generator
      */
-    public function getPages()
+    public function getPages() : \Generator
     {
         if (0 != $this->pageSize) {
             $pages = ceil($this->getTotal() / $this->pageSize);
@@ -118,7 +118,7 @@ class QueryDataProvider
      * @param int $n
      * @return \T4\Core\Collection
      */
-    public function getPage(int $n)
+    public function getPage(int $n) : Collection
     {
         if ($this->pageSize != 0) {
             $query = $this->query . ' LIMIT ' . $this->pageSize . ' OFFSET ' . ( ($n - 1) * $this->pageSize );
@@ -133,7 +133,7 @@ class QueryDataProvider
         }
     }
 
-    public function getAll()
+    public function getAll() : Collection
     {
         $query = $this->query;
         if (empty($this->class)) {

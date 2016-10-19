@@ -1,6 +1,7 @@
 <?php
 
 namespace T4\Orm;
+use T4\Core\Collection;
 use T4\Core\IProvider;
 use T4\Core\Std;
 
@@ -69,7 +70,7 @@ class ModelDataProvider
      * @param int $size
      * @return $this
      */
-    public function setPageSize(int $size = 0)
+    public function setPageSize(int $size = 0) : self
     {
         $this->pageSize = $size;
         return $this;
@@ -78,7 +79,7 @@ class ModelDataProvider
     /**
      * @return int
      */
-    public function getPageSize()
+    public function getPageSize() : int
     {
         return $this->pageSize;
     }
@@ -86,7 +87,7 @@ class ModelDataProvider
     /**
      * @return int
      */
-    public function getTotal()
+    public function getTotal() : int
     {
         if (null === $this->total) {
             $options = $this->options;
@@ -98,7 +99,7 @@ class ModelDataProvider
     /**
      * @return \Generator
      */
-    public function getPages()
+    public function getPages() : \Generator
     {
         $options = $this->options;
 
@@ -121,7 +122,7 @@ class ModelDataProvider
      * @param int $n
      * @return \T4\Core\Collection
      */
-    public function getPage(int $n)
+    public function getPage(int $n) : Collection
     {
         $options = $this->options;
 
@@ -133,7 +134,7 @@ class ModelDataProvider
         return $this->class::findAll($options);
     }
 
-    public function getAll()
+    public function getAll() : Collection
     {
         return $this->class::findAll($this->options);
     }

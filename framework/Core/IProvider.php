@@ -4,12 +4,13 @@ namespace T4\Core;
 
 interface IProvider
 {
-    public function setPageSize(int $size = 0);
+    public function setPageSize(int $size = 0) : self;
+    public function getPageSize() : int;
 
-    public function getPageSize();
-    public function getTotal();
+    public function getTotal() : int;
 
-    public function getPages();
-    public function getPage(int $n);
-    public function getAll();
+    public function getPages() : \Generator;
+
+    public function getPage(int $n) : Collection;
+    public function getAll() : Collection;
 }
