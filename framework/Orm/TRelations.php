@@ -89,6 +89,16 @@ trait TRelations
         return $class::PK;
     }
 
+    public static function getHasManyThisLinkColumnName($relation)
+    {
+        if (!empty($relation['this'])) {
+            return $relation['this'];
+        }
+        /** @var \T4\Orm\Model $class */
+        $class = get_called_class();
+        return $class::PK;
+    }
+
     public static function getManyToManyThisLinkColumnName($relation)
     {
         if (!empty($relation['this'])) {
@@ -167,8 +177,13 @@ trait TRelations
             case $class::HAS_MANY:
                 /** @var \T4\Orm\Model $relationClass */
                 $relationClass = $relation['model'];
-                $link = $class::getRelationLinkName($relation);
-                return $relationClass::findAllByColumn($link, $this->getPk(), $options);
+                $thisColumnName = $class::getHasManyThisLinkColumnName($relation);
+                $thatColumnName = $class::getRelationLinkName($relation);
+                return $relationClass::findAllByColumn(
+                    $thatColumnName,
+                    $this->{$thisColumnName},
+                    $options
+                );
                 break;
 
             case $class::MANY_TO_MANY:
