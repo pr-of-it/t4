@@ -79,6 +79,16 @@ trait TRelations
         return $relationClass::PK;
     }
 
+    public static function getHasOneThisLinkColumnName($relation)
+    {
+        if (!empty($relation['this'])) {
+            return $relation['this'];
+        }
+        /** @var \T4\Orm\Model $class */
+        $class = get_called_class();
+        return $class::PK;
+    }
+
     public static function getManyToManyThisLinkColumnName($relation)
     {
         if (!empty($relation['this'])) {
@@ -124,8 +134,9 @@ trait TRelations
                 /** @var \T4\Orm\Model $relationClass */
                 $relationClass = $relation['model'];
                 $thisColumnName = $class::getRelationLinkName($relation);
+                $thatColumnName = $class::getBelongsToThatLinkColumnName($relation);
                 $subModel = $relationClass::findByColumn(
-                    $class::getBelongsToThatLinkColumnName($relation),
+                    $thatColumnName,
                     $this->{$thisColumnName},
                     $options
                 );
@@ -139,8 +150,18 @@ trait TRelations
             case $class::HAS_ONE:
                 /** @var \T4\Orm\Model $relationClass */
                 $relationClass = $relation['model'];
-                $link = $class::getRelationLinkName($relation);
-                return $relationClass::findByColumn($link, $this->getPk(), $options);
+                $thisColumnName = $class::getHasOneThisLinkColumnName($relation);
+                $thatColumnName = $class::getRelationLinkName($relation);
+                $subModel = $relationClass::findByColumn(
+                    $thatColumnName,
+                    $this->{$thisColumnName},
+                    $options
+                );
+                if (empty($subModel)) {
+                    return null;
+                } else {
+                    return $subModel;
+                }
                 break;
 
             case $class::HAS_MANY:
