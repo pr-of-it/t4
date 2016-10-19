@@ -70,7 +70,7 @@ class ModelDataProvider
      * @param int $size
      * @return $this
      */
-    public function setPageSize(int $size = 0) : self
+    public function setPageSize(int $size = 0) : IProvider
     {
         $this->pageSize = $size;
         return $this;

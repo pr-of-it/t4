@@ -4,7 +4,7 @@ namespace T4\Core;
 
 interface IProvider
 {
-    public function setPageSize(int $size = 0) : self;
+    public function setPageSize(int $size = 0) : IProvider;
     public function getPageSize() : int;
 
     public function getTotal() : int;
