@@ -2,6 +2,7 @@
 
 namespace T4\Widgets;
 
+use T4\Core\Url;
 use T4\Mvc\Widget;
 
 class Pager
@@ -32,6 +33,11 @@ class Pager
 
     }
 
+    protected function getPageLink(int $page)
+    {
+        return (string)(new Url())->fromString(sprintf($this->options->url, $page));
+    }
+
     public function render()
     {
         $pagesCount = ceil($this->options->total / $this->options->size);
@@ -57,7 +63,7 @@ class Pager
         ?>
         <ul class="pagination">
             <li<?php echo($this->options->active == 1 ? ' class="disabled"' : ''); ?>><a
-                    href="<?php rawurlencode(printf($this->options->url, 1)); ?>">&laquo;</a></li>
+                    href="<?php echo $this->getPageLink(1); ?>">&laquo;</a></li>
             <?php
             $prev = 1;
             foreach ($displayed as $page) {
@@ -67,17 +73,17 @@ class Pager
                 }
                 ?>
                 <li<?php echo($this->options->active == $page ? ' class="active"' : ''); ?>>
-                    <a href="<?php rawurlencode(printf($this->options->url, $page)); ?>"><?php echo $page; ?></a>
+                    <a href="<?php echo $this->getPageLink($page); ?>"><?php echo $page; ?></a>
                 </li>
                 <?php
                 $prev = $page;
             }
             ?>
             <li<?php echo($this->options->active == $pagesCount ? ' class="disabled"' : ''); ?>><a
-                    href="<?php rawurlencode(printf($this->options->url, $page)); ?>">&raquo;</a>
+                    href="<?php echo $this->getPageLink($page) ?>">&raquo;</a>
             </li>
         </ul>
-    <?php
+        <?php
     }
 
 }
