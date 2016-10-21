@@ -11,7 +11,8 @@ namespace T4\Core;
  * @implements \Countable
  * @implements \IteratorAggregate
  * @implements \T4\Core\IArrayable
- * @implements \Setializeable
+ * @implements \Serializable
+ * @implements \JsonSerializable
  */
 trait TArrayAccess
 {
@@ -159,6 +160,11 @@ trait TArrayAccess
     public function unserialize($serialized)
     {
         $this->storage = unserialize($serialized);
+    }
+
+    public function jsonSerialize ()
+    {
+        return $this->storage;
     }
 
 }

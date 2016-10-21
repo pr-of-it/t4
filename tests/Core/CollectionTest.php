@@ -286,4 +286,19 @@ class CollectionTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($collection1, $collection2);
     }
 
+    public function testJsonSerialize()
+    {
+        $collection = new Collection([1, 2, 3, 4]);
+        $this->assertEquals(
+            '[1,2,3,4]',
+            json_encode($collection)
+        );
+
+        $collection = new Collection(['foo' => 100, 'bar' => 'two', 'baz' => [300, 400]]);
+        $this->assertEquals(
+            '{"foo":100,"bar":"two","baz":[300,400]}',
+            json_encode($collection)
+        );
+    }
+
 }
