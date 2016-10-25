@@ -45,7 +45,7 @@ class Std
     /**
      * @return array
      */
-    public function toArray()
+    public function toArray() : array
     {
         $data = [];
         foreach (array_keys($this->__data) as $key) {
@@ -61,7 +61,7 @@ class Std
     /**
      * @return array
      */
-    public function toArrayRecursive()
+    public function toArrayRecursive() : array
     {
         $data = [];
         foreach (array_keys($this->__data) as $key) {

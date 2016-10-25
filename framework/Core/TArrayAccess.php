@@ -3,6 +3,9 @@
 namespace T4\Core;
 
 /**
+ *
+ * IArrayAccess interface vanilla implementation
+ *
  * Trait TArrayAccess
  * @package T4\Core
  *
@@ -15,6 +18,7 @@ namespace T4\Core;
  * @implements \JsonSerializable
  */
 trait TArrayAccess
+// implements IArrayAccess
 {
 
     protected $storage = [];
@@ -23,16 +27,28 @@ trait TArrayAccess
      * --------------------------------------------------------------------------------
      */
 
+    /**
+     * @param int|string $offset
+     * @return bool
+     */
     protected function innerIsset($offset)
     {
         return array_key_exists($offset, $this->storage);
     }
 
+    /**
+     * @param int|string $offset
+     * @return mixed
+     */
     protected function innerGet($offset)
     {
         return array_key_exists($offset, $this->storage) ? $this->storage[$offset] : null;
     }
 
+    /**
+     * @param int|string $offset
+     * @param mixed $value
+     */
     protected function innerSet($offset, $value)
     {
         if ('' == $offset) {
@@ -45,6 +61,9 @@ trait TArrayAccess
         $this->storage[$offset] = $value;
     }
 
+    /**
+     * @param int|string $offset
+     */
     protected function innerUnset($offset)
     {
         unset($this->storage[$offset]);
@@ -55,7 +74,7 @@ trait TArrayAccess
      */
 
     /**
-     * @param $offset
+     * @param int|string $offset
      * @return bool
      */
     public function offsetExists($offset)
@@ -64,7 +83,7 @@ trait TArrayAccess
     }
 
     /**
-     * @param $offset
+     * @param int|string $offset
      * @return mixed
      */
     public function offsetGet($offset)
@@ -73,8 +92,8 @@ trait TArrayAccess
     }
 
     /**
-     * @param $offset
-     * @param $value
+     * @param int|string $offset
+     * @param mixed $value
      */
     public function offsetSet($offset, $value)
     {
@@ -82,7 +101,7 @@ trait TArrayAccess
     }
 
     /**
-     * @param $offset
+     * @param int|string $offset
      */
     public function offsetUnset($offset)
     {
@@ -121,6 +140,10 @@ trait TArrayAccess
      * --------------------------------------------------------------------------------
      */
 
+    /**
+     * @param iterable $data
+     * @return $this
+     */
     public function fromArray($data)
     {
         foreach ($data as $offset => $value) {
@@ -129,12 +152,18 @@ trait TArrayAccess
         return $this;
     }
 
-    public function toArray()
+    /**
+     * @return array
+     */
+    public function toArray() : array
     {
         return $this->storage;
     }
 
-    public function toArrayRecursive()
+    /**
+     * @return array
+     */
+    public function toArrayRecursive() : array
     {
         $data = [];
         foreach (array_keys($this->storage) as $key) {
@@ -152,16 +181,29 @@ trait TArrayAccess
      * --------------------------------------------------------------------------------
      */
 
+    /**
+     * @return string
+     */
     public function serialize()
     {
         return serialize($this->storage);
     }
 
+    /**
+     * @param string $serialized
+     */
     public function unserialize($serialized)
     {
         $this->storage = unserialize($serialized);
     }
 
+    /*
+     * --------------------------------------------------------------------------------
+     */
+
+    /**
+     * @return array
+     */
     public function jsonSerialize ()
     {
         return $this->storage;
