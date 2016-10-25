@@ -50,11 +50,11 @@ FILE
         $config = new Config;
         $config->load(self::TEST_CONFIG_FILE);
         $this->assertInstanceOf(
-            'T4\Core\Std',
+            T4\Core\Std::class,
             $config->db
         );
         $this->assertInstanceOf(
-            'T4\Core\Std',
+            T4\Core\Std::class,
             $config
         );
         $this->assertEquals(
@@ -70,6 +70,32 @@ FILE
             $config->name
         );
 
+    }
+
+    public function testSave()
+    {
+        $config = new Config;
+        $config->load(self::TEST_CONFIG_FILE);
+        $config->db->default = 42;
+        $config->save();
+
+        $expected = <<<FILE
+<?php
+
+return [
+  'db' =>
+  [
+    'default' => 42,
+  ],
+  'name' => 'test',
+];
+FILE;
+        $expected = str_replace(["\r\n", "\r", "\n"], '', $expected);
+
+        $this->assertEquals(
+            $expected,
+            str_replace(["\r\n", "\r", "\n"], '', file_get_contents(self::TEST_CONFIG_FILE))
+        );
     }
 
     protected function tearDown()

@@ -26,7 +26,7 @@ class Std
 
     /**
      * @param array $data
-     * @return \T4\Core\Std $this
+     * @return $this
      */
     public function fromArray($data)
     {
