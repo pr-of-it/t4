@@ -6,7 +6,6 @@ use T4\Core\Config;
 
 abstract class ACache
 {
-    const DEFAULT_CACHE_TIME = 300;
 
     public function __construct(Config $config = null)
     {

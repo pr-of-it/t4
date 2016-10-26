@@ -2,7 +2,9 @@
 
 namespace T4\Mvc;
 
+use T4\Cache\File;
 use T4\Console\TRunCommand;
+use T4\Core\Config;
 use T4\Core\Exception;
 use T4\Core\ISingleton;
 use T4\Core\Session;
@@ -11,7 +13,6 @@ use T4\Core\TSingleton;
 use T4\Core\TStdGetSet;
 use T4\Http\E403Exception;
 use T4\Http\E404Exception;
-use T4\Http\Request;
 use T4\Threads\Helpers;
 
 /**
@@ -197,7 +198,8 @@ class Application
         };
 
         if (!empty($blockOptions['cache'])) {
-            $cache = \T4\Cache\Factory::getInstance();
+            /** @todo заменить на ->cache->default */
+            $cache = new File(new Config(['path' => ROOT_PATH_PROTECTED . DS . 'Cache']));
             $key = md5($canonicalPath . serialize($route->params) . $template);
             if (!empty($blockOptions['cache']['time'])) {
                 return $cache($key, $getBlock, $blockOptions['cache']['time']);
