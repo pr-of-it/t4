@@ -44,7 +44,6 @@ class Pgsql
         return implode('.', $parts);
     }
 
-
     protected function createColumnDDL($table, $name, $options)
     {
         $name = $this->quoteName($name);
@@ -584,7 +583,7 @@ class Pgsql
             ->delete()
             ->from($this->quoteName($class::getTableName()))
             ->where($this->quoteName($class::PK) . '=:id')
-            ->params([':id' => $model->getPk()]);
+            ->param(':id', $model->getPk());
         $connection->execute($query);
     }
 

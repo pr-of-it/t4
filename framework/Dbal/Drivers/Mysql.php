@@ -513,17 +513,19 @@ class Mysql
 
         $connection = $class::getDbConnection();
         if ($model->isNew()) {
-            $sql = new QueryBuilder();
-            $sql->insert($class::getTableName())
-                ->values($sets);
-            $connection->execute($sql, $data);
+            $query = new Query();
+            $query->insert($class::getTableName())
+                ->values($sets)
+                ->params($data);
+            $connection->execute($query);
             $model->{$class::PK} = $connection->lastInsertId();
         } else {
-            $sql = new QueryBuilder();
-            $sql->update($class::getTableName())
+            $query = new Query();
+            $query->update($class::getTableName())
                 ->values($sets)
-                ->where($class::PK . '=' . $model->getPk());
-            $connection->execute($sql, $data);
+                ->where($this->quoteName($class::PK) . '='. $model->getPk())
+                ->params($data);
+            $connection->execute($query);
         }
 
         return $model;
@@ -534,7 +536,6 @@ class Mysql
     {
         $this->saveColumns($model);
     }
-    
 
     public function delete(Model $model)
     {
@@ -545,7 +546,7 @@ class Mysql
             ->delete()
             ->from($this->quoteName($class::getTableName()))
             ->where($this->quoteName($class::PK) . '=:id')
-            ->params([':id' => $model->getPk()]);
+            ->param(':id', $model->getPk());
         $connection->execute($query);
     }
 
