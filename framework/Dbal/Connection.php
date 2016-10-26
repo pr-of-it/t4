@@ -52,7 +52,7 @@ class Connection
         }
         $pdo = new \PDO($dsn, $config->user, $config->password, $options);
         $pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
-        $pdo->setAttribute(\PDO::ATTR_STATEMENT_CLASS, [__NAMESPACE__ . '\\Statement']);
+        $pdo->setAttribute(\PDO::ATTR_STATEMENT_CLASS, [Statement::class]);
         return $pdo;
     }
 
