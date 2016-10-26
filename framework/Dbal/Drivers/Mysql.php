@@ -356,23 +356,42 @@ class Mysql
         return $result;
     }
 
+    /**
+     * @param string $class
+     * @param array|\T4\Dbal\Query $options
+     * @return \T4\Core\Collection
+     * @throws \T4\Dbal\Exception
+     */
     public function findAll($class, $options = [])
     {
         /** @var \T4\Orm\Model $class */
-        $query = new QueryBuilder($options);
+        if ('mysql' != $class::getDbConnection()->getDriverName()) {
+            throw new Exception('DB drivers mismatch');
+        }
+        $query = new Query($options);
         $query
             ->select('t1.*')
             ->from($class::getTableName());
         return $this->findAllByQuery($class, $query);
     }
 
+    /**
+     * @param string $class
+     * @param array|\T4\Dbal\Query $options
+     * @return mixed
+     * @throws \T4\Dbal\Exception
+     */
     public function find($class, $options = [])
     {
         /** @var \T4\Orm\Model $class */
-        $query = new QueryBuilder($options);
+        if ('mysql' != $class::getDbConnection()->getDriverName()) {
+            throw new Exception('DB drivers mismatch');
+        }
+        $query = new Query($options);
         $query
             ->select('t1.*')
-            ->from($class::getTableName());
+            ->from($class::getTableName())
+            ->limit(1);
         return $this->findByQuery($class, $query);
     }
 
