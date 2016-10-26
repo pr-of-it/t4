@@ -2,6 +2,7 @@
 
 namespace T4\Dbal;
 
+use T4\Core\IArrayable;
 use T4\Core\Std;
 
 /**
@@ -40,8 +41,10 @@ class Query
             $this->string = $data;
             return;
         }
-        
-        $data = (array)$data;
+
+        if ($data instanceof IArrayable) {
+            $data = $data->toArrayRecursive();
+        }
         
         if (isset($data['action'])) {
             $this->action = $data['action'];

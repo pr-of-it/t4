@@ -4,6 +4,7 @@ namespace T4\Dbal\Drivers;
 
 use T4\Core\Collection;
 use T4\Dbal\Connection;
+use T4\Dbal\Exception;
 use T4\Dbal\IDriver;
 use T4\Dbal\Query;
 use T4\Dbal\QueryBuilder;
@@ -422,28 +423,46 @@ class Mysql
         return $class::getDbConnection()->query($query, $params)->fetchScalar();
     }
 
+    /**
+     * @param string $class
+     * @param array|\T4\Dbal\Query $options
+     * @return int
+     * @throws \T4\Dbal\Exception
+     */
     public function countAll($class, $options = [])
     {
         /** @var \T4\Orm\Model $class */
-        $query = new QueryBuilder();
+        if ('mysql' != $class::getDbConnection()->getDriverName()) {
+            throw new Exception('DB drivers mismatch');
+        }
+        $query = new Query($options);
         $query
             ->select('COUNT(*)')
-            ->from($class::getTableName())
-            ->where(!empty($options['where']) ? $options['where'] : '')
-            ->params(!empty($options['params']) ? $options['params'] : []);
-        return $class::getDbConnection()->query($query->getQuery($this), $query->getParams())->fetchScalar();
+            ->from($class::getTableName());
+        return (int)$class::getDbConnection()->query($query)->fetchScalar();
     }
 
+    /**
+     * @param string $class
+     * @param string $column
+     * @param mixed $value
+     * @param array|\T4\Dbal\Query $options
+     * @return int
+     * @throws \T4\Dbal\Exception
+     */
     public function countAllByColumn($class, $column, $value, $options = [])
     {
         /** @var \T4\Orm\Model $class */
-        $query = new QueryBuilder();
+        if ('mysql' != $class::getDbConnection()->getDriverName()) {
+            throw new Exception('DB drivers mismatch');
+        }
+        $query = new Query($options);
         $query
             ->select('COUNT(*)')
             ->from($class::getTableName())
-            ->where('`' . $column . '`=:value')
-            ->params([':value' => $value]);
-        return $class::getDbConnection()->query($query->getQuery($this), $query->getParams())->fetchScalar();
+            ->where($this->quoteName($column) . '=:columnvalue' . (!empty($query->where) ? ' AND (' . $query->where . ')' : ''))
+            ->param(':columnvalue', $value);
+        return (int)$class::getDbConnection()->query($query)->fetchScalar();
     }
 
     /**
