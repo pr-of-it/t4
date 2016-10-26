@@ -71,18 +71,23 @@ class Standard
         $class = get_class($model);
         $columns = $class::getColumns();
         foreach ($columns as $name => $column) {
-            if ($column['type'] == 'json') {
-                if (
-                    !empty($column['class'])
-                    &&
-                    class_exists($column['class'])
-                    &&
-                    (is_subclass_of($column['class'], Std::class) || is_subclass_of($column['class'], Collection::class))
-                ) {
-                    $class = $column['class'];
-                    $model->$name = new $class(json_decode($model->$name, true));
+            if ($column['type'] == 'json' && null !== $model->$name) {
+                $decoded = json_decode($model->$name, true);
+                if (is_scalar($decoded)) {
+                    $model->$name = $decoded;
                 } else {
-                    $model->$name = new Std(json_decode($model->$name, true));
+                    if (
+                        !empty($column['class'])
+                        &&
+                        class_exists($column['class'])
+                        &&
+                        (is_subclass_of($column['class'], Std::class) || is_subclass_of($column['class'], Collection::class))
+                    ) {
+                        $class = $column['class'];
+                        $model->$name = new $class($decoded);
+                    } else {
+                        $model->$name = new Std($decoded);
+                    }
                 }
             }
         }
@@ -94,7 +99,7 @@ class Standard
         $class = get_class($model);
         $columns = $class::getColumns();
         foreach ($columns as $name => $column) {
-            if ($column['type'] == 'json') {
+            if ($column['type'] == 'json' && null !== $model->$name) {
                 if ($model->$name instanceof IArrayable) {
                     $model->$name = json_encode($model->$name->toArray(), JSON_NUMERIC_CHECK | JSON_UNESCAPED_UNICODE);
                 } else {
