@@ -113,10 +113,11 @@ class Query
     }
 
     /**
-     * @param $names
+     * @param array $names
+     * @param bool $trim
      * @return array
      */
-    protected function prepareNames($names = [])
+    protected function prepareNames($names = [], $trim = true)
     {
         if (1 == count($names)) {
             if (is_array($names[0])) {
@@ -125,7 +126,9 @@ class Query
                 $names = preg_split('~[\s]*\,[\s]*~', $names[0]);
             }
         }
-        $names = array_map([$this, 'trimName'], $names);
+        if ($trim) {
+            $names = array_map([$this, 'trimName'], $names);
+        }
         return $names;
     }
 
@@ -318,7 +321,7 @@ class Query
      */
     public function group($group)
     {
-        $group = $this->prepareNames(func_get_args());
+        $group = $this->prepareNames(func_get_args(), false);
         $this->group = $group;
         return $this;
     }
@@ -341,7 +344,7 @@ class Query
      */
     public function order($order)
     {
-        $order = $this->prepareNames(func_get_args());
+        $order = $this->prepareNames(func_get_args(),false);
         $this->order = $order;
         return $this;
     }

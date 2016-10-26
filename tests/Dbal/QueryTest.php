@@ -277,7 +277,7 @@ class QueryTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('select', $query->action);
         $this->assertEquals(['*'], $query->columns);
         $this->assertEquals(['foo'], $query->tables);
-        $this->assertEquals(['id', 'name'], $query->order);
+        $this->assertEquals(['id', '`name`'], $query->order);
 
         $q = $query->select()->from('foo')->order('"id" DESC, `name` asc');
         $this->assertInstanceOf(\T4\Dbal\Query::class, $q);
