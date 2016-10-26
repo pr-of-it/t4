@@ -371,7 +371,7 @@ class Mysql
         $query = new Query($options);
         $query
             ->select('t1.*')
-            ->from($class::getTableName());
+            ->from($this->quoteName($class::getTableName()));
         return $this->findAllByQuery($class, $query);
     }
 
@@ -390,38 +390,55 @@ class Mysql
         $query = new Query($options);
         $query
             ->select('t1.*')
-            ->from($class::getTableName())
+            ->from($this->quoteName($class::getTableName()))
             ->limit(1);
         return $this->findByQuery($class, $query);
     }
 
+    /**
+     * @param string $class
+     * @param string $column
+     * @param mixed $value
+     * @param array|\T4\Dbal\Query $options
+     * @return \T4\Core\Collection
+     * @throws \T4\Dbal\Exception
+     */
     public function findAllByColumn($class, $column, $value, $options = [])
     {
         /** @var \T4\Orm\Model $class */
-        $query = new QueryBuilder();
+        if ('mysql' != $class::getDbConnection()->getDriverName()) {
+            throw new Exception('DB drivers mismatch');
+        }
+        $query = new Query($options);
         $query
-            ->select('*')
-            ->from($class::getTableName())
-            ->where('`' . $column . '`=:value' . (!empty($options['where']) ? ' AND (' . $options['where'] . ')' : ''))
-            ->order(!empty($options['order']) ? $options['order'] : '')
-            ->offset(!empty($options['offset']) ? $options['offset'] : '')
-            ->limit(!empty($options['limit']) ? $options['limit'] : '')
-            ->params([':value' => $value] + (!empty($options['params']) ? $options['params'] : []));
+            ->select('t1.*')
+            ->from($this->quoteName($class::getTableName()))
+            ->where($this->quoteName($column) . '=:columnvalue' . (!empty($query->where) ? ' AND (' . $query->where . ')' : ''))
+            ->param(':columnvalue', $value);
         return $this->findAllByQuery($class, $query);
     }
 
+    /**
+     * @param string $class
+     * @param string $column
+     * @param mixed $value
+     * @param array|\T4\Dbal\Query $options
+     * @return mixed
+     * @throws \T4\Dbal\Exception
+     */
     public function findByColumn($class, $column, $value, $options = [])
     {
         /** @var \T4\Orm\Model $class */
-        $query = new QueryBuilder();
+        if ('mysql' != $class::getDbConnection()->getDriverName()) {
+            throw new Exception('DB drivers mismatch');
+        }
+        $query = new Query($options);
         $query
-            ->select('*')
-            ->from($class::getTableName())
-            ->where('`' . $column . '`=:value')
-            ->order(!empty($options['order']) ? $options['order'] : '')
-            ->offset(!empty($options['offset']) ? $options['offset'] : '')
+            ->select('t1.*')
+            ->from($this->quoteName($class::getTableName()))
+            ->where($this->quoteName($column) . '=:columnvalue' . (!empty($query->where) ? ' AND (' . $query->where . ')' : ''))
             ->limit(1)
-            ->params([':value' => $value]);
+            ->param(':columnvalue', $value);
         return $this->findByQuery($class, $query);
     }
 
@@ -457,7 +474,7 @@ class Mysql
         $query = new Query($options);
         $query
             ->select('COUNT(*)')
-            ->from($class::getTableName());
+            ->from($this->quoteName($class::getTableName()));
         return (int)$class::getDbConnection()->query($query)->fetchScalar();
     }
 
@@ -478,7 +495,7 @@ class Mysql
         $query = new Query($options);
         $query
             ->select('COUNT(*)')
-            ->from($class::getTableName())
+            ->from($this->quoteName($class::getTableName()))
             ->where($this->quoteName($column) . '=:columnvalue' . (!empty($query->where) ? ' AND (' . $query->where . ')' : ''))
             ->param(':columnvalue', $value);
         return (int)$class::getDbConnection()->query($query)->fetchScalar();
