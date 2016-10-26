@@ -5,6 +5,7 @@ namespace T4\Orm;
 use T4\Core\Collection;
 use T4\Core\IProvider;
 use T4\Core\Std;
+use T4\Dbal\Query;
 use T4\Dbal\QueryBuilder;
 
 /**
@@ -58,6 +59,9 @@ class QueryDataProvider
     {
         if ($query instanceof QueryBuilder) {
             $query =  $query->getQuery($this->getConnection()->getDriverName());
+        }
+        if ($query instanceof Query) {
+            $query =  $this->getConnection()->getDriver()->makeQueryString($query);
         }
         $this->queryForCount = preg_replace('~^[\s]*SELECT([\s\S]+)FROM~iU', 'SELECT COUNT(*) FROM', $query);
         return $query;

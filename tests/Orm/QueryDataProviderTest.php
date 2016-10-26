@@ -24,7 +24,7 @@ namespace T4\Tests\Orm\Models {
 }
 namespace T4\Tests\Orm {
 
-    use T4\Dbal\QueryBuilder;
+    use T4\Dbal\Query;
     use T4\Orm\QueryDataProvider;
     use T4\Tests\Orm\Models\Model;
 
@@ -44,7 +44,7 @@ namespace T4\Tests\Orm {
             $this->assertEquals('SELECT COUNT(*) FROM test WHERE foo=:foo', $provider->queryForCount);
             
             $provider = new QueryDataProvider(
-                (new QueryBuilder())->select()->from('test')->where('bar=:bar'),
+                (new Query())->select()->from('test')->where('bar=:bar'),
                 [],
                 Model::class
             );
