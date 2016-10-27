@@ -13,6 +13,8 @@ interface IDriver
 
     public function __construct(Config $config);
 
+    public function cache($key, callable $callback, $time = null);
+
     public function __invoke($key, callable $callback, $time = null);
 
 }

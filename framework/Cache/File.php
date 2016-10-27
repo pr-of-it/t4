@@ -21,7 +21,7 @@ class File
         $this->config = $config;
     }
 
-    public function __invoke($key, callable $callback, $time = null)
+    public function cache($key, callable $callback, $time = null)
     {
         if (null === $time) {
             $time = self::DEFAULT_CACHE_TIME;
@@ -42,6 +42,11 @@ class File
         } else {
             return unserialize(file_get_contents($fileName));
         }
+    }
+
+    public function __invoke($key, callable $callback, $time = null)
+    {
+        return $this->cache($key, $callback, $time);
     }
 
 }

@@ -135,4 +135,18 @@ trait TApplicationMagic
         return $flash;
     }
 
+    protected function getCache()
+    {
+        static $item = null;
+        if (null === $item) {
+            if (isset($this->config->cache)) {
+                $config = $this->config->cache;
+            } else {
+                $config = new Config(['default' => ['class' => \T4\Cache\File::class, 'path' => ROOT_PATH_PROTECTED . DS . 'Cache']]);
+            }
+            $item = new \T4\Cache\Set($config);
+        }
+        return $item;
+    }
+
 } 

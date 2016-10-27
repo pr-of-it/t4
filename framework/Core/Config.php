@@ -102,4 +102,22 @@ class Config
         return $str;
     }
 
+    protected function innerSet($key, $val)
+    {
+        if ('path' == $key) {
+            $this->__data['path'] = $val;
+        } else {
+            parent::innerSet($key, $val);
+        }
+    }
+
+    protected function innerGet($key)
+    {
+        if ('path' == $key) {
+            return $this->__data['path'];
+        } else {
+            return parent::innerGet($key);
+        }
+    }
+
 }

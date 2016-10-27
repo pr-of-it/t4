@@ -33,6 +33,7 @@ use T4\Threads\Helpers;
  * @property \T4\Mvc\Module[] $modules
  * @property \T4\Mvc\AssetsManager $assets
  * @property \T4\Core\Flash $flash
+ * @property \T4\Cache\Set $cache
  */
 class Application
     implements

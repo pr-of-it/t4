@@ -9,7 +9,7 @@ class Driver
 
     public static function instance(Config $config)
     {
-        if (empty($config->class) || !($config->class instanceof IDriver)) {
+        if (empty($config->class) || !(is_subclass_of($config->class, IDriver::class))) {
             throw new Exception('Invalid cache driver class name');
         }
         $class = $config->class;
