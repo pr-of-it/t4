@@ -199,8 +199,8 @@ class Application
         };
 
         if (!empty($blockOptions['cache'])) {
-            /** @todo заменить на ->cache->default */
-            $cache = new File(new Config(['path' => ROOT_PATH_PROTECTED . DS . 'Cache']));
+            /** @var \T4\Cache\IDriver $cache */
+            $cache = $this->cache->default;
             $key = md5($canonicalPath . serialize($route->params) . $template);
             if (!empty($blockOptions['cache']['time'])) {
                 return $cache($key, $getBlock, $blockOptions['cache']['time']);

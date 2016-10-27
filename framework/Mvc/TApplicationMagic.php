@@ -142,8 +142,9 @@ trait TApplicationMagic
             if (isset($this->config->cache)) {
                 $config = $this->config->cache;
             } else {
-                $config = new Config(['default' => ['class' => \T4\Cache\File::class, 'path' => ROOT_PATH_PROTECTED . DS . 'Cache']]);
+                $config = new Config;
             }
+            $config->default = $config->default ?? new Config(['class' => \T4\Cache\File::class, 'path' => ROOT_PATH_PROTECTED . DS . 'Cache']);
             $item = new \T4\Cache\Set($config);
         }
         return $item;
