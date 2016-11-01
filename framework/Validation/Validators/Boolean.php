@@ -2,7 +2,7 @@
 
 namespace T4\Validation\Validators;
 
-use T4\Core\Validator;
+use T4\Validation\Validator;
 use T4\Validation\Exceptions\InvalidBoolean;
 
 class Boolean extends Validator

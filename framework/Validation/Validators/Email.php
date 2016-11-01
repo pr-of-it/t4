@@ -2,7 +2,7 @@
 
 namespace T4\Validation\Validators;
 
-use T4\Core\Validator;
+use T4\Validation\Validator;
 use T4\Validation\Exceptions\EmptyValue;
 use T4\Validation\Exceptions\InvalidEmail;
 

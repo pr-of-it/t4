@@ -2,7 +2,7 @@
 
 namespace T4\Validation\Validators;
 
-use T4\Core\Validator;
+use T4\Validation\Validator;
 use T4\Validation\Exceptions\InvalidInt;
 use T4\Validation\Exceptions\OutOfRange;
 
