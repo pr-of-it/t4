@@ -1,13 +1,13 @@
 <?php
 
-namespace T4\Core;
+namespace T4\Validation;
 
 abstract class Validator
 {
 
     abstract public function validate($value): bool;
 
-    public function __invoke($value)
+    final public function __invoke($value): bool
     {
         return $this->validate($value);
     }
