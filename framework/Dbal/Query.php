@@ -109,7 +109,12 @@ class Query
         ) {
             return $s;
         }
-        return $trimmed;
+        $parts = explode('.', $trimmed);
+        if (count($parts) > 1) {
+            return implode('.', array_map([$this, 'trimName'], $parts));
+        } else {
+            return $trimmed;
+        }
     }
 
     /**

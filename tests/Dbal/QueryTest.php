@@ -136,6 +136,20 @@ class QueryTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('select', $query->action);
         $this->assertEquals(['*'], $query->columns);
         $this->assertEquals(['foo', 'bar'], $query->tables);
+
+        $q = $query->select()->from('foo.bar');
+        $this->assertInstanceOf(\T4\Dbal\Query::class, $q);
+        $this->assertEquals($q, $query);
+        $this->assertEquals('select', $query->action);
+        $this->assertEquals(['*'], $query->columns);
+        $this->assertEquals(['foo.bar'], $query->tables);
+
+        $q = $query->select()->from('"foo"."bar"');
+        $this->assertInstanceOf(\T4\Dbal\Query::class, $q);
+        $this->assertEquals($q, $query);
+        $this->assertEquals('select', $query->action);
+        $this->assertEquals(['*'], $query->columns);
+        $this->assertEquals(['foo.bar'], $query->tables);
     }
 
     public function testAction()
@@ -400,7 +414,7 @@ class QueryTest extends PHPUnit_Framework_TestCase
     {
         $query = new \T4\Dbal\Query([
             'action' => 'select',
-            'columns' => 'foo, `bar`, "baz" AS b',
+            'columns' => 'foo, `bar`, "baz" AS b, "public.table1"',
             'tables' => ' tbl  ',
             'joins' => [
                 ['table' => 'tb1', 'on' => 'tb1.id=tbl.baz_id', 'type' => 'left'],
@@ -420,7 +434,7 @@ class QueryTest extends PHPUnit_Framework_TestCase
         $this->assertInstanceOf(\T4\Dbal\Query::class, $query);
         $this->assertFalse($query->isString());
         $this->assertEquals('select', $query->action);
-        $this->assertEquals(['foo', 'bar', '"baz" AS b'], $query->columns);
+        $this->assertEquals(['foo', 'bar', '"baz" AS b', 'public.table1'], $query->columns);
         $this->assertEquals(['tbl'], $query->tables);
         $this->assertEquals([
             ['table' => 'tb1', 'on' => 'tb1.id=tbl.baz_id', 'type' => 'left'],
