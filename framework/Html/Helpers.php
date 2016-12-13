@@ -90,7 +90,11 @@ class Helpers
         $htmlOptionsText = implode(' ', $htmlOptionsText);
 
         $html = '<select ' . $htmlOptionsText . '>' . "\n";
-        if (isset($options['null']) && $options['null']) {
+        if (
+            isset($options['null']) && $options['null']
+            &&
+            $data->first()[$options['valueColumn']] !== 0 && $data->first()[$options['titleColumn']] !== '---'
+        ) {
             $data->prepend([$options['valueColumn'] => 0, $options['titleColumn'] => '---']);
         }
         foreach ($data as $item) {
