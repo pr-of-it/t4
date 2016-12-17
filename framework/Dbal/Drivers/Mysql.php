@@ -371,7 +371,7 @@ class Mysql
         $query = new Query($options);
         $query
             ->select('t1.*')
-            ->from($this->quoteName($class::getTableName()));
+            ->from($class::getTableName());
         return $this->findAllByQuery($class, $query);
     }
 
@@ -390,7 +390,7 @@ class Mysql
         $query = new Query($options);
         $query
             ->select('t1.*')
-            ->from($this->quoteName($class::getTableName()))
+            ->from($class::getTableName())
             ->limit(1);
         return $this->findByQuery($class, $query);
     }
@@ -412,7 +412,7 @@ class Mysql
         $query = new Query($options);
         $query
             ->select('t1.*')
-            ->from($this->quoteName($class::getTableName()))
+            ->from($class::getTableName())
             ->where($this->quoteName($column) . '=:columnvalue' . (!empty($query->where) ? ' AND (' . $query->where . ')' : ''))
             ->param(':columnvalue', $value);
         return $this->findAllByQuery($class, $query);
@@ -435,7 +435,7 @@ class Mysql
         $query = new Query($options);
         $query
             ->select('t1.*')
-            ->from($this->quoteName($class::getTableName()))
+            ->from($class::getTableName())
             ->where($this->quoteName($column) . '=:columnvalue' . (!empty($query->where) ? ' AND (' . $query->where . ')' : ''))
             ->limit(1)
             ->param(':columnvalue', $value);
@@ -474,7 +474,7 @@ class Mysql
         $query = new Query($options);
         $query
             ->select('COUNT(*)')
-            ->from($this->quoteName($class::getTableName()));
+            ->from($class::getTableName());
         return (int)$class::getDbConnection()->query($query)->fetchScalar();
     }
 
@@ -495,7 +495,7 @@ class Mysql
         $query = new Query($options);
         $query
             ->select('COUNT(*)')
-            ->from($this->quoteName($class::getTableName()))
+            ->from($class::getTableName())
             ->where($this->quoteName($column) . '=:columnvalue' . (!empty($query->where) ? ' AND (' . $query->where . ')' : ''))
             ->param(':columnvalue', $value);
         return (int)$class::getDbConnection()->query($query)->fetchScalar();
@@ -580,7 +580,7 @@ class Mysql
         $connection = $class::getDbConnection();
         $query = (new Query())
             ->delete()
-            ->from($this->quoteName($class::getTableName()))
+            ->from($class::getTableName())
             ->where($this->quoteName($class::PK) . '=:id')
             ->param(':id', $model->getPk());
         $connection->execute($query);
