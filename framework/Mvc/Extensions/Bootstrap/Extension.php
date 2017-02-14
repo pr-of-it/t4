@@ -12,7 +12,7 @@ class Extension
         $assets = $this->app->assets;
         $theme = $this->config->theme;
 
-        $version = (int)$this->config->version ?? '3.3.7';
+        $version = $this->config->version ?: '3.3.7';
 
         if (isset($this->config->location) && 'local' == $this->config->location) {
 
