@@ -110,6 +110,8 @@ class Pgsql
                 $ddl = 'CHARACTER(' . (isset($options['length']) ? (int)$options['length'] : 255) . ')';
                 break;
             case 'string':
+                $ddl = 'VARCHAR(' . (isset($options['length']) ? (int)$options['length'] : 255) . ')';
+                break;
             default:
                 $ddl = $options['type'];
                 break;
