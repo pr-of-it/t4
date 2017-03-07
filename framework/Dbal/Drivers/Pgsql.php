@@ -111,11 +111,7 @@ class Pgsql
                 break;
             case 'string':
             default:
-                if (isset($options['length'])) {
-                    $ddl = 'VARCHAR(' . (int)$options['length'] . ')';
-                } else {
-                    $ddl = 'VARCHAR';
-                }
+                $ddl = $options['type'];
                 break;
         }
 

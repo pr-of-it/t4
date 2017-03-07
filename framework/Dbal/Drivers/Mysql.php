@@ -130,8 +130,10 @@ class Mysql
                 $ddl = 'CHAR(' . (isset($options['length']) ? (int)$options['length'] : 255) . ')';
                 break;
             case 'string':
-            default:
                 $ddl = 'VARCHAR(' . (isset($options['length']) ? (int)$options['length'] : 255) . ')';
+                break;
+            default:
+                $ddl = $options['type'];
                 break;
         }
 
