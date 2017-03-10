@@ -184,10 +184,6 @@ class Pgsql
 
         }
 
-        if (!$hasPK) {
-            array_unshift($columnsDDL, $this->createColumnDDL($tableName, Model::PK, ['type' => 'pk']));
-        }
-
         $indexesDDL = [];
         $columnsUsed = [];
 
@@ -200,6 +196,10 @@ class Pgsql
             }
             $indexesDDL[] = 'CREATE ' . $this->createIndexDDL($tableName, $name, $options);
             $columnsUsed[] = $options['columns'];
+        }
+
+        if (!$hasPK) {
+            array_unshift($columnsDDL, $this->createColumnDDL($tableName, Model::PK, ['type' => 'pk']));
         }
 
         $createTableDDL = 'CREATE TABLE ' . $this->quoteName($tableName) . "\n" . '(' . implode(', ', array_unique($columnsDDL)) . ')';

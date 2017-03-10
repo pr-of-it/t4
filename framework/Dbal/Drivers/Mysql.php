@@ -190,6 +190,7 @@ class Mysql
         $indexesDDL = [];
 
         $hasPK = false;
+
         foreach ($columns as $name => $options) {
             $columnsDDL[] = $this->createColumnDDL($name, $options);
             if ('pk' == $options['type']) {
@@ -200,13 +201,17 @@ class Mysql
                 $indexesDDL[] = $this->createIndexDDL('', ['type'=>'index', 'columns'=>[$name]]);
             }
         }
-        if (!$hasPK) {
-            array_unshift($columnsDDL, $this->createColumnDDL(Model::PK, ['type' => 'pk']));
-            array_unshift($indexesDDL, $this->createIndexDDL('', ['type'=>'primary', 'columns'=>[Model::PK]]));
-        }
 
         foreach ($indexes as $name => $options) {
             $indexesDDL[] = $this->createIndexDDL(is_numeric($name) ? '' : $name, $options);
+            if ('primary' == $options['type']) {
+                $hasPK = true;
+            }
+        }
+
+        if (!$hasPK) {
+            array_unshift($columnsDDL, $this->createColumnDDL(Model::PK, ['type' => 'pk']));
+            array_unshift($indexesDDL, $this->createIndexDDL('', ['type'=>'primary', 'columns'=>[Model::PK]]));
         }
 
         $sql .= "(\n" .
