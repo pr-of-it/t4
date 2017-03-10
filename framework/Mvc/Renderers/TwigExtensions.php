@@ -20,6 +20,12 @@ class TwigExtensions
         $app = Application::instance();
         return [
 
+            'lambda' => new \Twig_Function_Function(
+                function (callable $lambda, ...$args) {
+                    return $lambda(...$args);
+                }
+            ),
+
             'asset' => new \Twig_Function_Function(function ($path) use ($app) {return $app->assets->publish($path);}),
             'publish' => new \Twig_Function_Function(function ($path) use ($app) {$app->assets->publish($path);return '';}),
             'publishCss' => new \Twig_Function_Function(function () use ($app) { return $app->assets->getPublishedCss();},  ['is_safe' => ['html']]),
