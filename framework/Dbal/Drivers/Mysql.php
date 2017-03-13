@@ -531,7 +531,14 @@ class Mysql
             } else {
                 $cols[] = $column;
                 $sets[$column] = ':' . $column;
-                $data[':'.$column] = $model->{$column};
+                switch ($def['type']) {
+                    case 'boolean':
+                        $data[':' . $column] = (int)$model->{$column};
+                        break;
+                    default:
+                        $data[':' . $column] = $model->{$column};
+                        break;
+                }
             }
         }
 

@@ -552,7 +552,14 @@ class Pgsql
                 $cols[] = $this->quoteName($column);
                 $prep[] = ':' . $column;
                 $sets[] = '' . $this->quoteName($column) . '=:' . $column;
-                $data[':' . $column] = $model->{$column};
+                switch ($def['type']) {
+                    case 'boolean':
+                        $data[':' . $column] = (int)$model->{$column};
+                        break;
+                    default:
+                        $data[':' . $column] = $model->{$column};
+                        break;
+                }
             }
         }
 
