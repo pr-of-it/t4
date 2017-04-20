@@ -204,7 +204,7 @@ class Mysql
 
         foreach ($indexes as $name => $options) {
             $indexesDDL[] = $this->createIndexDDL(is_numeric($name) ? '' : $name, $options);
-            if ('primary' == $options['type']) {
+            if (isset($options['type']) && 'primary' == $options['type']) {
                 $hasPK = true;
             }
         }

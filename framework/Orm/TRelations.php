@@ -229,7 +229,9 @@ trait TRelations
      */
     protected function setRelation($keys, $value)
     {
+        /** @var \T4\Orm\Model $class */
         $class = get_class($this);
+
         $relations = $class::getRelations();
         $key = array_shift($keys);
         if (empty($relations[$key])) {
@@ -237,17 +239,22 @@ trait TRelations
         }
 
         $relation = $relations[$key];
+
         switch ($relation['type']) {
 
             case $class::HAS_ONE:
+                $thatColumnName = $class::getRelationLinkName($relation);
             case $class::BELONGS_TO:
+                $thatColumnName = $class::getBelongsToThatLinkColumnName($relation);
+
+                /** @var \T4\Orm\Model $relationClass */
                 $relationClass = $relation['model'];
                 
                 if (empty($keys)) { // relation model fetching
                     if (empty($value) || $value instanceof $relationClass) {
                         $this->$key = $value;
                     } else {
-                        $this->$key = $relationClass::findByPk($value);
+                        $this->$key = $relationClass::findByColumn($thatColumnName, $value);
                     }
                 } else { // model relation structure batch restoring
                     if (empty($this->innerIsSet($key))) {
@@ -299,7 +306,8 @@ trait TRelations
             if ( $this->{$key}->isNew() ) {
                 $this->{$key}->save();
             }
-            $this->{$column} = $this->{$key}->getPk();
+            $thatColumnName = $class::getBelongsToThatLinkColumnName($relation);
+            $this->{$column} = $this->{$key}->{$thatColumnName};
         } else {
             $this->{$column} = null;
         }

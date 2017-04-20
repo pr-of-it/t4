@@ -72,7 +72,7 @@ class Standard
         $columns = $class::getColumns();
         foreach ($columns as $name => $column) {
             if ($column['type'] == 'json' && null !== $model->$name) {
-                $decoded = json_decode($model->$name, true);
+                $decoded = json_decode($model->$name, true, 512, JSON_BIGINT_AS_STRING);
                 if (is_scalar($decoded)) {
                     $model->$name = $decoded;
                 } else {
