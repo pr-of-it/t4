@@ -13,7 +13,7 @@ class Extension
         if ( isset($this->config->location) && 'local' == $this->config->location ) {
             $assets->publishJsFile($this->assetsPath.'/lib/js/jquery-2.1.0.min.js');
         } else {
-            $assets->registerJsUrl('http://code.jquery.com/jquery-2.1.0.min.js');
+            $assets->registerJsUrl('//code.jquery.com/jquery-2.1.0.min.js');
         }
 
         if (!empty($this->config->ui)) {
