@@ -34,6 +34,12 @@ class CollectionTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(3, $collection1[2]);
     }
 
+    public function testConstructWithZeroKey()
+    {
+        $collection = new Collection([1 => '1', 0 => '0', 2 => '2']);
+        $this->assertCount(3, $collection);
+    }
+
     public function testAppendPrependAdd()
     {
         $collection = new Collection();

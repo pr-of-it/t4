@@ -36,6 +36,12 @@ class StdTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($obj[2], 'baz');
     }
 
+    public function testConstructWithZeroKey()
+    {
+        $obj = new T4\Core\Std([1 => '1', 0 => '0', 2 => '2']);
+        $this->assertCount(3, $obj);
+    }
+
     public function testArrayAccess()
     {
         $obj = new T4\Core\Std();

@@ -51,7 +51,7 @@ trait TArrayAccess
      */
     protected function innerSet($offset, $value)
     {
-        if ('' == $offset) {
+        if (null === $offset) {
             if (empty($this->storage)) {
                 $offset = 0;
             } else {
@@ -147,7 +147,7 @@ trait TArrayAccess
     public function fromArray($data)
     {
         foreach ($data as $offset => $value) {
-            $this[$offset] = $value;
+            $this->innerSet($offset, $value);
         }
         return $this;
     }
