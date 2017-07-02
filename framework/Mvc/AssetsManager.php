@@ -57,7 +57,6 @@ class AssetsManager
 
         $type = is_dir($realPath) ? 'dir' : 'file';
 
-
         // Получаем время последней модификации ресурса
         // и, заодно, путь до него и до возможной публикации
         clearstatcache(true, $realPath);
@@ -78,9 +77,9 @@ class AssetsManager
 
             Helpers::mkDir($assetBasePath);
             if ('dir' == $type) {
-                Helpers::copyDir($realPath, $assetBasePath);
+                Helpers::copyDir($realPath, $assetBasePath, 0666);
             } else {
-                Helpers::copyFile($realPath, $assetBasePath);
+                Helpers::copyFile($realPath, $assetBasePath, 0666);
             }
 
         } else {
@@ -94,12 +93,12 @@ class AssetsManager
                     !is_readable($assetBasePath . DS . $baseRealName)
                     || $lastModifiedTime >= filemtime($assetBasePath . DS . $baseRealName)
                 ) {
-                    Helpers::copyFile($realPath, $assetBasePath);
+                    Helpers::copyFile($realPath, $assetBasePath, 0666);
                 }
             } else {
                 // Это папка. Она уже скопирована. Но протухла
                 if ($lastModifiedTime >= filemtime($assetBasePath . DS . '.')) {
-                    Helpers::copyDir($realPath, $assetBasePath);
+                    Helpers::copyDir($realPath, $assetBasePath, 0666);
                 }
             }
 

@@ -123,7 +123,7 @@ class Helpers
      * @param $dst Папка-приемник
      * @throws \T4\Fs\Exception
      */
-    public static function copyDir($src, $dst)
+    public static function copyDir($src, $dst, $fileMode = 0644)
     {
         $src = realpath($src);
         if (!is_readable($src)) {
@@ -155,7 +155,7 @@ class Helpers
             if (is_dir($file)) {
                 self::copyDir($file, $dst . DS . $fileName);
             } else {
-                self::copyFile($file, $dst);
+                self::copyFile($file, $dst, $fileMode);
             }
         }
     }
