@@ -37,6 +37,14 @@ class AssetsManager
      */
     protected $publishedJs = [];
 
+    protected function getPathHash(string $path, string $prefix=''): string
+    {
+        if (!empty($prefix) && 0 === strpos($path, $prefix)) {
+            $path = substr($path, strlen($prefix));
+        }
+        return sha1($path);
+    }
+
     /**
      * Публикует ресурс (файл или директорию)
      * Возвращает публичный URL ресурса
@@ -68,7 +76,7 @@ class AssetsManager
             $baseRealName = pathinfo($realPath, PATHINFO_BASENAME);
             $lastModifiedTime = filemtime($realPath);
         }
-        $pathHash = substr(md5($baseRealPath), 0, 12);
+        $pathHash = $this->getPathHash($baseRealPath, ROOT_PATH_PROTECTED);
         $assetBasePath = ROOT_PATH_PUBLIC . DS . 'Assets' . DS . $pathHash;
         $assetBaseUrl = '/Assets/' . $pathHash;
 
