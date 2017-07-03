@@ -57,11 +57,13 @@ class AssetsManager
         $realPath = $this->getRealPath($path);
 
         // TODO: смущает меня этот кусок, если честно. Надо внимательно его перепроверить.
+        /*
         foreach ($this->assets as $asset) {
             if (false !== strpos($realPath, $asset['path'])) {
                 return str_replace(DS, '/', str_replace($asset['path'], $asset['url'], $realPath));
             }
         }
+        */
 
         $type = is_dir($realPath) ? 'dir' : 'file';
 
