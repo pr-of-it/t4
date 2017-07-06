@@ -4,6 +4,7 @@ require_once '{{ROOT_PATH_T4}}' . '/boot.php';
 require_once '{{ROOT_PATH_PROTECTED}}' . '/boot.php';
 require_once '{{ROOT_PATH_T4}}' . '/autoload.php';
 require_once '{{ROOT_PATH_PROTECTED}}' . '/autoload.php';
+\T4\Core\Session::init();
 
 /*
  * ### CKFinder : Configuration File - Basic Instructions
@@ -37,7 +38,9 @@ function CheckAuthentication()
 	// forget to add session_start() at the top of this file.
 
 	$app = \T4\Mvc\Application::instance()->setConfig(new \T4\Core\Config(ROOT_PATH_PROTECTED . '/config.php'));
-	return !empty($app->user);
+	$hasUserInApplication = !empty($app->user);
+	$hasUserInSession =  boolval(\T4\Core\Session::get('__user'));
+	return $hasUserInApplication || $hasUserInSession;
 }
 
 // LicenseKey : Paste your license key here. If left blank, CKFinder will be
