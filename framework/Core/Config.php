@@ -104,7 +104,7 @@ class Config
 
     protected function innerSet($key, $val)
     {
-        if ('path' == $key) {
+        if ('path' === $key) {
             $this->__data['path'] = $val;
         } else {
             parent::innerSet($key, $val);
@@ -113,7 +113,7 @@ class Config
 
     protected function innerGet($key)
     {
-        if ('path' == $key) {
+        if ('path' === $key) {
             return $this->__data['path'];
         } else {
             return parent::innerGet($key);
