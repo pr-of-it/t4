@@ -186,9 +186,15 @@ class Helpers
     public static function dirMTime($path)
     {
         clearstatcache();
-        return max(array_map(function ($f) {
-            return filemtime($f);
-        }, self::listDirRecursive($path)));
+        return max(
+            array_map(
+                function ($f) {
+                    return filemtime($f);
+                },
+                self::listDirRecursive($path)
+            ),
+            filemtime($path)
+        );
     }
 
 }

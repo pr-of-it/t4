@@ -37,14 +37,6 @@ class AssetsManager
      */
     protected $publishedJs = [];
 
-    protected function getPathHash(string $path, string $prefix=''): string
-    {
-        if (!empty($prefix) && 0 === strpos($path, $prefix)) {
-            $path = substr($path, strlen($prefix));
-        }
-        return sha1($path);
-    }
-
     /**
      * Публикует ресурс (файл или директорию)
      * Возвращает публичный URL ресурса
@@ -57,15 +49,14 @@ class AssetsManager
         $realPath = $this->getRealPath($path);
 
         // TODO: смущает меня этот кусок, если честно. Надо внимательно его перепроверить.
-        /*
         foreach ($this->assets as $asset) {
             if (false !== strpos($realPath, $asset['path'])) {
                 return str_replace(DS, '/', str_replace($asset['path'], $asset['url'], $realPath));
             }
         }
-        */
 
         $type = is_dir($realPath) ? 'dir' : 'file';
+
 
         // Получаем время последней модификации ресурса
         // и, заодно, путь до него и до возможной публикации
@@ -78,7 +69,7 @@ class AssetsManager
             $baseRealName = pathinfo($realPath, PATHINFO_BASENAME);
             $lastModifiedTime = filemtime($realPath);
         }
-        $pathHash = $this->getPathHash($baseRealPath, ROOT_PATH_PROTECTED);
+        $pathHash = sha1($baseRealPath);
         $assetBasePath = ROOT_PATH_PUBLIC . DS . 'Assets' . DS . $pathHash;
         $assetBaseUrl = '/Assets/' . $pathHash;
 
@@ -87,9 +78,9 @@ class AssetsManager
 
             Helpers::mkDir($assetBasePath);
             if ('dir' == $type) {
-                Helpers::copyDir($realPath, $assetBasePath, 0666);
+                Helpers::copyDir($realPath, $assetBasePath);
             } else {
-                Helpers::copyFile($realPath, $assetBasePath, 0666);
+                Helpers::copyFile($realPath, $assetBasePath);
             }
 
         } else {
@@ -103,12 +94,12 @@ class AssetsManager
                     !is_readable($assetBasePath . DS . $baseRealName)
                     || $lastModifiedTime >= filemtime($assetBasePath . DS . $baseRealName)
                 ) {
-                    Helpers::copyFile($realPath, $assetBasePath, 0666);
+                    Helpers::copyFile($realPath, $assetBasePath);
                 }
             } else {
                 // Это папка. Она уже скопирована. Но протухла
                 if ($lastModifiedTime >= filemtime($assetBasePath . DS . '.')) {
-                    Helpers::copyDir($realPath, $assetBasePath, 0666);
+                    Helpers::copyDir($realPath, $assetBasePath);
                 }
             }
 
