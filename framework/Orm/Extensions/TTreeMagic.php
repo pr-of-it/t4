@@ -90,6 +90,19 @@ trait TTreeMagic
                     ->params([':lft'=>$model->__lft, ':rgt'=>$model->__rgt]);
                 return $class::findAllByQuery($query);
 
+            case 'hasChildren':
+                return $model->__rgt - $model->__lft > 1;
+                /*
+                $query = new Query();
+                $query
+                    ->select('COUNT(*)')
+                    ->from($class::getTableName())
+                    ->where('__lft>:lft AND __rgt<:rgt')
+                    ->order('__lft')
+                    ->params([':lft'=>$model->__lft, ':rgt'=>$model->__rgt]);
+                return 0 != $connection->query($query)->fetchScalar();
+                */
+
             case 'findAllChildren':
                 $query = new Query();
                 $query
@@ -99,16 +112,6 @@ trait TTreeMagic
                     ->order('__lft')
                     ->params([':lft'=>$model->__lft, ':rgt'=>$model->__rgt]);
                 return $class::findAllByQuery($query);
-
-            case 'hasChildren':
-                $query = new Query();
-                $query
-                    ->select('COUNT(*)')
-                    ->from($class::getTableName())
-                    ->where('__lft>:lft AND __rgt<:rgt')
-                    ->order('__lft')
-                    ->params([':lft'=>$model->__lft, ':rgt'=>$model->__rgt]);
-                return 0 != $connection->query($query)->fetchScalar();
 
             case 'findSubTree':
                 $query = new Query();
