@@ -326,6 +326,7 @@ trait TRelations
 
         /** @var \T4\Orm\Model $oldSubModel */
         $oldSubModel = $this->getRelationLazy($key);
+
         /** @var \T4\Orm\Model $newSubModel */
         $newSubModel = $this->{$key};
 

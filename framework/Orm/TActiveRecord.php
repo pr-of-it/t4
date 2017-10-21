@@ -84,7 +84,7 @@ trait TActiveRecord
             switch ($relation['type']) {
 
                 case static::HAS_ONE:
-                    if ( null === $this->{$key} || $this->{$key} instanceof Model ) {
+                    if ( !empty($this->{$key}) || $this->{$key} instanceof Model ) {
                         $this->saveRelationsAfterHasOne($key);
                     }
                     break;
