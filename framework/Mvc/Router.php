@@ -67,6 +67,12 @@ class Router
                         if (!($route instanceof Route)) {
                             $route = new Route($route);
                         }
+                        if (empty($route->action)) {
+                            $route->action = self::DEFAULT_ACTION;
+                        }
+                        if (empty($route->params)) {
+                            $route->params = new Route([]);
+                        }
                         if (empty($route->format)) {
                             $route->format = $request->extension ?: $this->allowedExtensions[0];
                         }
