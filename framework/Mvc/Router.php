@@ -112,7 +112,7 @@ class Router
         }
 
         $parts = parse_url($path);
-        $basePath = isset($parts['path']) ? $parts['path'] : null;
+        $basePath = !empty($parts['path']) ? $parts['path'] : '/';
 
         if (empty($basePath)) {
             $extension = null;
