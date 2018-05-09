@@ -134,11 +134,14 @@ class Application
 
     /**
      * @param null $module
-     * @param $controller
+     * @param string $controller
      * @return bool
      */
     public function existsController($module = null, $controller)
     {
+        if (class_exists($controller) && is_subclass_of($controller, Controller::class)) {
+            return true;
+        }
         $controllerClassName = (empty($module) ? '\\App\\Controllers\\' : '\\App\\Modules\\' . ucfirst($module) . '\\Controllers\\') . ucfirst($controller);
         return $this->existsModule($module) && class_exists($controllerClassName) && is_subclass_of($controllerClassName, Controller::class);
     }
@@ -151,14 +154,19 @@ class Application
      */
     public function createController($module = null, $controller)
     {
-        if (!$this->existsController($module ?:  null, $controller)) {
+        if (!$this->existsController($module ?: null, $controller)) {
             throw new Exception('Controller ' . $controller . ' does not exist');
         }
 
-        if (empty($module))
-            $controllerClass = '\\App\\Controllers\\' . $controller;
-        else
-            $controllerClass = '\\App\\Modules\\' . ucfirst($module) . '\\Controllers\\' . ucfirst($controller);
+        if (class_exists($controller) && is_subclass_of($controller, Controller::class)) {
+            $controllerClass = $controller;
+        } else {
+            if (empty($module)) {
+                $controllerClass = '\\App\\Controllers\\' . $controller;
+            } else {
+                $controllerClass = '\\App\\Modules\\' . ucfirst($module) . '\\Controllers\\' . ucfirst($controller);
+            }
+        }
 
         $controller = new $controllerClass;
 
