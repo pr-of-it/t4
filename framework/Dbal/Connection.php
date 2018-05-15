@@ -173,4 +173,9 @@ class Connection
     {
         return $this->pdo->commit();
     }
+
+    public function inTransaction(): bool
+    {
+        return $this->pdo->inTransaction();
+    }
 }
