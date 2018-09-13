@@ -30,7 +30,14 @@ class Migrate
             if (!$this->isInstalled()) {
                 $this->install();
             }
-            $migrations = $this->getMigrationsAfter($this->getLastMigrationTime());
+
+            $lastMigrationTime = $this->getLastMigrationTime();
+
+            if (!empty($notExecutedMigrations = $this->getNotExecutedMigrationsBefore($lastMigrationTime))) {
+                throw new Exception('Not executed earlier migrations found: ' . implode(', ', $notExecutedMigrations));
+            }
+
+            $migrations = $this->getMigrationsAfter($lastMigrationTime);
             foreach ($migrations as $migration) {
                 $this->writeLn($migration->getName() . ' up...');
                 $migration->up();
@@ -76,6 +83,31 @@ class Migrate
             }
         }
         return $migrations;
+    }
+
+    protected function getNotExecutedMigrationsBefore($time)
+    {
+        $migrationsBefore = [];
+
+        foreach (glob($this->getMigrationsPath() . DS . sprintf(self::SEARCH_FILE_NAME_PATTERN, '*', '*') . '.php') as $fileName) {
+            $className = self::MIGRATIONS_NAMESPACE . '\\' . pathinfo($fileName, PATHINFO_FILENAME);
+            /** @var Migration $migration */
+            $migration = new $className;
+
+            if ($migration->getTimestamp() < $time) {
+                $query = (new Query())
+                    ->select('COUNT(*)')
+                    ->from(self::TABLE_NAME)
+                    ->where('time = :time')
+                    ->params([':time' => $migration->getTimestamp()]);
+
+                if (0 === $this->app->db->default->query($query)->fetchScalar()) {
+                    $migrationsBefore[] = $migration->getName();
+                }
+            }
+        }
+
+        return $migrationsBefore;
     }
 
     protected function getMigrationsPath($module = null)
