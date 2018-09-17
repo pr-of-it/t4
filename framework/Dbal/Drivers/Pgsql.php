@@ -17,7 +17,7 @@ class Pgsql
     use TPgsqlQueryBuilder;
     use TPgsqlQuery;
 
-    protected $selectNoQouteTemplate = '~count|avg|group_concat|min|max|sum~i';
+    protected $selectNoQouteTemplate = '~distinct|count|avg|group_concat|min|max|sum~i';
 
     public function quoteName($name)
     {

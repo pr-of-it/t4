@@ -17,7 +17,7 @@ class Mysql
     use TMysqlQueryBuilder;
     use TMysqlQuery;
 
-    protected $selectNoQouteTemplate = '~count|avg|group_concat|min|max|sum~i';
+    protected $selectNoQouteTemplate = '~distinct|count|avg|group_concat|min|max|sum~i';
 
     public function quoteName($name)
     {
