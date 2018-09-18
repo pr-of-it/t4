@@ -37,7 +37,7 @@ namespace T4\Tests\Orm\Relations {
         extends BaseTest
     {
 
-        protected function setUp()
+        protected function setUp(): void
         {
             $this->getT4Connection()->execute('CREATE TABLE cats (__id SERIAL, num INT)');
             $this->getT4Connection()->execute('
@@ -58,7 +58,7 @@ namespace T4\Tests\Orm\Relations {
 
         }
 
-        protected function tearDown()
+        protected function tearDown(): void
         {
             $this->getT4Connection()->execute('DROP TABLE cats');
             $this->getT4Connection()->execute('DROP TABLE items');

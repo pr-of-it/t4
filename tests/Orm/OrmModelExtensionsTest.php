@@ -33,7 +33,7 @@ namespace {
         protected static $extensions = ['foo'];
     }
 
-    class OrmModelExtensionsTest extends PHPUnit_Framework_TestCase
+    class OrmModelExtensionsTest extends \PHPUnit\Framework\TestCase
     {
 
         public function testColumns()

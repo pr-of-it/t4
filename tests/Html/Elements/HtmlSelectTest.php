@@ -12,7 +12,7 @@ class DummyModel extends Model {
     ];
 }
 
-class HtmlSelectTest extends PHPUnit_Framework_TestCase {
+class HtmlSelectTest extends \PHPUnit\Framework\TestCase {
 
     public function testRender()
     {

@@ -11,7 +11,7 @@ class TestStdClass3 extends \T4\Core\Std {
 
 }
 
-class StdIArrayableTest extends PHPUnit_Framework_TestCase
+class StdIArrayableTest extends \PHPUnit\Framework\TestCase
 {
 
 

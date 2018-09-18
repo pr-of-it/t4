@@ -9,7 +9,7 @@ use T4\Validation\Validators\Email;
 
 require_once realpath(__DIR__ . '/../../../framework/boot.php');
 
-class EmailTest extends \PHPUnit_Framework_TestCase
+class EmailTest extends \PHPUnit\Framework\TestCase
 {
 
     public function testPositive()

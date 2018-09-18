@@ -4,7 +4,7 @@ require_once realpath(__DIR__ . '/../../../../../framework/boot.php');
 require_once __DIR__ . '/../testClasses.php';
 require_once __DIR__ . '/../TPgsqlDbTest.php';
 
-class PqsqlOrmExtTreeRemoveTest extends PHPUnit_Extensions_Database_TestCase
+class PqsqlOrmExtTreeRemoveTest extends \PHPUnit\DbUnit\TestCase
 {
 
     use TPgsqlDbTest;

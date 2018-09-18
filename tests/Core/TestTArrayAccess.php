@@ -8,7 +8,7 @@ class TestAA
     use \T4\Core\TArrayAccess;
 }
 
-class TestTArrayAccess extends PHPUnit_Framework_TestCase
+class TestTArrayAccess extends \PHPUnit\Framework\TestCase
 {
 
     public function testSetGet()

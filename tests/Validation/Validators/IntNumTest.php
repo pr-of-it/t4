@@ -9,7 +9,7 @@ use T4\Validation\Validators\IntNum;
 
 require_once realpath(__DIR__ . '/../../../framework/boot.php');
 
-class IntNumTest extends \PHPUnit_Framework_TestCase
+class IntNumTest extends \PHPUnit\Framework\TestCase
 {
 
     public function testPositive()

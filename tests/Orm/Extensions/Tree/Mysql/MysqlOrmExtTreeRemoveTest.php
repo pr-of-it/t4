@@ -4,7 +4,7 @@ require_once realpath(__DIR__ . '/../../../../../framework/boot.php');
 require_once __DIR__ . '/../testClasses.php';
 require_once __DIR__ . '/../TMysqlDbTest.php';
 
-class MysqlOrmExtTreeRemoveTest extends PHPUnit_Extensions_Database_TestCase
+class MysqlOrmExtTreeRemoveTest extends \PHPUnit\DbUnit\TestCase
 {
 
     use TMysqlDbTest;

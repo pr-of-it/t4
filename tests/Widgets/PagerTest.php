@@ -8,7 +8,7 @@ use T4\Widgets\Pager;
 
 require_once realpath(__DIR__ . '/../../framework/boot.php');
 
-class PagerTest extends \PHPUnit_Framework_TestCase
+class PagerTest extends \PHPUnit\Framework\TestCase
 {
 
     public function testGetPageLink()

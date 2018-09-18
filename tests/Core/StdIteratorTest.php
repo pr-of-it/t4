@@ -11,7 +11,7 @@ class TestStdClass4 extends \T4\Core\Std {
 
 }
 
-class StdIteratorTest extends PHPUnit_Framework_TestCase
+class StdIteratorTest extends \PHPUnit\Framework\TestCase
 {
 
 

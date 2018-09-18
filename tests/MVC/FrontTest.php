@@ -38,7 +38,7 @@ class TestApp implements \T4\Mvc\IApplication {
     }
 }
 
-class FrontTest extends PHPUnit_Framework_TestCase
+class FrontTest extends \PHPUnit\Framework\TestCase
 {
 
     public function testTemplateFileName()

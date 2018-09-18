@@ -2,7 +2,7 @@
 
 require_once realpath(__DIR__ . '/../../framework/boot.php');
 
-class FileTest extends PHPUnit_Framework_TestCase
+class FileTest extends \PHPUnit\Framework\TestCase
 {
 
     protected function setUp()

@@ -32,7 +32,7 @@ namespace T4\Tests\Orm {
 
 
     class QueryDataProviderTest
-        extends \PHPUnit_Framework_TestCase
+        extends \PHPUnit\Framework\TestCase
     {
 
         public function testQueryForCount()

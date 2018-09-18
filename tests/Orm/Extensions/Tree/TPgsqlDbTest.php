@@ -14,7 +14,7 @@ trait TPgsqlDbTest
         return new \T4\Dbal\Connection($this->getT4ConnectionConfig());
     }
 
-    public function setUp()
+    protected function setUp(): void
     {
         $config = $this->getT4ConnectionConfig();
         $this->connection = new \Pdo('pgsql:dbname=' . $config->dbname . ';host=' . $config->host . '', $config->user, $config->password);

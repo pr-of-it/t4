@@ -9,7 +9,7 @@ use T4\Dbal\Query;
 require_once realpath(__DIR__ . '/../../../framework/boot.php');
 
 abstract class BaseTest
-    extends \PHPUnit_Extensions_Database_TestCase
+    extends \PHPUnit\DbUnit\TestCase
 {
 
     /**

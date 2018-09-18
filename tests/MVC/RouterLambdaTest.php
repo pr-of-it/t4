@@ -35,7 +35,7 @@ function getLambdaRouteConfig()
     ]);
 }
 
-class RouterLambdaTest extends PHPUnit_Framework_TestCase
+class RouterLambdaTest extends \PHPUnit\Framework\TestCase
 {
 
     public function testParseUrl()

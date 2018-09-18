@@ -16,7 +16,7 @@ function getSimpleRouteConfig()
     ]);
 }
 
-class RouterSimpleTest extends PHPUnit_Framework_TestCase
+class RouterSimpleTest extends \PHPUnit\Framework\TestCase
 {
 
     public function testSplitRequestPath()

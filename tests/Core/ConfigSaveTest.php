@@ -4,7 +4,7 @@ use T4\Core\Config;
 
 require_once realpath(__DIR__ . '/../../framework/boot.php');
 
-class ConfigSaveTest extends PHPUnit_Framework_TestCase
+class ConfigSaveTest extends \PHPUnit\Framework\TestCase
 {
 
     protected function setUp()

@@ -2,7 +2,7 @@
 
 require_once realpath(__DIR__ . '/../../../framework/boot.php');
 
-class PgsqlDriverTest extends PHPUnit_Framework_TestCase {
+class PgsqlDriverTest extends \PHPUnit\Framework\TestCase {
 
     public function testQuoteName()
     {

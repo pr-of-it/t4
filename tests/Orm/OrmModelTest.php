@@ -12,7 +12,7 @@ class Book extends \T4\Orm\Model
     ];
 }
 
-class OrmModelTest extends PHPUnit_Extensions_Database_TestCase
+class OrmModelTest extends \PHPUnit\DbUnit\TestCase
 {
 
     protected $connection;

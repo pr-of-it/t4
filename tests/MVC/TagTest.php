@@ -11,7 +11,7 @@ class TestTag extends \T4\Mvc\Tag
 
 ;
 
-class TagTest extends PHPUnit_Framework_TestCase
+class TagTest extends \PHPUnit\Framework\TestCase
 {
 
     public function testParseParams()

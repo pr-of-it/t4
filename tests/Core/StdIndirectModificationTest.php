@@ -13,7 +13,7 @@ namespace T4\Tests\Core\Std {
         }
     }
 
-    class StdIndirectModificationTest extends \PHPUnit_Framework_TestCase
+    class StdIndirectModificationTest extends \PHPUnit\Framework\TestCase
     {
 
         public function testConstruct()

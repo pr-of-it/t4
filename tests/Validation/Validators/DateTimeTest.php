@@ -9,7 +9,7 @@ use T4\Validation\Validators\DateTime;
 
 require_once realpath(__DIR__ . '/../../../framework/boot.php');
 
-class DateTimeTest extends \PHPUnit_Framework_TestCase
+class DateTimeTest extends \PHPUnit\Framework\TestCase
 {
 
     public function testPositive()

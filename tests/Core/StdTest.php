@@ -20,7 +20,7 @@ class TestStdClass2 extends \T4\Core\Std {
 
 }
 
-class StdTest extends PHPUnit_Framework_TestCase
+class StdTest extends \PHPUnit\Framework\TestCase
 {
 
     public function testAdd()

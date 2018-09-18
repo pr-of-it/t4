@@ -2,7 +2,7 @@
 
 require_once realpath(__DIR__ . '/../../../framework/boot.php');
 
-class InputTest extends PHPUnit_Framework_TestCase
+class InputTest extends \PHPUnit\Framework\TestCase
 {
 
     public function testText()

@@ -2,7 +2,7 @@
 
 require_once realpath(__DIR__ . '/../../framework/boot.php');
 
-class MemcacheTest extends PHPUnit_Framework_TestCase
+class MemcacheTest extends \PHPUnit\Framework\TestCase
 {
 
     public function testCache()

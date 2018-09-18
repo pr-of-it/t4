@@ -15,7 +15,7 @@ class BeginsWithTestTestConnection extends Connection {
     }
 }
 
-class BeginsWithTest extends \PHPUnit_Framework_TestCase
+class BeginsWithTest extends \PHPUnit\Framework\TestCase
 {
 
     public function testModifyQuery()

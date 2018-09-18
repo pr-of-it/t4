@@ -2,7 +2,7 @@
 
 require_once realpath(__DIR__ . '/../../framework/boot.php');
 
-class UploaderTest extends PHPUnit_Framework_TestCase
+class UploaderTest extends \PHPUnit\Framework\TestCase
 {
 
     public function testSuggestUploadedFileName()
