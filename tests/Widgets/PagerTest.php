@@ -23,9 +23,10 @@ class PagerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('http://example.com/test.html?foo=1&bar%5Bbaz%5D=2&page=3', $link);
 
         $_SERVER = [
-            'SERVER_PORT' => '80',
-            'HTTP_HOST'   => 'example.com',
-            'REQUEST_URI' => '/test.html?foo=1&bar%5Bbaz%5D=2',
+            'SERVER_PORT'  => '80',
+            'HTTP_HOST'    => 'example.com',
+            'REQUEST_URI'  => '/test.html?foo=1&bar%5Bbaz%5D=2',
+            'REQUEST_TIME' => \time(),
         ];
         $pager = new Pager(['total' => 7]);
         $link = $getLink->invokeArgs($pager, ['page' => 3]);
