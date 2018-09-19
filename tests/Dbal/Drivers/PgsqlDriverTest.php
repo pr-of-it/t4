@@ -2,7 +2,7 @@
 
 require_once realpath(__DIR__ . '/../../../framework/boot.php');
 
-class PgsqlDriverTest extends PHPUnit_Framework_TestCase {
+class PgsqlDriverTest extends \PHPUnit\Framework\TestCase {
 
     public function testQuoteName()
     {
@@ -91,7 +91,7 @@ class PgsqlDriverTest extends PHPUnit_Framework_TestCase {
             $reflector->invokeArgs($driver, ['table', 'foo', ['type' => 'char', 'length' => 123]])
         );
         $this->assertEquals(
-            '"foo" VARCHAR',
+            '"foo" VARCHAR(255)',
             $reflector->invokeArgs($driver, ['table', 'foo', ['type' => 'string']])
         );
         $this->assertEquals(
@@ -142,13 +142,13 @@ class PgsqlDriverTest extends PHPUnit_Framework_TestCase {
         );
         $this->assertEquals(
             [
-                'CREATE TABLE "foo"' . "\n" . '("__id" BIGSERIAL PRIMARY KEY, "foo" INTEGER, "bar" VARCHAR)'
+                'CREATE TABLE "foo"' . "\n" . '("__id" BIGSERIAL PRIMARY KEY, "foo" INTEGER, "bar" VARCHAR(255))'
             ],
             $reflector->invokeArgs($driver, ['foo', ['foo'=>['type'=>'int'], 'bar'=>['type'=>'string']]])
         );
         $this->assertEquals(
             [
-                'CREATE TABLE "foo"' . "\n" . '("__id" BIGSERIAL PRIMARY KEY, "lnk" BIGINT, "foo" INTEGER, "bar" VARCHAR)',
+                'CREATE TABLE "foo"' . "\n" . '("__id" BIGSERIAL PRIMARY KEY, "lnk" BIGINT, "foo" INTEGER, "bar" VARCHAR(255))',
                 'CREATE INDEX ON "foo" ("lnk")',
             ],
             $reflector->invokeArgs($driver, ['foo', ['lnk'=>['type'=>'link'], 'foo'=>['type'=>'int'], 'bar'=>['type'=>'string']]])

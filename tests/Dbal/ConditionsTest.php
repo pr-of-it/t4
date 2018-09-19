@@ -8,7 +8,7 @@ namespace T4\Tests\Dbal {
     require_once realpath(__DIR__ . '/../../framework/boot.php');
 
     class ConditionsTest
-        extends \PHPUnit_Framework_TestCase
+        extends \PHPUnit\Framework\TestCase
     {
         
         public function testCreate()

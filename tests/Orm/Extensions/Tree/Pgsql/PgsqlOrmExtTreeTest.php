@@ -4,23 +4,9 @@ require_once realpath(__DIR__ . '/../../../../../framework/boot.php');
 require_once __DIR__ . '/../testClasses.php';
 require_once __DIR__ . '/../TPgsqlDbTest.php';
 
-class PgsqlOrmExtTreeTest extends PHPUnit_Extensions_Database_TestCase
+class PgsqlOrmExtTreeTest extends \PHPUnit\DbUnit\TestCase
 {
     use TPgsqlDbTest;
-
-    public function testMigrationUp()
-    {
-        /*
-        $columns = $this->connection->query('SHOW COLUMNS FROM comments')->fetchAll();
-        $this->assertCount(6, $columns);
-        $this->assertEquals('__id', $columns[0]['Field']);
-        $this->assertEquals('num', $columns[1]['Field']);
-        $this->assertEquals('__lft', $columns[2]['Field']);
-        $this->assertEquals('__rgt', $columns[3]['Field']);
-        $this->assertEquals('__lvl', $columns[4]['Field']);
-        $this->assertEquals('__prt', $columns[5]['Field']);
-        */
-    }
 
     public function testInsert()
     {

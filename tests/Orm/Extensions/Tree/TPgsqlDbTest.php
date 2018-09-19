@@ -6,7 +6,7 @@ trait TPgsqlDbTest
 
     protected function getT4ConnectionConfig()
     {
-        return new \T4\Core\Config(['driver' => 'pgsql', 'host' => '127.0.0.1', 'dbname' => 't4test', 'user' => 'postgres', 'password' => 'postgres']);
+        return new \T4\Core\Config(require __DIR__ . '/../../../dbConfigPostresql.php');
     }
 
     protected function getT4Connection()
@@ -14,7 +14,7 @@ trait TPgsqlDbTest
         return new \T4\Dbal\Connection($this->getT4ConnectionConfig());
     }
 
-    public function setUp()
+    protected function setUp(): void
     {
         $config = $this->getT4ConnectionConfig();
         $this->connection = new \Pdo('pgsql:dbname=' . $config->dbname . ';host=' . $config->host . '', $config->user, $config->password);

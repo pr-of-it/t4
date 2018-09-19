@@ -9,7 +9,7 @@ use T4\Validation\Validators\IpV4;
 
 require_once realpath(__DIR__ . '/../../../framework/boot.php');
 
-class IpV4Test extends \PHPUnit_Framework_TestCase
+class IpV4Test extends \PHPUnit\Framework\TestCase
 {
 
     public function testPositive()

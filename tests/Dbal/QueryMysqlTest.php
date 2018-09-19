@@ -2,7 +2,7 @@
 
 require_once realpath(__DIR__ . '/../../framework/boot.php');
 
-class QueryMysqlTest extends PHPUnit_Framework_TestCase
+class QueryMysqlTest extends \PHPUnit\Framework\TestCase
 {
 
     public function testMysqlMakeStringQuery()

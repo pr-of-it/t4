@@ -2,7 +2,7 @@
 
 require_once realpath(__DIR__ . '/../../../framework/boot.php');
 
-class MysqlDriverTest extends PHPUnit_Framework_TestCase {
+class MysqlDriverTest extends \PHPUnit\Framework\TestCase {
 
     public function testQuoteName()
     {

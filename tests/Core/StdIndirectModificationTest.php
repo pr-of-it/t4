@@ -13,7 +13,7 @@ namespace T4\Tests\Core\Std {
         }
     }
 
-    class StdIndirectModificationTest extends \PHPUnit_Framework_TestCase
+    class StdIndirectModificationTest extends \PHPUnit\Framework\TestCase
     {
 
         public function testConstruct()
@@ -22,21 +22,5 @@ namespace T4\Tests\Core\Std {
             $this->assertEquals([], $obj->foo);
             $this->assertEquals(42, $obj->bar);
         }
-
-        public function testMutate()
-        {
-            /**
-             * THIS TEST FAILS! 
-            $obj = new TestStdClass();
-            $obj->foo[] = 'bla';
-            $obj->bar += 2;
-
-            $this->assertEquals(['bla'], $obj->foo);
-            $this->assertEquals(44, $obj->bar);
-             *
-             */
-        }
-
     }
-
 }

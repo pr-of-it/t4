@@ -15,7 +15,7 @@ class SorterTestTestConnection extends Connection {
     }
 }
 
-class SorterTest extends \PHPUnit_Framework_TestCase
+class SorterTest extends \PHPUnit\Framework\TestCase
 {
 
     public function testModifyQuery()

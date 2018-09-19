@@ -70,7 +70,7 @@ class Values extends \T4\Core\Std
 
 }
 
-class ValidateTest extends PHPUnit_Framework_TestCase
+class ValidateTest extends \PHPUnit\Framework\TestCase
 {
 
     public function testValidateTrue()

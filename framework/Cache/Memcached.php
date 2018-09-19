@@ -4,15 +4,17 @@ namespace T4\Cache;
 
 use T4\Core\Config;
 
-class Memcache
-    implements IDriver
+class Memcached implements IDriver
 {
 
-    const DEFAULT_PORT = 11211;
-    const DEFAULT_CACHE_TIME = 300;
+    protected const DEFAULT_PORT = 11211;
+    protected const DEFAULT_CACHE_TIME = 300;
 
     protected $config;
-    protected $memcache;
+    /**
+     * @var \Memcached
+     */
+    protected $memcached;
 
     public function __construct(Config $config)
     {
@@ -24,8 +26,8 @@ class Memcache
         }
         $this->config = $config;
         try {
-            $this->memcache = new \Memcache();
-            $this->memcache->addserver($config->host, $config->port);
+            $this->memcached = new \Memcached();
+            $this->memcached->addServer($config->host, $config->port);
         } catch (\Exception $e) {
             throw new Exception($e->getMessage(), $e->getCode(), $e);
         }
@@ -37,18 +39,17 @@ class Memcache
             $time = self::DEFAULT_CACHE_TIME;
         }
 
-        if (false === $value = $this->memcache->get($key)) {
-            $res = call_user_func($callback);
-            $this->memcache->set($key, $res, 0, $time);
+        if (false === $value = $this->memcached->get($key)) {
+            $res = $callback();
+            $this->memcached->set($key, $res, $time);
             return $res;
-        } else {
-            return $value;
         }
+
+        return $value;
     }
 
     public function __invoke($key, callable $callback, $time = null)
     {
         return $this->cache($key, $callback, $time);
     }
-
 }

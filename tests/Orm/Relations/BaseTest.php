@@ -9,7 +9,7 @@ use T4\Dbal\Query;
 require_once realpath(__DIR__ . '/../../../framework/boot.php');
 
 abstract class BaseTest
-    extends \PHPUnit_Extensions_Database_TestCase
+    extends \PHPUnit\DbUnit\TestCase
 {
 
     /**
@@ -19,7 +19,7 @@ abstract class BaseTest
 
     protected function getT4ConnectionConfig()
     {
-        return new \T4\Core\Config(['driver' => 'mysql', 'host' => '127.0.0.1', 'dbname' => 't4test', 'user' => 'root', 'password' => '']);
+        return new \T4\Core\Config(require __DIR__ . '/../../dbConfigMySql.php');
     }
 
     protected function getT4Connection()

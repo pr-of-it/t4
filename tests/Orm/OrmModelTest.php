@@ -12,17 +12,17 @@ class Book extends \T4\Orm\Model
     ];
 }
 
-class OrmModelTest extends PHPUnit_Extensions_Database_TestCase
+class OrmModelTest extends \PHPUnit\DbUnit\TestCase
 {
 
     protected $connection;
 
-    protected function getT4ConnectionConfig()
+    protected function getT4ConnectionConfig(): \T4\Core\Config
     {
-        return new \T4\Core\Config(['driver' => 'mysql', 'host' => '127.0.0.1', 'dbname' => 't4test', 'user' => 'root', 'password' => '']);
+        return new \T4\Core\Config(require __DIR__ . '/../dbConfigMySql.php');
     }
 
-    protected function getT4Connection()
+    protected function getT4Connection(): \T4\Dbal\Connection
     {
         return new \T4\Dbal\Connection($this->getT4ConnectionConfig());
     }
@@ -33,11 +33,12 @@ class OrmModelTest extends PHPUnit_Extensions_Database_TestCase
         $this->connection = new \Pdo('mysql:dbname=' . $config->dbname . ';host=' . $config->host . '', $config->user, $config->password);
         $this->connection->query('DROP TABLE `books`');
         $this->connection->query('CREATE TABLE `books` (`__id` SERIAL, `title` VARCHAR(255), `author` VARCHAR(100))');
+        parent::__construct();
     }
 
     /**
      * Returns the test database connection.
-     * @return PHPUnit_Extensions_Database_DB_IDatabaseConnection
+     * @return \PHPUnit\DbUnit\Database\DefaultConnection
      */
     protected function getConnection()
     {
@@ -46,7 +47,7 @@ class OrmModelTest extends PHPUnit_Extensions_Database_TestCase
 
     /**
      * Returns the test dataset.
-     * @return PHPUnit_Extensions_Database_DataSet_IDataSet
+     * @return \PHPUnit\DbUnit\DataSet\XmlDataSet
      */
     protected function getDataSet()
     {

@@ -4,7 +4,7 @@ use T4\Html\Elements\Textarea;
 
 require_once realpath(__DIR__ . '/../../../framework/boot.php');
 
-class HtmlTextareaTest extends PHPUnit_Framework_TestCase
+class HtmlTextareaTest extends \PHPUnit\Framework\TestCase
 {
 
     public function testRender()

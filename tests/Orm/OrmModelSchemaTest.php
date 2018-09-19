@@ -54,7 +54,7 @@ class BookTestModel4 extends \T4\Orm\Model
     protected static $extensions = ['test'];
 }
 
-class OrmModelSchemaTest extends PHPUnit_Framework_TestCase
+class OrmModelSchemaTest extends \PHPUnit\Framework\TestCase
 {
 
     public function testSchema()

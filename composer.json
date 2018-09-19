@@ -10,15 +10,17 @@
   "minimum-stability": "dev",
   "prefer-stable": true,
   "require": {
-    "php": ">=7.0.0",
+    "php": ">=7.1.0",
     "twig/twig": "1.*",
     "phpmailer/phpmailer": "5.*",
-    "psr/log": "1.*"
+    "psr/log": "1.*",
+    "ext-pdo": "*",
+    "ext-memcached": "*"
   },
   "require-dev": {
     "phing/phing": "2.*",
-    "phpunit/phpunit": "3.7.*",
-    "phpunit/dbunit": "1.3.*"
+    "phpunit/phpunit": "7.*",
+    "phpunit/dbunit": "4.*"
   },
   "autoload": {
     "psr-4": {

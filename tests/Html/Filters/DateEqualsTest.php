@@ -16,7 +16,7 @@ class DateEqualsTestTestConnection extends Connection {
     }
 }
 
-class DateEqualsTest extends \PHPUnit_Framework_TestCase
+class DateEqualsTest extends \PHPUnit\Framework\TestCase
 {
 
     public function testModifyQuery()

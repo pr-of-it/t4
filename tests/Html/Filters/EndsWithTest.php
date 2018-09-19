@@ -15,7 +15,7 @@ class EndsWithTestTestConnection extends Connection {
 
 require_once realpath(__DIR__ . '/../../../framework/boot.php');
 
-class EndsWithTest extends \PHPUnit_Framework_TestCase
+class EndsWithTest extends \PHPUnit\Framework\TestCase
 {
 
     public function testModifyQuery()

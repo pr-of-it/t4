@@ -18,7 +18,7 @@ namespace {
 
     use T4\Console\Request;
 
-    class ApplicationTest extends PHPUnit_Framework_TestCase
+    class ApplicationTest extends \PHPUnit\Framework\TestCase
     {
 
         public function testParseRequest()

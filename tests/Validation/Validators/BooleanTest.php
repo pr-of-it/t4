@@ -8,7 +8,7 @@ use T4\Validation\Validators\Boolean;
 
 require_once realpath(__DIR__ . '/../../../framework/boot.php');
 
-class BooleanTest extends \PHPUnit_Framework_TestCase
+class BooleanTest extends \PHPUnit\Framework\TestCase
 {
 
     public function testPositive()
