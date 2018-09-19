@@ -22,6 +22,7 @@ class PagerTest extends \PHPUnit\Framework\TestCase
         $link = $getLink->invokeArgs($pager, ['page' => 3]);
         $this->assertEquals('http://example.com/test.html?foo=1&bar%5Bbaz%5D=2&page=3', $link);
 
+        $oldServerArray = $_SERVER;
         $_SERVER = [
             'SERVER_PORT'  => '80',
             'HTTP_HOST'    => 'example.com',
@@ -35,6 +36,7 @@ class PagerTest extends \PHPUnit\Framework\TestCase
         Application::instance()->request->url->query = new QueryString();
         $pager = new Pager(['total' => 7]);
         $link = $getLink->invokeArgs($pager, ['page' => 3]);
+        $_SERVER = $oldServerArray;
         $this->assertEquals('http://example.com/test.html?page=3', $link);
     }
 

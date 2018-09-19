@@ -2,13 +2,13 @@
 
 require_once realpath(__DIR__ . '/../../framework/boot.php');
 
-class MemcacheTest extends \PHPUnit\Framework\TestCase
+class MemcachedTest extends \PHPUnit\Framework\TestCase
 {
 
-    public function testCache()
+    public function testCache(): void
     {
         $config = new \T4\Core\Config(['host' => 'localhost']);
-        $cache = new \T4\Cache\Memcache($config);
+        $cache = new \T4\Cache\Memcached($config);
 
         $key = 'Test';
         $time = 1;
@@ -34,7 +34,5 @@ class MemcacheTest extends \PHPUnit\Framework\TestCase
             'Мир, труд, май!',
             $cache($key, $src2, $time)
         );
-
     }
-
 }

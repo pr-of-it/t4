@@ -73,7 +73,7 @@ class RouterLambdaTest extends \PHPUnit\Framework\TestCase
         );
         $url = '/items/45.html';
         $this->assertEquals(
-            new \T4\Mvc\Route(['module' => 'Shop', 'controller' => 'Items', 'action' => 'View', 'format' => 'json']),
+            new \T4\Mvc\Route(['module' => 'Shop', 'controller' => 'Items', 'action' => 'View', 'format' => 'json', 'params' => []]),
             $reflector->invoke($router, $url)
         );
     }
