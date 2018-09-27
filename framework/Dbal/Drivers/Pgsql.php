@@ -134,6 +134,8 @@ class Pgsql
         $ddl = 'INDEX ' . (!empty($name) ? $this->quoteName($name) . ' ' : '') . 'ON ' . $this->quoteName($tableName);
         if ('unique' == $options['type']) {
             $ddl = 'UNIQUE ' . $ddl;
+        } elseif ('primary' == $options['type']) {
+            $ddl = 'PRIMARY ' . $ddl;
         }
 
         $driver = $this;
@@ -196,6 +198,9 @@ class Pgsql
             }
             $indexesDDL[] = 'CREATE ' . $this->createIndexDDL($tableName, $name, $options);
             $columnsUsed[] = $options['columns'];
+            if (isset($options['type']) && 'primary' == $options['type']) {
+                $hasPK = true;
+            }
         }
 
         if (!$hasPK) {
