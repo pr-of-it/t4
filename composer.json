@@ -14,8 +14,7 @@
     "twig/twig": "1.*",
     "phpmailer/phpmailer": "5.*",
     "psr/log": "1.*",
-    "ext-pdo": "*",
-    "ext-memcached": "*"
+    "ext-pdo": "*"
   },
   "require-dev": {
     "phing/phing": "2.*",
