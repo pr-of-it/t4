@@ -282,6 +282,26 @@ class Router
             }
         }
 
+        if ($app->existsController(null, implode('\\', $urlParts))) {
+            return new Route([
+                'module' => '',
+                'controller' => implode('\\', array_map('ucfirst', $urlParts)),
+                'action' => self::DEFAULT_ACTION,
+                'params' => [],
+                'format' => $url->extension ?: 'html',
+            ]);
+        }
+
+        if ($app->existsController(null, implode('\\', array_slice($urlParts, 0, -1)))) {
+            return new Route([
+                'module' => '',
+                'controller' => implode('\\', array_map('ucfirst', array_slice($urlParts, 0, -1))),
+                'action' => ucfirst(array_pop($urlParts)),
+                'params' => [],
+                'format' => $url->extension ?: 'html',
+            ]);
+        }
+
         throw new RouterException('Route to path \'' . $url->basepath . '\' is not found');
     }
 
