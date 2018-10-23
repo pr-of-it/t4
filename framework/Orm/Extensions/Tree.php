@@ -356,6 +356,7 @@ class Tree
 
     public function beforeSave(Model &$model)
     {
+
         if ($model->isNew()) {
             if (empty($model->parent)) {
                 $this->insertModelAsLastRoot($model);
