@@ -367,6 +367,19 @@ class Tree
             /** @var \T4\Orm\Model $class */
             $class = get_class($model);
             $oldParent = empty($model->__prt) ? null : $class::findByPk($model->__prt);
+            /** @var \T4\Dbal\Connection $connection */
+            $connection = $class::getDbConnection();
+
+            $query = (new Query())
+                ->select('count(*)')
+                ->from($class::getTableName())
+                ->where('__id=:id AND __lft<:lft AND __rgt>:rgt')
+                ->params([':id' => $model->parent->getPk(), ':lft'=>$model->__lft, ':rgt'=>$model->__rgt]);
+
+            if ($connection->query($query)->fetchScalar() > 0) {
+                throw new Exception('Parent must not be in children!');
+            }
+
             if ($oldParent != $model->parent) {
                 $model->refreshTreeColumns();
                 if (empty($model->parent)) {
