@@ -367,10 +367,8 @@ class Tree
             /** @var \T4\Orm\Model $class */
             $class = get_class($model);
             $oldParent = empty($model->__prt) ? null : $class::findByPk($model->__prt);
-
             if ($oldParent != $model->parent) {
                 $model->refreshTreeColumns();
-
                 if (empty($model->parent)) {
                     $this->insertModelAsLastRoot($model);
                 } else {
