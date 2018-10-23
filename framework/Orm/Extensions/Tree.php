@@ -371,7 +371,9 @@ class Tree
             if ($oldParent != $model->parent) {
                 $model->refreshTreeColumns();
 
-                if (!empty($model->parent)) {
+                if (empty($model->parent)) {
+                    $this->insertModelAsLastRoot($model);
+                } else {
                     /** @var \T4\Dbal\Connection $connection */
                     $connection = $class::getDbConnection();
                     $query = new Query();
@@ -384,11 +386,7 @@ class Tree
                     if ($connection->query($query)->fetchScalar() > 0) {
                         throw new Exception('Parent must not be in children!');
                     }
-                }
 
-                if (empty($model->parent)) {
-                    $this->insertModelAsLastRoot($model);
-                } else {
                     $this->insertModelAsLastChildOf($model, $model->parent);
                 }
             }
