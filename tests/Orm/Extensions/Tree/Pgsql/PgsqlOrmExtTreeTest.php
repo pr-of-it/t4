@@ -152,6 +152,19 @@ class PgsqlOrmExtTreeTest extends \PHPUnit\DbUnit\TestCase
             $this->_testDbElement($comment44->getPk(),  10, 11, 1, $comment4->getPk());
         $this->_testDbElement($comment22->getPk(),  13, 16, 0, 0);
             $this->_testDbElement($comment222->getPk(), 14, 15, 1, $comment22->getPk());
+
+        $comment1->parent = $comment3;
+        $this->expectException(\T4\Orm\Exception::class);
+        $comment1->save();
+
+        $this->_testDbElement($comment1->getPk(),   1, 6, 0, 0);
+        $this->_testDbElement($comment11->getPk(),  2, 3, 1, $comment1->getPk());
+        $this->_testDbElement($comment3->getPk(),   4, 5, 1, $comment1->getPk());
+        $this->_testDbElement($comment2->getPk(),   7, 8, 0, 0);
+        $this->_testDbElement($comment4->getPk(),   9, 12, 0, 0);
+        $this->_testDbElement($comment44->getPk(),  10, 11, 1, $comment4->getPk());
+        $this->_testDbElement($comment22->getPk(),  13, 16, 0, 0);
+        $this->_testDbElement($comment222->getPk(), 14, 15, 1, $comment22->getPk());
     }
 
     public function testMoveBefore()
