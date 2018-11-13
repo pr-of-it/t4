@@ -10,6 +10,6 @@ use T4\Mvc\Application as MvcApplication;
  * Возвращает экземпляр приложения
  * @return IApplication
  */
-function app() {
+function app(): IApplication {
     return 0 === strpos(PHP_SAPI, 'cli') ? CliApplication::instance() : MvcApplication::instance();
 }
