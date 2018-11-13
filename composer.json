@@ -26,7 +26,8 @@
       "T4\\": "framework/"
     },
     "files": [
-      "framework/boot.php"
+      "framework/boot.php",
+      "framework/app.php"
     ]
   }
 }
