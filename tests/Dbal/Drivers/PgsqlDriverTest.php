@@ -115,15 +115,15 @@ class PgsqlDriverTest extends \PHPUnit\Framework\TestCase {
         $reflector->setAccessible(true);
 
         $this->assertEquals(
-            'INDEX ON "foo" ("bar")',
+            'CREATE INDEX ON "foo" ("bar")',
             $reflector->invokeArgs($driver, ['foo', '', ['columns' => ['bar']]])
         );
         $this->assertEquals(
-            'UNIQUE INDEX ON "foo" ("bar", "baz")',
+            'CREATE UNIQUE INDEX ON "foo" ("bar", "baz")',
             $reflector->invokeArgs($driver, ['foo', '', ['type'=>'unique', 'columns' => ['bar', 'baz']]])
         );
         $this->assertEquals(
-            'UNIQUE INDEX "test" ON "foo" ("bar", "baz") WHERE id>123',
+            'CREATE UNIQUE INDEX "test" ON "foo" ("bar", "baz") WHERE id>123',
             $reflector->invokeArgs($driver, ['foo', 'test', ['type'=>'unique', 'columns' => ['bar', 'baz'], 'where' => 'id>123']])
         );
     }
