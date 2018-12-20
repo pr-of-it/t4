@@ -14,6 +14,23 @@ trait TRelations
 {
 
     /**
+     * @param $key
+     * @return bool
+     * @throws Exception
+     */
+    public function isRelationLoaded($key)
+    {
+        /** @var \T4\Orm\Model $class */
+        $class = \get_class($this);
+        $relations = $class::getRelations();
+        if (empty($relations[$key])) {
+            throw new Exception('No such column or relation: ' . $key . ' in model of ' . $class . ' class');
+        }
+
+        return array_key_exists($key, (array)$this);
+    }
+
+    /**
      * @return array
      */
     public static function getRelations()
