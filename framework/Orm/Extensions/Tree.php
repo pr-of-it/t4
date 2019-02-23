@@ -372,6 +372,19 @@ class Tree
                 if (empty($model->parent)) {
                     $this->insertModelAsLastRoot($model);
                 } else {
+                    /** @var \T4\Dbal\Connection $connection */
+                    $connection = $class::getDbConnection();
+                    $query = new Query();
+                    $query
+                        ->select('count(*)')
+                        ->from($class::getTableName())
+                        ->where('__id=:id AND __lft>:lft AND __rgt<:rgt')
+                        ->params([':id' => $model->parent->getPk(), ':lft'=>$model->__lft, ':rgt'=>$model->__rgt]);
+
+                    if ($connection->query($query)->fetchScalar() > 0) {
+                        throw new Exception('Parent must not be in children!');
+                    }
+
                     $this->insertModelAsLastChildOf($model, $model->parent);
                 }
             }
