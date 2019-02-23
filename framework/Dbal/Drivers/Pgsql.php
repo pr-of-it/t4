@@ -294,7 +294,7 @@ class Pgsql
     public function addIndex(Connection $connection, $tableName, array $indexes)
     {
         foreach ($indexes as $name => $options) {
-            $ddl = 'CREATE ' . $this->createIndexDDL($tableName, is_numeric($name) ? '' : $name, $options);
+            $ddl = $this->createIndexDDL($tableName, is_numeric($name) ? '' : $name, $options);
             $connection->execute($ddl);
         }
     }
