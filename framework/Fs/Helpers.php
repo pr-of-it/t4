@@ -187,12 +187,12 @@ class Helpers
     {
         clearstatcache();
         return max(
-            array_map(
+            max(array_map(
                 function ($f) {
                     return filemtime($f);
                 },
                 self::listDirRecursive($path)
-            ),
+            )),
             filemtime($path)
         );
     }
