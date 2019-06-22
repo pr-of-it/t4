@@ -59,6 +59,9 @@ class Pgsql
             case 'link':
                 $ddl = 'BIGINT';
                 break;
+            case 'link-not-null':
+                $ddl = 'BIGINT NOT NULL';
+                break;
             case 'serial':
                 $ddl = 'SERIAL';
                 break;
@@ -119,6 +122,9 @@ class Pgsql
 
         if (isset($options['default'])) {
             $default = 'ALTER TABLE ' . $this->quoteName($table) . ' ALTER COLUMN ' . $name . ' SET DEFAULT \'' . $options['default'] . '\'';
+            return [$name . ' ' . $ddl, $default];
+        } elseif (true === $options['not-null']) {
+            $default = 'ALTER TABLE ' . $this->quoteName($table) . ' ALTER COLUMN ' . $name . ' SET NOT NULL';
             return [$name . ' ' . $ddl, $default];
         }
 
