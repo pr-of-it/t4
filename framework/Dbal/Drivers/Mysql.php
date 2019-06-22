@@ -60,6 +60,9 @@ class Mysql
             case 'link':
                 $ddl = 'BIGINT UNSIGNED NULL DEFAULT NULL';
                 break;
+            case 'link-not-null':
+                $ddl = 'BIGINT UNSIGNED NOT NULL';
+                break;
             case 'serial':
                 $ddl = 'SERIAL';
                 break;
@@ -136,9 +139,11 @@ class Mysql
                 $ddl = $options['type'];
                 break;
         }
-
+    
         if(isset($options['default'])) {
-            $ddl .= ' ' . 'NOT NULL DEFAULT' . ' \'' . $options['default'] .'\'';
+            $ddl .= ' ' . 'DEFAULT' . ' \'' . $options['default'] .'\'';
+        } elseif (true === $options['not-null']) {
+            $ddl .= ' ' . 'NOT NULL';
         }
 
         return $name . ' ' . $ddl;
