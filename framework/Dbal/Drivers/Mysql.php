@@ -138,8 +138,8 @@ class Mysql
         }
     
         if(isset($options['default'])) {
-            $ddl .= ' ' . 'DEFAULT' . ' \'' . $options['default'] .'\'';
-        } elseif (true === $options['not-null']) {
+            $ddl .= ' ' . 'NOT NULL DEFAULT' . ' \'' . $options['default'] .'\'';
+        } elseif (isset($options['null']) && false === $options['null']) {
             $ddl .= ' ' . 'NOT NULL';
         }
 
