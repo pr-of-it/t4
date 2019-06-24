@@ -39,7 +39,7 @@ class MysqlDriverTest extends \PHPUnit\Framework\TestCase {
             $reflector->invokeArgs($driver, ['foo', ['type' => 'pk']])
         );
         $this->assertEquals(
-            '`foo` BIGINT UNSIGNED NULL DEFAULT NULL',
+            '`foo` BIGINT UNSIGNED',
             $reflector->invokeArgs($driver, ['foo', ['type' => 'relation']])
         );
         $this->assertEquals(
@@ -93,6 +93,14 @@ class MysqlDriverTest extends \PHPUnit\Framework\TestCase {
             $reflector->invokeArgs($driver, ['foo', ['type' => 'datetime']])
         );
         $this->assertEquals(
+            '`foo` DATETIME NOT NULL',
+            $reflector->invokeArgs($driver, ['foo', ['type' => 'datetime', 'null' => false]])
+        );
+        $this->assertEquals(
+            '`foo` DATETIME',
+            $reflector->invokeArgs($driver, ['foo', ['type' => 'datetime', 'null' => true]])
+        );
+        $this->assertEquals(
             '`foo` DATE',
             $reflector->invokeArgs($driver, ['foo', ['type' => 'date']])
         );
@@ -127,6 +135,22 @@ class MysqlDriverTest extends \PHPUnit\Framework\TestCase {
         $this->assertEquals(
             '`foo` LONGTEXT',
             $reflector->invokeArgs($driver, ['foo', ['type' => 'jsonb']])
+        );
+        $this->assertEquals(
+            '`foo` BIGINT UNSIGNED NOT NULL',
+            $reflector->invokeArgs($driver, ['foo', ['type' => 'link', 'null' => false]])
+        );
+        $this->assertEquals(
+            '`foo` BIGINT UNSIGNED',
+            $reflector->invokeArgs($driver, ['foo', ['type' => 'link', 'null' => true]])
+        );
+        $this->assertEquals(
+            '`foo` BIGINT UNSIGNED NOT NULL DEFAULT \'1\'',
+            $reflector->invokeArgs($driver, ['foo', ['type' => 'link', 'null' => true, 'default' => 1]])
+        );
+        $this->assertEquals(
+            '`foo` BIGINT UNSIGNED NOT NULL DEFAULT \'1\'',
+            $reflector->invokeArgs($driver, ['foo', ['type' => 'link', 'null' => false, 'default' => 1]])
         );
     }
 
