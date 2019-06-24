@@ -55,8 +55,16 @@ class PgsqlDriverTest extends \PHPUnit\Framework\TestCase {
             $reflector->invokeArgs($driver, ['table', 'foo', ['type' => 'relation', 'null' => false]])
         );
         $this->assertEquals(
+            '"foo" BIGINT NOT NULL DEFAULT \'123\'',
+            $reflector->invokeArgs($driver, ['table', 'foo', ['type' => 'relation', 'null' => false, 'default' => '123']])
+        );
+        $this->assertEquals(
             '"foo" BIGINT',
             $reflector->invokeArgs($driver, ['table', 'foo', ['type' => 'relation', 'null' => true]])
+        );
+        $this->assertEquals(
+            '"foo" BIGINT DEFAULT \'123\'',
+            $reflector->invokeArgs($driver, ['table', 'foo', ['type' => 'relation', 'null' => true, 'default' => '123']])
         );
         $this->assertEquals(
             '"foo" SERIAL',
