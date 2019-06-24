@@ -43,6 +43,22 @@ class MysqlDriverTest extends \PHPUnit\Framework\TestCase {
             $reflector->invokeArgs($driver, ['foo', ['type' => 'relation']])
         );
         $this->assertEquals(
+            '`foo` BIGINT UNSIGNED NOT NULL',
+            $reflector->invokeArgs($driver, ['foo', ['type' => 'relation', 'null' => false]])
+        );
+        $this->assertEquals(
+            '`foo` BIGINT UNSIGNED',
+            $reflector->invokeArgs($driver, ['foo', ['type' => 'relation', 'null' => true]])
+        );
+        $this->assertEquals(
+            '`foo` BIGINT UNSIGNED NOT NULL DEFAULT \'1\'',
+            $reflector->invokeArgs($driver, ['foo', ['type' => 'relation', 'null' => true, 'default' => 1]])
+        );
+        $this->assertEquals(
+            '`foo` BIGINT UNSIGNED NOT NULL DEFAULT \'1\'',
+            $reflector->invokeArgs($driver, ['foo', ['type' => 'relation', 'null' => false, 'default' => 1]])
+        );
+        $this->assertEquals(
             '`foo` SERIAL',
             $reflector->invokeArgs($driver, ['foo', ['type' => 'serial']])
         );
@@ -135,22 +151,6 @@ class MysqlDriverTest extends \PHPUnit\Framework\TestCase {
         $this->assertEquals(
             '`foo` LONGTEXT',
             $reflector->invokeArgs($driver, ['foo', ['type' => 'jsonb']])
-        );
-        $this->assertEquals(
-            '`foo` BIGINT UNSIGNED NOT NULL',
-            $reflector->invokeArgs($driver, ['foo', ['type' => 'link', 'null' => false]])
-        );
-        $this->assertEquals(
-            '`foo` BIGINT UNSIGNED',
-            $reflector->invokeArgs($driver, ['foo', ['type' => 'link', 'null' => true]])
-        );
-        $this->assertEquals(
-            '`foo` BIGINT UNSIGNED NOT NULL DEFAULT \'1\'',
-            $reflector->invokeArgs($driver, ['foo', ['type' => 'link', 'null' => true, 'default' => 1]])
-        );
-        $this->assertEquals(
-            '`foo` BIGINT UNSIGNED NOT NULL DEFAULT \'1\'',
-            $reflector->invokeArgs($driver, ['foo', ['type' => 'link', 'null' => false, 'default' => 1]])
         );
     }
 
