@@ -215,7 +215,7 @@ class MysqlDriverTest extends \PHPUnit\Framework\TestCase {
         $this->assertEquals(
             'CREATE TABLE `foo`' . "\n" . '(' . "\n" .
             '`__id` SERIAL,' . "\n" .
-            '`lnk` BIGINT UNSIGNED NULL DEFAULT NULL,' . "\n" .
+            '`lnk` BIGINT UNSIGNED,' . "\n" .
             '`foo` INT,' . "\n" .
             '`bar` VARCHAR(255),' . "\n" .
             'PRIMARY KEY (`__id`),' . "\n" .
