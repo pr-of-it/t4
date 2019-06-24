@@ -116,10 +116,13 @@ class Pgsql
                 $ddl = $options['type'];
                 break;
         }
-
-        if (isset($options['default'])) {
-            $default = 'ALTER TABLE ' . $this->quoteName($table) . ' ALTER COLUMN ' . $name . ' SET DEFAULT \'' . $options['default'] . '\'';
-            return [$name . ' ' . $ddl, $default];
+    
+        if (isset($options['null']) && false === $options['null']) {
+            $ddl .= ' ' . 'NOT NULL';
+        }
+    
+        if(isset($options['default'])) {
+            $ddl .= ' ' . 'DEFAULT' . ' \'' . $options['default'] .'\'';
         }
 
         return $name . ' ' . $ddl;

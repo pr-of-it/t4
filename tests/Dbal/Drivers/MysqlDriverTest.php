@@ -39,8 +39,24 @@ class MysqlDriverTest extends \PHPUnit\Framework\TestCase {
             $reflector->invokeArgs($driver, ['foo', ['type' => 'pk']])
         );
         $this->assertEquals(
-            '`foo` BIGINT UNSIGNED NULL DEFAULT NULL',
+            '`foo` BIGINT UNSIGNED',
             $reflector->invokeArgs($driver, ['foo', ['type' => 'relation']])
+        );
+        $this->assertEquals(
+            '`foo` BIGINT UNSIGNED NOT NULL',
+            $reflector->invokeArgs($driver, ['foo', ['type' => 'relation', 'null' => false]])
+        );
+        $this->assertEquals(
+            '`foo` BIGINT UNSIGNED',
+            $reflector->invokeArgs($driver, ['foo', ['type' => 'relation', 'null' => true]])
+        );
+        $this->assertEquals(
+            '`foo` BIGINT UNSIGNED DEFAULT \'1\'',
+            $reflector->invokeArgs($driver, ['foo', ['type' => 'relation', 'null' => true, 'default' => 1]])
+        );
+        $this->assertEquals(
+            '`foo` BIGINT UNSIGNED NOT NULL DEFAULT \'1\'',
+            $reflector->invokeArgs($driver, ['foo', ['type' => 'relation', 'null' => false, 'default' => 1]])
         );
         $this->assertEquals(
             '`foo` SERIAL',
@@ -51,8 +67,12 @@ class MysqlDriverTest extends \PHPUnit\Framework\TestCase {
             $reflector->invokeArgs($driver, ['foo', ['type' => 'boolean']])
         );
         $this->assertEquals(
-            '`foo` INT NOT NULL DEFAULT \'123\'',
+            '`foo` INT DEFAULT \'123\'',
             $reflector->invokeArgs($driver, ['foo', ['type' => 'int', 'default' => '123']])
+        );
+        $this->assertEquals(
+            '`foo` INT NOT NULL DEFAULT \'123\'',
+            $reflector->invokeArgs($driver, ['foo', ['type' => 'int', 'default' => '123', 'null' => false]])
         );
         $this->assertEquals(
             '`foo` INT',
@@ -66,9 +86,12 @@ class MysqlDriverTest extends \PHPUnit\Framework\TestCase {
             '`foo` FLOAT',
             $reflector->invokeArgs($driver, ['foo', ['type' => 'float']])
         );
-
         $this->assertEquals(
             '`foo` TEXT NOT NULL DEFAULT \'123\'',
+            $reflector->invokeArgs($driver, ['foo', ['type' => 'text', 'default' => '123', 'null' => false]])
+        );
+        $this->assertEquals(
+            '`foo` TEXT DEFAULT \'123\'',
             $reflector->invokeArgs($driver, ['foo', ['type' => 'text', 'default' => '123']])
         );
         $this->assertEquals(
@@ -91,6 +114,14 @@ class MysqlDriverTest extends \PHPUnit\Framework\TestCase {
         $this->assertEquals(
             '`foo` DATETIME',
             $reflector->invokeArgs($driver, ['foo', ['type' => 'datetime']])
+        );
+        $this->assertEquals(
+            '`foo` DATETIME NOT NULL',
+            $reflector->invokeArgs($driver, ['foo', ['type' => 'datetime', 'null' => false]])
+        );
+        $this->assertEquals(
+            '`foo` DATETIME',
+            $reflector->invokeArgs($driver, ['foo', ['type' => 'datetime', 'null' => true]])
         );
         $this->assertEquals(
             '`foo` DATE',
