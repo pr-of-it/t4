@@ -60,9 +60,6 @@ class Mysql
             case 'link':
                 $ddl = 'BIGINT UNSIGNED NULL DEFAULT NULL';
                 break;
-            case 'link-not-null':
-                $ddl = 'BIGINT UNSIGNED NOT NULL';
-                break;
             case 'serial':
                 $ddl = 'SERIAL';
                 break;

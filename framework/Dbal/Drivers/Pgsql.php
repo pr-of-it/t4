@@ -59,9 +59,6 @@ class Pgsql
             case 'link':
                 $ddl = 'BIGINT';
                 break;
-            case 'link-not-null':
-                $ddl = 'BIGINT NOT NULL';
-                break;
             case 'serial':
                 $ddl = 'SERIAL';
                 break;
