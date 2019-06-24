@@ -137,10 +137,12 @@ class Mysql
                 break;
         }
     
-        if(isset($options['default'])) {
-            $ddl .= ' ' . 'NOT NULL DEFAULT' . ' \'' . $options['default'] .'\'';
-        } elseif (isset($options['null']) && false === $options['null']) {
+        if (isset($options['null']) && false === $options['null']) {
             $ddl .= ' ' . 'NOT NULL';
+        }
+        
+        if(isset($options['default'])) {
+            $ddl .= ' ' . 'DEFAULT' . ' \'' . $options['default'] .'\'';
         }
 
         return $name . ' ' . $ddl;
