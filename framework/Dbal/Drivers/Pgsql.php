@@ -459,11 +459,13 @@ class Pgsql
         if ($query instanceof QueryBuilder) {
             $params = $query->getParams();
             $query = clone $query;
+            $query->order = null;
             $query = $query->select('COUNT(*)')->getQuery($this);
         }
         if ($query instanceof Query) {
             $params = array_merge($params, $query->params);
             $query = clone $query;
+            $query->order = null;
             $query->select('COUNT(*)');
             $query = $this->makeQueryString($query);
         }
@@ -486,6 +488,7 @@ class Pgsql
         $query
             ->select('COUNT(*)')
             ->from($class::getTableName());
+        $query->order = null;
         return (int)$class::getDbConnection()->query($query)->fetchScalar();
     }
 
@@ -509,6 +512,7 @@ class Pgsql
             ->from($class::getTableName())
             ->where($this->quoteName($column) . '=:columnvalue' . (!empty($query->where) ? ' AND (' . $query->where . ')' : ''))
             ->param(':columnvalue', $value);
+        $query->order = null;
         return (int)$class::getDbConnection()->query($query)->fetchScalar();
     }
 
