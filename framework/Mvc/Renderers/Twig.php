@@ -18,7 +18,7 @@ class Twig
 
     public function __construct($paths = [])
     {
-        $this->paths = (array)$paths;
+        $this->paths = array_filter((array)$paths, function ($path) {return file_exists($path) && is_dir($path);});
         $this->links = new Std;
 
         $this->links->app = Application::instance();

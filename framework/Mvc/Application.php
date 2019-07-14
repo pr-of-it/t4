@@ -170,7 +170,7 @@ class Application
 
         $controller = new $controllerClass;
 
-        $view = new View('twig', $controller->getTemplatePaths());
+        $view = new View('twig', array_filter($controller->getTemplatePaths(), function ($path) {return file_exists($path) && is_dir($path);}));
         $controller->view = $view;
         $view->setController($controller);
 
