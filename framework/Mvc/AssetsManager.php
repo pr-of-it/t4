@@ -21,10 +21,10 @@ class AssetsManager
     use TSingleton;
 
     /**
-     * Список ресурсов, опубликованных при текущем запуске приложения
+     * Список папок с ресурсами, опубликованных при текущем запуске приложения
      * @var array
      */
-    protected $assets = [];
+    protected $publishedAssetDirs = [];
 
     /**
      * URLs опубликованных файлов стилей
@@ -38,6 +38,39 @@ class AssetsManager
     protected $publishedJs = [];
 
     /**
+     * В случае, если мы опубликовали папку с ресурсами, сохраним информацию об этом
+     * На случай, если придет запрос на публикацию вложенной папки или файла - мы сможем сразу вычислить их URL
+     * @param string $path
+     * @param string $url
+     */
+    protected function addAssetsDirToPublished(string $path, string $url)
+    {
+        $asset = &$this->publishedAssetDirs[];
+        $asset['path'] = $path;
+        $asset['url']  = $url;
+    }
+
+    /**
+     * Проверяем, не находится ли указанный ресурс в уже ранее опубликованной папке с ресурсами?
+     * Если да - сразу возвращаем его URL
+     * Если нет - возвращается false
+     *
+     * @param string $path
+     * @return false|string
+     */
+    protected function isInsidePublishedAssetsDir(string $path)
+    {
+        $url = false;
+        foreach ($this->publishedAssetDirs as $asset) {
+            if (0 === strpos($path, $asset['path'])) {
+                $url = str_replace(DS, '/', str_replace($asset['path'], $asset['url'], $path));
+                break;
+            }
+        }
+        return $url;
+    }
+
+    /**
      * Публикует ресурс (файл или директорию)
      * Возвращает публичный URL ресурса
      * @param string $path
@@ -48,15 +81,11 @@ class AssetsManager
         // Получаем абсолютный путь в ФС до ресурса и узнаем тип ресурса
         $realPath = $this->getRealPath($path);
 
-        // TODO: смущает меня этот кусок, если честно. Надо внимательно его перепроверить.
-        foreach ($this->assets as $asset) {
-            if (false !== strpos($realPath, $asset['path'])) {
-                return str_replace(DS, '/', str_replace($asset['path'], $asset['url'], $realPath));
-            }
+        if (false !== ($url = $this->isInsidePublishedAssetsDir($realPath))) {
+            return $url;
         }
 
         $type = is_dir($realPath) ? 'dir' : 'file';
-
 
         // Получаем время последней модификации ресурса
         // и, заодно, путь до него и до возможной публикации
@@ -105,12 +134,12 @@ class AssetsManager
 
         }
 
-        $asset = &$this->assets[];
-        $asset['path'] = $realPath;
-        $asset['url'] = str_replace(DS, '/', str_replace($baseRealPath, $assetBaseUrl, $realPath));
+        $url = str_replace(DS, '/', str_replace($baseRealPath, $assetBaseUrl, $realPath));
+        if ('dir' == $type) {
+            $this->addAssetsDirToPublished($realPath, $url);
+        }
 
-        return $asset['url'];
-
+        return $url;
     }
 
     /*
@@ -193,7 +222,8 @@ class AssetsManager
     }
 
     /**
-     * TODO: заменить на Helpers::getRealPath()
+     * @todo заменить на Helpers::getRealPath()
+     *
      * Получает абсолютный путь из условной записи пути до ресурса
      * Обрабатывает две возможности:
      * 1. Путь к ресурсу начинается с // - путь указан относительно корня фреймворка
@@ -205,19 +235,22 @@ class AssetsManager
      */
     protected function getRealPath($path)
     {
-        if (0 === strpos($path, '//')) {
+        /* starts with // not /// */
+        if (0 === strpos($path, '//') && 0 !== strpos($path, '///')) {
             $realPath = \T4\ROOT_PATH . DS . substr($path, 2);
-        } elseif (0 === strpos($path, '/')) {
+        /* starts with / not // */
+        } elseif (0 === strpos($path, '/') && 0 !== strpos($path, '//')) {
             $realPath = ROOT_PATH_PROTECTED . DS . substr($path, 1);
         } else {
-            throw new Exception('Path \'' . $path . '\' for asset is invalid');
+            throw new Exception("Path '" . $path . "' for asset is invalid");
         }
+
         $realPath = realpath($realPath);
-        if (false === $realPath)
-            throw new Exception('Path \'' . $path . '\' for asset is not found');
+        if (false === $realPath) {
+            throw new Exception("Path '" . $path . "' for asset is not found");
+        }
 
         return $realPath;
-
     }
 
 }
