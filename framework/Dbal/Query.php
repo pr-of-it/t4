@@ -98,15 +98,7 @@ class Query
     protected function trimName($s)
     {
         $trimmed = trim($s, " \"'`\t\n\r\0\x0B");
-        if (
-            false !== strpos($trimmed, ' ')
-            ||
-            false !== stripos($trimmed, 'as')
-            ||
-            false !== stripos($trimmed, 'asc')
-            ||
-            false !== stripos($trimmed, 'desc')
-        ) {
+        if (preg_match('/([ "]|asc?|desc)/', $trimmed)) {
             return $s;
         }
         $parts = explode('.', $trimmed);

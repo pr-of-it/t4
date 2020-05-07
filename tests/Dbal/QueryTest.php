@@ -51,6 +51,16 @@ class QueryTest extends \PHPUnit\Framework\TestCase
             ['foo AS f', '`bar` b'],
             $reflector->invokeArgs($query, [ ['foo AS f, `bar` b'] ])
         );
+
+        $this->assertEquals(
+            ['public.table'],
+            $reflector->invokeArgs($query, [ ['public.table'] ])
+        );
+
+        $this->assertEquals(
+            ['"public"."tableName"'],
+            $reflector->invokeArgs($query, [ ['"public"."tableName"'] ])
+        );
     }
 
     public function testColumns()
