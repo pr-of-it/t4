@@ -62,6 +62,9 @@ trait TRelations
                 $class = array_pop($class);
                 return '__' . strtolower($class) . '_id';
             case $class::MANY_TO_MANY:
+                if (!empty($relation['pivot'])) {
+                    return $relation['pivot'];
+                }
                 $thisTableName = $class::getTableName();
                 $thatTableName = $relation['model']::getTableName();
                 return $thisTableName < $thatTableName ? $thisTableName . '_to_' . $thatTableName : $thatTableName . '_to_' . $thisTableName;
